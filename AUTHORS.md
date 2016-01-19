@@ -2,7 +2,7 @@
 **Antoine Brouillette** [Portfolio](http://qc-leblond.github.io/)  
 **Marc-André Fortin-Leclerc** [Portfolio (WIP)](http://marcandrefl.github.io/)  
 **Laurier L. Lajoie** [Portfolio](http://www.laurierlajoie.com/)  
-**Alexis Lessard** [Portfolio](https://github.com/sprawls)  
+**Alexis Lessard** [Portfolio](https://sprawls.github.io)  
 **Anthony Makhlouf** [Portfolio](https://www.artstation.com/artist/mak31)  
 **Pierre-Luc Messier**  
 **Alex Rodrigue**  
