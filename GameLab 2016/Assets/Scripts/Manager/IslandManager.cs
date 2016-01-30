@@ -7,11 +7,6 @@ namespace Simoncouche.Islands {
 	/// Every Island data
 	/// </summary>
 	public class IslandManager : Manager<IslandManager> {
-		
-		/// <summary>
-		/// The Island data for every type of Island
-		/// </summary>
-		private List<IslandData> _islandData = new List<IslandData>();
 
 		/// <summary>
 		/// A list of every Island currently in play
@@ -27,11 +22,6 @@ namespace Simoncouche.Islands {
 
 		public override void Awake() {
 			base.Awake();
-			if (Instance == this) {
-				//Get Island Data from the editor pref
-				IslandCustomEditorWindow.RecalculateIslandData();
-				_islandData = IslandCustomEditorWindow._islandData;
-			}
 		}
 
 		/// <summary>
@@ -47,22 +37,19 @@ namespace Simoncouche.Islands {
 			if (a_IslandLink != null && b_IslandLink != null && a_IslandLink != b_IslandLink) {
 				List<IslandChunk> chunks = b_IslandLink.chunks;
 				foreach(IslandChunk chunk in chunks) {
-					IslandChunkData data = FindChunkInIslandData(chunk);
-					a_IslandLink.AddChunkToIsland(chunk, data.position, data.rotation);
+					a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
 				}
 				RemoveIsland(b_IslandLink);
 			} 
 
 			//If a is contained in a Island
 			else if (a_IslandLink != null) {
-				IslandChunkData data = FindChunkInIslandData(b);
-				a_IslandLink.AddChunkToIsland(b, data.position, data.rotation);
+				a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
 			} 
 			
 			//If b is contained in a Island
 			else if (b_IslandLink != null) {
-				IslandChunkData data = FindChunkInIslandData(a);
-				b_IslandLink.AddChunkToIsland(a, data.position, data.rotation);
+				b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
 			} 
 			
 			//If a & b are not contained in a Island
@@ -84,40 +71,15 @@ namespace Simoncouche.Islands {
 		}
 
 		/// <summary>
-		/// Find the chunk data related to the chunk
-		/// </summary>
-		/// <param name="chunk">The reference to the chunk</param>
-		/// <returns>The Island chunk data</returns>
-		private IslandChunkData FindChunkInIslandData(IslandChunk chunk) {
-			foreach (IslandData d_Island in _islandData) {
-				if (d_Island.color == chunk.color) {
-					foreach (IslandChunkData d_chunk in d_Island.chunks) {
-						if (d_chunk.chunkLetter == chunk.chunkLetter) {
-							return d_chunk;
-						}
-					}
-				}
-			}
-
-			Debug.LogError("The type of chunk used does not exist");
-			return null;
-		}
-
-		/// <summary>
 		/// Creates a Island at position a and adds a, b has it's child. Adds the new Island to the _Island list
 		/// </summary>
 		/// <param name="a">First chunk</param>
 		/// <param name="b">Second chunk</param>
 		private void CreateIsland(IslandChunk a, IslandChunk b) {
-			Debug.Log(a.transform.position + " " + b.transform.position + " " + FindMiddlePoint(a.transform.position, b.transform.position));
-			GameObject Island = Instantiate(_islandComponent, FindMiddlePoint(a.transform.position, b.transform.position), a.transform.rotation) as GameObject;
+			GameObject Island = Instantiate(_islandComponent, a.transform.position, a.transform.rotation) as GameObject;
 			Island.name = "Island";
 
-			IslandChunkData data = FindChunkInIslandData(a);
-			Island.GetComponent<Island>().AddChunkToIsland(a, data.position, data.rotation);
-
-			data = FindChunkInIslandData(b);
-			Island.GetComponent<Island>().AddChunkToIsland(b, data.position, data.rotation);
+			Island.GetComponent<Island>().AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
 
 			_island.Add(Island.GetComponent<Island>());
 		}
@@ -129,6 +91,20 @@ namespace Simoncouche.Islands {
 		private void RemoveIsland(Island Island) {
 			_island.Remove(Island);
 			Destroy(Island.gameObject);
+		}
+
+		/// <summary>
+		/// Get the point of merge between 2 island chunk
+		/// </summary>
+		/// <param name="a">The point to be merge to other island chunk</param>
+		/// <param name="b">Island that point a merges to</param>
+		/// <returns>The merge position</returns>
+		private Vector3 GetMergingPoint(Vector3 a, Vector3 b) {
+			/*RaycastHit hit;
+			Debug.DrawRay(a, b);
+			Physics.Raycast(a, b, out hit, Vector3.Distance(a, b));
+			return hit.point;*/
+			return FindMiddlePoint(a, b);
 		}
 
 		/// <summary>

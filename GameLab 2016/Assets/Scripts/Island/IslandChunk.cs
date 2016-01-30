@@ -5,7 +5,7 @@ namespace Simoncouche.Islands {
 	/// <summary>
 	/// The component attached to a Island chunk
 	/// </summary>
-	[RequireComponent(typeof(CircleCollider2D))]
+	[RequireComponent(typeof(PolygonCollider2D))]
 	public class IslandChunk : MonoBehaviour {
 
 		[Header("Island Property")]
@@ -26,7 +26,7 @@ namespace Simoncouche.Islands {
 			private set { }
 		}
 
-		/// <summary>
+		/*/// <summary>
 		/// Associated Chunk Letter
 		/// </summary>
 		[SerializeField]
@@ -40,22 +40,7 @@ namespace Simoncouche.Islands {
 				return _chunkLetter;
 			}
 			private set { }
-		}
-
-		/// <summary>
-		/// The radius of the circle collider
-		/// </summary>
-		[Header("Collider Property")]
-		[SerializeField]
-		[Tooltip("The radius of the circle collider")]
-		[Range(0.1f, 5f)]
-		private float _circleColliderRadius = 2;
-
-		void Awake() {
-			CircleCollider2D col = GetComponent<CircleCollider2D>();
-			col.radius = _circleColliderRadius;
-			col.isTrigger = true;
-		}
+		}*/
 
 		void OnTriggerEnter2D(Collider2D other) {
 			IslandChunk chunk = other.GetComponent<IslandChunk>();

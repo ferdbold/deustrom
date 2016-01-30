@@ -35,8 +35,8 @@ namespace Simoncouche.Islands {
 			if (!chunks.Contains(chunk)) {
 				chunk.transform.SetParent(transform);
 				chunks.Add(chunk);
-				chunk.transform.localPosition = pos;
-				chunk.transform.localRotation = Quaternion.Euler(rot);
+				/*chunk.transform.localPosition = pos;
+				chunk.transform.localRotation = Quaternion.Euler(rot);*/
 				ChangeVelocityWhenMerging(chunk);
 			}
 		}
