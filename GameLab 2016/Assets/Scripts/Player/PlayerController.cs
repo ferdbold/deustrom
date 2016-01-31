@@ -10,11 +10,15 @@ public class PlayerController : MonoBehaviour {
 	/// <summary>
 	/// Variable to adjust the jetpack speed
 	/// </summary>
+    ///
+    [Tooltip("Acceleration of the player in unit per second")]
 	public float jetpackAcceleration;
 
 	/// <summary>
 	/// Maximum velocity of the player
 	/// </summary>
+    /// 
+    [Tooltip("Maximum velocity of the player")]
 	public float maximumVelocity;
 	#endregion
 
@@ -98,8 +102,7 @@ public class PlayerController : MonoBehaviour {
 					0.0f,
 					0.0f), //Because of Orientation modification in Orientation modification
 					1.5f));
-			}
-			else {
+			}else {
 				StartCoroutine(SmoothSpriteFlip(new Vector3(0.0f
 					, 0.0f
 					, 0.0f)
@@ -136,8 +139,7 @@ public class PlayerController : MonoBehaviour {
 
 		if (Mathf.Abs(_leftAnalogHorizontal) > 0.0f) {
 			_isMovingHorizontal = true;
-		}
-		else{
+		}else{
 			_isMovingHorizontal = false;
 		}
 
@@ -159,7 +161,6 @@ public class PlayerController : MonoBehaviour {
 		if (_isMovingVertical) {
 			tempAcceleration.y += _leftAnalogVertical;
 		}
-		bool hasRotated = false;
 		
 
 		//Sprite Flip Condition
@@ -169,40 +170,30 @@ public class PlayerController : MonoBehaviour {
 			if (_isLookingRight && _leftAnalogHorizontal < 0.0f) {
 				_playerSpriteRenderer.flipY = true;
 				_isLookingRight = false;
-				//Debug.Log("eulerAngles avant: " + _playerSpriteRenderer.transform.eulerAngles);
-				hasRotated = true;
-			}
-			else if (!_isLookingRight && _leftAnalogHorizontal > 0.0f) {
+			}else if (!_isLookingRight && _leftAnalogHorizontal > 0.0f) {
 				_playerSpriteRenderer.flipY = false;
 				_isLookingRight = true;
-				hasRotated = true;
 			}
 		}
-		
-
-		//Orientation modification
-		if (_isMovingHorizontal || _isMovingVertical) {
-			float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
-			Vector3 tempRotation = transform.rotation.eulerAngles;
-			tempRotation.z = angle;
-			if (_leftAnalogHorizontal < 0.0f) {
-				tempRotation.z -= 180.0f;
-				//Debug.Log("eulerAngles apres: " + _playerSpriteRenderer.transform.eulerAngles);
-			}
-			if (!hasRotated) {
-				transform.eulerAngles = tempRotation;
-			}
-		}
-
-		
-
 
 		//Velocity modification
+        tempAcceleration.Normalize();//We normalize the vector
 		tempAcceleration *= jetpackAcceleration * Time.fixedDeltaTime;
 		tempVelocity = Vector3.ClampMagnitude(tempVelocity+ tempAcceleration, maximumVelocity);
-		_playerRigidBody.velocity = tempVelocity;
+        _playerRigidBody.velocity = tempVelocity;
 
-        //Debug.Log(_playerRigidBody.velocity);
+
+        //Orientation modification
+        if (_isMovingHorizontal || _isMovingVertical){
+            float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
+            Vector3 tempRotation = transform.rotation.eulerAngles;
+            tempRotation.z = angle;
+            if (_leftAnalogHorizontal < 0.0f){
+                tempRotation.z -= 180.0f;
+            }
+            transform.eulerAngles = tempRotation; //We apply the rotation
+        }
+
 
 	}
 
