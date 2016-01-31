@@ -5,12 +5,14 @@ public class Wormhole : MonoBehaviour {
 
     //Editor Variables
     [Header("Visuals")]
-    [SerializeField] public ParticleSystem FX_Warp_In;
-    [SerializeField] public ParticleSystem FX_Warp_Out;
+    [Tooltip("FX that is played in a wormhole when somethings goes IN")] [SerializeField] public ParticleSystem FX_Warp_In;
+    [Tooltip("FX that is played in a wormhole when somethings comes OUT")] [SerializeField] public ParticleSystem FX_Warp_Out;
+
     [Header("Worhole Properties")]
-    [SerializeField] private Wormhole targetWormhole;  
-    [SerializeField] private float EXPULSION_FORCE = 4f;
-    [SerializeField] private LayerMask GravityLayerMask;
+    [Tooltip("Wormhole where objects will be teleported")][SerializeField] private Wormhole targetWormhole;  
+    [Tooltip("Force applied to objects coming out of this wormhole")][SerializeField] private float EXPULSION_FORCE = 4f;
+    [Tooltip("Time without collision that objects coming out of this wormhole will have")] [SerializeField] private float NO_COLLISION_TIME = 2f;
+    [Tooltip("NOT FOR EDIT. Layers of objects to teleport into wormhole")] [SerializeField] private LayerMask GravityLayerMask;
 
     [HideInInspector] public Vector3 warpPosition { get; private set; }
  
@@ -29,7 +31,7 @@ public class Wormhole : MonoBehaviour {
     private void WarpToTarget(GravityBody bodyToWarp, GameObject bodyGameObject) {
         Vector2 randomDirection = Random.insideUnitCircle;
         //Disable collision and teleport
-        bodyToWarp.DisableCollision(2f);
+        bodyToWarp.DisableCollision(NO_COLLISION_TIME);
         ToggleTrailRenderer(bodyGameObject, false);
         bodyGameObject.transform.position = targetWormhole.warpPosition + (Vector3)randomDirection * 0f;
         ToggleTrailRenderer(bodyGameObject, true);
