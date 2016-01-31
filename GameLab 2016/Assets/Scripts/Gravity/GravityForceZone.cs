@@ -4,8 +4,7 @@
 public class GravityForceZone : GravityModifier {
 
     
-    [SerializeField] private Vector2 FORCE = Vector2.zero;
-    [SerializeField] private bool INDEPENDANT_FROM_MASS = false;
+    [Tooltip("Force applied to gravity bodies inside this zone")][SerializeField] private Vector2 FORCE = Vector2.zero;
     private float gravityForceFactor = 0.1f; //Force applied by gravityForceZone is multiplied by this
 
 	// Use this for initialization
@@ -16,12 +15,14 @@ public class GravityForceZone : GravityModifier {
     /// <summary>
     /// Method called every FixedUpdate by objects affected by this gravity modifier
     /// </summary>
-    /// <param name="planet">object affected by this modifier</param>
+    /// <param name="body">object affected by this modifier</param>
     /// <returns>force to apply to object</returns>
-    public override Vector2 ApplyGravityForce(GravityBody planet) {
-        //Calculate acceleration based on planet's weigth
+    public override Vector2 ApplyGravityForce(GravityBody body) {
+        //Calculate acceleration based on force
         Vector2 acc = GRAVITYCONSTANT * gravityForceFactor * FORCE;
-        if (!INDEPENDANT_FROM_MASS) acc /= planet.Weigth;
+        Vector2 accWeigth = CalculateAccFromWeigth(acc, body);
+        acc += accWeigth;
         return acc;
     }
+
 }

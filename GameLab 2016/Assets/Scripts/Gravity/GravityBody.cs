@@ -12,17 +12,18 @@ public class GravityBody : GravityObject {
     public Vector2 Velocity { get { return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
     [SerializeField] private Vector2 START_VELOCITY = Vector2.zero;
 
-    
-    private Rigidbody2D _rigidBody; 
+    //Components
+    private Rigidbody2D _rigidBody;
+    //Collision
     private int gravityModifierLayerMask;
     private int playerLayerMask;
     private int gravityBodyLayerMask;
-    //Collision
     private float timeNoCollision = 0f;
     public bool collisionEnabled { get; private set; }
-    //Activated
-    [SerializeField]  private bool _activated = true; //Serialized for debug purposes
+    //Activation
+    [Tooltip("DO NOT TOUCH. USED FOR DEBUG.")] [SerializeField]  private bool _activated = true; //Serialized for debug purposes
 
+    [Tooltip("DO NOT TOUCH. USED FOR DEBUG.")]
     public List<GravityModifier> currentGravObjects = new List<GravityModifier>();
 
     override protected void Awake(){

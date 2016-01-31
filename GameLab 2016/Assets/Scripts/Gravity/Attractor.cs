@@ -6,13 +6,16 @@
 /// </summary>
 public class Attractor : GravityModifier {
 
-    /// <summary> multiplier of force applied from planet's velocity compared to force towards planet </summary>
-    [SerializeField] private float VELOCITY_FORCE_MULT = 0.1f; ///
+
+
+    [Tooltip("Force of the attraction toward the center of the whirlpool")]
     [SerializeField] private float FORCE = 1f;
     public float Force { get { return FORCE; } private set { FORCE = value; }}
 
-    protected float MIN_DIST_MULTIPLIER = 2f;
- 
+    /// <summary> multiplier of force applied from body's velocity compared to force towards body </summary>
+    [Tooltip("Factor of the force to be applied to the side instead of toward the attractor. The higher this is, the more force will be applied in the whirlpool's direction")]
+    [SerializeField] private float SIDE_FORCE_FACTOR = 0.1f;
+
 
     void Start () {
         base.Start();
@@ -31,14 +34,24 @@ public class Attractor : GravityModifier {
         _collider.isTrigger = true;
     }
 
-    public override Vector2 ApplyGravityForce(GravityBody planet) {
+    public override Vector2 ApplyGravityForce(GravityBody body) {
         //Apply force toward Attractor
-        Vector2 forceDirectionAtt = transform.position - planet.transform.position;  //Get force direction
-        Vector2 accAtt = GRAVITYCONSTANT * (forceDirectionAtt.normalized * Force) / (Mathf.Max(forceDirectionAtt.sqrMagnitude, MIN_DIST_MULTIPLIER) * planet.Weigth); //Calculate acceleration based on attractor's force and distance
-        //Apply force toward planet's current velocity
-        Vector2 forceDirectionVel = planet.Velocity;  //Get force direction
-        Vector2 accVel = VELOCITY_FORCE_MULT * accAtt.magnitude * forceDirectionVel.normalized;
+        Vector2 forceDirectionAtt = transform.position - body.transform.position;  //Get force direction
+        Vector2 accAtt = GRAVITYCONSTANT * (forceDirectionAtt.normalized * Force); //Get acceleration
+
+        //Take into account body/attractor's distance
+        Vector2 accDistance = CalculateAccFromDistance(accAtt, body);
+        accAtt += accDistance;
+        //Take into account body's weigth
+        Vector2 accWeigth = CalculateAccFromWeigth(accAtt, body);
+        accAtt += accWeigth;
+        
+
+        //Apply force toward body's current velocity
+        Vector2 forceDirectionVel = body.Velocity;  //Get force direction
+        Vector2 accVel = SIDE_FORCE_FACTOR * accAtt.magnitude * forceDirectionVel.normalized;
         accVel = Vector2.zero;
+       
 
         return accAtt + accVel;
     }
