@@ -5,7 +5,7 @@ namespace Simoncouche.Islands {
 	/// <summary>
 	/// The global Island information, parent to Island Chunk
 	/// </summary>
-	public class Island : MonoBehaviour {
+	public class Island : IslandChunk {
 
 
 
@@ -14,14 +14,13 @@ namespace Simoncouche.Islands {
 
         //Island's Components
         private CircleCollider2D _collider;
-        private GravityBody _body;
         private TrailRenderer _trailRenderer;
 
 
 		void Awake() {
 			chunks = new List<IslandChunk>();
             _collider = GetComponent<CircleCollider2D>();
-            _body = GetComponent<GravityBody>();
+			base.Awake();
             _trailRenderer = GetComponent<TrailRenderer>();
 		}
 
@@ -55,10 +54,12 @@ namespace Simoncouche.Islands {
 		/// </summary>
 		/// <param name="chunk"></param>
         private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
-            
-            _body.Velocity = ( _body.Velocity + chunk.gravityBody.Velocity) / 2f;       
+			//Merge weight
+			gravityBody.Velocity = (gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
+			weight = weight + chunk.weight;
+
             _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
-            _body.Weigth += chunk.gravityBody.Weigth;
+			gravityBody.Weigth += chunk.gravityBody.Weigth;
             _trailRenderer.startWidth += 0.25f;
             _trailRenderer.time += 0.25f;
 

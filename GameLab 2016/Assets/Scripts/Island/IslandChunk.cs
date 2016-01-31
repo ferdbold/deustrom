@@ -16,13 +16,23 @@ namespace Simoncouche.Islands {
 		private IslandUtils.color _color;	
 		public IslandUtils.color color {
 			get { return _color; }
-            private set { _color = value; }
+            protected set { _color = value; }
+		}
+
+		/// <summary>The weigth of the island chunk</summary>
+		[SerializeField]
+		[Tooltip("Weight of the island chunk")]
+		[Range(1, 10)]
+		private int _weight = 1;
+		public int weight {
+			get { return _weight; }
+			protected set { _weight = value; }
 		}
 
         /// <summary> Gravity Body associated with this island chunk </summary>
         public GravityBody gravityBody {get; private set;}
 
-        void Awake() {
+        protected void Awake() {
             gravityBody = GetComponent<GravityBody>();
         }
 
