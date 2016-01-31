@@ -21,7 +21,7 @@ public class GravityBody : GravityObject {
     private float timeNoCollision = 0f;
     public bool collisionEnabled { get; private set; }
     //Activated
-    private bool _activated = true;
+    [SerializeField]  private bool _activated = true; //Serialized for debug purposes
 
     public List<GravityModifier> currentGravObjects = new List<GravityModifier>();
 
@@ -112,7 +112,7 @@ public class GravityBody : GravityObject {
         if (other.gameObject.layer == gravityModifierLayerMask && other.gameObject != gameObject) {
             GravityModifier gravityObjScript = other.gameObject.GetComponent<GravityModifier>();
             if (gravityObjScript != null) {
-                currentGravObjects.Add(gravityObjScript);
+                if(!currentGravObjects.Contains(gravityObjScript)) currentGravObjects.Add(gravityObjScript);
             }
         }
     }
