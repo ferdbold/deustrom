@@ -9,7 +9,7 @@ public class GravityBody : GravityObject {
 
     //Getters
     public float Weigth { get { return _rigidBody.mass; }  set { _rigidBody.mass = value; } }
-    public Vector2 Velocity { get { Debug.Log(_rigidBody); return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
+    public Vector2 Velocity { get { return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
     [SerializeField] private Vector2 START_VELOCITY = Vector2.zero;
 
     
