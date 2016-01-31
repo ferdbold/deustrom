@@ -7,13 +7,22 @@ namespace Simoncouche.Islands {
 	/// </summary>
 	public class Island : MonoBehaviour {
 
-		/// <summary>
-		/// The many part of the Island
-		/// </summary>
+
+
+		/// <summary> The many part of the Island </summary>
 		public List<IslandChunk> chunks { get; private set; }
+
+        //Island's Components
+        private CircleCollider2D _collider;
+        private GravityBody _body;
+        private TrailRenderer _trailRenderer;
+
 
 		void Awake() {
 			chunks = new List<IslandChunk>();
+            _collider = GetComponent<CircleCollider2D>();
+            _body = GetComponent<GravityBody>();
+            _trailRenderer = GetComponent<TrailRenderer>();
 		}
 
 		/// <summary>
@@ -37,7 +46,7 @@ namespace Simoncouche.Islands {
 				chunks.Add(chunk);
 				/*chunk.transform.localPosition = pos;
 				chunk.transform.localRotation = Quaternion.Euler(rot);*/
-				ChangeVelocityWhenMerging(chunk);
+				ChangeGravityBodyWhenMerging(chunk);
 			}
 		}
 
@@ -45,10 +54,16 @@ namespace Simoncouche.Islands {
 		/// Changes the velocity of the entire Island based on new fragment
 		/// </summary>
 		/// <param name="chunk"></param>
-		private void ChangeVelocityWhenMerging(IslandChunk chunk) {
-			Rigidbody2D Island = this.GetComponent<Rigidbody2D>();
-			Island.velocity = (Island.velocity + chunk.GetComponent<Rigidbody2D>().velocity) / 2;
-			chunk.GetComponent<Rigidbody2D>().isKinematic = true;
+        private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
+            
+            _body.Velocity = ( _body.Velocity + chunk.gravityBody.Velocity) / 2f;       
+            _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
+            _body.Weigth += chunk.gravityBody.Weigth;
+            _trailRenderer.startWidth += 0.25f;
+            _trailRenderer.time += 0.25f;
+
+            //deactivate the gravitybody of the chunk
+            chunk.gravityBody.DeactivateGravityBody();
 		}
 	}
 }

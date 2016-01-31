@@ -19,5 +19,9 @@ public class GravityObject : MonoBehaviour {
         
     }
 
+    protected virtual void Awake() {
+
+    }
+
 
 }

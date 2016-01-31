@@ -8,8 +8,8 @@ using System.Collections.Generic;
 public class GravityBody : GravityObject {
 
     //Getters
-    public float Weigth { get { return _rigidBody.mass; } private set { _rigidBody.mass = value; } }
-    public Vector2 Velocity { get { return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
+    public float Weigth { get { return _rigidBody.mass; }  set { _rigidBody.mass = value; } }
+    public Vector2 Velocity { get { Debug.Log(_rigidBody); return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
     [SerializeField] private Vector2 START_VELOCITY = Vector2.zero;
 
     
@@ -20,12 +20,13 @@ public class GravityBody : GravityObject {
     //Collision
     private float timeNoCollision = 0f;
     public bool collisionEnabled { get; private set; }
+    //Activated
+    private bool _activated = true;
 
     public List<GravityModifier> currentGravObjects = new List<GravityModifier>();
 
-
-    override protected void Start () {
-        base.Start();
+    override protected void Awake(){
+        base.Awake();
 
         gravityModifierLayerMask = 8; //Get gravity modifier layermask
         playerLayerMask = 9; //Get player layermask
@@ -37,11 +38,20 @@ public class GravityBody : GravityObject {
         SetupCollider();
     }
 
+    override protected void Start () {
+        base.Start();
+
+    }
+
     void Update() {
+        if (!_activated) return;
+
         CheckCollisionEnabled();
     }
 
     void FixedUpdate() {
+        if (!_activated) return;
+
         Vector2 acceleration = Vector2.zero;
         foreach (GravityModifier gravObj in currentGravObjects) {
             Vector2 accelChange = gravObj.ApplyGravityForce(this);
@@ -50,6 +60,21 @@ public class GravityBody : GravityObject {
         }
         _rigidBody.velocity += acceleration * Time.fixedDeltaTime;
     }
+
+    /// <summary> Deactivates GravityBody (used when body creates or join an island)  </summary>
+    public void DeactivateGravityBody() {
+        _activated = false;
+        _rigidBody.isKinematic = true;
+        _collider.enabled = false;
+    }
+
+    /// <summary> Activates GravityBody </summary>
+    public void ActivateGravityBody() {
+        _activated = true;
+        _rigidBody.isKinematic = false;
+        _collider.enabled = true;
+    }
+
 
     #region Components Initialization
 
