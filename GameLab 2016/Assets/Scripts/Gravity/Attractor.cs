@@ -13,8 +13,8 @@ public class Attractor : GravityModifier {
     public float Force { get { return FORCE; } private set { FORCE = value; }}
 
     /// <summary> multiplier of force applied from body's velocity compared to force towards body </summary>
-    [Tooltip("Factor of the force to be applied to the side instead of toward the attractor. The higher this is, the more force will be applied in the whirlpool's direction")]
-    [SerializeField] private float SIDE_FORCE_FACTOR = 0.1f;
+    [Tooltip("Force of the rotation of the attractor. Clockwise if positive, counter-clockwise if negative.")]
+    [SerializeField] private float SIDE_FORCE = 0.1f;
 
 
     void Start () {
@@ -45,15 +45,15 @@ public class Attractor : GravityModifier {
         //Take into account body's weigth
         Vector2 accWeigth = CalculateAccFromWeigth(accAtt, body);
         accAtt += accWeigth;
-        
 
-        //Apply force toward body's current velocity
-        Vector2 forceDirectionVel = body.Velocity;  //Get force direction
-        Vector2 accVel = SIDE_FORCE_FACTOR * accAtt.magnitude * forceDirectionVel.normalized;
-        accVel = Vector2.zero;
-       
 
-        return accAtt + accVel;
+        //Apply force toward a side of the attractor
+        Vector2 forceDirectionSide = new Vector2(-forceDirectionAtt.y, forceDirectionAtt.x);
+        Vector2 accSide = SIDE_FORCE * forceDirectionSide.normalized;
+        accSide = Vector2.zero;
+        //TODO : Reduce this force if the target planet's velocity is already in that direction
+
+        return accAtt + accSide;
     }
 
 }
