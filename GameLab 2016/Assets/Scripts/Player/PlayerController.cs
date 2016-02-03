@@ -7,12 +7,14 @@ public class PlayerController : MonoBehaviour {
 	#region PublicVariables
 	[Header("Player speed properties")]
 
+
 	/// <summary>
 	/// Variable to adjust the jetpack speed
 	/// </summary>
     ///
     [Tooltip("Acceleration of the player in unit per second")]
-	public float jetpackAcceleration;
+	public float playerAcceleration;
+
 
 	/// <summary>
 	/// Maximum velocity of the player
@@ -20,36 +22,70 @@ public class PlayerController : MonoBehaviour {
     /// 
     [Tooltip("Maximum velocity of the player")]
 	public float maximumVelocity;
+
+
+	[Header("Player on orientation switch properties")]
+
+
+	/// <summary>
+	/// Angle between the last movement force used and the current movement force.  If higher thant this variable, we apply a boost.
+	/// </summary>
+	[Tooltip("Angle between the last movement force used and the current movement force.  If higher thant this variable, we apply a boost.")]
+	public float boostAngleTreshold;
+
+
+	/// <summary>
+	/// This is value is a multiplier of the acceleration when we are in a boost situation
+	/// </summary>
+	[Tooltip("Acceleration multipler when the rotation boost happens")]
+	public float boostMultipler;
+
+
+	/// <summary>
+	/// Angle between the last movement force used and the current movement force.  If higher thant this variable, we apply a boost.
+	/// </summary>
+	[Tooltip("Angle between the last movement force used and the current movement force.  If higher thant this variable, we apply a boost.")]
+	public float boostTimeOnRotate;
+
 	#endregion
 
 
-
 	#region PrivateVariables
+	
+
 	/// <summary>
 	/// Reference of player's rigidbody
 	/// </summary>
 	private Rigidbody2D _playerRigidBody;
+
 
 	/// <summary>
 	/// Reference of the player's sprite renderer in order to lerp on the player flip
 	/// </summary>
 	private SpriteRenderer _playerSpriteRenderer;
 
+
 	/// <summary>
 	/// Is the player moving horizontally?
 	/// </summary>
 	private bool _isMovingHorizontal;
+
 
 	/// <summary>
 	/// Is the player moving vertical?
 	/// </summary>
 	private bool _isMovingVertical;
 
+
 	/// <summary>
 	/// Is the player looking at his right
 	/// </summary>
 	private bool _isLookingRight=true;
 
+
+	/// <summary>
+	/// Is it flipping the sprite
+	/// </summary>
 	private bool _isFlippingSprite = false;
 
 
@@ -58,10 +94,28 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	private float _leftAnalogHorizontal;
 
+
 	/// <summary>
 	/// Input of left analog at the vertical
 	/// </summary>
 	private float _leftAnalogVertical;
+
+
+	[Header("Private variables")]
+
+
+	/// <summary>
+	/// Last velocity change applied to our rigidbody
+	/// </summary>
+	[SerializeField]
+	private Vector3 _lastAccelerationApplied;
+
+
+	/// <summary>
+	/// This value is set true if we change drastically our player's movement orientation
+	/// </summary>
+	[SerializeField]
+	private bool _flipBoost;
 	#endregion
 
 
@@ -130,6 +184,17 @@ public class PlayerController : MonoBehaviour {
 	}
 
 
+	private void TemporaryBoost() {
+		_flipBoost = true;
+		StartCoroutine(BoostTimer(boostTimeOnRotate));
+	}
+
+	private IEnumerator BoostTimer(float waitTime) {
+		yield return new WaitForSeconds(waitTime);
+		_flipBoost = false;
+	}
+
+
 	/// <summary>
 	/// Function called in Update to register player inputs
 	/// </summary>
@@ -177,14 +242,24 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		//Velocity modification
-        tempAcceleration.Normalize();//We normalize the vector
-		tempAcceleration *= jetpackAcceleration * Time.fixedDeltaTime;
+		tempAcceleration *= playerAcceleration * Time.fixedDeltaTime;
+		if ((Mathf.Abs(Vector3.Angle(tempAcceleration.normalized, _lastAccelerationApplied.normalized))) > 0.0f+ boostAngleTreshold   
+			&& (Mathf.Abs(Vector3.Angle(tempAcceleration.normalized, _lastAccelerationApplied.normalized))) < 360.0f- boostAngleTreshold) 
+		{
+			TemporaryBoost();
+		}
+		if (_flipBoost) {
+			tempAcceleration *= boostMultipler; 
+		}
 		tempVelocity = Vector3.ClampMagnitude(tempVelocity+ tempAcceleration, maximumVelocity);
         _playerRigidBody.velocity = tempVelocity;
+		if (_isMovingHorizontal || _isMovingVertical) {
+			_lastAccelerationApplied = tempAcceleration.normalized;
+		}
 
 
-        //Orientation modification
-        if (_isMovingHorizontal || _isMovingVertical){
+		//Orientation modification
+		if (_isMovingHorizontal || _isMovingVertical){
             float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
             Vector3 tempRotation = transform.rotation.eulerAngles;
             tempRotation.z = angle;
@@ -196,6 +271,7 @@ public class PlayerController : MonoBehaviour {
 
 
 	}
+
 
 	/// <summary>
 	/// Fonction which returns the right analog horizontal input
