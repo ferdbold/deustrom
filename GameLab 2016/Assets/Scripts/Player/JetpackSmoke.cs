@@ -18,6 +18,8 @@ public class JetpackSmoke : MonoBehaviour {
 	/// <summary>
 	/// Maximum emission rate of ParticleSystem.emission.rate
 	/// </summary>
+    /// 
+    [Tooltip("Taux d'emission de particules maximal")]
 	public float maxEmissionRate;
 	#endregion
 
@@ -27,15 +29,9 @@ public class JetpackSmoke : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-
+	void Update (){
 		//Need a local variable of the EmissionModule since ParticleSystem.emissionRate is deprecated
 		ParticleSystem.EmissionModule emissionModule=_jetpackParticleSystem.emission;
-		
-		//Do a rotation with player inputs
-		/*_jetpackParticleSystem.transform.rotation = Quaternion.LookRotation(
-			new Vector3(-_playerController.GetLeftAnalogHorizontal(), -_playerController.GetLeftAnalogVertical(), 0.0f));*/
-		//transform.LookAt(this.transform.position + new Vector3(-_playerController.GetLeftAnalogHorizontal(), -_playerController.GetLeftAnalogVertical()));
 
 		//Modification of the particle emission rate with player inputs
 		ParticleSystem.MinMaxCurve rate = new ParticleSystem.MinMaxCurve();
