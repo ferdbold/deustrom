@@ -59,7 +59,7 @@ namespace Simoncouche.Islands {
 			weight = weight + chunk.weight;
 
             _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
-			gravityBody.Weigth += chunk.gravityBody.Weigth;
+			gravityBody.Weight += chunk.gravityBody.Weight;
             _trailRenderer.startWidth += 0.25f;
             _trailRenderer.time += 0.25f;
 
