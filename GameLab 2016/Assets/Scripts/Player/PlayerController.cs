@@ -132,11 +132,7 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	void Start() {
 		_playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
-	}
-
-	// Update is called once per frame
-	void Update () {
-		PlayerInputs();
+		GameManager.inputManager.AddEvent(InputManager.Axis.leftAnalog, PlayerInputs); //Setup input
 	}
 
 	/// <summary>
@@ -198,9 +194,9 @@ public class PlayerController : MonoBehaviour {
 	/// <summary>
 	/// Function called in Update to register player inputs
 	/// </summary>
-	private void PlayerInputs() {
-		_leftAnalogHorizontal = Input.GetAxis("Horizontal");
-		_leftAnalogVertical = Input.GetAxis("Vertical");
+	private void PlayerInputs(params float[] input) {
+		_leftAnalogHorizontal = input[0];
+		_leftAnalogVertical = input[1];
 
 		if (Mathf.Abs(_leftAnalogHorizontal) > 0.0f) {
 			_isMovingHorizontal = true;

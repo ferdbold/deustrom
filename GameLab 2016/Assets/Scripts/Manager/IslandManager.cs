@@ -5,7 +5,7 @@ namespace Simoncouche.Islands {
 	/// <summary>
 	/// Every Island data
 	/// </summary>
-	public class IslandManager : Manager<IslandManager> {
+	public class IslandManager : MonoBehaviour {
 
 		/// <summary>
 		/// A list of every Island currently in play
@@ -18,10 +18,6 @@ namespace Simoncouche.Islands {
 		[SerializeField]
 		[Tooltip("Island Object Prefab Reference")]
 		private GameObject _islandComponent;
-
-		public override void Awake() {
-			base.Awake();
-		}
 
 		/// <summary>
 		/// Creates a Island from 2 chunk, Will not work for multiple piece of the same letter in one scene

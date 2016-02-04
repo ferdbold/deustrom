@@ -53,7 +53,7 @@ namespace Simoncouche.Islands {
             Collider2D other = col.collider;
 			IslandChunk chunk = other.GetComponent<IslandChunk>();
 			if (chunk != null && chunk.color == _color) {
-				IslandManager.Instance.HandleChunkCollision(this, chunk);
+				GameManager.islandManager.HandleChunkCollision(this, chunk);
 			}
 		}
 	}

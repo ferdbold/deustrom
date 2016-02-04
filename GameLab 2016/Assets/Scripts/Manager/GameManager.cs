@@ -1,12 +1,23 @@
 ﻿using UnityEngine;
-using System.Collections;
+using Simoncouche.Islands;
 
-public class GameManager : Manager<GameManager> {
+public class GameManager : MonoBehaviour {
 
-	public override void Awake() {
-		base.Awake();
-		if (Instance == this) {
+	public static GameManager Instance { get; private set; }
+
+	// Link to every managers
+	public static InputManager inputManager { get; private set; }
+	public static IslandManager islandManager { get; private set; }
+
+	void Awake() {
+		if (Instance == null) {
+			Instance = this;
+			inputManager = GetComponent<InputManager>();
+			islandManager = GetComponent<IslandManager>();
 			DontDestroyOnLoad(gameObject);
+		}
+		else {
+			Destroy(gameObject);
 		}
 	}
 
