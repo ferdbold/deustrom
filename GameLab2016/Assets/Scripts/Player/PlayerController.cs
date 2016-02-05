@@ -144,19 +144,8 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	void Start() {
 		_playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
-<<<<<<< HEAD:GameLab 2016/Assets/Scripts/Player/PlayerController.cs
 		GameManager.inputManager.AddEvent(InputManager.Axis.leftAnalog, PlayerInputs); //Setup input
-=======
 	}
-
-
-	// Update is called once per frame
-	void Update () {
-		PlayerInputs();
->>>>>>> 018ecdc2bf26d4c06c4c1252827a64a8e6b494ee:GameLab2016/Assets/Scripts/Player/PlayerController.cs
-	}
-
-
 	/// <summary>
 	/// FixedUpdate pour le character avec rigidbody (sujet à changements)
 	/// </summary>
