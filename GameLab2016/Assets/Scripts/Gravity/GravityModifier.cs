@@ -34,7 +34,7 @@ public abstract class GravityModifier : GravityObject {
     /// <param name="body">gravity body's info</param>
     /// <returns></returns>
     protected Vector2 CalculateAccFromWeigth(Vector2 accForce, GravityBody body) {
-        Vector2 accWeigth = accForce / body.Weigth;
+        Vector2 accWeigth = accForce / body.Weight;
         accWeigth = accWeigth - accForce;
         accWeigth = accWeigth * WEIGTH_IMPORTANCE;
         return accWeigth;
