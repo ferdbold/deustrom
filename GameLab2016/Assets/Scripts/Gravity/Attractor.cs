@@ -50,10 +50,14 @@ public class Attractor : GravityModifier {
         //Apply force toward a side of the attractor
         Vector2 forceDirectionSide = new Vector2(-forceDirectionAtt.y, forceDirectionAtt.x);
         Vector2 accSide = SIDE_FORCE * forceDirectionSide.normalized;
-        accSide = Vector2.zero;
-        //TODO : Reduce this force if the target planet's velocity is already in that direction
+        //Reduce the side force if the player is already going in that direction
+        Vector3 projection = Vector3.ClampMagnitude(Vector3.Project(forceDirectionAtt, forceDirectionSide), forceDirectionAtt.magnitude);
+        if (accSide.normalized == ((Vector2)projection).normalized) accSide = projection;
 
-        return accAtt + accSide;
+        //Get final force
+        Vector2 finalForce = accAtt + accSide;
+        finalForce = finalForce.normalized * accAtt.magnitude;
+        return finalForce;
     }
 
 }

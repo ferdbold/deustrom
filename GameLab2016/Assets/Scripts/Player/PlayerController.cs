@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour {
 
@@ -108,7 +109,7 @@ public class PlayerController : MonoBehaviour {
 	/// Last velocity change applied to our rigidbody
 	/// </summary>
 	[SerializeField]
-	private Vector3 _lastAccelerationApplied;
+	private Vector2 _lastAccelerationApplied=Vector2.zero;
 
 
 	/// <summary>
@@ -116,8 +117,17 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	[SerializeField]
 	private bool _flipBoost;
-	#endregion
 
+
+    /// <summary>
+    /// This variable stock the accumulated velocity change applied by the player on the rigidbody.
+    /// It is subracted to the rigidbody.velocity in order to prevent inertia.
+    /// </summary>
+    [SerializeField]
+    private Vector2 _currentVelocityChangeApplied=Vector2.zero;
+
+
+	#endregion
 
 
 	/// <summary>
@@ -127,13 +137,25 @@ public class PlayerController : MonoBehaviour {
 		_playerSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_playerRigidBody = GetComponent<Rigidbody2D>();
 	}
+
+
 	/// <summary>
 	/// Initialization of variables
 	/// </summary>
 	void Start() {
 		_playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
+<<<<<<< HEAD:GameLab 2016/Assets/Scripts/Player/PlayerController.cs
 		GameManager.inputManager.AddEvent(InputManager.Axis.leftAnalog, PlayerInputs); //Setup input
+=======
 	}
+
+
+	// Update is called once per frame
+	void Update () {
+		PlayerInputs();
+>>>>>>> 018ecdc2bf26d4c06c4c1252827a64a8e6b494ee:GameLab2016/Assets/Scripts/Player/PlayerController.cs
+	}
+
 
 	/// <summary>
 	/// FixedUpdate pour le character avec rigidbody (sujet à changements)
@@ -142,6 +164,7 @@ public class PlayerController : MonoBehaviour {
 		CharacterMovement();
 	}
 
+
 	/// <summary>
 	/// Function to flip the player's sprite if going toward the opposite direction
 	/// </summary>
@@ -149,17 +172,17 @@ public class PlayerController : MonoBehaviour {
 		if (_isMovingHorizontal) {
 			if (_leftAnalogHorizontal < 0) {
 				StartCoroutine(SmoothSpriteFlip(new Vector3(180.0f,
-					0.0f,
 					0.0f), //Because of Orientation modification in Orientation modification
 					1.5f));
 			}else {
-				StartCoroutine(SmoothSpriteFlip(new Vector3(0.0f
+                StartCoroutine(SmoothSpriteFlip(new Vector3(0.0f
 					, 0.0f
 					, 0.0f)
 					, 1.5f));
 			}
 		}
 	}
+
 
 	/// <summary>
 	/// Coroutine doing a lerp on the rotation of a sprite in order to flip his it !!! Not actually used (buggy)  !!!
@@ -169,9 +192,9 @@ public class PlayerController : MonoBehaviour {
 	/// <returns></returns>
 	private IEnumerator SmoothSpriteFlip(Vector3 endRot, float time) {
 		float elapsedTime =  0.0f;
-		Vector3 initialTransform = _playerSpriteRenderer.transform.rotation.eulerAngles;
+        Vector3 initialTransform = _playerSpriteRenderer.transform.rotation.eulerAngles;
 		while (elapsedTime < time) {
-			Vector3 tempVector = Vector3.Lerp(initialTransform, endRot, elapsedTime / time);
+            Vector3 tempVector = Vector3.Lerp(initialTransform, endRot, elapsedTime / time);
 			_playerSpriteRenderer.transform.rotation = Quaternion.Euler(tempVector);
 			elapsedTime += Time.deltaTime;
 			yield return new WaitForFixedUpdate();	//Wait For Fixed update because the function is the coroutine is called in charaterMovement which is in fixed update
@@ -180,15 +203,26 @@ public class PlayerController : MonoBehaviour {
 	}
 
 
+    /// <summary>
+    /// This gives a boost to the player when he does a rotation of a certain degree
+    /// </summary>
 	private void TemporaryBoost() {
 		_flipBoost = true;
 		StartCoroutine(BoostTimer(boostTimeOnRotate));
 	}
 
+
+    /// <summary>
+    /// This is a basic timer for the temporary boost
+    /// </summary>
+    /// <param name="waitTime"></param>
+    /// <returns></returns>
 	private IEnumerator BoostTimer(float waitTime) {
 		yield return new WaitForSeconds(waitTime);
 		_flipBoost = false;
 	}
+
+
 
 
 	/// <summary>
@@ -208,13 +242,14 @@ public class PlayerController : MonoBehaviour {
 		else _isMovingVertical = false;
 	}
 
+
+
 	/// <summary>
 	/// Function that is called right after PlayerInputs inside Update in order to apply movement to our character
 	/// </summary>
 	private void CharacterMovement() {
-		
-		Vector3 tempVelocity = _playerRigidBody.velocity;
-		Vector3 tempAcceleration = new Vector3(0.0f, 0.0f, 0.0f);
+		Vector2 tempVelocity = _playerRigidBody.velocity;
+		Vector2 tempAcceleration = new Vector2(0.0f, 0.0f);
 		if (_isMovingHorizontal) {
 			tempAcceleration.x += _leftAnalogHorizontal;
 		}
@@ -226,7 +261,7 @@ public class PlayerController : MonoBehaviour {
 
 		//Sprite Flip Condition
 		if (_isMovingHorizontal) {
-			Vector3 tempScale = _playerSpriteRenderer.transform.localScale;
+			Vector2 tempScale = _playerSpriteRenderer.transform.localScale;
 			
 			if (_isLookingRight && _leftAnalogHorizontal < 0.0f) {
 				_playerSpriteRenderer.flipY = true;
@@ -238,22 +273,33 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		//Velocity modification
-		tempAcceleration *= playerAcceleration * Time.fixedDeltaTime;
-		if ((Mathf.Abs(Vector3.Angle(tempAcceleration.normalized, _lastAccelerationApplied.normalized))) > 0.0f+ boostAngleTreshold   
-			&& (Mathf.Abs(Vector3.Angle(tempAcceleration.normalized, _lastAccelerationApplied.normalized))) < 360.0f- boostAngleTreshold) 
-		{
-			TemporaryBoost();
-		}
-		if (_flipBoost) {
-			tempAcceleration *= boostMultipler; 
-		}
-		tempVelocity = Vector3.ClampMagnitude(tempVelocity+ tempAcceleration, maximumVelocity);
-        _playerRigidBody.velocity = tempVelocity;
-		if (_isMovingHorizontal || _isMovingVertical) {
-			_lastAccelerationApplied = tempAcceleration.normalized;
-		}
+        if (_isMovingHorizontal || _isMovingVertical){
+            tempAcceleration *= playerAcceleration*Time.fixedDeltaTime;
 
+            //if we must do a quick turn between a specified angleTreshold
+		    if ((Mathf.Abs(Vector2.Angle(tempAcceleration.normalized, _lastAccelerationApplied.normalized))) > 0.0f+ boostAngleTreshold   
+			    && (Mathf.Abs(Vector2.Angle(tempAcceleration.normalized, _lastAccelerationApplied.normalized))) < 360.0f- boostAngleTreshold) 
+		    {
+			    TemporaryBoost();
+		    }
+		    if (_flipBoost) {
+			    tempAcceleration *= boostMultipler; 
+		    }
+		    tempVelocity = Vector2.ClampMagnitude(tempVelocity+ tempAcceleration, maximumVelocity);
+            _playerRigidBody.velocity = tempVelocity;
+            //We keep the value of the last velocity applied to the rigidbody from the player
+            _lastAccelerationApplied = tempAcceleration;
+            //We keep the value of the whole velocity applied to the rigidbody from the player
+            _currentVelocityChangeApplied = Vector2.ClampMagnitude(tempAcceleration + _currentVelocityChangeApplied, maximumVelocity);
+		}
+        else if (_currentVelocityChangeApplied.magnitude>0.0f) //There is no inertia because of this (but there is no deceleration right now too!)
+        {
+            _playerRigidBody.velocity -= _currentVelocityChangeApplied;
+            _currentVelocityChangeApplied = Vector2.zero;
+        }
+        
 
+        
 		//Orientation modification
 		if (_isMovingHorizontal || _isMovingVertical){
             float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
@@ -276,6 +322,7 @@ public class PlayerController : MonoBehaviour {
 	public float GetLeftAnalogHorizontal() {
 		return _leftAnalogHorizontal;
 	}
+
 	/// <summary>
 	/// Fonction which returns the left analog vertical input
 	/// </summary>
