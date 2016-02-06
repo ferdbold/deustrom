@@ -7,12 +7,15 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Rigidbody2D))]
 public class GravityBody : GravityObject {
 
+    //Properties
+    [Tooltip("Default linear drag of this rigidbody")][SerializeField] private float DEFAULT_DRAG = 0.35f;
+    [Tooltip("Velocity of this gravity body when loading scene.")][SerializeField] private Vector2 START_VELOCITY = Vector2.zero;
+
     //Getters
     public float Weight { get { return _rigidBody.mass; }  set { _rigidBody.mass = value; } }
     public Vector2 Velocity { get { return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
     public float LinearDrag { get { return _rigidBody.drag; } set { _rigidBody.drag = value; } }
     public float AngularDrag { get { return _rigidBody.angularDrag; } set { _rigidBody.angularDrag = value; } }
-    [SerializeField] private Vector2 START_VELOCITY = Vector2.zero;
 
     //Components
     private Rigidbody2D _rigidBody;
@@ -23,8 +26,8 @@ public class GravityBody : GravityObject {
     private float timeNoCollision = 0f;
     public bool collisionEnabled { get; private set; }
     //Activation
+    [Header("Debug : ")]
     [Tooltip("DO NOT TOUCH. USED FOR DEBUG.")] [SerializeField]  private bool _activated = true; //Serialized for debug purposes
-
     [Tooltip("DO NOT TOUCH. USED FOR DEBUG.")]
     public List<GravityModifier> currentGravObjects = new List<GravityModifier>();
 
@@ -34,7 +37,10 @@ public class GravityBody : GravityObject {
         gravityModifierLayerMask = 8; //Get gravity modifier layermask
         playerLayerMask = 9; //Get player layermask
         gravityBodyLayerMask = 10; //Get gravity body layermask
-        if (gameObject.layer != playerLayerMask) gameObject.layer = 10;
+
+        if (gameObject.layer != playerLayerMask) { //if player
+            gameObject.layer = 10;
+        }
         collisionEnabled = true;
 
         SetupRigidbody();
@@ -96,6 +102,8 @@ public class GravityBody : GravityObject {
         _rigidBody.gravityScale = 0;
         //Set Starting Velocity
         _rigidBody.velocity = START_VELOCITY;
+        //Set starting Drag
+        _rigidBody.drag = DEFAULT_DRAG;
     }
 
     /// <summary>
