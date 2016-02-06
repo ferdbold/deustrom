@@ -10,6 +10,8 @@ public class GravityBody : GravityObject {
     //Getters
     public float Weight { get { return _rigidBody.mass; }  set { _rigidBody.mass = value; } }
     public Vector2 Velocity { get { return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
+    public float LinearDrag { get { return _rigidBody.drag; } set { _rigidBody.drag = value; } }
+    public float AngularDrag { get { return _rigidBody.angularDrag; } set { _rigidBody.angularDrag = value; } }
     [SerializeField] private Vector2 START_VELOCITY = Vector2.zero;
 
     //Components
@@ -76,6 +78,13 @@ public class GravityBody : GravityObject {
         _collider.enabled = true;
     }
 
+    /// <summary>
+    /// Destroys the gravity body (should override this to score points when destroying)
+    /// </summary>
+    public virtual void DestroyGravityBody(){
+        Debug.Log("Destroyed RigidBody " + gameObject.name);
+        Destroy(gameObject);
+    }
 
     #region Components Initialization
 

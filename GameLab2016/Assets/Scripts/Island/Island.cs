@@ -54,6 +54,7 @@ namespace Simoncouche.Islands {
 		/// </summary>
 		/// <param name="chunk"></param>
         private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
+            gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
 			//Merge weight
 			gravityBody.Velocity = (gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
 			weight = weight + chunk.weight;
