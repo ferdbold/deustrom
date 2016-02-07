@@ -14,7 +14,7 @@ public abstract class GravityModifier : GravityObject {
     /// <summary> Distance from the attractor at which the force reaches its maximum power </summary>
     protected float MIN_DIST_MULTIPLIER = 2f;
 
-    // Use this for initialization
+
     protected virtual void Start() {
         base.Start();
         if (gameObject.layer != 9) gameObject.layer = 8; //If not player layer, set gravityModifier Layer
