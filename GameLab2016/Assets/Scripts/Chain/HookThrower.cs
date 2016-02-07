@@ -9,7 +9,7 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private Hook _hookPrefab;
 
-		private float _spawnRopeDistanceThreshold = 1f;
+		private float _spawnChainDistanceThreshold = 4f;
 
 		private Hook _hookObj;
 
@@ -25,26 +25,22 @@ namespace Simoncouche.Chain {
 		}
 
 		public void Update() {
-			// TODO: Move this to input manager
-			if (Input.GetButtonDown("Fire") && !isGrapplingHookActive) {
+			// TODO: Move this to InputManager
+			if (Input.GetButtonDown("Fire Hook") && !isGrapplingHookActive) {
 				Fire();
 			}
 
-			if (isGrapplingHookActive && Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnRopeDistanceThreshold) {
-				_joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
+			if (isGrapplingHookActive) {
+				if (Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnChainDistanceThreshold) {
+					_joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
+				}
 			}
 		}
 
 		private void Fire() {
-			_hookObj = (Hook)Instantiate(_hookPrefab, transform.position, transform.rotation);
+			_hookObj = (Hook)Instantiate(_hookPrefab, transform.position, transform.rotation * Quaternion.Euler(0, 90, 0));
 			_hookObj.thrower = this;
-			_hookObj.onHit.AddListener(RecallHook);
 			_joint.enabled = true;
-		}
-
-		public void RecallHook() {
-			Destroy(_hookObj.gameObject);
-			_hookObj = null;
 		}
 
 		private bool isGrapplingHookActive {

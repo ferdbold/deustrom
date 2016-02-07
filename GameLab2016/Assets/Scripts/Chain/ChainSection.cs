@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Simoncouche.Chain {
 
-	[RequireComponent(typeof(SpringJoint2D))]
+	[RequireComponent(typeof(HingeJoint2D))]
 	public class ChainSection : MonoBehaviour {
 
 		[SerializeField]
@@ -14,8 +14,8 @@ namespace Simoncouche.Chain {
 
 		// COMPONENTS
 
-		private SpringJoint2D _joint;
-		public SpringJoint2D joint { get { return _joint; } }
+		private HingeJoint2D _joint;
+		public HingeJoint2D joint { get { return _joint; } }
 
 		private Rigidbody2D _rigidbody;
 		public new Rigidbody2D rigidbody { get { return _rigidbody; } }
@@ -23,7 +23,7 @@ namespace Simoncouche.Chain {
 		// METHODS
 
 		public void Awake() {
-			_joint = GetComponent<SpringJoint2D>();
+			_joint = GetComponent<HingeJoint2D>();
 			_rigidbody = GetComponent<Rigidbody2D>();
 		}
 

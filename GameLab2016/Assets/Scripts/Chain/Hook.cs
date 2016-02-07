@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 
 namespace Simoncouche.Chain {
 
@@ -12,12 +11,8 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private float _forceAmount = 50f;
 
-		[SerializeField]
-		private UnityEvent _onHit;
-
 		private ChainSection _nextChain;
 
-		public UnityEvent onHit { get { return _onHit; } }
 		public HookThrower thrower { get; set; }
 
 		// COMPONENTS
@@ -40,12 +35,6 @@ namespace Simoncouche.Chain {
 			_nextChain = (ChainSection)Instantiate(_chainSectionPrefab, transform.position, transform.rotation);
 			_nextChain.joint.connectedBody = _rigidbody;
 			_nextChain.thrower = thrower;
-		}
-
-		public void Update() {
-			if (Input.GetButtonDown("Fire")) {
-				onHit.Invoke();
-			}
 		}
 
 		public void OnCollisionEnter2D(Collision2D collision) {
