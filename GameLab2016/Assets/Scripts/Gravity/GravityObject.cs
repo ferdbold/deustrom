@@ -7,6 +7,7 @@ using System.Collections;
 [RequireComponent(typeof(CircleCollider2D))]
 public class GravityObject : MonoBehaviour {
 
+    [Header("Properties : ")]
     static public float GRAVITYCONSTANT = 10f; 
 
     [Tooltip("NOT YET IMPLEMENTED : Objects will only be influenced by objects of higher or equal attraction level than themselves. ")]
