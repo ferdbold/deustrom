@@ -14,9 +14,12 @@ public class Attractor : GravityModifier {
     [Tooltip("Force of the rotation of the attractor. Clockwise if positive, counter-clockwise if negative.")]
     [SerializeField] private float SIDE_FORCE = 1f;
 
-    private Vector2 _dragMaximums = new Vector2(0f, 2.25f);
-    private float _radiusDragMultiplier = 1f;
-
+    //Drag Values
+    [Header("Linear Drag :")]
+    [Tooltip("Min and max linear drag values to add to gravity body based on distance between attractor and body.")]
+    [SerializeField] private Vector2 _dragMaximums = new Vector2(0f, 1.5f);
+    private float _additionnalDragRate = 0.1f;
+    private float _additionnalDragDistance = 0.85f;
 
     void Start () {
         base.Start();
@@ -46,7 +49,7 @@ public class Attractor : GravityModifier {
         Vector2 accFromRotation = ApplyRotationForce(body);
         
         //Modify the body's linear drag so it is attracted to the center of the attractor
-        ModifyLinearDrag(body);
+        if(body.gameObject.tag != "Player") ModifyLinearDrag(body);
 
         //Get final force and return it
         Vector2 finalForce = accFromAttraction + accFromRotation; //mix both acceleration
@@ -89,10 +92,17 @@ public class Attractor : GravityModifier {
     /// <summary> Modify the linear drag so objects are gradually attracted to this attractor's center </summary>
     private void ModifyLinearDrag(GravityBody body) {
         float distance = Vector2.Distance(transform.position, body.transform.position);
-        float distanceStep = 1 - (distance / (radius * _radiusDragMultiplier));
+        float distanceStep = 1 - (distance / radius);
 
-        Debug.Log("drag : " + Mathf.Lerp(_dragMaximums.x, _dragMaximums.y, distanceStep) + "    With step of " + distanceStep);
-        body.LinearDrag = Mathf.Lerp(_dragMaximums.x, _dragMaximums.y, distanceStep);
+        //If object is really close to maelstrom's center, progressively add drag so it slowly reaches the center
+        if (distanceStep >= _additionnalDragDistance) {
+            body.AdditionnalDrag += Time.deltaTime * _additionnalDragRate;
+        } else {
+            body.AdditionnalDrag -= Time.deltaTime * _additionnalDragRate;
+        }
+
+        //Debug.Log("drag : " + Mathf.Lerp(_dragMaximums.x, _dragMaximums.y, distanceStep) + "    With step of " + distanceStep);
+        body.LinearDrag = Mathf.Lerp(_dragMaximums.x, _dragMaximums.y, distanceStep) + body.AdditionnalDrag + body.DefaultDrag;
     }
 
 }
