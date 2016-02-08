@@ -6,7 +6,7 @@ using DG.Tweening;
 public class PlayerController : MonoBehaviour {
 
 	#region PublicVariables
-	[Header("Player speed properties")]
+	[Header("Player Speed Properties")]
 
 
 	/// <summary>
@@ -73,6 +73,9 @@ public class PlayerController : MonoBehaviour {
 	/// Input of left analog at the vertical
 	/// </summary>
 	private float _leftAnalogVertical;
+
+
+	private Vector2 _currentAddedVelocity=Vector2.zero;
 	#endregion
 
 
@@ -191,7 +194,10 @@ public class PlayerController : MonoBehaviour {
         if (_isMovingHorizontal || _isMovingVertical){
             tempAcceleration *= playerAcceleration*Time.fixedDeltaTime;
 		    tempVelocity = Vector2.ClampMagnitude(tempVelocity+ tempAcceleration, maximumVelocity);
+			_currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
             _playerRigidBody.velocity = tempVelocity;
+
+
 		}
 
         
@@ -211,6 +217,10 @@ public class PlayerController : MonoBehaviour {
 
 	}
 
+
+	public Vector2 GetCurrentAddedVelocity() {
+		return _currentAddedVelocity;
+	}
 
 	/// <summary>
 	/// Fonction which returns the right analog horizontal input
