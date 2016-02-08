@@ -10,12 +10,16 @@ public class GravityBody : GravityObject {
     //Properties
     [Tooltip("Default linear drag of this rigidbody")][SerializeField] private float DEFAULT_DRAG = 0.35f;
     [Tooltip("Velocity of this gravity body when loading scene.")][SerializeField] private Vector2 START_VELOCITY = Vector2.zero;
+    private float _additionnalDrag = 0f; //Additionnal drag added by attractor
 
     //Getters
     public float Weight { get { return _rigidBody.mass; }  set { _rigidBody.mass = value; } }
     public Vector2 Velocity { get { return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
     public float LinearDrag { get { return _rigidBody.drag; } set { _rigidBody.drag = value; } }
     public float AngularDrag { get { return _rigidBody.angularDrag; } set { _rigidBody.angularDrag = value; } }
+    
+    public float AdditionnalDrag { get { return _additionnalDrag; } set { _additionnalDrag = Mathf.Clamp(value, 0f, 2f); } }
+    public float DefaultDrag { get { return DEFAULT_DRAG;  } private set { DEFAULT_DRAG = value; } }
 
     //Components
     private Rigidbody2D _rigidBody;
@@ -25,11 +29,11 @@ public class GravityBody : GravityObject {
     private int gravityBodyLayerMask;
     private float timeNoCollision = 0f;
     public bool collisionEnabled { get; private set; }
+
     //Activation
     [Header("Debug : ")]
     [Tooltip("DO NOT TOUCH. USED FOR DEBUG.")] [SerializeField]  private bool _activated = true; //Serialized for debug purposes
-    [Tooltip("DO NOT TOUCH. USED FOR DEBUG.")]
-    public List<GravityModifier> currentGravObjects = new List<GravityModifier>();
+    [Tooltip("DO NOT TOUCH. USED FOR DEBUG.")] public List<GravityModifier> currentGravObjects = new List<GravityModifier>();
 
     override protected void Awake(){
         base.Awake();
