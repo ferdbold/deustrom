@@ -29,11 +29,22 @@ namespace Simoncouche.Islands {
 			protected set { _weight = value; }
 		}
 
+		[Header("Anchor Points Attributes")]
+		[SerializeField]
+		[Tooltip("The distance from the origin to the side of the hexagon")]
+		private float _anchorPointRadius = 1f;
+
         /// <summary> Gravity Body associated with this island chunk </summary>
         public GravityBody gravityBody {get; private set;}
 
+		private static GameObject _anchorPointObject = null;
+
         protected void Awake() {
             gravityBody = GetComponent<GravityBody>();
+			if (_anchorPointObject == null) {
+				_anchorPointObject = Resources.Load("Island/AnchorPoints") as GameObject;
+			}
+			//SpawnAnchorPoints();
         }
 
 		/*/// <summary> Associated Chunk Letter </summary>
@@ -48,6 +59,15 @@ namespace Simoncouche.Islands {
 			}
 			private set { }
 		}*/
+
+		/// <summary> Spawn Every Anchor points around the island </summary>
+		void SpawnAnchorPoints () {
+			for (int angle=0; angle <= 300; angle+=60) {
+				Transform anchor = (Instantiate(_anchorPointObject) as GameObject).transform;
+				anchor.SetParent(transform);
+				anchor.localPosition = new Vector3(_anchorPointRadius * Mathf.Cos(angle), _anchorPointRadius * Mathf.Cos(angle), 0);
+			}
+		}
 
 		void OnCollisionEnter2D(Collision2D col) {
             Collider2D other = col.collider;
