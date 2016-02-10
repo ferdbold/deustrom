@@ -70,11 +70,24 @@ namespace Simoncouche.Islands {
 		}
 
 		void OnCollisionEnter2D(Collision2D col) {
+           
+
             Collider2D other = col.collider;
 			IslandChunk chunk = other.GetComponent<IslandChunk>();
+
 			if (chunk != null && chunk.color == _color) {
 				GameManager.islandManager.HandleChunkCollision(this, chunk);
-			}
+                Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Assemble.");
+                //TODO AUDIO : ISLAND ASSEMBLE SOUND
+            } else {
+                Vector3 myVelocity = gravityBody.Velocity;
+                Vector3 otherVelocity = chunk.gravityBody.Velocity;
+                Vector3 targetVelocity = Vector3.Reflect(myVelocity, col.contacts[0].normal);
+
+
+                Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
+                //TODO AUDIO : ISLAND COLLISION SOUND
+            }
 		}
 	}
 }
