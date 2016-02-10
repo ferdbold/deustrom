@@ -24,10 +24,12 @@ public class GravityBody : GravityObject {
     //Components
     private Rigidbody2D _rigidBody;
     //Collision
-    private int gravityModifierLayerMask;
-    private int playerLayerMask;
-    private int gravityBodyLayerMask;
+    private int gravityModifierLayerMask;  //Layermask of gravity modifier
+    private int playerLayerMask; //Layermask of player
+    private int gravityBodyLayerMask; //Layermask of gravity bodies
+    /// <summary> Time remaining without collisions activated </summary>
     private float timeNoCollision = 0f;
+    /// <summary> Are collisions currently enabled </summary>
     public bool collisionEnabled { get; private set; }
 
     //Activation

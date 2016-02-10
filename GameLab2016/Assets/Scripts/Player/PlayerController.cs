@@ -9,69 +9,39 @@ public class PlayerController : MonoBehaviour {
 	[Header("Player Speed Properties")]
 
 
-	/// <summary>
-	/// Variable to adjust the jetpack speed
-	/// </summary>
-    ///
+	/// <summary> Variable to adjust the jetpack speed </summary>
     [Tooltip("Acceleration of the player in unit per second")]
 	public float playerAcceleration;
 
-
-	/// <summary>
-	/// Maximum velocity of the player
-	/// </summary>
-    /// 
+	/// <summary> Maximum velocity of the player </summary>
     [Tooltip("Maximum velocity of the player")]
 	public float maximumVelocity;
 	#endregion
 
 
 	#region PrivateVariables
-	/// <summary>
-	/// Reference of player's rigidbody
-	/// </summary>
+	/// <summary> Reference of player's rigidbody  </summary>
 	private Rigidbody2D _playerRigidBody;
 
-
-	/// <summary>
-	/// Reference of the player's sprite renderer in order to lerp on the player flip
-	/// </summary>
+	/// <summary> Reference of the player's sprite renderer in order to lerp on the player flip  </summary>
 	private SpriteRenderer _playerSpriteRenderer;
 
-
-	/// <summary>
-	/// Is the player moving horizontally?
-	/// </summary>
+	/// <summary>  Is the player moving horizontally? </summary>
 	private bool _isMovingHorizontal;
 
-
-	/// <summary>
-	/// Is the player moving vertical?
-	/// </summary>
+	/// <summary>  Is the player moving vertical? </summary>
 	private bool _isMovingVertical;
 
-
-	/// <summary>
-	/// Is the player looking at his right
-	/// </summary>
+	/// <summary>  Is the player looking at his right  </summary>
 	private bool _isLookingRight=true;
 
-
-	/// <summary>
-	/// Is it flipping the sprite
-	/// </summary>
+	/// <summary> Is it flipping the sprite  </summary>
 	private bool _isFlippingSprite = false;
 
-
-	/// <summary>
-	/// Input of left analog at the horizontal
-	/// </summary>
+	/// <summary> Input of left analog at the horizontal  </summary>
 	private float _leftAnalogHorizontal;
 
-
-	/// <summary>
-	/// Input of left analog at the vertical
-	/// </summary>
+	/// <summary> Input of left analog at the vertical </summary>
 	private float _leftAnalogVertical;
 
 
@@ -168,13 +138,8 @@ public class PlayerController : MonoBehaviour {
 	private void CharacterMovement() {
 		Vector2 tempVelocity = _playerRigidBody.velocity;
 		Vector2 tempAcceleration = new Vector2(0.0f, 0.0f);
-		if (_isMovingHorizontal) {
-			tempAcceleration.x += _leftAnalogHorizontal;
-		}
 
-		if (_isMovingVertical) {
-			tempAcceleration.y += _leftAnalogVertical;
-		}
+
 		
 
 		//Sprite Flip Condition
@@ -189,20 +154,42 @@ public class PlayerController : MonoBehaviour {
 				_isLookingRight = true;
 			}
 		}
-
-		//Velocity modification
+        
+        //Velocity modification 1
+        //Get Horizontal and vertical analog values
+        if (_isMovingHorizontal) {
+            tempAcceleration.x += _leftAnalogHorizontal;
+        }
+        if (_isMovingVertical) {
+            tempAcceleration.y += _leftAnalogVertical;
+        }
+        //Modify velocity
         if (_isMovingHorizontal || _isMovingVertical){
             tempAcceleration *= playerAcceleration*Time.fixedDeltaTime;
 		    tempVelocity = Vector2.ClampMagnitude(tempVelocity+ tempAcceleration, maximumVelocity);
 			_currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
             _playerRigidBody.velocity = tempVelocity;
-
-
 		}
-
         
-		//Orientation modification
-		if (_isMovingHorizontal || _isMovingVertical){
+        /*
+        //Velocity modification 2
+        if (_isMovingHorizontal || _isMovingVertical) {
+            Vector2 movementDirection = new Vector2(_leftAnalogHorizontal, _leftAnalogVertical);
+
+            Vector2 projection = (Vector2) Vector3.ClampMagnitude(Vector3.Project(_playerRigidBody.velocity, movementDirection * maximumVelocity), maximumVelocity);
+            if (movementDirection.normalized == projection.normalized) {
+                Debug.Log("projection change : " + Mathf.Max(0, (movementDirection.magnitude - (projection).magnitude)));
+                movementDirection = movementDirection.normalized * Mathf.Max(0,(movementDirection.magnitude - (projection).magnitude));
+            }
+            
+
+            Vector2 addedAcceleration = movementDirection * playerAcceleration * Time.fixedDeltaTime;
+            _playerRigidBody.velocity += addedAcceleration;
+        }
+        */
+
+        //Orientation modification
+        if (_isMovingHorizontal || _isMovingVertical){
             float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
             Vector3 tempRotation = transform.rotation.eulerAngles;
             tempRotation.z = angle;
