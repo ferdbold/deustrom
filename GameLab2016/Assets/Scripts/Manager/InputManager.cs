@@ -78,8 +78,6 @@ public class InputManager : MonoBehaviour {
 		foreach(AxisTuple axis in axii) {
 			if (axis.Item2 != null) {
 				axis.Item2.Invoke(axis.Item3, axis.Item4);
-			} else {
-				Debug.LogWarning(string.Format("InputManager: The {0} axis is not linked to any event", axis.Item1));
 			}
 		}
 
@@ -88,8 +86,6 @@ public class InputManager : MonoBehaviour {
 				if (button.Item3) {
 					button.Item2.Invoke();
 				}
-			} else {
-				Debug.LogWarning(string.Format("InputManager: The {0} button is not linked to any event", button.Item1));
 			}
 		}
 	}
