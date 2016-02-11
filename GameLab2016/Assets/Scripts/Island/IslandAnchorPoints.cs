@@ -17,11 +17,11 @@ namespace Simoncouche.Islands {
 		private IslandChunk _parentRef;
 
 		void Awake() {
-			//GetComponentInChildren("");
+			_parentRef = GetComponentInParent<IslandChunk>();
 		}
 
 		void OnTriggerEnter2D(Collider2D other) {
-
+			_parentRef.HandleAnchorPointCollision(other, this);
 		}
 	}
 }

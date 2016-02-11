@@ -61,27 +61,32 @@ namespace Simoncouche.Islands {
 			}
 		}
 
-		public void HandleAnchorPointCollision(IslandAnchorPoints anchor) {
+		/// <summary>
+		/// Handle a trigger collision with the anchors
+		/// </summary>
+		/// <param name="other">The object that collided with the anchor</param>
+		/// <param name="anchor">The anchor sending the event</param>
+		public void HandleAnchorPointCollision(Collider2D other, IslandAnchorPoints anchor) {
+			IslandChunk chunk = other.GetComponent<IslandChunk>();
 
+			if (chunk != null && chunk.color == _color) {
+				GameManager.islandManager.HandleChunkCollision(this, chunk);
+				Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
+				//TODO AUDIO : ISLAND ASSEMBLE SOUND
+			}
 		}
 
 		#endregion
 
 		void OnCollisionEnter2D(Collision2D col) {
-           
-
             Collider2D other = col.collider;
 			IslandChunk chunk = other.GetComponent<IslandChunk>();
 
+			
 			if (chunk != null && chunk.color == _color) {
-				GameManager.islandManager.HandleChunkCollision(this, chunk);
-                Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Assemble.");
-                //TODO AUDIO : ISLAND ASSEMBLE SOUND
-            } else {
                 Vector3 myVelocity = gravityBody.Velocity;
                 Vector3 otherVelocity = chunk.gravityBody.Velocity;
                 Vector3 targetVelocity = Vector3.Reflect(myVelocity, col.contacts[0].normal);
-
 
                 Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
                 //TODO AUDIO : ISLAND COLLISION SOUND
