@@ -33,7 +33,7 @@ namespace Simoncouche.Chain {
 
 		public void SpawnNewSection() {
 			Vector3 nextChainSectionPosition = transform.position;
-			nextChainSectionPosition -= transform.right * transform.localScale.x;
+			nextChainSectionPosition -= transform.up * transform.localScale.x;
 
 			_nextChainSection = (ChainSection)Instantiate(_chainSectionPrefab, nextChainSectionPosition, transform.rotation);
 			_nextChainSection.joint.connectedBody = _rigidbody;

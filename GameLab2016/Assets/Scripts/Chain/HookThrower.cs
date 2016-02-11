@@ -9,6 +9,10 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private Hook _hookPrefab;
 
+		[Tooltip("The initial force sent to the hook upon throwing it")]
+		[SerializeField]
+		private float _initialForceAmount = 10f;
+
 		private float _spawnChainDistanceThreshold = 4f;
 
 		private Hook _hookObj;
@@ -30,7 +34,7 @@ namespace Simoncouche.Chain {
 				Fire();
 			}
 
-			if (isGrapplingHookActive) {
+			if (isGrapplingHookActive && _joint.connectedBody != null) {
 				if (Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnChainDistanceThreshold) {
 					_joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
 				}
@@ -38,7 +42,8 @@ namespace Simoncouche.Chain {
 		}
 
 		private void Fire() {
-			_hookObj = (Hook)Instantiate(_hookPrefab, transform.position, transform.rotation * Quaternion.Euler(0, 90, 0));
+			_hookObj = (Hook)Instantiate(_hookPrefab, transform.position, transform.rotation);
+			_hookObj.SetInitialForce(_initialForceAmount);
 			_hookObj.thrower = this;
 			_joint.enabled = true;
 		}

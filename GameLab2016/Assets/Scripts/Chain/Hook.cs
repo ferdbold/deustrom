@@ -8,10 +8,9 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private ChainSection _chainSectionPrefab;
 
-		[SerializeField]
-		private float _forceAmount = 50f;
-
 		private ChainSection _nextChain;
+
+		private float _initialForce = 0f;
 
 		public HookThrower thrower { get; set; }
 
@@ -27,14 +26,15 @@ namespace Simoncouche.Chain {
 		public void Awake() {
 			_rigidbody = GetComponent<Rigidbody2D>();
 			_joint = GetComponent<FixedJoint2D>();
-
-			_rigidbody.AddForce(transform.rotation * new Vector2(_forceAmount, 0), ForceMode2D.Impulse);
 		}
 
 		public void Start() {
 			_nextChain = (ChainSection)Instantiate(_chainSectionPrefab, transform.position, transform.rotation);
 			_nextChain.joint.connectedBody = _rigidbody;
 			_nextChain.thrower = thrower;
+
+			Debug.Log (transform.rotation * new Vector2 (_initialForce, 0));
+			_rigidbody.AddForce(transform.rotation * new Vector2(_initialForce, 0));
 		}
 
 		public void OnCollisionEnter2D(Collision2D collision) {
@@ -43,6 +43,10 @@ namespace Simoncouche.Chain {
 				_joint.connectedBody = collision.rigidbody;
 				_joint.connectedAnchor = collision.transform.InverseTransformPoint(collision.contacts[0].point);
 			}
+		}
+
+		public void SetInitialForce(float value) {
+			_initialForce = value;
 		}
 	}
 }
