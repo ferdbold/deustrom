@@ -23,17 +23,12 @@ public class PlayerController : MonoBehaviour {
 	/// <summary>  Reference of player's rigidbody  </summary>
 	private Rigidbody2D _playerRigidBody;
 
-	/// <summary> Reference of the player's sprite renderer in order to lerp on the player flip  </summary>
-	private SpriteRenderer _playerSpriteRenderer;
-
 	/// <summary>  Is the player moving horizontally? </summary>
 	private bool _isMovingHorizontal;
 
 	/// <summary>  Is the player moving vertical? </summary>
 	private bool _isMovingVertical;
 
-	/// <summary>  Is the player looking at his right  </summary>
-	private bool _isLookingRight=true;
 
 	/// <summary> Input of left analog at the horizontal  </summary>
 	private float _leftAnalogHorizontal;
@@ -52,7 +47,6 @@ public class PlayerController : MonoBehaviour {
 	/// Getting multiple needed components (Rigidbody, ...)
 	/// </summary>
 	void Awake() {
-		_playerSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
 		_playerRigidBody = GetComponent<Rigidbody2D>();
 	}
 
@@ -70,45 +64,6 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate() {
 		CharacterMovement();
 	}
-
-
-	/// <summary>
-	/// Function to flip the player's sprite if going toward the opposite direction
-	/// </summary>
-	private void UpdateSpriteFlip() {
-		if (_isMovingHorizontal) {
-			if (_leftAnalogHorizontal < 0) {
-				StartCoroutine(SmoothSpriteFlip(new Vector3(180.0f,
-					0.0f), //Because of Orientation modification in Orientation modification
-					1.5f));
-			}else {
-                StartCoroutine(SmoothSpriteFlip(new Vector3(0.0f
-					, 0.0f
-					, 0.0f)
-					, 1.5f));
-			}
-		}
-	}
-
-
-	/// <summary>
-	/// Coroutine doing a lerp on the rotation of a sprite in order to flip his it !!! Not actually used (buggy)  !!!
-	/// </summary>
-	/// <param name="endRot"></param>
-	/// <param name="time"></param>
-	/// <returns></returns>
-	private IEnumerator SmoothSpriteFlip(Vector3 endRot, float time) {
-		float elapsedTime =  0.0f;
-        Vector3 initialTransform = _playerSpriteRenderer.transform.rotation.eulerAngles;
-		while (elapsedTime < time) {
-            Vector3 tempVector = Vector3.Lerp(initialTransform, endRot, elapsedTime / time);
-			_playerSpriteRenderer.transform.rotation = Quaternion.Euler(tempVector);
-			elapsedTime += Time.deltaTime;
-			yield return new WaitForFixedUpdate();	//Wait For Fixed update because the function is the coroutine is called in charaterMovement which is in fixed update
-		}
-
-	}
-
 
 
 
@@ -139,40 +94,19 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	private void CharacterMovement() {
 
-        //Sprite Flip Condition
-        CheckSpriteFlip();
-
         //Add Velocity based on speed
         VelocityCalculation();
 
         //Orientation modification
         ModifyOrientation();
 
-
-
     }
 
-    /// <summary>
-    /// Check if sprite needs to be flipped based on player inputs
-    /// </summary>
-    private void CheckSpriteFlip() {
-        if (_isMovingHorizontal) {
-
-            if (_isLookingRight && _leftAnalogHorizontal < 0.0f) {
-                _playerSpriteRenderer.flipY = true;
-                _isLookingRight = false;
-            } else if (!_isLookingRight && _leftAnalogHorizontal > 0.0f) {
-                _playerSpriteRenderer.flipY = false;
-                _isLookingRight = true;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Calculates the velocity to add based on player inputs and current Velocity.
-    /// Intensify acceleration if going against current velocity and reduce acceleration if going towards current velocity.
-    /// </summary>
-    private void VelocityCalculation() {
+	/// <summary>
+	/// Calculates the velocity to add based on player inputs and current Velocity.
+	/// Intensify acceleration if going against current velocity and reduce acceleration if going towards current velocity.
+	/// </summary>
+	private void VelocityCalculation() {
         if (_isMovingHorizontal || _isMovingVertical) {
             Vector2 movementDirection = new Vector2(_leftAnalogHorizontal, _leftAnalogVertical); //direction of the analogs
             Vector2 addedAcceleration = movementDirection * playerAcceleration * Time.fixedDeltaTime; //Acceleration to add 
