@@ -23,18 +23,28 @@ namespace Simoncouche.Islands {
 		/// Creates a Island from 2 chunk, Will not work for multiple piece of the same letter in one scene
 		/// </summary>
 		/// <param name="a">the first chunk</param>
+		/// /// <param name="a_anchor">the anchor associated to a</param>
 		/// <param name="b">the second chunk</param>
-		public void HandleChunkCollision(IslandChunk a, IslandChunk b) {
+		/// <param name="b_anchor">the anchor associated to b</param>
+		public void HandleChunkCollision(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor) {
 			Island a_IslandLink = ChunkContainedInIsland(a);
 			Island b_IslandLink = ChunkContainedInIsland(b);
 			
 			//If both are contained in Island
 			if (a_IslandLink != null && b_IslandLink != null && a_IslandLink != b_IslandLink) {
-				List<IslandChunk> chunks = b_IslandLink.chunks;
-				foreach(IslandChunk chunk in chunks) {
-					a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
+				if (a_IslandLink.weight <= b_IslandLink.weight) {
+					List<IslandChunk> chunks = b_IslandLink.chunks;
+					foreach (IslandChunk chunk in chunks) {
+						a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
+					}
+					RemoveIsland(b_IslandLink);
+				} else {
+					List<IslandChunk> chunks = a_IslandLink.chunks;
+					foreach (IslandChunk chunk in chunks) {
+						b_IslandLink.AddChunkToIsland(chunk, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
+					}
+					RemoveIsland(a_IslandLink);
 				}
-				RemoveIsland(b_IslandLink);
 			} 
 
 			//If a is contained in a Island
@@ -88,6 +98,42 @@ namespace Simoncouche.Islands {
 			Destroy(Island.gameObject);
 		}
 
+		#region Utils
+
+		/// <summary>
+		/// Join chunk to another
+		/// </summary>
+		/// <param name="a">The chunk to be joined</param>
+		/// /// <param name="a_anchor">anchor assossiated to a</param>
+		/// <param name="b">The chunk joined to</param>
+		/// <param name="b_anchor">anchor assossiated to b</param>
+		private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor) {
+			a.ConnectChunk(FindTargetLocalPosition(a, a_anchor, b_anchor),
+						   FindTargetRotForAnchor(a_anchor, b_anchor),
+						   b,
+						   1f);
+		}
+
+		/// <summary>
+		/// Find the correct euler angle to be at the right position for the anchor
+		/// </summary>
+		/// <param name="a">The point to be merge to other island chunk</param>
+		/// <param name="b">Island that point a merges to</param>
+		/// <returns>euler angle</returns>
+		private Vector3 FindTargetRotForAnchor(IslandAnchorPoints a, IslandAnchorPoints b) {
+			return new Vector3(0, 0, a.angle - b.angle + 180);
+		}
+
+		/// <summary>
+		/// Find the target local position
+		/// </summary>
+		/// <param name="a">The point to be merge to other island chunk</param>
+		/// <param name="b">Island that point a merges to</param>
+		/// <returns></returns>
+		private Vector3 FindTargetLocalPosition(IslandChunk a_chunk, IslandAnchorPoints a, IslandAnchorPoints b) {
+			return a_chunk.transform.localPosition - b.position - a.position;
+		}
+
 		/// <summary>
 		/// Get the point of merge between 2 island chunk
 		/// </summary>
@@ -111,5 +157,7 @@ namespace Simoncouche.Islands {
 		private Vector3 FindMiddlePoint(Vector3 a, Vector3 b) {
 			return (a + (b - a) / 2);
 		}
+
+		#endregion
 	}
 }
