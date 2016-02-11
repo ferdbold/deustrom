@@ -137,83 +137,107 @@ public class PlayerController : MonoBehaviour {
 	/// Function that is called right after PlayerInputs inside Update in order to apply movement to our character
 	/// </summary>
 	private void CharacterMovement() {
+        //initial velocity
 		Vector2 tempVelocity = _playerRigidBody.velocity;
-		Vector2 tempAcceleration = new Vector2(0.0f, 0.0f);
 
+        //Sprite Flip Condition
+        CheckSpriteFlip();
 
-		
-
-		//Sprite Flip Condition
-		if (_isMovingHorizontal) {
-			Vector2 tempScale = _playerSpriteRenderer.transform.localScale;
-			
-			if (_isLookingRight && _leftAnalogHorizontal < 0.0f) {
-				_playerSpriteRenderer.flipY = true;
-				_isLookingRight = false;
-			}else if (!_isLookingRight && _leftAnalogHorizontal > 0.0f) {
-				_playerSpriteRenderer.flipY = false;
-				_isLookingRight = true;
-			}
-		}
-
-        if (DEBUG_USING_CONTROLS_1) {
-            //Velocity modification 1
-            //Get Horizontal and vertical analog values
-            if (_isMovingHorizontal) {
-                tempAcceleration.x += _leftAnalogHorizontal;
-            }
-            if (_isMovingVertical) {
-                tempAcceleration.y += _leftAnalogVertical;
-            }
-            //Modify velocity
-            if (_isMovingHorizontal || _isMovingVertical) {
-                tempAcceleration *= playerAcceleration * Time.fixedDeltaTime;
-                tempVelocity = Vector2.ClampMagnitude(tempVelocity + tempAcceleration, maximumVelocity);
-                _currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
-                _playerRigidBody.velocity = tempVelocity;
-            }
-        } else {
-
-            //Velocity modification 2
-            if (_isMovingHorizontal || _isMovingVertical) {
-                Vector2 movementDirection = new Vector2(_leftAnalogHorizontal, _leftAnalogVertical); //direction of the analogs
-                Vector2 addedAcceleration = movementDirection * playerAcceleration * Time.fixedDeltaTime; //Acceleration to add 
-                Vector2 projection = (Vector2)(Vector3.Project(_playerRigidBody.velocity + addedAcceleration, movementDirection*maximumVelocity)); //projection of player's velocity on max movement
-
-                //If we're trying to move in the direction of the player's velocity, reduce the movement by a factor of the current speed divided by max speed
-                float speedMult = Mathf.Max(0f, (1f - (projection.magnitude / maximumVelocity)));
-                
-                if (movementDirection.normalized == projection.normalized) {
-                               
-                } else {
-                    speedMult += 1;
-                }
-                
-                Debug.Log("mov :" + movementDirection * maximumVelocity + "      vel : " + _playerRigidBody.velocity + "    proj : " + projection + "     factor : " + speedMult + "     final acc : " + (addedAcceleration * speedMult));
-
-                addedAcceleration = addedAcceleration * speedMult;
-
-                //Apply transformations
-                _playerRigidBody.velocity += addedAcceleration;
-            }
-        }
-        
+        //Add Velocity based on speed
+        VelocityCalculation();
 
         //Orientation modification
-        if (_isMovingHorizontal || _isMovingVertical){
+        ModifyOrientation();
+
+        //Get added velocity 
+        _currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
+
+
+    }
+
+    /// <summary>
+    /// Check if sprite needs to be flipped based on player inputs
+    /// </summary>
+    private void CheckSpriteFlip() {
+        if (_isMovingHorizontal) {
+            Vector2 tempScale = _playerSpriteRenderer.transform.localScale;
+
+            if (_isLookingRight && _leftAnalogHorizontal < 0.0f) {
+                _playerSpriteRenderer.flipY = true;
+                _isLookingRight = false;
+            } else if (!_isLookingRight && _leftAnalogHorizontal > 0.0f) {
+                _playerSpriteRenderer.flipY = false;
+                _isLookingRight = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Calculates the velocity to add based on player inputs and current Velocity.
+    /// Intensify acceleration if going against current velocity and reduce acceleration if going towards current velocity.
+    /// </summary>
+    private void VelocityCalculation() {
+        if (_isMovingHorizontal || _isMovingVertical) {
+            Vector2 movementDirection = new Vector2(_leftAnalogHorizontal, _leftAnalogVertical); //direction of the analogs
+            Vector2 addedAcceleration = movementDirection * playerAcceleration * Time.fixedDeltaTime; //Acceleration to add 
+            Vector2 projection = (Vector2)(Vector3.Project(_playerRigidBody.velocity + addedAcceleration, movementDirection * maximumVelocity)); //projection of player's velocity on max movement
+
+            //If we're trying to move in the direction of the player's velocity, reduce the movement by a factor of the current speed divided by max speed
+            float speedMult = Mathf.Max(0f, (1f - (projection.magnitude / maximumVelocity)));
+
+            if (!(movementDirection.normalized == projection.normalized)) {
+                speedMult += 1;
+            }
+
+            //Multiply acceleration by calculated mutliplier
+            addedAcceleration = addedAcceleration * speedMult;
+            //Debug.Log("mov :" + movementDirection * maximumVelocity + "      vel : " + _playerRigidBody.velocity + "    proj : " + projection + "     factor : " + speedMult + "     final acc : " + (addedAcceleration * speedMult));
+
+            //Apply transformations
+            _playerRigidBody.velocity += addedAcceleration;
+        }
+    }
+
+    /// <summary>
+    /// Modify Orientation based on analog inputs
+    /// </summary>
+    private void ModifyOrientation() {
+        if (_isMovingHorizontal || _isMovingVertical) {
             float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
             Vector3 tempRotation = transform.rotation.eulerAngles;
             tempRotation.z = angle;
-            if (_leftAnalogHorizontal < 0.0f){
+            if (_leftAnalogHorizontal < 0.0f) {
                 tempRotation.z -= 180.0f;
             }
             transform.eulerAngles = tempRotation; //We apply the rotation
         }
 
+    }
+
+    /// <summary>
+    /// DEPRECATED. KEPT UNTIL FEEDBACK IS PROVIDED.
+    /// </summary>
+    private void VelocityCalculationByClampingVelocity(Vector2 tempVelocity) {
 
 
+        Vector2 tempAcceleration = new Vector2(0.0f, 0.0f);
 
-	}
+        //Get Horizontal and vertical analog values
+        if (_isMovingHorizontal) {
+            tempAcceleration.x += _leftAnalogHorizontal;
+        }
+        if (_isMovingVertical) {
+            tempAcceleration.y += _leftAnalogVertical;
+        }
+        //Modify velocity
+        if (_isMovingHorizontal || _isMovingVertical) {
+            tempAcceleration *= playerAcceleration * Time.fixedDeltaTime;
+            tempVelocity = Vector2.ClampMagnitude(tempVelocity + tempAcceleration, maximumVelocity);
+            _currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
+            _playerRigidBody.velocity = tempVelocity;
+        }
+    }
+
 
 
 	public Vector2 GetCurrentAddedVelocity() {
