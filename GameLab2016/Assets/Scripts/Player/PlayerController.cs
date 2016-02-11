@@ -181,11 +181,18 @@ public class PlayerController : MonoBehaviour {
                 Vector2 projection = (Vector2)(Vector3.Project(_playerRigidBody.velocity + addedAcceleration, movementDirection*maximumVelocity)); //projection of player's velocity on max movement
 
                 //If we're trying to move in the direction of the player's velocity, reduce the movement by a factor of the current speed divided by max speed
+                float speedMult = Mathf.Max(0f, (1f - (projection.magnitude / maximumVelocity)));
+                
                 if (movementDirection.normalized == projection.normalized) {
-                    float speedMult = Mathf.Max(0f,(1f - (projection.magnitude / maximumVelocity)));
-                    //Debug.Log("mov :" + movementDirection * maximumVelocity + "      vel : " + _playerRigidBody.velocity + "    proj : " + projection + "     factor : " + speedMult);
-                    movementDirection = movementDirection.normalized * speedMult;
+                               
+                } else {
+                    speedMult += 1;
                 }
+                
+                Debug.Log("mov :" + movementDirection * maximumVelocity + "      vel : " + _playerRigidBody.velocity + "    proj : " + projection + "     factor : " + speedMult + "     final acc : " + (addedAcceleration * speedMult));
+
+                addedAcceleration = addedAcceleration * speedMult;
+
                 //Apply transformations
                 _playerRigidBody.velocity += addedAcceleration;
             }
