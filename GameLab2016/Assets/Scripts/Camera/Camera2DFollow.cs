@@ -17,7 +17,8 @@ public class Camera2DFollow : MonoBehaviour {
 
 	void Start () {
         if (target == null)  target = GameObject.FindGameObjectWithTag("Player").transform;
-	}
+        transform.position = new Vector3(target.position.x, target.position.y, Z_POSITION);
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -28,4 +29,6 @@ public class Camera2DFollow : MonoBehaviour {
         transform.position = new Vector3(targetPosition.x, targetPosition.y, Z_POSITION);
         
 	}
+
+   
 }
