@@ -28,12 +28,11 @@ namespace Simoncouche.Chain {
 			_joint = GetComponent<SpringJoint2D>();
 		}
 
-		public void Update() {
-			// TODO: Move this to InputManager
-			if (Input.GetButtonDown("Fire Hook") && !isGrapplingHookActive) {
-				Fire();
-			}
+		public void Start() {
+			GameManager.inputManager.AddEvent(InputManager.Button.fireHook, this.Fire);
+		}
 
+		public void Update() {
 			if (isGrapplingHookActive && _joint.connectedBody != null) {
 				if (Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnChainDistanceThreshold) {
 					_joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
@@ -42,10 +41,13 @@ namespace Simoncouche.Chain {
 		}
 
 		private void Fire() {
-			_hookObj = (Hook)Instantiate(_hookPrefab, transform.position, transform.rotation);
-			_hookObj.SetInitialForce(_initialForceAmount);
-			_hookObj.thrower = this;
-			_joint.enabled = true;
+			// Prevent player from throwing multiple hooks (for now)
+			if (!isGrapplingHookActive) {
+				_hookObj = (Hook)Instantiate(_hookPrefab, transform.position, transform.rotation);
+				_hookObj.SetInitialForce(_initialForceAmount);
+				_hookObj.thrower = this;
+				_joint.enabled = true;
+			}
 		}
 
 		private bool isGrapplingHookActive {

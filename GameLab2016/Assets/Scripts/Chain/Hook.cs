@@ -33,7 +33,6 @@ namespace Simoncouche.Chain {
 			_nextChain.joint.connectedBody = _rigidbody;
 			_nextChain.thrower = thrower;
 
-			Debug.Log (transform.rotation * new Vector2 (_initialForce, 0));
 			_rigidbody.AddForce(transform.rotation * new Vector2(_initialForce, 0));
 		}
 
