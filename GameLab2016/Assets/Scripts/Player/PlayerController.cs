@@ -46,8 +46,9 @@ public class PlayerController : MonoBehaviour {
 
 
 	private Vector2 _currentAddedVelocity=Vector2.zero;
-	#endregion
+    #endregion
 
+    public bool DEBUG_USING_CONTROLS_1 = false;
 
 	/// <summary>
 	/// Getting multiple needed components (Rigidbody, ...)
@@ -154,39 +155,42 @@ public class PlayerController : MonoBehaviour {
 				_isLookingRight = true;
 			}
 		}
-        
-        //Velocity modification 1
-        //Get Horizontal and vertical analog values
-        if (_isMovingHorizontal) {
-            tempAcceleration.x += _leftAnalogHorizontal;
-        }
-        if (_isMovingVertical) {
-            tempAcceleration.y += _leftAnalogVertical;
-        }
-        //Modify velocity
-        if (_isMovingHorizontal || _isMovingVertical){
-            tempAcceleration *= playerAcceleration*Time.fixedDeltaTime;
-		    tempVelocity = Vector2.ClampMagnitude(tempVelocity+ tempAcceleration, maximumVelocity);
-			_currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
-            _playerRigidBody.velocity = tempVelocity;
-		}
-        
-        /*
-        //Velocity modification 2
-        if (_isMovingHorizontal || _isMovingVertical) {
-            Vector2 movementDirection = new Vector2(_leftAnalogHorizontal, _leftAnalogVertical);
 
-            Vector2 projection = (Vector2) Vector3.ClampMagnitude(Vector3.Project(_playerRigidBody.velocity, movementDirection * maximumVelocity), maximumVelocity);
-            if (movementDirection.normalized == projection.normalized) {
-                Debug.Log("projection change : " + Mathf.Max(0, (movementDirection.magnitude - (projection).magnitude)));
-                movementDirection = movementDirection.normalized * Mathf.Max(0,(movementDirection.magnitude - (projection).magnitude));
+        if (DEBUG_USING_CONTROLS_1) {
+            //Velocity modification 1
+            //Get Horizontal and vertical analog values
+            if (_isMovingHorizontal) {
+                tempAcceleration.x += _leftAnalogHorizontal;
             }
-            
+            if (_isMovingVertical) {
+                tempAcceleration.y += _leftAnalogVertical;
+            }
+            //Modify velocity
+            if (_isMovingHorizontal || _isMovingVertical) {
+                tempAcceleration *= playerAcceleration * Time.fixedDeltaTime;
+                tempVelocity = Vector2.ClampMagnitude(tempVelocity + tempAcceleration, maximumVelocity);
+                _currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
+                _playerRigidBody.velocity = tempVelocity;
+            }
+        } else {
 
-            Vector2 addedAcceleration = movementDirection * playerAcceleration * Time.fixedDeltaTime;
-            _playerRigidBody.velocity += addedAcceleration;
+            //Velocity modification 2
+            if (_isMovingHorizontal || _isMovingVertical) {
+                Vector2 movementDirection = new Vector2(_leftAnalogHorizontal, _leftAnalogVertical); //direction of the analogs
+                Vector2 addedAcceleration = movementDirection * playerAcceleration * Time.fixedDeltaTime; //Acceleration to add 
+                Vector2 projection = (Vector2)(Vector3.Project(_playerRigidBody.velocity + addedAcceleration, movementDirection*maximumVelocity)); //projection of player's velocity on max movement
+
+                //If we're trying to move in the direction of the player's velocity, reduce the movement by a factor of the current speed divided by max speed
+                if (movementDirection.normalized == projection.normalized) {
+                    float speedMult = Mathf.Max(0f,(1f - (projection.magnitude / maximumVelocity)));
+                    //Debug.Log("mov :" + movementDirection * maximumVelocity + "      vel : " + _playerRigidBody.velocity + "    proj : " + projection + "     factor : " + speedMult);
+                    movementDirection = movementDirection.normalized * speedMult;
+                }
+                //Apply transformations
+                _playerRigidBody.velocity += addedAcceleration;
+            }
         }
-        */
+        
 
         //Orientation modification
         if (_isMovingHorizontal || _isMovingVertical){
