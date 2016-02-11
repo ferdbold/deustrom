@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
-using System;
+using System.Collections.Generic;
+
+using AxisTuple = Eppy.Tuple<string, InputManager.EventAxis, float, float>;
+using ButtonTuple = Eppy.Tuple<string, InputManager.EventButton, bool>;
 
 public class InputManager : MonoBehaviour {
 
@@ -63,19 +66,31 @@ public class InputManager : MonoBehaviour {
 	#endregion
 
 	void Update() {
-		try {
-			/* Called function linked to */
-			//Axis
-			_leftAnalog.Invoke(Input.GetAxis("L_Horizontal"), Input.GetAxis("L_Vertical"));
-			_rightAnalog.Invoke(Input.GetAxis("R_Horizontal"), Input.GetAxis("R_Horizontal"));
+		List<AxisTuple> axii = new List<AxisTuple>() {
+			new AxisTuple("Left Analog", _leftAnalog, Input.GetAxis("L_Horizontal"), Input.GetAxis("L_Vertical")),
+			new AxisTuple("Right Analog", _rightAnalog, Input.GetAxis("R_Horizontal"), Input.GetAxis("R_Vertical"))
+		};
+		List<ButtonTuple> buttons = new List<ButtonTuple>() {
+			new ButtonTuple("Fire Hook", _fireHookButton, Input.GetButtonDown("Fire Hook")),
+			new ButtonTuple("Start", _startButton, Input.GetButtonDown("Start"))
+		};
 
-			//Button
-			if (Input.GetButtonDown("Fire Hook")) _fireHookButton.Invoke();
-			if (Input.GetButtonDown("Start")) _startButton.Invoke();
-
+		foreach(AxisTuple axis in axii) {
+			if (axis.Item2 != null) {
+				axis.Item2.Invoke(axis.Item3, axis.Item4);
+			} else {
+				Debug.LogWarning(string.Format("InputManager: The {0} axis is not linked to any event", axis.Item1));
+			}
 		}
-		catch (NullReferenceException e) {
-			Debug.LogWarning("One or more inputs are not linked to any event. " + e.Message);
+
+		foreach (ButtonTuple button in buttons) {
+			if (button.Item1 != null) {
+				if (button.Item3) {
+					button.Item2.Invoke();
+				}
+			} else {
+				Debug.LogWarning(string.Format("InputManager: The {0} button is not linked to any event", button.Item1));
+			}
 		}
 	}
 }
