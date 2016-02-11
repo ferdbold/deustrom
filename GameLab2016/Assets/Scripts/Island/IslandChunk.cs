@@ -44,9 +44,38 @@ namespace Simoncouche.Islands {
 			if (_anchorPointObject == null) {
 				_anchorPointObject = Resources.Load("Island/AnchorPoints") as GameObject;
 			}
-			//SpawnAnchorPoints();
+			SpawnAnchorPoints();
         }
 
+		#region Anchor Points Handling
+
+		/// <summary> Spawn Every Anchor points around the island </summary>
+		void SpawnAnchorPoints () {
+			for (int angle=0; angle <= 300; angle+=60) {
+				Transform anchor = (Instantiate(_anchorPointObject) as GameObject).transform;
+				anchor.SetParent(transform);
+				anchor.localPosition = new Vector3(_anchorPointRadius * Mathf.Cos(angle * Mathf.PI / 180f),
+												   _anchorPointRadius * Mathf.Sin(angle * Mathf.PI / 180f),
+												   0);
+				anchor.name = "AnchorPoints angle: " + angle;
+			}
+		}
+
+		public void HandleAnchorPointCollision(IslandAnchorPoints anchor) {
+
+		}
+
+		#endregion
+
+		void OnCollisionEnter2D(Collision2D col) {
+            Collider2D other = col.collider;
+			IslandChunk chunk = other.GetComponent<IslandChunk>();
+			if (chunk != null && chunk.color == _color) {
+				GameManager.islandManager.HandleChunkCollision(this, chunk);
+			}
+		}
+
+		#region Legacy
 		/*/// <summary> Associated Chunk Letter </summary>
 		[SerializeField]
 		[Tooltip("The associated chunk letter")]
@@ -59,22 +88,6 @@ namespace Simoncouche.Islands {
 			}
 			private set { }
 		}*/
-
-		/// <summary> Spawn Every Anchor points around the island </summary>
-		void SpawnAnchorPoints () {
-			for (int angle=0; angle <= 300; angle+=60) {
-				Transform anchor = (Instantiate(_anchorPointObject) as GameObject).transform;
-				anchor.SetParent(transform);
-				anchor.localPosition = new Vector3(_anchorPointRadius * Mathf.Cos(angle), _anchorPointRadius * Mathf.Cos(angle), 0);
-			}
-		}
-
-		void OnCollisionEnter2D(Collision2D col) {
-            Collider2D other = col.collider;
-			IslandChunk chunk = other.GetComponent<IslandChunk>();
-			if (chunk != null && chunk.color == _color) {
-				GameManager.islandManager.HandleChunkCollision(this, chunk);
-			}
-		}
+		#endregion
 	}
 }

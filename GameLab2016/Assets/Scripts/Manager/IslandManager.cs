@@ -15,7 +15,7 @@ namespace Simoncouche.Islands {
 		/// <summary>
 		/// The Island prefab reference
 		/// </summary>
-		[SerializeField]
+		[SerializeField]  
 		[Tooltip("Island Object Prefab Reference")]
 		private GameObject _islandComponent;
 
