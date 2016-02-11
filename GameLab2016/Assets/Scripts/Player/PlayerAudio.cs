@@ -37,6 +37,7 @@ public class PlayerAudio : MonoBehaviour {
 	private float _volumeSwimming;
 	private AudioSource _playerAudioSource;
 	private bool _isCoroutineRunning;
+	private const float _axisMaxValue=1.0f;
 	#endregion
 
 
@@ -51,7 +52,15 @@ public class PlayerAudio : MonoBehaviour {
 	
 		
 	// Update is called once per frame
+
 	void Update () {
+
+		//We lerp the current added velocity by the player on the character to get a pitch higher or lower depending on velocity
+		//magnitude divided by Time.fixedDeltatime is done cause 
+		_currentPitchValue = Mathf.Lerp(minPitch, maxPitch, GetMovementValue() / _axisMaxValue);
+
+		_playerAudioSource.pitch = _currentPitchValue;
+
 		if (Mathf.Abs(_pRef.GetLeftAnalogHorizontal()) > 0.0f 
 			|| Mathf.Abs(_pRef.GetLeftAnalogVertical()) > 0.0f) {
 			//We reset the volume to the volume specified in the inspector
@@ -60,17 +69,24 @@ public class PlayerAudio : MonoBehaviour {
 			StopCoroutine("TimerUntilSoundStop");
 			_isCoroutineRunning = false;
 
-			//We lerp the current added velocity by the player on the character to get a pitch higher or lower depending on velocity
-			//magnitude divided by Time.fixedDeltatime is done cause 
-			_currentPitchValue = Mathf.Lerp(minPitch, maxPitch, (_pRef.GetCurrentAddedVelocity().magnitude/Time.fixedDeltaTime)/_pRef.maximumVelocity);
-
-			_playerAudioSource.pitch = _currentPitchValue;
+			
 
 			if (!_playerAudioSource.isPlaying) _playerAudioSource.Play();
 		}else {
 			FadeAudioSource();
 		}
 		
+	}
+
+	/// <summary>
+	/// We get the hypothenuse value of our 2 vectors 
+	/// </summary>
+	/// <returns></returns>
+	private float GetMovementValue() {
+		float x = Mathf.Pow(_pRef.GetCurrentPlayerMovementInputs().x, 2.0f);
+		float y = Mathf.Pow(_pRef.GetCurrentPlayerMovementInputs().y, 2.0f);
+		float movementValue = Mathf.Clamp(Mathf.Sqrt(x+y), 0.0f, _axisMaxValue);
+		return movementValue;
 	}
 
 	/// <summary>

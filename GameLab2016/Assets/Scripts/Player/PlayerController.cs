@@ -44,11 +44,12 @@ public class PlayerController : MonoBehaviour {
 	/// <summary> Input of left analog at the vertical </summary>
 	private float _leftAnalogVertical;
 
-
-	private Vector2 _currentAddedVelocity=Vector2.zero;
+	/// <summary>
+	/// Vector of player inputs
+	/// </summary>
+	private Vector2 _currentPlayerMovementInputs=Vector2.zero;
     #endregion
 
-    public bool DEBUG_USING_CONTROLS_1 = false;
 
 	/// <summary>
 	/// Getting multiple needed components (Rigidbody, ...)
@@ -129,6 +130,9 @@ public class PlayerController : MonoBehaviour {
 
 		if (Mathf.Abs(_leftAnalogVertical) > 0.0f) _isMovingVertical = true;
 		else _isMovingVertical = false;
+
+		_currentPlayerMovementInputs.x = _leftAnalogHorizontal;
+		_currentPlayerMovementInputs.y = _leftAnalogVertical;
 	}
 
 
@@ -137,8 +141,6 @@ public class PlayerController : MonoBehaviour {
 	/// Function that is called right after PlayerInputs inside Update in order to apply movement to our character
 	/// </summary>
 	private void CharacterMovement() {
-        //initial velocity
-		Vector2 tempVelocity = _playerRigidBody.velocity;
 
         //Sprite Flip Condition
         CheckSpriteFlip();
@@ -149,8 +151,6 @@ public class PlayerController : MonoBehaviour {
         //Orientation modification
         ModifyOrientation();
 
-        //Get added velocity 
-        _currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
 
 
     }
@@ -233,15 +233,14 @@ public class PlayerController : MonoBehaviour {
         if (_isMovingHorizontal || _isMovingVertical) {
             tempAcceleration *= playerAcceleration * Time.fixedDeltaTime;
             tempVelocity = Vector2.ClampMagnitude(tempVelocity + tempAcceleration, maximumVelocity);
-            _currentAddedVelocity = tempVelocity - _playerRigidBody.velocity;
             _playerRigidBody.velocity = tempVelocity;
         }
     }
 
 
 
-	public Vector2 GetCurrentAddedVelocity() {
-		return _currentAddedVelocity;
+	public Vector2 GetCurrentPlayerMovementInputs() {
+		return _currentPlayerMovementInputs;
 	}
 
 	/// <summary>
