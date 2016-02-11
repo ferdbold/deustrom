@@ -151,6 +151,7 @@ public class GravityBody : GravityObject {
             }
         }
     }
+
     #endregion
 
     #region Advanced Collision Functions
