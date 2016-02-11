@@ -17,7 +17,7 @@ namespace Simoncouche.Islands {
         private TrailRenderer _trailRenderer;
 
 
-		void Awake() {
+		protected override void Awake() {
 			chunks = new List<IslandChunk>();
             _collider = GetComponent<CircleCollider2D>();
 			base.Awake();

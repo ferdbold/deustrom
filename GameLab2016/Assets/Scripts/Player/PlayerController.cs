@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour {
 
 
 	#region PrivateVariables
-	/// <summary> Reference of player's rigidbody  </summary>
+	/// <summary>  Reference of player's rigidbody  </summary>
 	private Rigidbody2D _playerRigidBody;
 
 	/// <summary> Reference of the player's sprite renderer in order to lerp on the player flip  </summary>
@@ -34,9 +34,6 @@ public class PlayerController : MonoBehaviour {
 
 	/// <summary>  Is the player looking at his right  </summary>
 	private bool _isLookingRight=true;
-
-	/// <summary> Is it flipping the sprite  </summary>
-	private bool _isFlippingSprite = false;
 
 	/// <summary> Input of left analog at the horizontal  </summary>
 	private float _leftAnalogHorizontal;
@@ -109,7 +106,7 @@ public class PlayerController : MonoBehaviour {
 			elapsedTime += Time.deltaTime;
 			yield return new WaitForFixedUpdate();	//Wait For Fixed update because the function is the coroutine is called in charaterMovement which is in fixed update
 		}
-		_isFlippingSprite = false;
+
 	}
 
 
@@ -160,7 +157,6 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     private void CheckSpriteFlip() {
         if (_isMovingHorizontal) {
-            Vector2 tempScale = _playerSpriteRenderer.transform.localScale;
 
             if (_isLookingRight && _leftAnalogHorizontal < 0.0f) {
                 _playerSpriteRenderer.flipY = true;

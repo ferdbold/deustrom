@@ -39,7 +39,7 @@ namespace Simoncouche.Islands {
 
 		private static GameObject _anchorPointObject = null;
 
-        protected void Awake() {
+        protected virtual void Awake() {
             gravityBody = GetComponent<GravityBody>();
 			if (_anchorPointObject == null) {
 				_anchorPointObject = Resources.Load("Island/AnchorPoints") as GameObject;
@@ -84,11 +84,7 @@ namespace Simoncouche.Islands {
 
 			
 			if (chunk != null && chunk.color == _color) {
-                Vector3 myVelocity = gravityBody.Velocity;
-                Vector3 otherVelocity = chunk.gravityBody.Velocity;
-                Vector3 targetVelocity = Vector3.Reflect(myVelocity, col.contacts[0].normal);
-
-                Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
+  
                 //TODO AUDIO : ISLAND COLLISION SOUND
             }
 		}

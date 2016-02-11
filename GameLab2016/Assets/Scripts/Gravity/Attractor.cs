@@ -21,7 +21,7 @@ public class Attractor : GravityModifier {
     private float _additionnalDragRate = 0.1f;
     private float _additionnalDragDistance = 0.85f;
 
-    void Start () {
+    protected override void Start () {
         base.Start();
         SetupCollider();
     }

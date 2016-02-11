@@ -15,7 +15,7 @@ public abstract class GravityModifier : GravityObject {
     protected float MIN_DIST_MULTIPLIER = 2f;
 
 
-    protected virtual void Start() {
+    protected override void Start() {
         base.Start();
         if (gameObject.layer != 9) gameObject.layer = 8; //If not player layer, set gravityModifier Layer
     }

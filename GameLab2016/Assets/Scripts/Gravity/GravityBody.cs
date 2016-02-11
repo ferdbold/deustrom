@@ -26,7 +26,6 @@ public class GravityBody : GravityObject {
     //Collision
     private int gravityModifierLayerMask;  //Layermask of gravity modifier
     private int playerLayerMask; //Layermask of player
-    private int gravityBodyLayerMask; //Layermask of gravity bodies
     /// <summary> Time remaining without collisions activated </summary>
     private float timeNoCollision = 0f;
     /// <summary> Are collisions currently enabled </summary>
@@ -42,7 +41,6 @@ public class GravityBody : GravityObject {
 
         gravityModifierLayerMask = 8; //Get gravity modifier layermask
         playerLayerMask = 9; //Get player layermask
-        gravityBodyLayerMask = 10; //Get gravity body layermask
 
         if (gameObject.layer != playerLayerMask) { //if player
             gameObject.layer = 10;

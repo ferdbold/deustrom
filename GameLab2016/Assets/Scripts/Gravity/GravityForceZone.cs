@@ -8,7 +8,7 @@ public class GravityForceZone : GravityModifier {
     private float gravityForceFactor = 0.1f; //Force applied by gravityForceZone is multiplied by this
 
 	// Use this for initialization
-	void Start () {
+	protected override void Start () {
         base.Start();
 	}
 
