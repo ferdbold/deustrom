@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Simoncouche.Islands;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
@@ -22,6 +23,12 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Update () {
+		if (Input.GetKeyDown(KeyCode.R)) {
+			SceneManager.LoadScene(0);
+		}
+		if (Input.GetKeyDown(KeyCode.Escape)) {
+			Application.Quit();
+		}
         if (Input.GetKeyDown(KeyCode.Alpha1)) {          
             Time.timeScale = 1f;
         }
