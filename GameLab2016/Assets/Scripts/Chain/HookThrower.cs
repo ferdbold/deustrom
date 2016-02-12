@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace Simoncouche.Chain {
 
@@ -26,14 +27,14 @@ namespace Simoncouche.Chain {
 		private float _spawnChainDistanceThreshold = 4f;
 
 		/// <summary>
-		/// A reference to the thrown hook
+		/// The list of all the chains thrown by this thrower currently in play
 		/// </summary>
-		private Hook _hookObj;
+		private List<Chain> _chains = new List<Chain>();
 
 		/// <summary>
 		/// The current aim orientation as set by the right analog input
 		/// </summary>
-		private float _aimOrientation;
+		public float aimOrientation { get; private set; }
 
 		// COMPONENTS
 
@@ -61,27 +62,22 @@ namespace Simoncouche.Chain {
 		public void Update() {
 			// Generate new sections if the distance to the linked section exceeds the threshold
 			// TODO: Unfuck this
-			if (isGrapplingHookActive && _joint.connectedBody != null) {
+			if (_chains.Count > 0 && _joint.connectedBody != null) {
 				if (Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnChainDistanceThreshold) {
 					_joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
 				}
 			}
 
 			// Apply rotation continously to the aimIndicator to prevent character rotation from updating the indicator
-			_aimIndicator.transform.rotation = Quaternion.Euler(0, 0, _aimOrientation);
+			_aimIndicator.transform.rotation = Quaternion.Euler(0, 0, this.aimOrientation);
 		}
 
 		/// <summary>
 		/// Handle user input to throw a new chain and hook
 		/// </summary>
 		private void Fire() {
-			// Prevent player from throwing multiple hooks (for now)
-			if (!isGrapplingHookActive) {
-				_hookObj = (Hook)Instantiate(_hookPrefab, transform.position, Quaternion.Euler(0, 0, _aimOrientation));
-				_hookObj.SetInitialForce(_initialForceAmount);
-				_hookObj.thrower = this;
-				_joint.enabled = true;
-			}
+			_chains.Add(Chain.Create(this, _initialForceAmount));
+			_joint.enabled = true;
 		}
 
 		/// <summary>
@@ -93,17 +89,11 @@ namespace Simoncouche.Chain {
 
 			// Only apply aiming if the user input is relevant (higher than the deadzone)
 			if (orientation.magnitude > _aimDeadzone) {
-				_aimOrientation = Vector2.Angle(Vector2.right, orientation);
+				this.aimOrientation = Vector2.Angle(Vector2.right, orientation);
 
 				if (axisValues[1] < 0) {
-					_aimOrientation = 360f - _aimOrientation;
+					this.aimOrientation = 360f - this.aimOrientation;
 				}
-			}
-		}
-
-		private bool isGrapplingHookActive {
-			get {
-				return _hookObj != null;
 			}
 		}
 	}

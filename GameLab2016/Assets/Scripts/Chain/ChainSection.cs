@@ -9,9 +9,11 @@ namespace Simoncouche.Chain {
 	[RequireComponent(typeof(HingeJoint2D))]
 	public class ChainSection : MonoBehaviour {
 
+		private static GameObject _chainSectionPrefab;
+
 		[Tooltip("Reference to the ChainSection prefab")]
 		[SerializeField]
-		private ChainSection _chainSectionPrefab;
+		//private ChainSection _chainSectionPrefab;
 
 		/// <summary>
 		/// The ChainSection that is linked to this section
@@ -19,9 +21,9 @@ namespace Simoncouche.Chain {
 		private ChainSection _nextChainSection;
 
 		/// <summary>
-		/// The character that generated this ChainSection
+		/// The chain this ChainSection is part of
 		/// </summary>
-		public HookThrower thrower { get; set; }
+		public Chain _chain;
 
 		// COMPONENTS
 
@@ -31,15 +33,34 @@ namespace Simoncouche.Chain {
 		private Rigidbody2D _rigidbody;
 		public new Rigidbody2D rigidbody { get { return _rigidbody; } }
 
-		// METHODS
+		/// <summary>
+		/// Spawn a new ChainSection inside a chain
+		/// </summary>
+		/// <param name="position">The world position for this new section</param>
+		/// <param name="chain">The parent chain</param>
+		/// <param name="previous">The previous link in the chain</param>
+		public static ChainSection Create(Vector3 position, Chain chain, Rigidbody2D previous) {
+			if (_chainSectionPrefab == null) {
+				_chainSectionPrefab = Resources.Load("Chain/ChainSection") as GameObject;
+			}
+
+			ChainSection chainSection = ((GameObject)Instantiate(
+                _chainSectionPrefab,
+                position,
+                previous.transform.rotation
+            )).GetComponent<ChainSection>();
+
+			chainSection.transform.parent = chain.transform;
+			chainSection.joint.connectedBody = previous;
+			chainSection.SetChain(chain);
+			chain.thrower.joint.connectedBody = chainSection.rigidbody;
+
+			return chainSection;
+		}
 
 		public void Awake() {
 			_joint = GetComponent<HingeJoint2D>();
 			_rigidbody = GetComponent<Rigidbody2D>();
-		}
-
-		public void Start() {
-			thrower.joint.connectedBody = _rigidbody;
 		}
 
 		/// <summary>
@@ -48,9 +69,11 @@ namespace Simoncouche.Chain {
 		public void SpawnNewSection() {
 			Vector3 nextChainSectionPosition = transform.position - transform.up * transform.localScale.x;
 
-			_nextChainSection = (ChainSection)Instantiate(_chainSectionPrefab, nextChainSectionPosition, transform.rotation);
-			_nextChainSection.joint.connectedBody = _rigidbody;
-			_nextChainSection.thrower = thrower;
+			_nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, _rigidbody);
+		}
+
+		public void SetChain(Chain value) {
+			_chain = value;
 		}
 	}
 }
