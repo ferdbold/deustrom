@@ -110,11 +110,12 @@ namespace Simoncouche.Islands {
 		/// /// <param name="a_anchor">anchor assossiated to a</param>
 		/// <param name="b">The chunk joined to</param>
 		/// <param name="b_anchor">anchor assossiated to b</param>
-		private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor) {
+		private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor, Island targetIsland) {
 			a.ConnectChunk(FindTargetLocalPosition(a, a_anchor, b_anchor),
 						   FindTargetRotForAnchor(a_anchor, b_anchor),
 						   b,
-						   1f);
+                           targetIsland,
+                           1f);
 		}
 
 		/// <summary>
