@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Simoncouche.Islands;
 
 namespace Simoncouche.Chain {
 
@@ -32,15 +33,15 @@ namespace Simoncouche.Chain {
 			_nextChain = (ChainSection)Instantiate(_chainSectionPrefab, transform.position, transform.rotation);
 			_nextChain.joint.connectedBody = _rigidbody;
 			_nextChain.thrower = thrower;
-
 			_rigidbody.AddForce(transform.rotation * new Vector2(_initialForce, 0));
 		}
 
-		public void OnCollisionEnter2D(Collision2D collision) {
-			if (collision.gameObject.GetComponent<Hookable>() != null) {
-				_joint.enabled = true;
-				_joint.connectedBody = collision.rigidbody;
-				_joint.connectedAnchor = collision.transform.InverseTransformPoint(collision.contacts[0].point);
+		public void OnTriggerEnter2D(Collider2D coll) {
+			if (_joint.connectedBody == null) {
+				if (coll.gameObject.GetComponent<IslandAnchorPoints>() != null) {
+					_joint.enabled = true;
+					_joint.connectedBody = coll.GetComponent<Rigidbody2D>();
+				}
 			}
 		}
 
