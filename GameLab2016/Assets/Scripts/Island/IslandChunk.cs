@@ -93,9 +93,9 @@ namespace Simoncouche.Islands {
 			IslandAnchorPoints otherAnchor = other.GetComponent<IslandAnchorPoints>();
 			IslandChunk chunk = other.GetComponentInParent<IslandChunk>();
 
-			if (otherAnchor != null && chunk.color == _color && otherAnchor.transform.parent != gameObject) {
+			if (otherAnchor != null && chunk.color == _color && otherAnchor.transform.parent.gameObject != gameObject) {
 				GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
-				Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
+				//Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
 				//TODO AUDIO : ISLAND ASSEMBLE SOUND
 			}
 		}
@@ -108,11 +108,8 @@ namespace Simoncouche.Islands {
 
 			
 			if (!(chunk != null && chunk.color == _color)) {
-                Vector3 myVelocity = gravityBody.Velocity;
-                Vector3 otherVelocity = chunk.gravityBody.Velocity;
-                Vector3 targetVelocity = Vector3.Reflect(myVelocity, col.contacts[0].normal);
 
-                Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
+                //Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
                 //TODO AUDIO : ISLAND COLLISION SOUND
             }
 		}
