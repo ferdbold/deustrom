@@ -38,34 +38,35 @@ namespace Simoncouche.Islands {
 			//If both are contained in Island
 			if (a_IslandLink != null && b_IslandLink != null && a_IslandLink != b_IslandLink) {
 				if (IslandUtils.CheckIfOnSameIsland(a_IslandLink, b_IslandLink)) return;
-				if (a_IslandLink.weight <= b_IslandLink.weight) {
-					List<IslandChunk> chunks = b_IslandLink.chunks;
-					foreach (IslandChunk chunk in chunks) {
-						a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-					}
-					RemoveIsland(b_IslandLink);
-				} else {
-					List<IslandChunk> chunks = a_IslandLink.chunks;
-					foreach (IslandChunk chunk in chunks) {
-						b_IslandLink.AddChunkToIsland(chunk, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
-					}
-					RemoveIsland(a_IslandLink);
+
+				bool isA = a_IslandLink.weight <= b_IslandLink.weight;
+
+				List<IslandChunk> chunks = isA ? b_IslandLink.chunks : a_IslandLink.chunks;
+				foreach (IslandChunk chunk in chunks) {
+					a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint((isA ? b : a).transform.position, 
+																		 (isA ? a : b).transform.position), 
+																		 (isA ? a : b).transform.rotation.eulerAngles);
 				}
+				RemoveIsland(isA ? b_IslandLink : a_IslandLink);
+				//Merge two chunk for island
 			} 
 
 			//If a is contained in a Island
 			else if (a_IslandLink != null) {
 				a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
+				JoinTwoChunk(a, a_anchor, b, b_anchor, a_IslandLink);
 			} 
 			
 			//If b is contained in a Island
 			else if (b_IslandLink != null) {
 				b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
+				JoinTwoChunk(b, b_anchor, a, a_anchor, b_IslandLink);
 			} 
 			
 			//If a & b are not contained in a Island
 			else {
 				CreateIsland(a, b);
+				JoinTwoChunk(a, a_anchor, b, b_anchor, ChunkContainedInIsland(a));
 			}
 		}
 
