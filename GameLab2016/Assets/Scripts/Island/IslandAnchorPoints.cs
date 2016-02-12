@@ -21,9 +21,7 @@ namespace Simoncouche.Islands {
 		}
 
 		void OnTriggerEnter2D(Collider2D other) {
-			if (_parentRef != null) {
-				_parentRef.HandleAnchorPointCollision(other, this);
-			}
+			_parentRef.HandleAnchorPointCollision(other, this);
 		}
 	}
 }

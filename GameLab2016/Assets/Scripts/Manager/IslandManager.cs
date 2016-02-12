@@ -32,6 +32,7 @@ namespace Simoncouche.Islands {
 			
 			//If both are contained in Island
 			if (a_IslandLink != null && b_IslandLink != null && a_IslandLink != b_IslandLink) {
+				if (IslandUtils.CheckIfOnSameIsland(a_IslandLink, b_IslandLink)) return;
 				if (a_IslandLink.weight <= b_IslandLink.weight) {
 					List<IslandChunk> chunks = b_IslandLink.chunks;
 					foreach (IslandChunk chunk in chunks) {
@@ -81,12 +82,13 @@ namespace Simoncouche.Islands {
 		/// <param name="a">First chunk</param>
 		/// <param name="b">Second chunk</param>
 		private void CreateIsland(IslandChunk a, IslandChunk b) {
-			GameObject Island = Instantiate(_islandComponent, a.transform.position, a.transform.rotation) as GameObject;
-			Island.name = "Island";
+			GameObject island = Instantiate(_islandComponent, a.transform.position, a.transform.rotation) as GameObject;
+			island.name = "Island";
 
-			Island.GetComponent<Island>().AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
+			island.GetComponent<Island>().AddChunkToIsland(a, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
+			island.GetComponent<Island>().AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
 
-			_island.Add(Island.GetComponent<Island>());
+			_island.Add(island.GetComponent<Island>());
 		}
 
 		/// <summary>
