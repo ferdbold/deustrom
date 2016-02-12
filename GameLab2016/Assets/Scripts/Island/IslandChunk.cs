@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
-using System.Timers;
 
 namespace Simoncouche.Islands {
 	/// <summary>
@@ -63,16 +63,17 @@ namespace Simoncouche.Islands {
 		/// <param name="targetRot">the target rotation</param>
 		/// <param name="time">the time taken</param>
 		/// <param name="targetChunk">the other chunk</param>
-
 		public void ConnectChunk(Vector3 targetPos, Vector3 targetRot, IslandChunk targetChunk, Island targetIsland, float time = 0.5f) {
             //Debug.Log("Connecting " + gameObject.name + " to " + targetChunk.name);
 			Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
 			transform.DOLocalRotate(targetRot, time);
 			transform.DOLocalMove(targetPos, time);
-            Timer t = new Timer(time);
-            t.Elapsed += delegate { targetIsland.CenterIslandRoot();};
-            t.Start();
+            StartCoroutine(Delay_CenterIslandRoot(time, targetIsland));
         }
+
+
+        /// <summary> Calls Center Island root function on a delay t in seconds </summary>
+        private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland) { yield return new WaitForSeconds(t); targetIsland.CenterIslandRoot(); }
 
 		#endregion
 

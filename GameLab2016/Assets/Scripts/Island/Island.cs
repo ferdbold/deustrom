@@ -83,20 +83,26 @@ namespace Simoncouche.Islands {
         /// Centers the root of the island based on its existing chunk
         /// </summary>
         public void CenterIslandRoot() {
-            
+            //Avoid error if chunks aren't properly initialized
+            if (chunks.Count == 0) {
+                Debug.Log("There are no chunks ! ");
+                return; 
+            }
+
+
             //Calculate median position of the island's chunks
             Vector3 medianPosition = Vector3.zero;
             for(int i = 0; i < chunks.Count; i++ ) {
                 medianPosition += chunks[i].transform.localPosition;
             }
             medianPosition /= chunks.Count;
-            Debug.Log("median position " + medianPosition);
+            //Debug.Log("median position " + medianPosition);
 
             //Modifiy Island chunks and island positions
             for (int i = 0; i < chunks.Count; i++) {
                 chunks[i].transform.localPosition -= medianPosition;
             }
-            transform.position = medianPosition;
+            transform.position += medianPosition;
 
         }
 
