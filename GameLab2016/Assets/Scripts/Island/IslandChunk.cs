@@ -63,6 +63,7 @@ namespace Simoncouche.Islands {
 		/// <param name="time">the time taken</param>
 		/// <param name="targetChunk">the other chunk</param>
 		public void ConnectChunk(Vector3 targetPos, Vector3 targetRot, IslandChunk targetChunk, float time = 0.5f) {
+			Debug.Log("Connecting " + gameObject.name + " to " + targetChunk.name);
 			Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
 			transform.DOLocalRotate(targetRot, time);
 			transform.DOLocalMove(targetPos, time);
