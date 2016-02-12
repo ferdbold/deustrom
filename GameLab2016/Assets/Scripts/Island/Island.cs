@@ -5,9 +5,13 @@ namespace Simoncouche.Islands {
 	/// <summary>
 	/// The global Island information, parent to Island Chunk
 	/// </summary>
-	public class Island : IslandChunk {
-
-
+	public class Island : MonoBehaviour {
+		
+		private int _weight = 1;
+		public int weight {
+			get { return _weight; }
+			protected set { _weight = value; }
+		}
 
 		/// <summary> The many part of the Island </summary>
 		public List<IslandChunk> chunks { get; private set; }
@@ -15,13 +19,13 @@ namespace Simoncouche.Islands {
         //Island's Components
         private CircleCollider2D _collider;
         private TrailRenderer _trailRenderer;
+		private GravityBody _gravityBody;
 
-
-		protected override void Awake() {
+		private void Awake() {
 			chunks = new List<IslandChunk>();
-            _collider = GetComponent<CircleCollider2D>();
-			base.Awake();
-            _trailRenderer = GetComponent<TrailRenderer>();
+			_collider = GetComponent<CircleCollider2D>();
+			_trailRenderer = GetComponent<TrailRenderer>();
+			_gravityBody = GetComponent<GravityBody>();
 		}
 
 		/// <summary>
@@ -54,13 +58,13 @@ namespace Simoncouche.Islands {
 		/// </summary>
 		/// <param name="chunk"></param>
         private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
-            gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
+            _gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
 			//Merge weight
-			gravityBody.Velocity = (gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
+			_gravityBody.Velocity = (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
 			weight = weight + chunk.weight;
 
             _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
-			gravityBody.Weight += chunk.gravityBody.Weight;
+			_gravityBody.Weight += chunk.gravityBody.Weight;
             _trailRenderer.startWidth += 0.25f;
             _trailRenderer.time += 0.25f;
 

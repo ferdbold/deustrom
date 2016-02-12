@@ -4,14 +4,13 @@ using System.Collections.Generic;
 
 namespace Simoncouche.Islands {
 	/// <summary>
-	/// The component attached to a Island chunk
+	/// The structure related to an island chunk
 	/// </summary>
 	[RequireComponent(typeof(GravityBody))]
 	public class IslandChunk : MonoBehaviour {
 
 		[Header("Island Property")]
-
-		/// <summary> The Color of the Island  </summary>
+		
 		[SerializeField]
 		[Tooltip("The Assign color of the Island")]
 		private IslandUtils.color _color;	
@@ -19,8 +18,7 @@ namespace Simoncouche.Islands {
 			get { return _color; }
             protected set { _color = value; }
 		}
-
-		/// <summary>The weigth of the island chunk</summary>
+		
 		[SerializeField]
 		[Tooltip("Weight of the island chunk")]
 		[Range(1, 10)]
@@ -33,7 +31,11 @@ namespace Simoncouche.Islands {
 		[Header("Anchor Points Attributes")]
 		[SerializeField]
 		[Tooltip("The distance from the origin to the side of the hexagon")]
-		private float _anchorPointRadius = 1f;
+		private float _anchorPointDistance = 0.5f;
+
+		[SerializeField]
+		[Tooltip("The radius of the anchor trigger zone")]
+		private float _anchorPointRadius = 0.2f;
 
 		public List<IslandAnchorPoints> anchors { get; private set; }
 
@@ -76,10 +78,11 @@ namespace Simoncouche.Islands {
 			for (int angle=0; angle <= 300; angle+=60) {
 				Transform anchor = (Instantiate(_anchorPointObject) as GameObject).transform;
 				anchor.SetParent(transform);
-				anchor.localPosition = new Vector3(_anchorPointRadius * Mathf.Cos(angle * Mathf.PI / 180f),
-												   _anchorPointRadius * Mathf.Sin(angle * Mathf.PI / 180f),
+				anchor.localPosition = new Vector3(_anchorPointDistance * Mathf.Cos(angle * Mathf.PI / 180f),
+												   _anchorPointDistance * Mathf.Sin(angle * Mathf.PI / 180f),
 												   0);
-				anchor.name = "AnchorPoints angle: " + angle;
+				anchor.name = "AnchorPoints " + angle;
+				anchor.GetComponent<CircleCollider2D>().radius = _anchorPointRadius;
 				anchors.Add(anchor.GetComponent<IslandAnchorPoints>());
 			}
 		}
@@ -93,9 +96,12 @@ namespace Simoncouche.Islands {
 			IslandAnchorPoints otherAnchor = other.GetComponent<IslandAnchorPoints>();
 			IslandChunk chunk = other.GetComponentInParent<IslandChunk>();
 
-			if (otherAnchor != null && chunk.color == _color && otherAnchor.transform.parent != gameObject) {
-				GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
+			if (otherAnchor != null && chunk.color == _color && otherAnchor.transform.parent.gameObject != gameObject ) {
+				if (IslandUtils.CheckIfOnSameIsland(other.GetComponentInParent<Island>(), GetComponentInParent<Island>())) {
+					return;
+				}
 				Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
+				GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
 				//TODO AUDIO : ISLAND ASSEMBLE SOUND
 			}
 		}
