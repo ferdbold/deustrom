@@ -18,13 +18,11 @@ namespace Simoncouche.Islands {
 
         //Island's Components
         private CircleCollider2D _collider;
-        private TrailRenderer _trailRenderer;
 		private GravityBody _gravityBody;
 
 		private void Awake() {
 			chunks = new List<IslandChunk>();
 			_collider = GetComponent<CircleCollider2D>();
-			_trailRenderer = GetComponent<TrailRenderer>();
 			_gravityBody = GetComponent<GravityBody>();
 		}
 
@@ -51,12 +49,23 @@ namespace Simoncouche.Islands {
 				chunk.transform.localRotation = Quaternion.Euler(rot);*/
 				ChangeGravityBodyWhenMerging(chunk);
 			}
-		}
+        }
 
-		/// <summary>
-		/// Changes the velocity of the entire Island based on new fragment
-		/// </summary>
-		/// <param name="chunk"></param>
+        /// <summary>
+        /// Remove a chunk of this island.
+        /// </summary>
+        /// <param name="chunk">Reference of the chunk to remove</param>
+        private void RemoveChunkToIsland(IslandChunk chunk) {
+            //TODO : Implement this function
+
+            //Recenter island middle
+            CenterIslandRoot();
+        }
+
+        /// <summary>
+        /// Changes the velocity of the entire Island based on new fragment
+        /// </summary>
+        /// <param name="chunk"></param>
         private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
             _gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
 			//Merge weight
@@ -65,11 +74,31 @@ namespace Simoncouche.Islands {
 
             _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
 			_gravityBody.Weight += chunk.gravityBody.Weight;
-            _trailRenderer.startWidth += 0.25f;
-            _trailRenderer.time += 0.25f;
 
             //deactivate the gravitybody of the chunk
             chunk.gravityBody.DeactivateGravityBody();
 		}
-	}
+
+        /// <summary>
+        /// Centers the root of the island based on its existing chunk
+        /// </summary>
+        public void CenterIslandRoot() {
+            
+            //Calculate median position of the island's chunks
+            Vector3 medianPosition = Vector3.zero;
+            for(int i = 0; i < chunks.Count; i++ ) {
+                medianPosition += chunks[i].transform.localPosition;
+            }
+            medianPosition /= chunks.Count;
+            Debug.Log("median position " + medianPosition);
+
+            //Modifiy Island chunks and island positions
+            for (int i = 0; i < chunks.Count; i++) {
+                chunks[i].transform.localPosition -= medianPosition;
+            }
+            transform.position = medianPosition;
+
+        }
+
+    }
 }
