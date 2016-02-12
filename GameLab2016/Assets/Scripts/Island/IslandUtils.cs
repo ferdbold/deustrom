@@ -29,5 +29,15 @@ namespace Simoncouche.Islands {
 		public static string CreateStringWithIslandInfo(color c, int number) {
 			return c.ToString("g") + " " + number.ToString();
 		}
+
+		/// <summary>
+		/// Check if the 2 island are the same object
+		/// </summary>
+		/// <param name="a">An Island</param>
+		/// <param name="b">An Island</param>
+		/// <returns>TRUE if the island are the same, FALSE if their is no island or </returns>
+		public static bool CheckIfOnSameIsland(Island a, Island b) {
+			return a != null && b != null && a.gameObject != b.gameObject;
+		}
 	}
 }
