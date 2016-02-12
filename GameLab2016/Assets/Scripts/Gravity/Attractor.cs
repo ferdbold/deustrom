@@ -18,8 +18,8 @@ public class Attractor : GravityModifier {
     [Header("Linear Drag :")]
     [Tooltip("Min and max linear drag values to add to gravity body based on distance between attractor and body.")]
     [SerializeField] private Vector2 _dragMaximums = new Vector2(0f, 1.5f);
-    private float _additionnalDragRate = 0.05f;
-    private float _additionnalDragDistance = 0.80f;
+    private float _additionnalDragRate = 0.025f;
+    private float _additionnalDragDistance = 0.75f;
 
     protected override void Start () {
         base.Start();
