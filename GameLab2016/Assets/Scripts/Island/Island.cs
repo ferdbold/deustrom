@@ -94,8 +94,6 @@ namespace Simoncouche.Islands {
                 Debug.Log("There are no chunks ! ");
                 return; 
             }
-
-
             //Calculate median position of the island's chunks
             Vector3 medianPosition = Vector3.zero;
             for(int i = 0; i < chunks.Count; i++ ) {
@@ -121,7 +119,6 @@ namespace Simoncouche.Islands {
             //Handle Score or island destruction
             RemoveChunkToIsland(triggerChunk);
             triggerChunk.gravityBody.DestroyGravityBody();
-            
         }
 
     }

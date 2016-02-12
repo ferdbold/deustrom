@@ -125,7 +125,6 @@ namespace Simoncouche.Islands {
 
         }
 
-
 		/// <summary>
 		/// Find the correct euler angle to be at the right position for the anchor
 		/// </summary>
