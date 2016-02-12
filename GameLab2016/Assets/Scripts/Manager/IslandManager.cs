@@ -61,7 +61,7 @@ namespace Simoncouche.Islands {
 			//If a & b are not contained in a Island
 			else {
 				CreateIsland(a, b);
-				JoinTwoChunk(a, a_anchor, b, b_anchor, a_IslandLink);
+				JoinTwoChunk(a, a_anchor, b, b_anchor, ChunkContainedInIsland(a));
 			}
 		}
 
