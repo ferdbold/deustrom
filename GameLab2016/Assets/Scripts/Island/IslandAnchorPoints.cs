@@ -16,12 +16,15 @@ namespace Simoncouche.Islands {
 
 		private IslandChunk _parentRef;
 
-		void Awake() {
+		void Start() {
 			_parentRef = GetComponentInParent<IslandChunk>();
 		}
 
 		void OnTriggerEnter2D(Collider2D other) {
-			_parentRef.HandleAnchorPointCollision(other, this);
+			if (_parentRef != null) {
+				Debug.Log(other.name);
+				_parentRef.HandleAnchorPointCollision(other, this);
+			}
 		}
 	}
 }
