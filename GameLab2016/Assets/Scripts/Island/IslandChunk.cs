@@ -79,9 +79,13 @@ namespace Simoncouche.Islands {
 		/// <summary> Spawn Every Anchor points around the island </summary>
 		void SpawnAnchorPoints () {
 			anchors = new List<IslandAnchorPoints>();
+            GameObject anchorParent = new GameObject();
+            anchorParent.name = "Anchors";
+            anchorParent.transform.SetParent(transform);
+
 			for (int angle=0; angle <= 300; angle+=60) {
 				Transform anchor = (Instantiate(_anchorPointObject) as GameObject).transform;
-				anchor.SetParent(transform);
+				anchor.SetParent(anchorParent.transform);
 				anchor.localPosition = new Vector3(_anchorPointDistance * Mathf.Cos(angle * Mathf.PI / 180f),
 												   _anchorPointDistance * Mathf.Sin(angle * Mathf.PI / 180f),
 												   0);
