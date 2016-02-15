@@ -121,5 +121,17 @@ namespace Simoncouche.Islands {
             triggerChunk.gravityBody.DestroyGravityBody();
         }
 
+
+        /// <summary>
+        /// Method called when entering the maelstrom
+        /// </summary>
+        /// <param name="triggerChunk"> Chunk that triggered the maelstrom enter</param>
+        public void OnMaelstromEnter(IslandChunk triggerChunk) {
+            //Handle Score or island destruction
+            RemoveChunkToIsland(triggerChunk);
+            triggerChunk.gravityBody.DestroyGravityBody();
+            
+        }
+
     }
 }
