@@ -62,6 +62,7 @@ namespace Simoncouche.Islands {
         /// <param name="chunk">Reference of the chunk to remove</param>
         private void RemoveChunkToIsland(IslandChunk chunk) {
             //TODO : Implement this function
+            if(chunks.Contains(chunk)) chunks.Remove(chunk);
 
             //Recenter island middle
             CenterIslandRoot();
@@ -74,8 +75,7 @@ namespace Simoncouche.Islands {
         private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
             _gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
             //Merge weight
-            Debug.Log(_gravityBody.Velocity + "  " +  weight + "  " + chunk.gravityBody.Velocity + "  " + chunk.weight + "  result : " + (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight));
-			_gravityBody.Velocity = (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
+            _gravityBody.Velocity = (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
 			weight = weight + chunk.weight;
 
             _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
