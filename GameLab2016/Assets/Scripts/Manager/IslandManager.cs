@@ -12,11 +12,7 @@ namespace Simoncouche.Islands {
 		/// </summary>
 		private List<Island> _island = new List<Island>();
 
-		/// <summary>
-		/// The Island prefab reference
-		/// </summary>
-		[SerializeField]  
-		[Tooltip("Island Object Prefab Reference")]
+		[SerializeField] [Tooltip("Island Object Prefab Reference")]
 		private GameObject _islandComponent;
 
         [Header("Visuals")]
@@ -122,7 +118,9 @@ namespace Simoncouche.Islands {
 						   b,
                            targetIsland,
                            1f);
-            GameObject ParticleGO = (GameObject) Instantiate(AssembleParticlePrefab, b_anchor.transform.position, Quaternion.identity);
+
+            //Instantiate Particles FX
+            GameObject ParticleGO = (GameObject) Instantiate(AssembleParticlePrefab, b_anchor.transform.position + new Vector3(0,0,-1.25f), Quaternion.identity);
             ParticleGO.transform.parent = b_anchor.transform;
 
         }
