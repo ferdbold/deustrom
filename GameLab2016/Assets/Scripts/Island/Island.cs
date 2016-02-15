@@ -25,6 +25,10 @@ namespace Simoncouche.Islands {
 			_collider = GetComponent<CircleCollider2D>();
 			_gravityBody = GetComponent<GravityBody>();
 		}
+        
+        private void Start() {
+            if (_collider != null) _collider.isTrigger = true;
+        }
 
 		/// <summary>
 		/// Returns if this Island has the target chunk
@@ -43,6 +47,7 @@ namespace Simoncouche.Islands {
 		/// <param name="rot">The rotation of the chunk</param>
 		public void AddChunkToIsland(IslandChunk chunk, Vector3 pos, Vector3 rot) {
 			if (!chunks.Contains(chunk)) {
+                chunk.parentIsland = this;
 				chunk.transform.SetParent(transform);
 				chunks.Add(chunk);
 				/*chunk.transform.localPosition = pos;
@@ -68,7 +73,8 @@ namespace Simoncouche.Islands {
         /// <param name="chunk"></param>
         private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
             _gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
-			//Merge weight
+            //Merge weight
+            Debug.Log(_gravityBody.Velocity + "  " +  weight + "  " + chunk.gravityBody.Velocity + "  " + chunk.weight + "  result : " + (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight));
 			_gravityBody.Velocity = (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
 			weight = weight + chunk.weight;
 
@@ -104,6 +110,18 @@ namespace Simoncouche.Islands {
             }
             transform.position += medianPosition;
 
+        }
+
+
+        /// <summary>
+        /// Method called when entering the maelstrom
+        /// </summary>
+        /// <param name="triggerChunk"> Chunk that triggered the maelstrom enter</param>
+        public void OnMaelstromEnter(IslandChunk triggerChunk) {
+            //Handle Score or island destruction
+            RemoveChunkToIsland(triggerChunk);
+            triggerChunk.gravityBody.DestroyGravityBody();
+            
         }
 
     }

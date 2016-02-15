@@ -34,6 +34,7 @@ namespace Simoncouche.Islands {
 			if (a_IslandLink != null && b_IslandLink != null && a_IslandLink != b_IslandLink) {
 				if (IslandUtils.CheckIfOnSameIsland(a_IslandLink, b_IslandLink)) return;
 
+                //Is A Island bigger than B Island
 				bool isA = a_IslandLink.weight <= b_IslandLink.weight;
 
 				List<IslandChunk> chunks = isA ? b_IslandLink.chunks : a_IslandLink.chunks;

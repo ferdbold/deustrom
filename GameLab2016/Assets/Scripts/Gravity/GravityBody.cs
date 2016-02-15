@@ -74,18 +74,16 @@ public class GravityBody : GravityObject {
         _rigidBody.velocity += acceleration * Time.fixedDeltaTime;
     }
 
-    /// <summary> Deactivates GravityBody (used when body creates or join an island)  </summary>
+    /// <summary> Deactivates GravityBody  </summary>
     public void DeactivateGravityBody() {
         _activated = false;
-        _rigidBody.isKinematic = true;
-        _collider.enabled = false;
+        _rigidBody.isKinematic = true; 
     }
 
     /// <summary> Activates GravityBody </summary>
     public void ActivateGravityBody() {
         _activated = true;
         _rigidBody.isKinematic = false;
-        _collider.enabled = true;
     }
 
     /// <summary>
