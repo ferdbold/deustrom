@@ -50,13 +50,13 @@ namespace Simoncouche.Islands {
 			//If a is contained in a Island
 			else if (a_IslandLink != null) {
 				a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-				JoinTwoChunk(a, a_anchor, b, b_anchor, a_IslandLink);
+				JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
 			} 
 			
 			//If b is contained in a Island
 			else if (b_IslandLink != null) {
 				b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
-				JoinTwoChunk(b, b_anchor, a, a_anchor, b_IslandLink);
+				JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
 			} 
 			
 			//If a & b are not contained in a Island
