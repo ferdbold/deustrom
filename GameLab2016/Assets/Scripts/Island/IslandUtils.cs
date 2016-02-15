@@ -37,7 +37,15 @@ namespace Simoncouche.Islands {
 		/// <param name="b">An Island</param>
 		/// <returns>TRUE if the island are the same, FALSE if their is no island or </returns>
 		public static bool CheckIfOnSameIsland(Island a, Island b) {
-			return a != null && b != null && a.gameObject != b.gameObject;
+			return a != null && b != null && a.gameObject == b.gameObject;        
 		}
-	}
+
+        /// <summary> Check if two island chunks are contained in the same island object </summary>
+        /// <param name="a"> Island Chunk 1</param>
+        /// <param name="b"> Island Chunk 2</param>
+        /// <returns>True if both islandchunk are contained in the same island, false otherwise</returns>
+        public static bool CheckIfOnSameIsland(IslandChunk a, IslandChunk b) {
+            return a.parentIsland != null && b.parentIsland != null && a.parentIsland == b.parentIsland;
+        }
+    }
 }

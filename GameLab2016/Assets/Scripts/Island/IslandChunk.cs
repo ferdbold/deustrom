@@ -10,32 +10,30 @@ namespace Simoncouche.Islands {
 	[RequireComponent(typeof(GravityBody))]
 	public class IslandChunk : MonoBehaviour {
 
-		[Header("Island Property")]
-		
-		[SerializeField]
-		[Tooltip("The Assign color of the Island")]
+        [Header("Island Property")]
+
+        [SerializeField][Tooltip("Current Island this islandChunk is attached to")]
+        public Island parentIsland = null;
+        
+
+        [SerializeField] [Tooltip("The Assign color of the Island")]
 		private IslandUtils.color _color;	
 		public IslandUtils.color color {
 			get { return _color; }
             protected set { _color = value; }
 		}
 		
-		[SerializeField]
-		[Tooltip("Weight of the island chunk")]
-		[Range(1, 10)]
+		[SerializeField] [Tooltip("Weight of the island chunk")] [Range(1, 10)]
 		private int _weight = 1;
 		public int weight {
 			get { return _weight; }
 			protected set { _weight = value; }
 		}
 
-		[Header("Anchor Points Attributes")]
-		[SerializeField]
-		[Tooltip("The distance from the origin to the side of the hexagon")]
+		[Header("Anchor Points Attributes")] [SerializeField] [Tooltip("The distance from the origin to the side of the hexagon")]
 		private float _anchorPointDistance = 0.5f;
 
-		[SerializeField]
-		[Tooltip("The radius of the anchor trigger zone")]
+		[SerializeField] [Tooltip("The radius of the anchor trigger zone")]
 		private float _anchorPointRadius = 0.2f;
 
 		public List<IslandAnchorPoints> anchors { get; private set; }
@@ -103,9 +101,11 @@ namespace Simoncouche.Islands {
 			IslandChunk chunk = other.GetComponentInParent<IslandChunk>();
 
 			if (otherAnchor != null && chunk.color == _color && otherAnchor.transform.parent.gameObject != gameObject ) {
-				if (IslandUtils.CheckIfOnSameIsland(other.GetComponentInParent<Island>(), GetComponentInParent<Island>())) {
+                
+				if (IslandUtils.CheckIfOnSameIsland(chunk, this)) {
 					return;
 				}
+                
 				//Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
 				GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
 				//TODO AUDIO : ISLAND ASSEMBLE SOUND
@@ -126,8 +126,18 @@ namespace Simoncouche.Islands {
             }
 		}
 
-		#region Legacy
-		/*/// <summary> Associated Chunk Letter </summary>
+        /// <summary>
+        /// Method called when entering the maelstrom
+        /// </summary>
+        public void OnMaelstromEnter() {
+            if (parentIsland != null) parentIsland.OnMaelstromEnter(this);
+            else {
+                gravityBody.DestroyGravityBody();
+            }
+        }
+
+        #region Legacy
+        /*/// <summary> Associated Chunk Letter </summary>
 		[SerializeField]
 		[Tooltip("The associated chunk letter")]
 		private IslandUtils.ChunkLetter _chunkLetter;
@@ -139,6 +149,6 @@ namespace Simoncouche.Islands {
 			}
 			private set { }
 		}*/
-		#endregion
-	}
+        #endregion
+    }
 }
