@@ -85,7 +85,7 @@ namespace Simoncouche.Islands {
 
 			for (int angle=0; angle <= 300; angle+=60) {
 				Transform anchor = (Instantiate(_anchorPointObject) as GameObject).transform;
-				anchor.SetParent(transform);
+				anchor.SetParent(anchorParent.transform);
 				anchor.localPosition = new Vector3(_anchorPointDistance * Mathf.Cos(angle * Mathf.PI / 180f),
 												   _anchorPointDistance * Mathf.Sin(angle * Mathf.PI / 180f),
 												   0);
