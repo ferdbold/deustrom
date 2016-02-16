@@ -7,6 +7,7 @@ namespace Simoncouche.Islands {
 	/// <summary>
 	/// The structure related to an island chunk
 	/// </summary>
+    [RequireComponent(typeof(AudioSource))]
 	[RequireComponent(typeof(GravityBody))]
 	public class IslandChunk : MonoBehaviour {
 
@@ -36,7 +37,14 @@ namespace Simoncouche.Islands {
 		[SerializeField] [Tooltip("The radius of the anchor trigger zone")]
 		private float _anchorPointRadius = 0.2f;
 
-		public List<IslandAnchorPoints> anchors { get; private set; }
+        [Header("Audio Clip (temporary until audio manager)")]
+        [SerializeField] [Tooltip("Collision Sound Clip")]
+        private AudioClip _collisionSound;
+
+        [SerializeField] [Tooltip("Merge Sound Clip")]
+        private AudioClip _mergeSound;
+
+        public List<IslandAnchorPoints> anchors { get; private set; }
 
         /// <summary> Gravity Body associated with this island chunk </summary>
         public GravityBody gravityBody {get; private set;}
@@ -44,11 +52,15 @@ namespace Simoncouche.Islands {
 		/// <summary> The anchor point type object (prefab ref) </summary>
 		private static GameObject _anchorPointObject = null;
 
-        protected virtual void Awake() {
+        /// <summary> audio source of the chunk </summary>
+        private AudioSource _audioSource;
+
+        void Awake() {
             gravityBody = GetComponent<GravityBody>();
 			if (_anchorPointObject == null) {
 				_anchorPointObject = Resources.Load("Island/AnchorPoints") as GameObject;
 			}
+            _audioSource = GetComponent<AudioSource>();
 			SpawnAnchorPoints();
         }
 
@@ -63,9 +75,10 @@ namespace Simoncouche.Islands {
 		/// <param name="targetChunk">the other chunk</param>
 		public void ConnectChunk(Vector3 targetPos, Vector3 targetRot, IslandChunk targetChunk, Island targetIsland, float time = 0.5f) {
 			Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+            //Debug.Log(targetPos + " " + targetRot);
 			transform.DOLocalRotate(targetRot, time);
 			transform.DOLocalMove(targetPos, time);
-            StartCoroutine(Delay_CenterIslandRoot(time, targetIsland));
+            StartCoroutine(Delay_CenterIslandRoot(time+0.1f, targetIsland));
         }
 
 
@@ -82,16 +95,20 @@ namespace Simoncouche.Islands {
             GameObject anchorParent = new GameObject();
             anchorParent.name = "Anchors";
             anchorParent.transform.SetParent(transform);
+            anchorParent.transform.localPosition = Vector3.zero;
+            anchorParent.transform.localScale = Vector3.one;
 
 			for (int angle=0; angle <= 300; angle+=60) {
 				Transform anchor = (Instantiate(_anchorPointObject) as GameObject).transform;
-				anchor.SetParent(transform);
+				anchor.SetParent(anchorParent.transform);
 				anchor.localPosition = new Vector3(_anchorPointDistance * Mathf.Cos(angle * Mathf.PI / 180f),
 												   _anchorPointDistance * Mathf.Sin(angle * Mathf.PI / 180f),
 												   0);
 				anchor.name = "AnchorPoints " + angle;
 				anchor.GetComponent<CircleCollider2D>().radius = _anchorPointRadius;
-				anchors.Add(anchor.GetComponent<IslandAnchorPoints>());
+                IslandAnchorPoints point = anchor.GetComponent<IslandAnchorPoints>();
+                point.Setup(angle);
+                anchors.Add(point);
 			}
 		}
 
@@ -112,7 +129,7 @@ namespace Simoncouche.Islands {
                 
 				//Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
 				GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
-				//TODO AUDIO : ISLAND ASSEMBLE SOUND
+                _audioSource.PlayOneShot(_mergeSound);
 			}
 		}
 
@@ -123,10 +140,10 @@ namespace Simoncouche.Islands {
 			IslandChunk chunk = other.GetComponent<IslandChunk>();
 
 			
-			if (!(chunk != null && chunk.color == _color)) {
+			if (!(chunk != null && chunk.color != _color)) {
 
                 //Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
-                //TODO AUDIO : ISLAND COLLISION SOUND
+                _audioSource.PlayOneShot(_collisionSound);
             }
 		}
 

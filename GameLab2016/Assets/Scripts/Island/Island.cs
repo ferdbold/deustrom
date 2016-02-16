@@ -75,7 +75,8 @@ namespace Simoncouche.Islands {
         private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
             _gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
             //Merge weight
-            _gravityBody.Velocity = (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
+            //Debug.Log(_gravityBody.Velocity + "  " +  weight + "  " + chunk.gravityBody.Velocity + "  " + chunk.weight + "  result : " + (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight));
+			_gravityBody.Velocity = (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
 			weight = weight + chunk.weight;
 
             _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
@@ -95,7 +96,6 @@ namespace Simoncouche.Islands {
                 return; 
             }
 
-
             //Calculate median position of the island's chunks
             Vector3 medianPosition = Vector3.zero;
             for(int i = 0; i < chunks.Count; i++ ) {
@@ -109,7 +109,6 @@ namespace Simoncouche.Islands {
                 chunks[i].transform.localPosition -= medianPosition;
             }
             transform.position += medianPosition;
-
         }
 
 
@@ -121,8 +120,6 @@ namespace Simoncouche.Islands {
             //Handle Score or island destruction
             RemoveChunkToIsland(triggerChunk);
             triggerChunk.gravityBody.DestroyGravityBody();
-            
         }
-
     }
 }
