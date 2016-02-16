@@ -12,12 +12,13 @@ namespace Simoncouche.Islands {
 		/// </summary>
 		private List<Island> _island = new List<Island>();
 
-		/// <summary>
-		/// The Island prefab reference
-		/// </summary>
-		[SerializeField]  
-		[Tooltip("Island Object Prefab Reference")]
+		[SerializeField] [Tooltip("Island Object Prefab Reference")]
 		private GameObject _islandComponent;
+
+        [Header("Visuals")]
+
+        [SerializeField] [Tooltip("Particle spawned when island assemble")]
+        private GameObject AssembleParticlePrefab;
 
 		/// <summary>
 		/// Creates a Island from 2 chunk, Will not work for multiple piece of the same letter in one scene
@@ -117,7 +118,11 @@ namespace Simoncouche.Islands {
 						   b,
                            targetIsland,
                            1f);
-		}
+            //Instantiate Particles FX
+            GameObject ParticleGO = (GameObject) Instantiate(AssembleParticlePrefab, b_anchor.transform.position + new Vector3(0,0,-1.25f), Quaternion.identity);
+            ParticleGO.transform.parent = b_anchor.transform;
+
+        }
 
 		/// <summary>
 		/// Find the correct euler angle to be at the right position for the anchor
