@@ -134,7 +134,6 @@ namespace Simoncouche.Islands {
 						   b,
                            targetIsland,
                            1f);
-
             //Instantiate Particles FX
             GameObject ParticleGO = (GameObject) Instantiate(AssembleParticlePrefab, b_anchor.transform.position + new Vector3(0,0,-1.25f), Quaternion.identity);
             ParticleGO.transform.parent = b_anchor.transform;
