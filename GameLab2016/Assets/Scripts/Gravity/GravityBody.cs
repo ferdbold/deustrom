@@ -90,7 +90,7 @@ public class GravityBody : GravityObject {
     /// Destroys the gravity body (should override this to score points when destroying)
     /// </summary>
     public virtual void DestroyGravityBody(){
-        Debug.Log("Destroyed RigidBody " + gameObject.name);
+        //Debug.Log("Destroyed RigidBody " + gameObject.name);
         Destroy(gameObject);
     }
 
