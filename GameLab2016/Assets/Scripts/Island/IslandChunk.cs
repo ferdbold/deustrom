@@ -63,6 +63,7 @@ namespace Simoncouche.Islands {
 		/// <param name="targetChunk">the other chunk</param>
 		public void ConnectChunk(Vector3 targetPos, Vector3 targetRot, IslandChunk targetChunk, Island targetIsland, float time = 0.5f) {
 			Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+            //Debug.Log(targetPos + " " + targetRot);
 			transform.DOLocalRotate(targetRot, time);
 			transform.DOLocalMove(targetPos, time);
             StartCoroutine(Delay_CenterIslandRoot(time, targetIsland));
@@ -82,16 +83,20 @@ namespace Simoncouche.Islands {
             GameObject anchorParent = new GameObject();
             anchorParent.name = "Anchors";
             anchorParent.transform.SetParent(transform);
+            anchorParent.transform.localPosition = Vector3.zero;
+            anchorParent.transform.localScale = Vector3.one;
 
 			for (int angle=0; angle <= 300; angle+=60) {
 				Transform anchor = (Instantiate(_anchorPointObject) as GameObject).transform;
-				anchor.SetParent(transform);
+				anchor.SetParent(anchorParent.transform);
 				anchor.localPosition = new Vector3(_anchorPointDistance * Mathf.Cos(angle * Mathf.PI / 180f),
 												   _anchorPointDistance * Mathf.Sin(angle * Mathf.PI / 180f),
 												   0);
 				anchor.name = "AnchorPoints " + angle;
 				anchor.GetComponent<CircleCollider2D>().radius = _anchorPointRadius;
-				anchors.Add(anchor.GetComponent<IslandAnchorPoints>());
+                IslandAnchorPoints point = anchor.GetComponent<IslandAnchorPoints>();
+                point.Setup(angle);
+                anchors.Add(point);
 			}
 		}
 
