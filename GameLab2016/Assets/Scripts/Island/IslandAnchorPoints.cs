@@ -20,6 +20,10 @@ namespace Simoncouche.Islands {
 			_parentRef = GetComponentInParent<IslandChunk>();
 		}
 
+        public void Setup(float _angle) {
+            angle = _angle;
+        }
+
 		void OnTriggerEnter2D(Collider2D other) {
 			_parentRef.HandleAnchorPointCollision(other, this);
 		}

@@ -13,12 +13,24 @@ namespace Simoncouche.Islands {
 		private List<Island> _island = new List<Island>();
 
 		[SerializeField] [Tooltip("Island Object Prefab Reference")]
-		private GameObject _islandComponent;
+		private GameObject _islandComponent = null;
 
         [Header("Visuals")]
 
         [SerializeField] [Tooltip("Particle spawned when island assemble")]
         private GameObject AssembleParticlePrefab;
+
+        /// <summary> the island subfolder in scene </summary>
+        private Transform _islandSubFolder;
+
+        void Awake() {
+            try {
+                _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
+            }
+            catch (System.NullReferenceException e) {
+                Debug.LogWarning("No Island sub folder in scene, you might have forgotten to add the tag to the subfolder. Error Thrown: " + e.Message);
+            }
+        }
 
 		/// <summary>
 		/// Creates a Island from 2 chunk, Will not work for multiple piece of the same letter in one scene
@@ -63,7 +75,7 @@ namespace Simoncouche.Islands {
 			//If a & b are not contained in a Island
 			else {
 				CreateIsland(a, b);
-				JoinTwoChunk(a, a_anchor, b, b_anchor, ChunkContainedInIsland(a));
+				JoinTwoChunk(b, b_anchor, a, a_anchor, ChunkContainedInIsland(a));
 			}
 		}
 
@@ -87,6 +99,9 @@ namespace Simoncouche.Islands {
 		private void CreateIsland(IslandChunk a, IslandChunk b) {
 			GameObject island = Instantiate(_islandComponent, a.transform.position, a.transform.rotation) as GameObject;
 			island.name = "Island";
+            if (_islandSubFolder != null) {
+                island.transform.SetParent(_islandSubFolder);
+            }
 
 			island.GetComponent<Island>().AddChunkToIsland(a, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
 			island.GetComponent<Island>().AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
@@ -113,6 +128,7 @@ namespace Simoncouche.Islands {
 		/// <param name="b">The chunk joined to</param>
 		/// <param name="b_anchor">anchor assossiated to b</param>
 		private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor, Island targetIsland) {
+            //Debug.Log(a.transform.localPosition + " " + b.transform.localPosition);
 			a.ConnectChunk(FindTargetLocalPosition(a, a_anchor, b_anchor),
 						   FindTargetRotForAnchor(a_anchor, b_anchor),
 						   b,
@@ -142,6 +158,7 @@ namespace Simoncouche.Islands {
 		/// <param name="b">Island that point a merges to</param>
 		/// <returns></returns>
 		private Vector3 FindTargetLocalPosition(IslandChunk a_chunk, IslandAnchorPoints a, IslandAnchorPoints b) {
+            Debug.Log(a_chunk.transform.localPosition + " " + b.position + " " + a.position);
 			return a_chunk.transform.localPosition - b.position - a.position;
 		}
 
