@@ -13,7 +13,7 @@ namespace Simoncouche.Islands {
 
         [Header("Island Property")]
 
-        [SerializeField][Tooltip("Current Island this islandChunk is attached to")]
+        [SerializeField][Tooltip("Current Island this islandChunk is attached to. Only modify this to create group of island chunks before in the editor.")]
         public Island parentIsland = null;
         
 
