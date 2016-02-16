@@ -129,7 +129,7 @@ namespace Simoncouche.Islands {
 		/// <param name="b_anchor">anchor assossiated to b</param>
 		private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor, Island targetIsland) {
             //Debug.Log(a.transform.localPosition + " " + b.transform.localPosition);
-			a.ConnectChunk(FindTargetLocalPosition(a, a_anchor, b_anchor),
+			a.ConnectChunk(FindTargetLocalPosition(a_anchor, b, b_anchor),
 						   FindTargetRotForAnchor(a_anchor, b_anchor),
 						   b,
                            targetIsland,
@@ -151,15 +151,14 @@ namespace Simoncouche.Islands {
 			return new Vector3(0, 0, a.angle - b.angle + 180);
 		}
 
-		/// <summary>
-		/// Find the target local position
-		/// </summary>
-		/// <param name="a">The point to be merge to other island chunk</param>
-		/// <param name="b">Island that point a merges to</param>
-		/// <returns></returns>
-		private Vector3 FindTargetLocalPosition(IslandChunk a_chunk, IslandAnchorPoints a, IslandAnchorPoints b) {
-            Debug.Log(a_chunk.transform.localPosition + " " + b.position + " " + a.position);
-			return a_chunk.transform.localPosition - b.position - a.position;
+        /// <summary>
+        /// Find the target local position
+        /// </summary>
+        /// <param name="a">The anchor of the island to merge</param>
+        /// <param name="b_chunk">Island to be merge to</param>
+        /// <returns></returns>
+        private Vector3 FindTargetLocalPosition(IslandAnchorPoints a, IslandChunk b_chunk, IslandAnchorPoints b) {
+			return b_chunk.transform.localPosition - a.position + b.position;
 		}
 
 		/// <summary>
