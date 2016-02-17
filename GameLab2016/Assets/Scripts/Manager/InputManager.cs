@@ -67,12 +67,15 @@ public class InputManager : MonoBehaviour {
 
 	void Update() {
 		List<AxisTuple> axii = new List<AxisTuple>() {
-			new AxisTuple("Left Analog", _leftAnalog, Input.GetAxis("L_Horizontal"), Input.GetAxis("L_Vertical")),
-			new AxisTuple("Right Analog", _rightAnalog, Input.GetAxis("R_Horizontal"), Input.GetAxis("R_Vertical"))
-		};
+			new AxisTuple("P1 Left Analog", _leftAnalog, Input.GetAxis("P1_L_Horizontal"), Input.GetAxis("P1_L_Vertical")),
+			new AxisTuple("P1 Right Analog", _rightAnalog, Input.GetAxis("P1_R_Horizontal"), Input.GetAxis("P1_R_Vertical")),
+            new AxisTuple("P2 Left Analog", _leftAnalog, Input.GetAxis("P2_L_Horizontal"), Input.GetAxis("P2_L_Vertical")),
+            new AxisTuple("P2 Right Analog", _rightAnalog, Input.GetAxis("P2_R_Horizontal"), Input.GetAxis("P2_R_Vertical"))
+        };
 		List<ButtonTuple> buttons = new List<ButtonTuple>() {
-			new ButtonTuple("Fire Hook", _fireHookButton, Input.GetButtonDown("Fire Hook")),
-			new ButtonTuple("Start", _startButton, Input.GetButtonDown("Start"))
+			new ButtonTuple("P1 Fire Hook", _fireHookButton, Input.GetButtonDown("P1_FireHook")),
+            new ButtonTuple("P2 Fire Hook", _fireHookButton, Input.GetButtonDown("P2_FireHook")),
+            new ButtonTuple("Start", _startButton, Input.GetButtonDown("Start"))
 		};
 
 		foreach(AxisTuple axis in axii) {
