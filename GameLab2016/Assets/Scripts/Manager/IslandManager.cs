@@ -12,17 +12,25 @@ namespace Simoncouche.Islands {
 		/// </summary>
 		private List<Island> _island = new List<Island>();
 
-		/// <summary>
-		/// The Island prefab reference
-		/// </summary>
-		[SerializeField]  
-		[Tooltip("Island Object Prefab Reference")]
-		private GameObject _islandComponent;
+		[SerializeField] [Tooltip("Island Object Prefab Reference")]
+		private GameObject _islandComponent = null;
 
         [Header("Visuals")]
 
         [SerializeField] [Tooltip("Particle spawned when island assemble")]
         private GameObject AssembleParticlePrefab;
+
+        /// <summary> the island subfolder in scene </summary>
+        private Transform _islandSubFolder;
+
+        void Awake() {
+            try {
+                _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
+            }
+            catch (System.NullReferenceException e) {
+                Debug.LogWarning("No Island sub folder in scene, you might have forgotten to add the tag to the subfolder. Error Thrown: " + e.Message);
+            }
+        }
 
 		/// <summary>
 		/// Creates a Island from 2 chunk, Will not work for multiple piece of the same letter in one scene
@@ -38,34 +46,36 @@ namespace Simoncouche.Islands {
 			//If both are contained in Island
 			if (a_IslandLink != null && b_IslandLink != null && a_IslandLink != b_IslandLink) {
 				if (IslandUtils.CheckIfOnSameIsland(a_IslandLink, b_IslandLink)) return;
-				if (a_IslandLink.weight <= b_IslandLink.weight) {
-					List<IslandChunk> chunks = b_IslandLink.chunks;
-					foreach (IslandChunk chunk in chunks) {
-						a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-					}
-					RemoveIsland(b_IslandLink);
-				} else {
-					List<IslandChunk> chunks = a_IslandLink.chunks;
-					foreach (IslandChunk chunk in chunks) {
-						b_IslandLink.AddChunkToIsland(chunk, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
-					}
-					RemoveIsland(a_IslandLink);
+
+                //Is A Island bigger than B Island
+				bool isA = a_IslandLink.weight <= b_IslandLink.weight;
+
+				List<IslandChunk> chunks = isA ? b_IslandLink.chunks : a_IslandLink.chunks;
+				foreach (IslandChunk chunk in chunks) {
+					a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint((isA ? b : a).transform.position, 
+																		 (isA ? a : b).transform.position), 
+																		 (isA ? a : b).transform.rotation.eulerAngles);
 				}
+				RemoveIsland(isA ? b_IslandLink : a_IslandLink);
+				//Merge two chunk for island
 			} 
 
 			//If a is contained in a Island
 			else if (a_IslandLink != null) {
 				a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
+				JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
 			} 
 			
 			//If b is contained in a Island
 			else if (b_IslandLink != null) {
 				b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
+				JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
 			} 
 			
 			//If a & b are not contained in a Island
 			else {
 				CreateIsland(a, b);
+				JoinTwoChunk(b, b_anchor, a, a_anchor, ChunkContainedInIsland(a));
 			}
 		}
 
@@ -89,6 +99,9 @@ namespace Simoncouche.Islands {
 		private void CreateIsland(IslandChunk a, IslandChunk b) {
 			GameObject island = Instantiate(_islandComponent, a.transform.position, a.transform.rotation) as GameObject;
 			island.name = "Island";
+            if (_islandSubFolder != null) {
+                island.transform.SetParent(_islandSubFolder);
+            }
 
 			island.GetComponent<Island>().AddChunkToIsland(a, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
 			island.GetComponent<Island>().AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
@@ -114,12 +127,15 @@ namespace Simoncouche.Islands {
 		/// /// <param name="a_anchor">anchor assossiated to a</param>
 		/// <param name="b">The chunk joined to</param>
 		/// <param name="b_anchor">anchor assossiated to b</param>
-		private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor) {
-			a.ConnectChunk(FindTargetLocalPosition(a, a_anchor, b_anchor),
+		private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor, Island targetIsland) {
+            //Debug.Log(a.transform.localPosition + " " + b.transform.localPosition);
+			a.ConnectChunk(FindTargetLocalPosition(a_anchor, b, b_anchor),
 						   FindTargetRotForAnchor(a_anchor, b_anchor),
 						   b,
-						   1f);
-            GameObject ParticleGO = (GameObject) Instantiate(AssembleParticlePrefab, b_anchor.transform.position, Quaternion.identity);
+                           targetIsland,
+                           1f);
+            //Instantiate Particles FX
+            GameObject ParticleGO = (GameObject) Instantiate(AssembleParticlePrefab, b_anchor.transform.position + new Vector3(0,0,-1.25f), Quaternion.identity);
             ParticleGO.transform.parent = b_anchor.transform;
 
         }
@@ -134,14 +150,14 @@ namespace Simoncouche.Islands {
 			return new Vector3(0, 0, a.angle - b.angle + 180);
 		}
 
-		/// <summary>
-		/// Find the target local position
-		/// </summary>
-		/// <param name="a">The point to be merge to other island chunk</param>
-		/// <param name="b">Island that point a merges to</param>
-		/// <returns></returns>
-		private Vector3 FindTargetLocalPosition(IslandChunk a_chunk, IslandAnchorPoints a, IslandAnchorPoints b) {
-			return a_chunk.transform.localPosition - b.position - a.position;
+        /// <summary>
+        /// Find the target local position
+        /// </summary>
+        /// <param name="a">The anchor of the island to merge</param>
+        /// <param name="b_chunk">Island to be merge to</param>
+        /// <returns></returns>
+        private Vector3 FindTargetLocalPosition(IslandAnchorPoints a, IslandChunk b_chunk, IslandAnchorPoints b) {
+			return b_chunk.transform.localPosition - a.position + b.position;
 		}
 
 		/// <summary>

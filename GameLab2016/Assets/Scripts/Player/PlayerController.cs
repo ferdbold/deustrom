@@ -9,19 +9,20 @@ public class PlayerController : MonoBehaviour {
 	[Header("Player Speed Properties")]
 
 
-	/// <summary> Variable to adjust the jetpack speed </summary>
     [Tooltip("Acceleration of the player in unit per second")]
 	public float playerAcceleration;
 
-	/// <summary> Maximum velocity of the player </summary>
     [Tooltip("Maximum velocity of the player")]
 	public float maximumVelocity;
-	#endregion
+    
+    [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
+    public AnimationCurve VelocityFalloffCurve;
 
+    #endregion
 
-	#region PrivateVariables
-	/// <summary>  Reference of player's rigidbody  </summary>
-	private Rigidbody2D _playerRigidBody;
+    #region PrivateVariables
+    /// <summary>  Reference of player's rigidbody  </summary>
+    private Rigidbody2D _playerRigidBody;
 
 	/// <summary>  Is the player moving horizontally? </summary>
 	private bool _isMovingHorizontal;
@@ -114,9 +115,10 @@ public class PlayerController : MonoBehaviour {
 
             //If we're trying to move in the direction of the player's velocity, reduce the movement by a factor of the current speed divided by max speed
             float speedMult = Mathf.Max(0f, (1f - (projection.magnitude / maximumVelocity)));
+            speedMult = VelocityFalloffCurve.Evaluate(speedMult);
 
             if (!(movementDirection.normalized == projection.normalized)) {
-                speedMult += 1;
+                speedMult += 0.5f;
             }
 
             //Multiply acceleration by calculated mutliplier
