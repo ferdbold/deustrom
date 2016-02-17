@@ -2,21 +2,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Simoncouche.Chain;
+
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour {
 
-	#region PublicVariables
+	#region InspectorVariables
 	[Header("Player Speed Properties")]
 
 
-    [Tooltip("Acceleration of the player in unit per second")]
-	public float playerAcceleration;
+    [SerializeField] [Tooltip("Acceleration of the player in unit per second")]
+	private float playerAcceleration;
 
-    [Tooltip("Maximum velocity of the player")]
-	public float maximumVelocity;
+    [SerializeField] [Tooltip("Maximum velocity of the player")]
+	private float maximumVelocity;
     
-    [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
-    public AnimationCurve VelocityFalloffCurve;
+    [SerializeField] [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
+    private AnimationCurve VelocityFalloffCurve;
+
+    [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
+    private bool isPlayerOne = true;
 
     #endregion
 
@@ -41,6 +46,9 @@ public class PlayerController : MonoBehaviour {
 	/// Vector of player inputs
 	/// </summary>
 	private Vector2 _currentPlayerMovementInputs=Vector2.zero;
+
+    /// <summary> Reference to the hook thrower attached to this object </summary>
+    private HookThrower _hookThrower;
     #endregion
 
 
@@ -57,7 +65,20 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	void Start() {
 		_playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
-		GameManager.inputManager.AddEvent(InputManager.Axis.leftAnalog, PlayerInputs); //Setup input
+
+        //Setup input
+        GameManager.inputManager.AddEvent(
+            isPlayerOne ? InputManager.Axis.p1_leftAnalog : InputManager.Axis.p2_leftAnalog, 
+            this.PlayerInputs
+        );
+
+        //TODO change hookthrower ref / Setup
+        _hookThrower = GetComponentInChildren<HookThrower>();
+        if (_hookThrower != null) {
+            _hookThrower.SetupInput(isPlayerOne);
+        } else {
+            Debug.LogError("Their is no hook thrower attached or child of this object");
+        }
 	}
 	/// <summary>
 	/// FixedUpdate pour le character avec rigidbody (sujet à changements)
