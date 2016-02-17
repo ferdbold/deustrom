@@ -33,21 +33,30 @@ namespace Simoncouche.Chain {
 		private Rigidbody2D _rigidbody;
 		public new Rigidbody2D rigidbody { get { return _rigidbody; } }
 
-		/// <summary>
-		/// Spawn a new ChainSection inside a chain
-		/// </summary>
-		/// <param name="position">The world position for this new section</param>
-		/// <param name="chain">The parent chain</param>
-		/// <param name="previous">The previous link in the chain</param>
-		public static ChainSection Create(Vector3 position, Chain chain, Rigidbody2D previous) {
+
+        /// <summary>
+        /// The angle difference from the last link in the chain
+        /// </summary>
+        [Tooltip("The angle difference from the last link in the chain")]
+        private static float chainAngleDiff = 90f;
+
+
+        /// <summary>
+        /// Spawn a new ChainSection inside a chain
+        /// </summary>
+        /// <param name="position">The world position for this new section</param>
+        /// <param name="chain">The parent chain</param>
+        /// <param name="previous">The previous link in the chain</param>
+        public static ChainSection Create(Vector3 position, Chain chain, Rigidbody2D previous) {
 			if (_chainSectionPrefab == null) {
 				_chainSectionPrefab = Resources.Load("Chain/ChainSection") as GameObject;
 			}
-
-			ChainSection chainSection = ((GameObject)Instantiate(
+            Quaternion nextRotation = previous.transform.rotation;
+            nextRotation *=Quaternion.Euler(chainAngleDiff, 0f, 0f);
+            ChainSection chainSection = ((GameObject)Instantiate(
                 _chainSectionPrefab,
                 position,
-                previous.transform.rotation
+                nextRotation
             )).GetComponent<ChainSection>();
 
 			chainSection.transform.parent = chain.transform;
@@ -67,10 +76,10 @@ namespace Simoncouche.Chain {
 		/// Generate a new ChainSection and link it to this section
 		/// </summary>
 		public void SpawnNewSection() {
-			Vector3 nextChainSectionPosition = transform.position - transform.up * transform.localScale.x;
-
-			_nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, _rigidbody);
-		}
+            Vector3 nextChainSectionPosition = transform.position - transform.right * transform.localScale.x;
+            _nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, _rigidbody);
+            _chain.endingLink = _nextChainSection;
+        }
 
 		public void SetChain(Chain value) {
 			_chain = value;

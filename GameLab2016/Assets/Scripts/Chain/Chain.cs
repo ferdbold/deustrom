@@ -3,22 +3,26 @@ using System.Collections;
 
 namespace Simoncouche.Chain {
 
-	/// <summary>
-	/// A Chain is a group of ChainSection game objects linked together, with one Hook object at either end.
-	/// </summary>
-	public class Chain : MonoBehaviour {
+    /// <summary>
+    /// A Chain is a group of ChainSection game objects linked together, with one Hook object at either end.
+    /// </summary>
+    public class Chain : MonoBehaviour {
 
-		/// <summary>
-		/// Self-reference to the chain prefab for factory purposes
-		/// </summary>
-		private static GameObject _chainPrefab;
+        /// <summary>
+        /// Self-reference to the chain prefab for factory purposes
+        /// </summary>
+        private static GameObject _chainPrefab;
 
-		[Tooltip("Reference to the Hook prefab")]
-		[SerializeField]
-		private Hook _hookPrefab;
+        [Tooltip("Reference to the Hook prefab")]
+        [SerializeField]
+        private Hook _hookPrefab;
 
-		private Hook _beginningHook;
-		private Hook _endingHook;
+        private Hook _beginningHook;
+        private Hook _endingHook;
+
+        public ChainSection endingLink=null;
+
+        public int currentLinkNumber{ get; private set; }
 
 		public HookThrower thrower { get; set; }
 		public float initialForce { get; set; }
@@ -48,5 +52,10 @@ namespace Simoncouche.Chain {
 		public void Start() {
 			_beginningHook = Hook.Create(this);
 		}
+
+        public void IncrementLinkNumber() {
+            currentLinkNumber += 1;
+        }
+
 	}
 }

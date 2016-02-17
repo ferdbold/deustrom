@@ -36,9 +36,25 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		public float aimOrientation { get; private set; }
 
-		// COMPONENTS
 
-		private SpringJoint2D _joint;
+        /// <summary>
+        /// The current aim orientation as set by the right analog input
+        /// </summary>
+        [Tooltip("Maximum number of links per chain")]
+        [SerializeField]
+        private int maximumLinksPerChain=30;
+
+        /// <summary>
+        /// The distance the first hook is in front of the player
+        /// </summary>
+        [Tooltip("The distance the first hook is in front of the player")]
+        [SerializeField]
+        private float distanceHookInFrontOfPlayer = 3f;
+
+
+        // COMPONENTS
+
+        private SpringJoint2D _joint;
 		public SpringJoint2D joint { get { return _joint; } }
 
 		private Transform _aimIndicator;
@@ -64,12 +80,21 @@ namespace Simoncouche.Chain {
 			// TODO: Unfuck this
 			if (_chains.Count > 0 && _joint.connectedBody != null) {
 				if (Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnChainDistanceThreshold) {
-					_joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
+                    foreach(Chain chain in _chains){
+                        if (chain.currentLinkNumber <= maximumLinksPerChain) {
+                            chain.IncrementLinkNumber();
+                            _joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
+                        }
+                    }
 				}
 			}
+            foreach (Chain chain in _chains)
+            {
+                if (chain.endingLink) chain.endingLink.GetComponent<Rigidbody2D>().position = this.transform.position + transform.right * distanceHookInFrontOfPlayer;
+            }
 
-			// Apply rotation continously to the aimIndicator to prevent character rotation from updating the indicator
-			_aimIndicator.transform.rotation = Quaternion.Euler(0, 0, this.aimOrientation);
+                // Apply rotation continously to the aimIndicator to prevent character rotation from updating the indicator
+                _aimIndicator.transform.rotation = Quaternion.Euler(0, 0, this.aimOrientation);
 		}
 
 		/// <summary>
