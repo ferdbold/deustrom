@@ -51,40 +51,37 @@ namespace Simoncouche.Controller {
 
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
-
-        /// <summary>
-        /// Vector of player inputs
-        /// </summary>
-        private Vector2 _currentPlayerMovementInputs = Vector2.zero;
         #endregion
 
         /// <summary>
         /// Getting multiple needed components (Rigidbody, ...)
         /// </summary>
-        void Awake()
-        {
+        void Awake() {
             _playerRigidBody = GetComponent<Rigidbody2D>();
             _aimController = GetComponent<AimController>();
+            _hookThrower = GetComponentInChildren<HookThrower>();
         }
 
-	    /// <summary>
-	    /// Initialization of variables
-	    /// </summary>
-	    void Start() {
-		    _playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
+        /// <summary>
+        /// Initialization of variables
+        /// </summary>
+        void Start() {
+            _playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
 
             //Setup input
             GameManager.inputManager.AddEvent(
-                isPlayerOne ? InputManager.Axis.p1_leftAnalog : InputManager.Axis.p2_leftAnalog, 
+                isPlayerOne ? InputManager.Axis.p1_leftAnalog : InputManager.Axis.p2_leftAnalog,
                 this.PlayerInputs
             );
 
-            //TODO change hookthrower ref / Setup
-            _hookThrower = GetComponentInChildren<HookThrower>();
             if (_hookThrower != null) {
                 _hookThrower.SetupInput(isPlayerOne);
             } else {
                 Debug.LogError("Their is no hook thrower attached or child of this object");
+            }
+
+            if (_aimController != null) {
+                _aimController.SetupInput(isPlayerOne);
             }
 	    }
 
