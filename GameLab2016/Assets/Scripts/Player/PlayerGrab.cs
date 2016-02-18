@@ -9,14 +9,14 @@ namespace Simoncouche.Controller {
         [Tooltip("Magnitude of the force applied to the thrown gravity body")][SerializeField]
         private float THROW_FORCE = 15f;
 
-       /// <summary> Parent of grabbed gravity body. Used to reposition  body at the right place when releasing. </summary>
+        /// <summary> Parent of grabbed gravity body. Used to reposition  body at the right place when releasing. </summary>
         private Transform _grabbedBodyParent = null;
 
 
-        
+
         //Components
         /// <summary> Currently Grabbed GravityBody</summary>
-        private GravityBody _grabbedBody = null;
+        public GravityBody grabbedBody { get; private set;}
 
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
@@ -27,7 +27,7 @@ namespace Simoncouche.Controller {
         void Awake() {
             _controller = GetComponent<PlayerController>();
             _aimController = GetComponent<AimController>();
-
+            grabbedBody = null;
 
             if (_aimController == null) {
                 Debug.LogError("Player/AimController cannot be found!");
@@ -35,7 +35,7 @@ namespace Simoncouche.Controller {
         }
 
         void Update() {
-            if (_grabbedBody != null && Input.GetKeyDown(KeyCode.F)) {
+            if (grabbedBody != null && Input.GetKeyDown(KeyCode.F)) {
                 Throw();
             }
         }
@@ -43,21 +43,21 @@ namespace Simoncouche.Controller {
         /// <summary> Attemps to grab gravity body if one is not already grabbed</summary>
         /// <param name="targetBody">target gravity body to grab</param>
         public void AttemptGrab(GravityBody targetBody) {
-            if(_grabbedBody == null) {
+            if(grabbedBody == null) {
                 IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
 
                 if(targetChunk.parentIsland == null) {
-                    _grabbedBody = targetBody;
+                    grabbedBody = targetBody;
                     //Set parent
                     _grabbedBodyParent = targetChunk.transform.parent;
                     targetChunk.transform.parent = transform;
                     //Ignore Collision
                     Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
                     //Deactivate gravity body
-                    _grabbedBody.DeactivateGravityBody();
+                    grabbedBody.DeactivateGravityBody();
                 } else {
                     Island parentIsland = targetChunk.parentIsland;
-                    _grabbedBody = targetBody;
+                    grabbedBody = targetBody;
                     //Set parent
                     _grabbedBodyParent = parentIsland.transform.parent;
                     parentIsland.transform.parent = transform;
@@ -76,10 +76,10 @@ namespace Simoncouche.Controller {
         
         /// <summary> Throw gravity body in direction of player's aim controller</summary>
         private void Throw() {
-            if(_grabbedBody != null) {
+            if(grabbedBody != null) {
                 //Get Body to add force to
-                GravityBody bodyToAddForce = _grabbedBody;
-                IslandChunk targetChunk = _grabbedBody.gameObject.GetComponent<IslandChunk>();
+                GravityBody bodyToAddForce = grabbedBody;
+                IslandChunk targetChunk = grabbedBody.gameObject.GetComponent<IslandChunk>();
                 if (targetChunk.parentIsland != null) {
                     bodyToAddForce = targetChunk.parentIsland.gravityBody;
                 }
@@ -91,21 +91,21 @@ namespace Simoncouche.Controller {
 
 
             } else {
-                Debug.Log("Attempted to throw when _grabbedBody is null.");
+                Debug.LogError("Attempted to throw when grabbedBody is null.");
             }
         }
 
         /// <summary> Releases the gravity body </summary>
-        private void Release() {
+        public void Release() {
             
-            IslandChunk targetChunk = _grabbedBody.gameObject.GetComponent<IslandChunk>();
+            IslandChunk targetChunk = grabbedBody.gameObject.GetComponent<IslandChunk>();
 
             //If chunk has no parent island
             if (targetChunk.parentIsland == null) {
                 //Unparent chunk & activate GravBody
                 targetChunk.transform.parent = _grabbedBodyParent;
                 _grabbedBodyParent = null;
-                _grabbedBody.ActivateGravityBody();
+                grabbedBody.ActivateGravityBody();
                 //UnIgnore Collision
                 StartCoroutine(RemoveCollision(targetChunk.GetComponent<Collider2D>(), 1f));
             }
@@ -124,7 +124,7 @@ namespace Simoncouche.Controller {
             }
 
             //Mark grabbed body as null
-            _grabbedBody = null;
+            grabbedBody = null;
         }
 
         /// <summary> Remove collision with given collider2D after a amount of time </summary>
