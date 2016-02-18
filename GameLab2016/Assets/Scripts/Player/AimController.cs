@@ -27,9 +27,11 @@ namespace Simoncouche.Controller {
             _aimIndicator = transform.Find("AimIndicator");
         }
 
-        void Start() {
-            //TODO : This even shouldn't work for multiple players !
-            GameManager.inputManager.AddEvent(InputManager.Axis.rightAnalog, this.Aim);
+        public void SetupInput(bool isPlayerOne) {
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Axis.p1_rightAnalog : InputManager.Axis.p2_rightAnalog,
+                this.Aim
+            );
         }
 
         void Update() {

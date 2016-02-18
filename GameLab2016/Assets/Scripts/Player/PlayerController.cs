@@ -2,24 +2,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Simoncouche.Chain;
 
 namespace Simoncouche.Controller {
-
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerController : MonoBehaviour {
 
-        #region PublicVariables
+	    #region InspectorVariables
         [Header("Player Speed Properties")]
 
+        [SerializeField] [Tooltip("Acceleration of the player in unit per second")]
+	    private float playerAcceleration;
 
-        [Tooltip("Acceleration of the player in unit per second")]
-        public float playerAcceleration;
+        [SerializeField] [Tooltip("Maximum velocity of the player")]
+	    private float maximumVelocity;
+    
+        [SerializeField] [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
+        private AnimationCurve VelocityFalloffCurve;
 
-        [Tooltip("Maximum velocity of the player")]
-        public float maximumVelocity;
-
-        [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
-        public AnimationCurve VelocityFalloffCurve;
+        [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
+        private bool isPlayerOne = true;
 
         #endregion
 
@@ -33,6 +35,13 @@ namespace Simoncouche.Controller {
         /// <summary>  Is the player moving vertical? </summary>
         private bool _isMovingVertical;
 
+	    /// <summary>
+	    /// Vector of player inputs
+	    /// </summary>
+	    private Vector2 _currentPlayerMovementInputs=Vector2.zero;
+
+        /// <summary> Reference to the hook thrower attached to this object </summary>
+        private HookThrower _hookThrower;
 
         /// <summary> Input of left analog at the horizontal  </summary>
         private float _leftAnalogHorizontal;
@@ -42,13 +51,7 @@ namespace Simoncouche.Controller {
 
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
-
-        /// <summary>
-        /// Vector of player inputs
-        /// </summary>
-        private Vector2 _currentPlayerMovementInputs = Vector2.zero;
         #endregion
-
 
         /// <summary>
         /// Getting multiple needed components (Rigidbody, ...)
@@ -56,16 +59,32 @@ namespace Simoncouche.Controller {
         void Awake() {
             _playerRigidBody = GetComponent<Rigidbody2D>();
             _aimController = GetComponent<AimController>();
+            _hookThrower = GetComponentInChildren<HookThrower>();
         }
-
 
         /// <summary>
         /// Initialization of variables
         /// </summary>
         void Start() {
             _playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
-            GameManager.inputManager.AddEvent(InputManager.Axis.leftAnalog, PlayerInputs); //Setup input
-        }
+
+            //Setup input
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Axis.p1_leftAnalog : InputManager.Axis.p2_leftAnalog,
+                this.PlayerInputs
+            );
+
+            if (_hookThrower != null) {
+                _hookThrower.SetupInput(isPlayerOne);
+            } else {
+                Debug.LogError("Their is no hook thrower attached or child of this object");
+            }
+
+            if (_aimController != null) {
+                _aimController.SetupInput(isPlayerOne);
+            }
+	    }
+
         /// <summary>
         /// FixedUpdate pour le character avec rigidbody (sujet à changements)
         /// </summary>

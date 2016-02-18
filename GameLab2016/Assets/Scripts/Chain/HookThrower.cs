@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using Simoncouche.Controller;
 
 namespace Simoncouche.Chain {
-    /// <summary>
-    /// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
-    /// </summary>
-    [RequireComponent(typeof(SpringJoint2D))]
-	[RequireComponent(typeof(AimController))]
+
+	/// <summary>
+	/// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
+	/// </summary>
+	[RequireComponent(typeof(SpringJoint2D))]
 	public class HookThrower : MonoBehaviour {
 
 		[Tooltip("Reference to the grappling hook prefab")]
@@ -17,6 +16,10 @@ namespace Simoncouche.Chain {
 		[Tooltip("The initial force sent to the hook upon throwing it")]
 		[SerializeField]
 		private float _initialForceAmount = 10f;
+
+		[Tooltip("Input axis threshold before applying aiming")]
+		[SerializeField]
+		private float _aimDeadzone = 0.01f;
 
 		/// <summary>
 		/// The minimum distance needed between the thrower and a chain's last ChainSection to spawn a new ChainSection
@@ -28,30 +31,47 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		private List<Chain> _chains = new List<Chain>();
 
+		/// <summary>
+		/// The current aim orientation as set by the right analog input
+		/// </summary>
+		public float aimOrientation { get; private set; }
+
 		// COMPONENTS
-		        
-		public SpringJoint2D joint { get; private set; }
-		public AimController aimController { get; private set; }
 
-        // METHODS
+		private SpringJoint2D _joint;
+		public SpringJoint2D joint { get { return _joint; } }
 
-        public void Awake() {
-			this.joint = GetComponent<SpringJoint2D>();
-            this.aimController = GetComponent<AimController>();
+		private Transform _aimIndicator;
+
+		// METHODS
+
+		public void Awake() {
+			_joint = GetComponent<SpringJoint2D>();
+			_aimIndicator = transform.Find("AimIndicator");
+
+			if (_aimIndicator == null) {
+				Debug.LogError("Player/AimIndicator cannot be found!");
+			}
 		}
 
-		public void Start() {
-			GameManager.inputManager.AddEvent(InputManager.Button.fireHook, this.Fire);
+		public void SetupInput(bool isPlayerOne) {
+			GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_fireHook : InputManager.Button.p2_fireHook, 
+                this.Fire
+            );
 		}
 
 		public void Update() {
 			// Generate new sections if the distance to the linked section exceeds the threshold
 			// TODO: Unfuck this
-			if (_chains.Count > 0 && this.joint.connectedBody != null) {
-				if (Vector3.Distance(transform.position, this.joint.connectedBody.position) > _spawnChainDistanceThreshold) {
-					this.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
+			if (_chains.Count > 0 && _joint.connectedBody != null) {
+				if (Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnChainDistanceThreshold) {
+					_joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
 				}
 			}
+
+			// Apply rotation continously to the aimIndicator to prevent character rotation from updating the indicator
+			_aimIndicator.transform.rotation = Quaternion.Euler(0, 0, this.aimOrientation);
 		}
 
 		/// <summary>
@@ -59,7 +79,24 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		private void Fire() {
 			_chains.Add(Chain.Create(this, _initialForceAmount));
-			this.joint.enabled = true;
+			_joint.enabled = true;
+		}
+
+		/// <summary>
+		/// Handle user input to update the aim indicator
+		/// </summary>
+		/// <param name="axisValues">Axis values.</param>
+		private void Aim(float[] axisValues) {
+			Vector2 orientation = new Vector2(axisValues[0], axisValues[1]);
+
+			// Only apply aiming if the user input is relevant (higher than the deadzone)
+			if (orientation.magnitude > _aimDeadzone) {
+				this.aimOrientation = Vector2.Angle(Vector2.right, orientation);
+
+				if (axisValues[1] < 0) {
+					this.aimOrientation = 360f - this.aimOrientation;
+				}
+			}
 		}
 	}
 }
