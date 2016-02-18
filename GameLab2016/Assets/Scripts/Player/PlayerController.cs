@@ -26,14 +26,23 @@ namespace Simoncouche.Controller {
         #endregion
 
         #region PrivateVariables
+        //Components
         /// <summary>  Reference of player's rigidbody  </summary>
         private Rigidbody2D _playerRigidBody;
 
+        /// <summary> Reference to the aim controller </summary>
+        private AimController _aimController;
+
+        /// <summary> Reference to the playerGrab which handles gravity body grabbing</summary>
+        private PlayerGrab _playerGrab;
+
+        //Inputs
         /// <summary>  Is the player moving horizontally? </summary>
         private bool _isMovingHorizontal;
 
         /// <summary>  Is the player moving vertical? </summary>
         private bool _isMovingVertical;
+
 
 	    /// <summary>
 	    /// Vector of player inputs
@@ -49,8 +58,6 @@ namespace Simoncouche.Controller {
         /// <summary> Input of left analog at the vertical </summary>
         private float _leftAnalogVertical;
 
-        /// <summary> Reference to the aim controller </summary>
-        private AimController _aimController;
         #endregion
 
         /// <summary>
