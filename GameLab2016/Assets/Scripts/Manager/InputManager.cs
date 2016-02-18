@@ -93,7 +93,7 @@ public class InputManager : MonoBehaviour {
 		foreach (ButtonTuple button in buttons) {
 			if (button.Item1 != null) {
 				if (button.Item3) {
-					button.Item2.Invoke();
+                    button.Item2.Invoke();
 				}
 			}
 		}
