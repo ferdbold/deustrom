@@ -40,8 +40,11 @@ namespace Simoncouche.Chain {
             this.aimController = GetComponent<AimController>();
 		}
 
-		public void Start() {
-			GameManager.inputManager.AddEvent(InputManager.Button.fireHook, this.Fire);
+		public void SetupInput(bool isPlayerOne) {
+			GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_fireHook : InputManager.Button.p2_fireHook, 
+                this.Fire
+            );
 		}
 
 		public void Update() {
