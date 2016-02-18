@@ -45,10 +45,6 @@ namespace Simoncouche.Chain {
                 isPlayerOne ? InputManager.Button.p1_fireHook : InputManager.Button.p2_fireHook, 
                 this.Fire
             );
-			GameManager.inputManager.AddEvent(
-                isPlayerOne ? InputManager.Axis.p1_rightAnalog : InputManager.Axis.p2_rightAnalog, 
-                this.Aim
-            );
 		}
 
 		public void Update() {
