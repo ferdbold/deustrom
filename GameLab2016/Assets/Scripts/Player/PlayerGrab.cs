@@ -7,7 +7,7 @@ namespace Simoncouche.Controller {
 
         //Attributes
         [Tooltip("Magnitude of the force applied to the thrown gravity body")][SerializeField]
-        private float THROW_FORCE = 10f;
+        private float THROW_FORCE = 15f;
 
        /// <summary> Parent of grabbed gravity body. Used to reposition  body at the right place when releasing. </summary>
         private Transform _grabbedBodyParent = null;
@@ -45,24 +45,32 @@ namespace Simoncouche.Controller {
         public void AttemptGrab(GravityBody targetBody) {
             if(_grabbedBody == null) {
                 IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
-                //Register body as grabbed
-                
 
-                //Modify grabbed body / chunk
-                
                 if(targetChunk.parentIsland == null) {
                     _grabbedBody = targetBody;
+                    //Set parent
                     _grabbedBodyParent = targetChunk.transform.parent;
                     targetChunk.transform.parent = transform;
-                    targetBody.DeactivateGravityBody();
+                    //Ignore Collision
                     Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+                    //Deactivate gravity body
+                    _grabbedBody.DeactivateGravityBody();
                 } else {
-                    //TODO : 
+                    Island parentIsland = targetChunk.parentIsland;
+                    _grabbedBody = targetBody;
+                    //Set parent
+                    _grabbedBodyParent = parentIsland.transform.parent;
+                    parentIsland.transform.parent = transform;
+                    //Ignore Collision
+                    foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
+                        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), iChunk.GetComponent<Collider2D>(), true);
+                    }
+                    //Deactivate gravity body
+                    parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
                 }
+
                 
-
-
-
+                
             }
         }
         
@@ -78,12 +86,12 @@ namespace Simoncouche.Controller {
                 //Release
                 Release();
                 //Add Force
-                Vector2 forceDirection = _aimController.GetDirectionToAimObject(transform).normalized;
+                Vector2 forceDirection = _aimController.aimOrientationVector2.normalized;
                 bodyToAddForce.Velocity += forceDirection * THROW_FORCE;
 
 
             } else {
-            Debug.Log("Attempted to throw when _grabbedBody is null.");
+                Debug.Log("Attempted to throw when _grabbedBody is null.");
             }
         }
 
@@ -92,21 +100,37 @@ namespace Simoncouche.Controller {
             
             IslandChunk targetChunk = _grabbedBody.gameObject.GetComponent<IslandChunk>();
 
+            //If chunk has no parent island
             if (targetChunk.parentIsland == null) {
+                //Unparent chunk & activate GravBody
                 targetChunk.transform.parent = _grabbedBodyParent;
                 _grabbedBodyParent = null;
-                _grabbedBody.ActivateGravityBody();  
-            } else {
-                //TODO:
-                targetChunk.transform.parent = _grabbedBodyParent;
-                _grabbedBodyParent = null;
+                _grabbedBody.ActivateGravityBody();
+                //UnIgnore Collision
+                StartCoroutine(RemoveCollision(targetChunk.GetComponent<Collider2D>(), 1f));
+            }
+            //If chunk has a parent island
+            else { 
+                //Get island and reactivate it
+                Island parentIsland = targetChunk.parentIsland;
+                parentIsland.gravityBody.ActivateGravityBody();
+                //Reparent island
+                parentIsland.transform.parent = _grabbedBodyParent;
+                _grabbedBodyParent = null;   
+                //UnIgnore Collision
+                foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
+                    StartCoroutine(RemoveCollision(iChunk.GetComponent<Collider2D>(), 1f));
+                }
             }
 
-            //Put collisiosn back on and unmark as grabbed
-            StartCoroutine(RemoveCollision(targetChunk.GetComponent<Collider2D>(), 1f));
+            //Mark grabbed body as null
             _grabbedBody = null;
         }
 
+        /// <summary> Remove collision with given collider2D after a amount of time </summary>
+        /// <param name="otherCol">collider to unIgnore</param>
+        /// <param name="time">time before unignore</param>
+        /// <returns></returns>
         IEnumerator RemoveCollision(Collider2D otherCol, float time) {
             yield return new WaitForSeconds(time);
             Physics2D.IgnoreCollision(GetComponent<Collider2D>(), otherCol, false);
