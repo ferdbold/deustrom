@@ -55,6 +55,11 @@ namespace Simoncouche.Controller {
                 }
             }
         }
+
+        public Vector2 GetDirectionToAimObject(Transform from) {
+            return _aimIndicator.transform.position - from.position;
+        }
+
     }
 
 }

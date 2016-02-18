@@ -30,11 +30,11 @@ namespace Simoncouche.Controller {
         /// <summary>  Reference of player's rigidbody  </summary>
         private Rigidbody2D _playerRigidBody;
 
-        /// <summary> Reference to the aim controller </summary>
-        private AimController _aimController;
-
         /// <summary> Reference to the playerGrab which handles gravity body grabbing</summary>
         private PlayerGrab _playerGrab;
+
+        /// <summary> Reference to the aim controller </summary>
+        private AimController _aimController;
 
         //Inputs
         /// <summary>  Is the player moving horizontally? </summary>
@@ -67,6 +67,12 @@ namespace Simoncouche.Controller {
             _playerRigidBody = GetComponent<Rigidbody2D>();
             _aimController = GetComponent<AimController>();
             _hookThrower = GetComponentInChildren<HookThrower>();
+            _playerGrab = GetComponent<PlayerGrab>();
+
+            if (_playerGrab == null) {
+                Debug.LogError("Player/PlayerGrab cannot be found!");
+            }
+
         }
 
         /// <summary>
@@ -101,28 +107,7 @@ namespace Simoncouche.Controller {
 
 
 
-        /// <summary>
-        /// Function called in Update to register player inputs
-        /// </summary>
-        private void PlayerInputs(params float[] input) {
-            _leftAnalogHorizontal = input[0];
-            _leftAnalogVertical = input[1];
-
-            if (Mathf.Abs(_leftAnalogHorizontal) > 0.0f) {
-                _isMovingHorizontal = true;
-            } else {
-                _isMovingHorizontal = false;
-            }
-
-            if (Mathf.Abs(_leftAnalogVertical) > 0.0f) _isMovingVertical = true;
-            else _isMovingVertical = false;
-
-            _currentPlayerMovementInputs.x = _leftAnalogHorizontal;
-            _currentPlayerMovementInputs.y = _leftAnalogVertical;
-        }
-
-
-
+        #region movement
         /// <summary>
         /// Function that is called right after PlayerInputs inside Update in order to apply movement to our character
         /// </summary>
@@ -178,28 +163,40 @@ namespace Simoncouche.Controller {
             }
 
         }
+        #endregion
+
+        #region Collision
+        
+        public void OnCollisionEnter2D(Collision2D col) {
+            GravityBody otherGB = col.collider.gameObject.GetComponent<GravityBody>();
+            if(otherGB != null) {
+                if (_playerGrab.gameObject.activeInHierarchy) _playerGrab.AttemptGrab(otherGB);
+            }
+        }
+
+        #endregion
+
+
+        #region PlayerInputs
 
         /// <summary>
-        /// DEPRECATED. KEPT UNTIL FEEDBACK IS PROVIDED.
+        /// Function called in Update to register player inputs
         /// </summary>
-        private void VelocityCalculationByClampingVelocity(Vector2 tempVelocity) {
+        private void PlayerInputs(params float[] input) {
+            _leftAnalogHorizontal = input[0];
+            _leftAnalogVertical = input[1];
 
+            if (Mathf.Abs(_leftAnalogHorizontal) > 0.0f) {
+                _isMovingHorizontal = true;
+            } else {
+                _isMovingHorizontal = false;
+            }
 
-            Vector2 tempAcceleration = new Vector2(0.0f, 0.0f);
+            if (Mathf.Abs(_leftAnalogVertical) > 0.0f) _isMovingVertical = true;
+            else _isMovingVertical = false;
 
-            //Get Horizontal and vertical analog values
-            if (_isMovingHorizontal) {
-                tempAcceleration.x += _leftAnalogHorizontal;
-            }
-            if (_isMovingVertical) {
-                tempAcceleration.y += _leftAnalogVertical;
-            }
-            //Modify velocity
-            if (_isMovingHorizontal || _isMovingVertical) {
-                tempAcceleration *= playerAcceleration * Time.fixedDeltaTime;
-                tempVelocity = Vector2.ClampMagnitude(tempVelocity + tempAcceleration, maximumVelocity);
-                _playerRigidBody.velocity = tempVelocity;
-            }
+            _currentPlayerMovementInputs.x = _leftAnalogHorizontal;
+            _currentPlayerMovementInputs.y = _leftAnalogVertical;
         }
 
 
@@ -223,5 +220,7 @@ namespace Simoncouche.Controller {
         public float GetLeftAnalogVertical() {
             return _leftAnalogVertical;
         }
+        #endregion
+
     }
 }
