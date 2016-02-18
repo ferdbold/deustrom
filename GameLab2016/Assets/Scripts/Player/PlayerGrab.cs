@@ -46,30 +46,32 @@ namespace Simoncouche.Controller {
             if(grabbedBody == null) {
                 IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
 
-                if(targetChunk.parentIsland == null) {
-                    grabbedBody = targetBody;
-                    //Set parent
-                    _grabbedBodyParent = targetChunk.transform.parent;
-                    targetChunk.transform.parent = transform;
-                    //Ignore Collision
-                    Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
-                    //Deactivate gravity body
-                    grabbedBody.DeactivateGravityBody();
-                } else {
-                    Island parentIsland = targetChunk.parentIsland;
-                    grabbedBody = targetBody;
-                    //Set parent
-                    _grabbedBodyParent = parentIsland.transform.parent;
-                    parentIsland.transform.parent = transform;
-                    //Ignore Collision
-                    foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
-                        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), iChunk.GetComponent<Collider2D>(), true);
-                    }
-                    //Deactivate gravity body
-                    parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
-                }
+                if (targetChunk != null) { //Make sure we are trying to grab an IslandChunk
 
-                
+                    if (targetChunk.parentIsland == null) {
+                        grabbedBody = targetBody;
+                        //Set parent
+                        _grabbedBodyParent = targetChunk.transform.parent;
+                        targetChunk.transform.parent = transform;
+                        //Ignore Collision
+                        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+                        //Deactivate gravity body
+                        grabbedBody.DeactivateGravityBody();
+                    } else {
+                        Island parentIsland = targetChunk.parentIsland;
+                        grabbedBody = targetBody;
+                        //Set parent
+                        _grabbedBodyParent = parentIsland.transform.parent;
+                        parentIsland.transform.parent = transform;
+                        //Ignore Collision
+                        foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
+                            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), iChunk.GetComponent<Collider2D>(), true);
+                        }
+                        //Deactivate gravity body
+                        parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
+                    }
+
+                }
                 
             }
         }
