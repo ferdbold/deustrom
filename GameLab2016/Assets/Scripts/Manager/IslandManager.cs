@@ -48,7 +48,7 @@ namespace Simoncouche.Islands {
 				if (IslandUtils.CheckIfOnSameIsland(a_IslandLink, b_IslandLink)) return;
 
                 //Is A Island bigger than B Island
-				bool isA = a_IslandLink.weight <= b_IslandLink.weight;
+				bool isA = a_IslandLink.chunks.Count <= b_IslandLink.chunks.Count;
 
 				List<IslandChunk> chunks = isA ? b_IslandLink.chunks : a_IslandLink.chunks;
 				foreach (IslandChunk chunk in chunks) {
@@ -57,7 +57,7 @@ namespace Simoncouche.Islands {
 																		 (isA ? a : b).transform.rotation.eulerAngles);
 				}
 				RemoveIsland(isA ? b_IslandLink : a_IslandLink);
-				//Merge two chunk for island
+				//TODO Merge two chunk for island
 			} 
 
 			//If a is contained in a Island
