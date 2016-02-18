@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using Simoncouche.Controller;
 
 namespace Simoncouche.Chain {
-
-
-
     /// <summary>
     /// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
     /// </summary>
     [RequireComponent(typeof(SpringJoint2D))]
+	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
 		[Tooltip("Reference to the grappling hook prefab")]
@@ -31,26 +29,15 @@ namespace Simoncouche.Chain {
 		private List<Chain> _chains = new List<Chain>();
 
 		// COMPONENTS
-
-		private SpringJoint2D _joint;
-		public SpringJoint2D joint { get { return _joint; } }
-        
-        private AimController _aimController;
-
-        //Getters & Setters
-        public float AimOrientation() { return _aimController.aimOrientation; }
-
-
+		        
+		public SpringJoint2D joint { get; private set; }
+		public AimController aimController { get; private set; }
 
         // METHODS
 
         public void Awake() {
-			_joint = GetComponent<SpringJoint2D>();
-            _aimController = GetComponent<AimController>();
-
-			if (_aimController == null) {
-				Debug.LogError("Player/AimController cannot be found!");
-			}
+			this.joint = GetComponent<SpringJoint2D>();
+            this.aimController = GetComponent<AimController>();
 		}
 
 		public void Start() {
@@ -60,13 +47,11 @@ namespace Simoncouche.Chain {
 		public void Update() {
 			// Generate new sections if the distance to the linked section exceeds the threshold
 			// TODO: Unfuck this
-			if (_chains.Count > 0 && _joint.connectedBody != null) {
-				if (Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnChainDistanceThreshold) {
-					_joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
+			if (_chains.Count > 0 && this.joint.connectedBody != null) {
+				if (Vector3.Distance(transform.position, this.joint.connectedBody.position) > _spawnChainDistanceThreshold) {
+					this.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
 				}
 			}
-
-			
 		}
 
 		/// <summary>
@@ -74,9 +59,7 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		private void Fire() {
 			_chains.Add(Chain.Create(this, _initialForceAmount));
-			_joint.enabled = true;
+			this.joint.enabled = true;
 		}
-
-		
 	}
 }

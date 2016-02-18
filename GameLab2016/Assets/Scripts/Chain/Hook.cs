@@ -47,7 +47,7 @@ namespace Simoncouche.Chain {
 			Hook hook = ((GameObject)Instantiate(
 				_hookPrefab, 
 				chain.thrower.transform.position, 
-				Quaternion.Euler(0, 0, chain.thrower.AimOrientation())
+				Quaternion.Euler(0, 0, chain.thrower.aimController.aimOrientation)
 			)).GetComponent<Hook>();
 
 			hook.transform.parent = chain.transform;
