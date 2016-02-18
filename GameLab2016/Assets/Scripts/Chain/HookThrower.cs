@@ -36,17 +36,10 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		public float aimOrientation { get; private set; }
 
-
-        /// <summary>
-        /// The current aim orientation as set by the right analog input
-        /// </summary>
         [Tooltip("Maximum number of links per chain")]
         [SerializeField]
         private int maximumLinksPerChain=30;
 
-        /// <summary>
-        /// The distance the first hook is in front of the player
-        /// </summary>
         [Tooltip("The distance the first hook is in front of the player")]
         [SerializeField]
         private float distanceHookInFrontOfPlayer = 3f;
