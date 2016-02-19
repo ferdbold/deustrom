@@ -6,7 +6,7 @@ namespace Simoncouche.Chain {
     /// <summary>
     /// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
     /// </summary>
-    [RequireComponent(typeof(SpringJoint2D))]
+    [RequireComponent(typeof(HingeJoint2D))]
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
@@ -18,10 +18,6 @@ namespace Simoncouche.Chain {
         }
 
         private State _currentState;
-
-		[Tooltip("Reference to the grappling hook prefab")]
-		[SerializeField]
-		private Hook _hookPrefab;
 
 		[Tooltip("The initial force sent to the hook upon throwing it")]
 		[SerializeField]
@@ -39,21 +35,13 @@ namespace Simoncouche.Chain {
         /// </summary>
         private List<Chain> _chains = new List<Chain>();
 
-
-        [Tooltip("The distance the first hook is in front of the player")]
-        [SerializeField]
-        private float distanceHookInFrontOfPlayer = 3f;
-
-		// COMPONENTS
-		        
-		public SpringJoint2D joint { get; private set; }
+		// COMPONENTS   
+            
+		public HingeJoint2D joint { get; private set; }
 		public AimController aimController { get; private set; }
 
-  
- 		private Transform _aimIndicator;
-
         public void Awake() {
-			this.joint = GetComponent<SpringJoint2D>();
+			this.joint = GetComponent<HingeJoint2D>();
             this.aimController = GetComponent<AimController>();
 		}
 
@@ -72,12 +60,14 @@ namespace Simoncouche.Chain {
             {
                 _chains.Add(Chain.Create(this, _initialForceAmount));
                 joint.enabled = true;
-                _currentState = State.OneHook;
+                //_currentState = State.OneHook;
             }
+            //TODO: MODIFIER POUR LIER LES 2 CHAINES
             else if(_currentState == State.OneHook) //If we press fire when we have 1 hook, we create a hook and switch the currentState to NoHook
             {
                 _chains[_chains.Count - 1].CreateSecondHook();
-                _currentState = State.NoHook;
+                joint.enabled = false;
+                //_currentState = State.NoHook;
                 //_currentState = State.TwoHook;
             }
             else if(_currentState == State.TwoHook)

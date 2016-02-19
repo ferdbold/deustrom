@@ -16,11 +16,7 @@ namespace Simoncouche.Chain {
 
         [Tooltip("This is the maximum distance between the hook and the player")]
         [SerializeField]
-        private float _maximumDistanceBetweenPlayer=10f;
-
-		[Tooltip("Reference to the ChainSection prefab")]
-		[SerializeField]
-		private ChainSection _chainSectionPrefab;
+        private float _maxDistanceBetweenPlayerAndHook=10f;
 
 		/// <summary>
 		/// The chain this hook is part of
@@ -78,8 +74,11 @@ namespace Simoncouche.Chain {
 				}
 			}
 		}
-
+        //TODO: Destroy the chain when the distance is higher than a certain value
         void Update() {
+            if(Vector2.Distance(this._rigidbody.position, _chain.thrower.transform.position) > _maxDistanceBetweenPlayerAndHook) {
+                _rigidbody.velocity = Vector2.zero;
+            }
             //if (_joint.connectedBody == null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
         }
 
@@ -102,5 +101,7 @@ namespace Simoncouche.Chain {
                 _rigidbody.position += vect;
             }
         }
+
+
 	}
 }

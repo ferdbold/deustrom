@@ -17,10 +17,6 @@ namespace Simoncouche.Chain {
         /// </summary>
         private static GameObject _chainPrefab;
 
-        [Tooltip("Reference to the Hook prefab")]
-        [SerializeField]
-        private Hook _hookPrefab;
-
         private Hook _beginningHook;
         private Hook _endingHook;
 
@@ -74,7 +70,7 @@ namespace Simoncouche.Chain {
 		}
 
         public void Update() {
-            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
+            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold) {
                 if (_currentLinkNumberBeginningHook < _maximumLinksPerChain) {
                     thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
                     _endingLinkBeginningHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
@@ -83,38 +79,14 @@ namespace Simoncouche.Chain {
                 //ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkBeginningHook); //We clamp the distance of the closet link to the player to a maximum distance from the player
             }
 
-            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
-                if (_currentLinkNumberEndingHook < _maximumLinksPerChain)
-                {
+            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold) {
+                if (_currentLinkNumberEndingHook < _maximumLinksPerChain) {
                     thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
                     _endingLinkEndingHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
                     _currentLinkNumberEndingHook++;
                 }
             }
-            if(_beginningHook != null) {
-                ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkBeginningHook); //We clamp the distance of the closet link to the player to a maximum distance from the player
-            }
-
-            if (_endingHook != null){
-                ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkEndingHook); //We clamp the distance of the closet link to the player to a maximum distance from the player
-            }
-
-            if (Vector2.Distance(_beginningHook.GetComponent<Rigidbody2D>().position,thrower.GetComponent<Rigidbody2D>().position) > 15f)
-            {
-                _beginningHook.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-                while (_beginningHook.joint.connectedBody != null)
-                {
-                    Rigidbody2D tempBody = _beginningHook.joint.connectedBody;
-
-                }
-            }
-
-            if (Vector2.Distance(_endingHook.GetComponent<Rigidbody2D>().position, thrower.GetComponent<Rigidbody2D>().position) > 15f)
-            {
-
-            }
         }
-
 
         /// <summary>
         /// Restrain the closest link of a chain with a maxDistance from the thrower's position
@@ -122,11 +94,9 @@ namespace Simoncouche.Chain {
         /// <param name="throwerPosition"></param>
         /// <param name="maxDistance"></param>
         /// <param name="chainSection"></param>
-        private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance, ChainSection chainSection)
-        {
+        private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance, ChainSection chainSection) {
             float currentDistance = Vector3.Distance(chainSection.GetComponent<Rigidbody2D>().position, throwerPosition.position);
-            if (currentDistance > maxDistance)
-            {
+            if (currentDistance > maxDistance) {
                 Vector2 vect = throwerPosition.position - (Vector3) chainSection.GetComponent<Rigidbody2D>().position;
                 vect = vect.normalized;
                 vect *= (currentDistance - maxDistance);
@@ -134,8 +104,7 @@ namespace Simoncouche.Chain {
             }
         }
 
-        public void CreateSecondHook()
-        {
+        public void CreateSecondHook() {
             _endingHook = Hook.Create(this);
         }
     }
