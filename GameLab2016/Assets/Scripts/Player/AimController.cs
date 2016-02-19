@@ -46,7 +46,7 @@ namespace Simoncouche.Controller {
 		/// <param name="axisValues">Axis values.</param>
 		private void Aim(float[] axisValues) {
             Vector2 orientation = new Vector2(axisValues[0], axisValues[1]);
-            aimOrientationVector2 = orientation;
+            if(orientation != Vector2.zero) aimOrientationVector2 = orientation;
 
             // Only apply aiming if the user input is relevant (higher than the deadzone)
             if (orientation.magnitude > _aimDeadzone) {

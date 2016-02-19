@@ -41,11 +41,6 @@ namespace Simoncouche.Controller {
             );
         }
 
-        void Update() {
-            if (grabbedBody != null && Input.GetKeyDown(KeyCode.F)) {
-                Throw();
-            }
-        }
 
         /// <summary> Attemps to grab gravity body if one is not already grabbed</summary>
         /// <param name="targetBody">target gravity body to grab</param>
