@@ -42,7 +42,7 @@ public class GravityBody : GravityObject {
         gravityModifierLayerMask = 8; //Get gravity modifier layermask
         playerLayerMask = 9; //Get player layermask
 
-        if (gameObject.layer != playerLayerMask) { //if player
+        if (gameObject.layer != playerLayerMask) { //if not player
             gameObject.layer = 10;
         }
         collisionEnabled = true;
@@ -118,8 +118,7 @@ public class GravityBody : GravityObject {
         //Set _collider values
         _collider.radius = radius;
         //Set trigger to false if we're not player. 
-        if (gameObject.layer != playerLayerMask) _collider.isTrigger = false;
-        else _collider.isTrigger = true;
+        _collider.isTrigger = false;
     }
     #endregion
 
