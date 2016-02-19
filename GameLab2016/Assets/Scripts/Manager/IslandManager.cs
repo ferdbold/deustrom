@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Simoncouche.Controller;
 
 namespace Simoncouche.Islands {
 	/// <summary>
@@ -23,7 +24,13 @@ namespace Simoncouche.Islands {
         /// <summary> the island subfolder in scene </summary>
         private Transform _islandSubFolder;
 
+        private PlayerGrab _playerGrab;
+
         void Awake() {
+            GameObject playerGO = GameObject.FindWithTag("Player");
+            if (playerGO != null) _playerGrab = playerGO.GetComponent<PlayerGrab>();
+            if(_playerGrab == null) Debug.LogError("_PlayerGrab cannot be found!");
+
             try {
                 _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
             }
@@ -48,28 +55,32 @@ namespace Simoncouche.Islands {
 				if (IslandUtils.CheckIfOnSameIsland(a_IslandLink, b_IslandLink)) return;
 
                 //Is A Island bigger than B Island
-				bool isA = a_IslandLink.weight <= b_IslandLink.weight;
+				bool isA = a_IslandLink.chunks.Count <= b_IslandLink.chunks.Count;
 
 				List<IslandChunk> chunks = isA ? b_IslandLink.chunks : a_IslandLink.chunks;
 				foreach (IslandChunk chunk in chunks) {
 					a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint((isA ? b : a).transform.position, 
 																		 (isA ? a : b).transform.position), 
 																		 (isA ? a : b).transform.rotation.eulerAngles);
-				}
+                    CheckPlayerGrab(chunk.gravityBody);
+
+                }
 				RemoveIsland(isA ? b_IslandLink : a_IslandLink);
-				//Merge two chunk for island
+				//TODO Merge two chunk for island
 			} 
 
 			//If a is contained in a Island
 			else if (a_IslandLink != null) {
 				a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-				JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
+                CheckPlayerGrab(b.gravityBody);
+                JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
 			} 
 			
 			//If b is contained in a Island
 			else if (b_IslandLink != null) {
 				b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
-				JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
+                CheckPlayerGrab(a.gravityBody);
+                JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
 			} 
 			
 			//If a & b are not contained in a Island
@@ -117,6 +128,15 @@ namespace Simoncouche.Islands {
 			_island.Remove(Island);
 			Destroy(Island.gameObject);
 		}
+
+        /// <summary> Check if player is currently grabbinb bodyToMerge. If so, make the player release the object </summary>
+        /// <param name="bodyToMerge">Gravity body of the body to merge</param>
+        private void CheckPlayerGrab(GravityBody bodyToMerge) {
+            if(bodyToMerge == _playerGrab.grabbedBody) {
+                _playerGrab.Release();
+            }
+
+        }
 
 		#region Utils
 
