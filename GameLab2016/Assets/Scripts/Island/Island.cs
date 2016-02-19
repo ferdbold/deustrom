@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using DG.Tweening;
+using System.Collections;
 
 namespace Simoncouche.Islands {
 	/// <summary>
@@ -55,6 +57,21 @@ namespace Simoncouche.Islands {
 				ChangeGravityBodyWhenMerging(chunk);
 			}
         }
+
+        public void ConnectIslandToIsland(Vector3 targetPos, Vector3 targetRot, Island targetIsland, float time = 0.5f) {
+            foreach (IslandChunk chunk in chunks) {
+                foreach (IslandChunk targetChunk in targetIsland.chunks) {
+                    Physics2D.IgnoreCollision(chunk.GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+                }
+            }
+            
+            transform.DOLocalRotate(targetRot, time);
+            transform.DOLocalMove(targetPos, time);
+            StartCoroutine(Delay_CenterIslandRoot(time + 0.1f, targetIsland));
+        }
+
+        /// <summary> Calls Center Island root function on a delay t in seconds </summary>
+        private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland) { yield return new WaitForSeconds(t); targetIsland.CenterIslandRoot(); }
 
         /// <summary>
         /// Remove a chunk of this island.
