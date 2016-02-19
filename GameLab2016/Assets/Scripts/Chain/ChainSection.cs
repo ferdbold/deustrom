@@ -85,7 +85,6 @@ namespace Simoncouche.Chain {
 		public void SpawnNewSection() {
             Vector3 nextChainSectionPosition = transform.position - transform.right * transform.localScale.x;
 			_nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, this.rigidbody, this.mesh.localRotation);
-            _chain.endingLink = _nextChainSection;
         }
 
 		private void SetChain(Chain value) {

@@ -76,7 +76,7 @@ namespace Simoncouche.Chain {
         public void Update() {
             if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
                 if (_currentLinkNumberBeginningHook < _maximumLinksPerChain) {
-                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection(thrower.transform);
+                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
                     _endingLinkBeginningHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
                     _currentLinkNumberBeginningHook++;
                 }
@@ -86,7 +86,7 @@ namespace Simoncouche.Chain {
                 Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
                 if (_currentLinkNumberEndingHook < _maximumLinksPerChain)
                 {
-                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection(thrower.transform);
+                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
                     _endingLinkEndingHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
                     _currentLinkNumberEndingHook++;
                 }
