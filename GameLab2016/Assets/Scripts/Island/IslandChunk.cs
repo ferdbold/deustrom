@@ -136,7 +136,7 @@ namespace Simoncouche.Islands {
 			IslandAnchorPoints otherAnchor = other.GetComponent<IslandAnchorPoints>();
 			IslandChunk chunk = other.GetComponentInParent<IslandChunk>();
 
-			if (otherAnchor != null && chunk.color == _color && otherAnchor.transform.parent.gameObject != gameObject ) {
+			if (otherAnchor != null && otherAnchor.transform.parent.gameObject != gameObject ) {
                 
 				if (IslandUtils.CheckIfOnSameIsland(chunk, this)) {
 					return;
@@ -154,8 +154,8 @@ namespace Simoncouche.Islands {
             Collider2D other = col.collider;
 			IslandChunk chunk = other.GetComponent<IslandChunk>();
 
-			
-			if (!(chunk != null && chunk.color != _color)) {
+			//Collide with chunk of other color
+			if (chunk != null && chunk.color != _color) {
 
                 //Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
                 _audioSource.PlayOneShot(_collisionSound);
