@@ -88,7 +88,7 @@ namespace Simoncouche.Chain {
             _chain.endingLink = _nextChainSection;
         }
 
-		public void SetChain(Chain value) {
+		private void SetChain(Chain value) {
 			_chain = value;
 		}
 	}
