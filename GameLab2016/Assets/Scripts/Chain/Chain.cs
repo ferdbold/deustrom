@@ -3,24 +3,48 @@ using System.Collections;
 
 namespace Simoncouche.Chain {
 
-	/// <summary>
-	/// A Chain is a group of ChainSection game objects linked together, with one Hook object at either end.
-	/// </summary>
-	public class Chain : MonoBehaviour {
+    /// <summary>
+    /// A Chain is a group of ChainSection game objects linked together, with one Hook object at either end.
+    /// </summary>
+    public class Chain : MonoBehaviour {
 
-		/// <summary>
-		/// Self-reference to the chain prefab for factory purposes
-		/// </summary>
-		private static GameObject _chainPrefab;
+        [Tooltip("This is the maximum distance between the hook and the player")]
+        [SerializeField]
+        private float _maximumDistanceBetweenPlayer = 5.0f;
 
-		[Tooltip("Reference to the Hook prefab")]
-		[SerializeField]
-		private Hook _hookPrefab;
+        /// <summary>
+        /// Self-reference to the chain prefab for factory purposes
+        /// </summary>
+        private static GameObject _chainPrefab;
 
-		private Hook _beginningHook;
-		private Hook _endingHook;
+        [Tooltip("Reference to the Hook prefab")]
+        [SerializeField]
+        private Hook _hookPrefab;
 
-		public HookThrower thrower { get; set; }
+        private Hook _beginningHook;
+        private Hook _endingHook;
+
+        private ChainSection _endingLinkBeginningHook=null;
+        private ChainSection _endingLinkEndingHook = null;
+
+        /// <summary>
+        /// The current number of links in the biginning hook
+        /// </summary>
+        private int _currentLinkNumberBeginningHook;
+
+        /// <summary>
+        /// The current number of links in the biginning hook
+        /// </summary>
+        private int _currentLinkNumberEndingHook;
+
+        /// <summary>
+        /// The current aim orientation as set by the right analog input
+        /// </summary>
+        [Tooltip("Maximum number of links per chain")]
+        [SerializeField]
+        private int _maximumLinksPerChain = 30;
+
+        public HookThrower thrower { get; set; }
 		public float initialForce { get; set; }
 
 		/// <summary>
@@ -48,5 +72,50 @@ namespace Simoncouche.Chain {
 		public void Start() {
 			_beginningHook = Hook.Create(this);
 		}
-	}
+
+        public void Update() {
+            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
+                if (_currentLinkNumberBeginningHook < _maximumLinksPerChain) {
+                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection(thrower.transform);
+                    _endingLinkBeginningHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
+                    _currentLinkNumberBeginningHook++;
+                }
+                ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkBeginningHook);
+            }
+            if (_endingHook!=null && 
+                Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
+                if (_currentLinkNumberEndingHook < _maximumLinksPerChain)
+                {
+                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection(thrower.transform);
+                    _endingLinkEndingHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
+                    _currentLinkNumberEndingHook++;
+                }
+                ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkEndingHook);
+            }
+        }
+
+
+        /// <summary>
+        /// Restrain the closest link of a chain with a maxDistance from the thrower's position
+        /// </summary>
+        /// <param name="throwerPosition"></param>
+        /// <param name="maxDistance"></param>
+        /// <param name="chainSection"></param>
+        private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance, ChainSection chainSection)
+        {
+            float currentDistance = Vector3.Distance(chainSection.transform.position, throwerPosition.position);
+            if (currentDistance > maxDistance)
+            {
+                Vector3 vect = throwerPosition.position - chainSection.transform.position;
+                vect = vect.normalized;
+                vect *= (currentDistance - maxDistance);
+                chainSection.transform.position += vect;
+            }
+        }
+
+        public void CreateSecondHook()
+        {
+            _endingHook = Hook.Create(this);
+        }
+    }
 }

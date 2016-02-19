@@ -74,11 +74,26 @@ namespace Simoncouche.Islands {
 		/// <param name="time">the time taken</param>
 		/// <param name="targetChunk">the other chunk</param>
 		public void ConnectChunk(Vector3 targetPos, Vector3 targetRot, IslandChunk targetChunk, Island targetIsland, float time = 0.5f) {
-			Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+            ChangeCollisionBetweenChunk(targetChunk);
             //Debug.Log(targetPos + " " + targetRot);
 			transform.DOLocalRotate(targetRot, time);
 			transform.DOLocalMove(targetPos, time);
             StartCoroutine(Delay_CenterIslandRoot(time+0.1f, targetIsland));
+        }
+
+        /// <summary>
+        /// Change Island Collision and it's anchor collision
+        /// </summary>
+        /// <param name="targetChunk">the target chunk</param
+        /// <param name="colliding">is the target colliding with this chunk</param>
+        private void ChangeCollisionBetweenChunk(IslandChunk targetChunk, bool colliding = false) {
+            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), !colliding);
+            foreach (IslandAnchorPoints point in anchors) {
+                foreach (IslandAnchorPoints targetPoint in targetChunk.anchors) {
+                    Physics2D.IgnoreCollision(point.GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), !colliding);
+                }
+            }
+
         }
 
 

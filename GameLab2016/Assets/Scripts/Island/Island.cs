@@ -1,29 +1,31 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using DG.Tweening;
+using System.Collections;
 
 namespace Simoncouche.Islands {
-	/// <summary>
-	/// The global Island information, parent to Island Chunk
-	/// </summary>
-	public class Island : MonoBehaviour {
-		
-		private int _weight = 1;
-		public int weight {
-			get { return _weight; }
-			protected set { _weight = value; }
-		}
+    /// <summary>
+    /// The global Island information, parent to Island Chunk
+    /// </summary>
+    public class Island : MonoBehaviour {
 
-		/// <summary> The many part of the Island </summary>
-		public List<IslandChunk> chunks { get; private set; }
+        private int _weight = 1;
+        public int weight {
+            get { return _weight; }
+            protected set { _weight = value; }
+        }
+
+        /// <summary> The many part of the Island </summary>
+        public List<IslandChunk> chunks { get; private set; }
 
         //Island's Components
         private CircleCollider2D _collider;
-		private GravityBody _gravityBody;
+        public GravityBody gravityBody { get; private set;}
 
 		private void Awake() {
 			chunks = new List<IslandChunk>();
 			_collider = GetComponent<CircleCollider2D>();
-			_gravityBody = GetComponent<GravityBody>();
+			gravityBody = GetComponent<GravityBody>();
 		}
         
         private void Start() {
@@ -56,6 +58,21 @@ namespace Simoncouche.Islands {
 			}
         }
 
+        public void ConnectIslandToIsland(Vector3 targetPos, Vector3 targetRot, Island targetIsland, float time = 0.5f) {
+            foreach (IslandChunk chunk in chunks) {
+                foreach (IslandChunk targetChunk in targetIsland.chunks) {
+                    Physics2D.IgnoreCollision(chunk.GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+                }
+            }
+            
+            transform.DOLocalRotate(targetRot, time);
+            transform.DOLocalMove(targetPos, time);
+            StartCoroutine(Delay_CenterIslandRoot(time + 0.1f, targetIsland));
+        }
+
+        /// <summary> Calls Center Island root function on a delay t in seconds </summary>
+        private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland) { yield return new WaitForSeconds(t); targetIsland.CenterIslandRoot(); }
+
         /// <summary>
         /// Remove a chunk of this island.
         /// </summary>
@@ -73,14 +90,14 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="chunk"></param>
         private void ChangeGravityBodyWhenMerging(IslandChunk chunk) {
-            _gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
+            gravityBody.LinearDrag = chunk.gravityBody.LinearDrag;
             //Merge weight
-            //Debug.Log(_gravityBody.Velocity + "  " +  weight + "  " + chunk.gravityBody.Velocity + "  " + chunk.weight + "  result : " + (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight));
-			_gravityBody.Velocity = (_gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
+            //Debug.Log(gravityBody.Velocity + "  " +  weight + "  " + chunk.gravityBody.Velocity + "  " + chunk.weight + "  result : " + (gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight));
+			gravityBody.Velocity = (gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
 			weight = weight + chunk.weight;
 
             _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
-			_gravityBody.Weight += chunk.gravityBody.Weight;
+			gravityBody.Weight += chunk.gravityBody.Weight;
 
             //deactivate the gravitybody of the chunk
             chunk.gravityBody.DeactivateGravityBody();

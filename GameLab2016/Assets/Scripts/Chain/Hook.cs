@@ -14,6 +14,10 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		private static GameObject _hookPrefab;
 
+        [Tooltip("This is the maximum distance between the hook and the player")]
+        [SerializeField]
+        private float _maximumDistanceBetweenPlayer=10f;
+
 		[Tooltip("Reference to the ChainSection prefab")]
 		[SerializeField]
 		private ChainSection _chainSectionPrefab;
@@ -47,7 +51,7 @@ namespace Simoncouche.Chain {
 			Hook hook = ((GameObject)Instantiate(
 				_hookPrefab, 
 				chain.thrower.transform.position, 
-				Quaternion.Euler(0, 0, chain.thrower.aimOrientation)
+				Quaternion.Euler(0, 0, chain.thrower.aimController.aimOrientation)
 			)).GetComponent<Hook>();
 
 			hook.transform.parent = chain.transform;
@@ -63,7 +67,6 @@ namespace Simoncouche.Chain {
 
 		public void Start() {
 			_nextChain = ChainSection.Create(transform.position, _chain, _rigidbody);
-
 			_rigidbody.AddForce(transform.rotation * new Vector2(_chain.initialForce, 0));
 		}
 
@@ -76,8 +79,27 @@ namespace Simoncouche.Chain {
 			}
 		}
 
+        void Update() {
+            if (_joint.connectedBody != null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
+        }
+
 		public void SetChain(Chain value) {
 			_chain = value;
 		}
+
+        /// <summary>
+        /// Restrain the closest link of a chain with a maxDistance from the thrower's position
+        /// </summary>
+        /// <param name="throwerPosition"></param>
+        /// <param name="maxDistance"></param>
+        private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance) {
+            float currentDistance = Vector3.Distance(transform.position, throwerPosition.position);
+            if (currentDistance > maxDistance) {
+                Vector3 vect = throwerPosition.position - transform.position;
+                vect = vect.normalized;
+                vect *= (currentDistance - maxDistance);
+                transform.position += vect;
+            }
+        }
 	}
 }

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
+using Simoncouche.Controller;
 
 namespace Simoncouche.Islands {
 	/// <summary>
@@ -20,10 +22,20 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Particle spawned when island assemble")]
         private GameObject AssembleParticlePrefab;
 
+        [SerializeField]
+        [Tooltip("The time it takes for 2 chunks to do their merging anim")]
+        private float _chunkMergeTime = 1f;
+
         /// <summary> the island subfolder in scene </summary>
         private Transform _islandSubFolder;
 
+        private PlayerGrab _playerGrab;
+
         void Awake() {
+            GameObject playerGO = GameObject.FindWithTag("Player");
+            if (playerGO != null) _playerGrab = playerGO.GetComponent<PlayerGrab>();
+            if(_playerGrab == null) Debug.LogError("_PlayerGrab cannot be found!");
+
             try {
                 _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
             }
@@ -48,28 +60,47 @@ namespace Simoncouche.Islands {
 				if (IslandUtils.CheckIfOnSameIsland(a_IslandLink, b_IslandLink)) return;
 
                 //Is A Island bigger than B Island
-				bool isA = a_IslandLink.weight <= b_IslandLink.weight;
+				bool isA = a_IslandLink.chunks.Count <= b_IslandLink.chunks.Count;
 
 				List<IslandChunk> chunks = isA ? b_IslandLink.chunks : a_IslandLink.chunks;
 				foreach (IslandChunk chunk in chunks) {
 					a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint((isA ? b : a).transform.position, 
 																		 (isA ? a : b).transform.position), 
 																		 (isA ? a : b).transform.rotation.eulerAngles);
-				}
-				RemoveIsland(isA ? b_IslandLink : a_IslandLink);
-				//Merge two chunk for island
+                    CheckPlayerGrab(chunk.gravityBody);
+                }
+
+                //Call the to island to be connected (The many ternary operator are for the possible value if one or the other island are assembled (hi hi)
+                (isA ? b_IslandLink : a_IslandLink).ConnectIslandToIsland(
+                    FindTargetLocalPosition(
+                        isA ? b_anchor : a_anchor,
+                        isA ? b_IslandLink : a_IslandLink,
+                        isA ? a_anchor : b_anchor
+                    ),
+                    FindTargetRotForAnchor(
+                        isA ? b_anchor : a_anchor,
+                        isA ? a_anchor : b_anchor   
+                    ),
+                    isA ? a_IslandLink : b_IslandLink,
+                    _chunkMergeTime
+                );
+
+                OnJoinChunk(b_anchor);
+                StartCoroutine(TimerIslandRemove(_chunkMergeTime, isA ? b_IslandLink : a_IslandLink));
 			} 
 
 			//If a is contained in a Island
 			else if (a_IslandLink != null) {
 				a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-				JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
+                CheckPlayerGrab(b.gravityBody);
+                JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
 			} 
 			
 			//If b is contained in a Island
 			else if (b_IslandLink != null) {
 				b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
-				JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
+                CheckPlayerGrab(a.gravityBody);
+                JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
 			} 
 			
 			//If a & b are not contained in a Island
@@ -78,6 +109,14 @@ namespace Simoncouche.Islands {
 				JoinTwoChunk(b, b_anchor, a, a_anchor, ChunkContainedInIsland(a));
 			}
 		}
+
+        /// <summary>
+        /// Timer before the island is remove and merged
+        /// </summary>
+        /// <param name="time">timer time</param>
+        /// <param name="island">island to be removed</param>
+        /// <returns></returns>
+        private IEnumerator TimerIslandRemove(float time, Island island) { yield return new WaitForSeconds(time); RemoveIsland(island); }
 
 		/// <summary>
 		/// Check if the chunk is contained in a Island
@@ -118,6 +157,15 @@ namespace Simoncouche.Islands {
 			Destroy(Island.gameObject);
 		}
 
+        /// <summary> Check if player is currently grabbinb bodyToMerge. If so, make the player release the object </summary>
+        /// <param name="bodyToMerge">Gravity body of the body to merge</param>
+        private void CheckPlayerGrab(GravityBody bodyToMerge) {
+            if(bodyToMerge == _playerGrab.grabbedBody) {
+                _playerGrab.Release();
+            }
+
+        }
+
 		#region Utils
 
 		/// <summary>
@@ -129,15 +177,24 @@ namespace Simoncouche.Islands {
 		/// <param name="b_anchor">anchor assossiated to b</param>
 		private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor, Island targetIsland) {
             //Debug.Log(a.transform.localPosition + " " + b.transform.localPosition);
-			a.ConnectChunk(FindTargetLocalPosition(a_anchor, b, b_anchor),
-						   FindTargetRotForAnchor(a_anchor, b_anchor),
-						   b,
-                           targetIsland,
-                           1f);
-            //Instantiate Particles FX
-            GameObject ParticleGO = (GameObject) Instantiate(AssembleParticlePrefab, b_anchor.transform.position + new Vector3(0,0,-1.25f), Quaternion.identity);
-            ParticleGO.transform.parent = b_anchor.transform;
+			a.ConnectChunk(
+                FindTargetLocalPosition(a_anchor, b, b_anchor),
+				FindTargetRotForAnchor(a_anchor, b_anchor),
+				b,
+                targetIsland,
+                _chunkMergeTime
+            );
+            OnJoinChunk(b_anchor);
+        }
 
+        /// <summary>
+        /// Event when a chunk is joined to another (same for island to island merge)
+        /// </summary>
+        /// <param name="anchor">The anchor to spawn the particle</param>
+        private void OnJoinChunk(IslandAnchorPoints anchor) {
+            //Instantiate Particles FX
+            GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab, anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+            ParticleGO.transform.parent = anchor.transform;
         }
 
 		/// <summary>
@@ -159,6 +216,16 @@ namespace Simoncouche.Islands {
         private Vector3 FindTargetLocalPosition(IslandAnchorPoints a, IslandChunk b_chunk, IslandAnchorPoints b) {
 			return b_chunk.transform.localPosition - a.position + b.position;
 		}
+
+        /// <summary>
+        /// Find the target local position
+        /// </summary>
+        /// <param name="a">The anchor of the island to merge</param>
+        /// <param name="b_chunk">Island to be merge to</param>
+        /// <returns></returns>
+        private Vector3 FindTargetLocalPosition(IslandAnchorPoints a, Island a_island, IslandAnchorPoints b) {
+            return a_island.transform.position - a.position + b.position;
+        }
 
 		/// <summary>
 		/// Get the point of merge between 2 island chunk
