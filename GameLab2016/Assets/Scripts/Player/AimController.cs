@@ -14,10 +14,11 @@ namespace Simoncouche.Controller {
         [SerializeField]
         private float _aimDeadzone = 0.01f;
 
-        /// <summary>
-        /// The current aim orientation as set by the right analog input
-        /// </summary>
+        /// <summary> The current aim orientation as set by the right analog input </summary>
         public float aimOrientation { get; private set; }
+
+        /// <summary> The current aim orientation in vector2 as set by the right analog input </summary>
+        public Vector2 aimOrientationVector2 { get; private set; }
 
         /// <summary> Transform of the aim object on screen </summary>
         private Transform _aimIndicator;
@@ -45,6 +46,7 @@ namespace Simoncouche.Controller {
 		/// <param name="axisValues">Axis values.</param>
 		private void Aim(float[] axisValues) {
             Vector2 orientation = new Vector2(axisValues[0], axisValues[1]);
+            aimOrientationVector2 = orientation;
 
             // Only apply aiming if the user input is relevant (higher than the deadzone)
             if (orientation.magnitude > _aimDeadzone) {
@@ -55,6 +57,7 @@ namespace Simoncouche.Controller {
                 }
             }
         }
+
     }
 
 }

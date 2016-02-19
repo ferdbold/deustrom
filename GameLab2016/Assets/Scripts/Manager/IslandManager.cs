@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using Simoncouche.Controller;
 
 namespace Simoncouche.Islands {
 	/// <summary>
@@ -28,7 +29,13 @@ namespace Simoncouche.Islands {
         /// <summary> the island subfolder in scene </summary>
         private Transform _islandSubFolder;
 
+        private PlayerGrab _playerGrab;
+
         void Awake() {
+            GameObject playerGO = GameObject.FindWithTag("Player");
+            if (playerGO != null) _playerGrab = playerGO.GetComponent<PlayerGrab>();
+            if(_playerGrab == null) Debug.LogError("_PlayerGrab cannot be found!");
+
             try {
                 _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
             }
@@ -79,18 +86,21 @@ namespace Simoncouche.Islands {
 
                 OnJoinChunk(b_anchor);
                 StartCoroutine(TimerIslandRemove(_chunkMergeTime, isA ? b_IslandLink : a_IslandLink));
+                CheckPlayerGrab(chunk.gravityBody);
 			} 
 
 			//If a is contained in a Island
 			else if (a_IslandLink != null) {
 				a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-				JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
+                CheckPlayerGrab(b.gravityBody);
+                JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
 			} 
 			
 			//If b is contained in a Island
 			else if (b_IslandLink != null) {
 				b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
-				JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
+                CheckPlayerGrab(a.gravityBody);
+                JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
 			} 
 			
 			//If a & b are not contained in a Island
@@ -146,6 +156,15 @@ namespace Simoncouche.Islands {
 			_island.Remove(Island);
 			Destroy(Island.gameObject);
 		}
+
+        /// <summary> Check if player is currently grabbinb bodyToMerge. If so, make the player release the object </summary>
+        /// <param name="bodyToMerge">Gravity body of the body to merge</param>
+        private void CheckPlayerGrab(GravityBody bodyToMerge) {
+            if(bodyToMerge == _playerGrab.grabbedBody) {
+                _playerGrab.Release();
+            }
+
+        }
 
 		#region Utils
 

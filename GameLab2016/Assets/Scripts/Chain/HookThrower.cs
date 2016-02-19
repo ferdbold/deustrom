@@ -28,6 +28,14 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		private List<Chain> _chains = new List<Chain>();
 
+        [Tooltip("Maximum number of links per chain")]
+        [SerializeField]
+        private int maximumLinksPerChain=30;
+
+        [Tooltip("The distance the first hook is in front of the player")]
+        [SerializeField]
+        private float distanceHookInFrontOfPlayer = 3f;
+
 		// COMPONENTS
 		        
 		public SpringJoint2D joint { get; private set; }
@@ -49,7 +57,6 @@ namespace Simoncouche.Chain {
 
 		public void Update() {
 			// Generate new sections if the distance to the linked section exceeds the threshold
-			// TODO: Unfuck this
 			if (_chains.Count > 0 && this.joint.connectedBody != null) {
 				if (Vector3.Distance(transform.position, this.joint.connectedBody.position) > _spawnChainDistanceThreshold) {
 					this.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
