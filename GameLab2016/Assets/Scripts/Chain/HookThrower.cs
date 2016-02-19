@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Simoncouche.Controller;
 
 namespace Simoncouche.Chain {
-
-	/// <summary>
-	/// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
-	/// </summary>
-	[RequireComponent(typeof(SpringJoint2D))]
+    /// <summary>
+    /// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
+    /// </summary>
+    [RequireComponent(typeof(SpringJoint2D))]
+	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
         enum State
@@ -26,10 +27,6 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private float _initialForceAmount = 10f;
 
-		[Tooltip("Input axis threshold before applying aiming")]
-		[SerializeField]
-		private float _aimDeadzone = 0.01f;
-
 		/// <summary>
 		/// The minimum distance needed between the thrower and a chain's last ChainSection to spawn a new ChainSection
 		/// </summary>
@@ -42,43 +39,32 @@ namespace Simoncouche.Chain {
         /// </summary>
         private List<Chain> _chains = new List<Chain>();
 
-		/// <summary>
-		/// The current aim orientation as set by the right analog input
-		/// </summary>
-		public float aimOrientation { get; private set; }
 
+        [Tooltip("Maximum number of links per chain")]
+        [SerializeField]
+        private int maximumLinksPerChain=30;
 
-
-        /// <summary>
-        /// The distance the first hook is in front of the player
-        /// </summary>
         [Tooltip("The distance the first hook is in front of the player")]
         [SerializeField]
         private float distanceHookInFrontOfPlayer = 3f;
 
+		// COMPONENTS
+		        
+		public SpringJoint2D joint { get; private set; }
+		public AimController aimController { get; private set; }
 
-        // COMPONENTS
 
-        private SpringJoint2D _joint;
-		public SpringJoint2D joint { get { return _joint; } }
 
-		private Transform _aimIndicator;
-
-		// METHODS
-
-		public void Awake() {
-            _currentState = State.NoHook;
-			_joint = GetComponent<SpringJoint2D>();
-			_aimIndicator = transform.Find("AimIndicator");
-
-			if (_aimIndicator == null) {
-				Debug.LogError("Player/AimIndicator cannot be found!");
-			}
+        public void Awake() {
+			this.joint = GetComponent<SpringJoint2D>();
+            this.aimController = GetComponent<AimController>();
 		}
 
-		public void Start() {
-			GameManager.inputManager.AddEvent(InputManager.Button.fireHook, this.Fire);
-			GameManager.inputManager.AddEvent(InputManager.Axis.rightAnalog, this.Aim);
+		public void SetupInput(bool isPlayerOne) {
+			GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_fireHook : InputManager.Button.p2_fireHook, 
+                this.Fire
+            );
 		}
 
 		public void Update() {

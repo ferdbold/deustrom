@@ -28,6 +28,7 @@ public class DestroyGravityBodyOnImpact : MonoBehaviour {
             //Check if islandChunk exist. If so, call Maelstrom Collision Method
             if(islandChunk != null) {
                 islandChunk.OnMaelstromEnter();
+                audioSource.PlayOneShot(DestroySound);
             }
             //Else if gravity body exists, call destroy method
             else if (gravityBodyScript != null) {

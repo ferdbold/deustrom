@@ -1,34 +1,34 @@
 fileFormatVersion: 2
-guid: b72fdfab4540a004b89cce9ca5816942
-timeCreated: 1455596339
+guid: 2b8187d5500894e41b6dab90df3537ed
+timeCreated: 1455771041
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
-    100002: SK_sobek_geo
-    100004: Sobek_clav_lf_ctrl_grp
-    100006: Sobek_clav_lf_jnt
-    100008: Sobek_clav_rt_ctrl_grp
-    100010: Sobek_clav_rt_jnt
-    100012: Sobek_elbow_lf_jnt
-    100014: Sobek_elbow_rt_jnt
-    100016: Sobek_eyelid_lf_ctrl_grp
-    100018: Sobek_eyelid_lf_jnt
-    100020: Sobek_eyelid_rt_ctrl_grp
-    100022: Sobek_eyelid_rt_jnt
-    100024: Sobek_eyelidEnd_lf_jnt
-    100026: Sobek_eyelidEnd_rt_jnt
-    100028: Sobek_fingerA_lf_ctrl_grp
-    100030: Sobek_fingerA_lf_jnt
-    100032: Sobek_fingerA_rt_ctrl_grp
-    100034: Sobek_fingerA_rt_jnt
-    100036: Sobek_fingerB_lf_ctrl_grp
-    100038: Sobek_fingerB_lf_jnt
-    100040: Sobek_fingerB_rt_ctrl_grp
-    100042: Sobek_fingerB_rt_jnt
-    100044: Sobek_forearm_lf_jnt
-    100046: Sobek_forearm_rt_jnt
+    100002: Sobek_clav_lf_ctrl_grp
+    100004: Sobek_clav_lf_jnt
+    100006: Sobek_clav_rt_ctrl_grp
+    100008: Sobek_clav_rt_jnt
+    100010: Sobek_elbow_lf_jnt
+    100012: Sobek_elbow_rt_jnt
+    100014: Sobek_eyelid_lf_ctrl_grp
+    100016: Sobek_eyelid_lf_jnt
+    100018: Sobek_eyelid_rt_ctrl_grp
+    100020: Sobek_eyelid_rt_jnt
+    100022: Sobek_eyelidEnd_lf_jnt
+    100024: Sobek_eyelidEnd_rt_jnt
+    100026: Sobek_fingerA_lf_ctrl_grp
+    100028: Sobek_fingerA_lf_jnt
+    100030: Sobek_fingerA_rt_ctrl_grp
+    100032: Sobek_fingerA_rt_jnt
+    100034: Sobek_fingerB_lf_ctrl_grp
+    100036: Sobek_fingerB_lf_jnt
+    100038: Sobek_fingerB_rt_ctrl_grp
+    100040: Sobek_fingerB_rt_jnt
+    100042: Sobek_forearm_lf_jnt
+    100044: Sobek_forearm_rt_jnt
+    100046: Sobek_geo
     100048: Sobek_hand_lf_jnt
     100050: Sobek_hand_rt_jnt
     100052: Sobek_hatA_lf_ctrl_grp
@@ -105,29 +105,29 @@ ModelImporter:
     100194: Sobek_thumbB_rt_ctrl_grp
     100196: Sobek_thumbB_rt_jnt
     400000: //RootNode
-    400002: SK_sobek_geo
-    400004: Sobek_clav_lf_ctrl_grp
-    400006: Sobek_clav_lf_jnt
-    400008: Sobek_clav_rt_ctrl_grp
-    400010: Sobek_clav_rt_jnt
-    400012: Sobek_elbow_lf_jnt
-    400014: Sobek_elbow_rt_jnt
-    400016: Sobek_eyelid_lf_ctrl_grp
-    400018: Sobek_eyelid_lf_jnt
-    400020: Sobek_eyelid_rt_ctrl_grp
-    400022: Sobek_eyelid_rt_jnt
-    400024: Sobek_eyelidEnd_lf_jnt
-    400026: Sobek_eyelidEnd_rt_jnt
-    400028: Sobek_fingerA_lf_ctrl_grp
-    400030: Sobek_fingerA_lf_jnt
-    400032: Sobek_fingerA_rt_ctrl_grp
-    400034: Sobek_fingerA_rt_jnt
-    400036: Sobek_fingerB_lf_ctrl_grp
-    400038: Sobek_fingerB_lf_jnt
-    400040: Sobek_fingerB_rt_ctrl_grp
-    400042: Sobek_fingerB_rt_jnt
-    400044: Sobek_forearm_lf_jnt
-    400046: Sobek_forearm_rt_jnt
+    400002: Sobek_clav_lf_ctrl_grp
+    400004: Sobek_clav_lf_jnt
+    400006: Sobek_clav_rt_ctrl_grp
+    400008: Sobek_clav_rt_jnt
+    400010: Sobek_elbow_lf_jnt
+    400012: Sobek_elbow_rt_jnt
+    400014: Sobek_eyelid_lf_ctrl_grp
+    400016: Sobek_eyelid_lf_jnt
+    400018: Sobek_eyelid_rt_ctrl_grp
+    400020: Sobek_eyelid_rt_jnt
+    400022: Sobek_eyelidEnd_lf_jnt
+    400024: Sobek_eyelidEnd_rt_jnt
+    400026: Sobek_fingerA_lf_ctrl_grp
+    400028: Sobek_fingerA_lf_jnt
+    400030: Sobek_fingerA_rt_ctrl_grp
+    400032: Sobek_fingerA_rt_jnt
+    400034: Sobek_fingerB_lf_ctrl_grp
+    400036: Sobek_fingerB_lf_jnt
+    400038: Sobek_fingerB_rt_ctrl_grp
+    400040: Sobek_fingerB_rt_jnt
+    400042: Sobek_forearm_lf_jnt
+    400044: Sobek_forearm_rt_jnt
+    400046: Sobek_geo
     400048: Sobek_hand_lf_jnt
     400050: Sobek_hand_rt_jnt
     400052: Sobek_hatA_lf_ctrl_grp
@@ -203,11 +203,11 @@ ModelImporter:
     400192: Sobek_thumbB_lf_jnt
     400194: Sobek_thumbB_rt_ctrl_grp
     400196: Sobek_thumbB_rt_jnt
-    4300000: SK_sobek_geo
+    4300000: Sobek_geo
     9500000: //RootNode
-    13700000: SK_sobek_geo
+    13700000: Sobek_geo
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:
