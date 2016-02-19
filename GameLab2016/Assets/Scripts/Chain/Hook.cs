@@ -16,11 +16,7 @@ namespace Simoncouche.Chain {
 
         [Tooltip("This is the maximum distance between the hook and the player")]
         [SerializeField]
-        private float _maximumDistanceBetweenPlayer=10f;
-
-		[Tooltip("Reference to the ChainSection prefab")]
-		[SerializeField]
-		private ChainSection _chainSectionPrefab;
+        private float _maxDistanceBetweenPlayerAndHook=10f;
 
 		/// <summary>
 		/// The chain this hook is part of
@@ -78,9 +74,12 @@ namespace Simoncouche.Chain {
 				}
 			}
 		}
-
+        //TODO: Destroy the chain when the distance is higher than a certain value
         void Update() {
-            if (_joint.connectedBody != null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
+            if(Vector2.Distance(this._rigidbody.position, _chain.thrower.transform.position) > _maxDistanceBetweenPlayerAndHook) {
+                _rigidbody.velocity = Vector2.zero;
+            }
+            //if (_joint.connectedBody == null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
         }
 
 		public void SetChain(Chain value) {
@@ -93,13 +92,16 @@ namespace Simoncouche.Chain {
         /// <param name="throwerPosition"></param>
         /// <param name="maxDistance"></param>
         private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance) {
-            float currentDistance = Vector3.Distance(transform.position, throwerPosition.position);
+            Debug.Log("ON CLAMP LE HOOK");
+            float currentDistance = Vector3.Distance(_rigidbody.position, throwerPosition.position);
             if (currentDistance > maxDistance) {
-                Vector3 vect = throwerPosition.position - transform.position;
+                Vector2 vect =  throwerPosition.position - (Vector3) _rigidbody.position;
                 vect = vect.normalized;
                 vect *= (currentDistance - maxDistance);
-                transform.position += vect;
+                _rigidbody.position += vect;
             }
         }
+
+
 	}
 }
