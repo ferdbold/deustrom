@@ -40,10 +40,6 @@ namespace Simoncouche.Chain {
         private List<Chain> _chains = new List<Chain>();
 
 
-        [Tooltip("Maximum number of links per chain")]
-        [SerializeField]
-        private int maximumLinksPerChain=30;
-
         [Tooltip("The distance the first hook is in front of the player")]
         [SerializeField]
         private float distanceHookInFrontOfPlayer = 3f;
@@ -53,7 +49,8 @@ namespace Simoncouche.Chain {
 		public SpringJoint2D joint { get; private set; }
 		public AimController aimController { get; private set; }
 
-
+  
+ 		private Transform _aimIndicator;
 
         public void Awake() {
 			this.joint = GetComponent<SpringJoint2D>();
@@ -67,47 +64,27 @@ namespace Simoncouche.Chain {
             );
 		}
 
-		public void Update() {
-            _aimIndicator.transform.rotation = Quaternion.Euler(0, 0, this.aimOrientation);
-		}
-
 		/// <summary>
 		/// Handle user input to throw a new chain and hook
 		/// </summary>
 		private void Fire() {
-            if (_currentState == State.NoHook)
+            if (_currentState == State.NoHook) //If we press fire when we don't have any hook, we create a hook and switch the currentState to OneHook
             {
                 _chains.Add(Chain.Create(this, _initialForceAmount));
-                _joint.enabled = true;
+                joint.enabled = true;
                 _currentState = State.OneHook;
             }
-            else if(_currentState == State.OneHook)
+            else if(_currentState == State.OneHook) //If we press fire when we have 1 hook, we create a hook and switch the currentState to NoHook
             {
                 _chains[_chains.Count - 1].CreateSecondHook();
-                _currentState = State.TwoHook;
+                _currentState = State.NoHook;
+                //_currentState = State.TwoHook;
             }
             else if(_currentState == State.TwoHook)
             {
                 _currentState = State.NoHook;
             }
 			
-		}
-
-		/// <summary>
-		/// Handle user input to update the aim indicator
-		/// </summary>
-		/// <param name="axisValues">Axis values.</param>
-		private void Aim(float[] axisValues) {
-			Vector2 orientation = new Vector2(axisValues[0], axisValues[1]);
-
-			// Only apply aiming if the user input is relevant (higher than the deadzone)
-			if (orientation.magnitude > _aimDeadzone) {
-				this.aimOrientation = Vector2.Angle(Vector2.right, orientation);
-
-				if (axisValues[1] < 0) {
-					this.aimOrientation = 360f - this.aimOrientation;
-				}
-			}
 		}
 	}
 }

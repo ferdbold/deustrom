@@ -80,7 +80,7 @@ namespace Simoncouche.Chain {
 		}
 
         void Update() {
-            if (_joint.connectedBody != null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
+            //if (_joint.connectedBody == null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
         }
 
 		public void SetChain(Chain value) {
@@ -93,12 +93,13 @@ namespace Simoncouche.Chain {
         /// <param name="throwerPosition"></param>
         /// <param name="maxDistance"></param>
         private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance) {
-            float currentDistance = Vector3.Distance(transform.position, throwerPosition.position);
+            Debug.Log("ON CLAMP LE HOOK");
+            float currentDistance = Vector3.Distance(_rigidbody.position, throwerPosition.position);
             if (currentDistance > maxDistance) {
-                Vector3 vect = throwerPosition.position - transform.position;
+                Vector2 vect =  throwerPosition.position - (Vector3) _rigidbody.position;
                 vect = vect.normalized;
                 vect *= (currentDistance - maxDistance);
-                transform.position += vect;
+                _rigidbody.position += vect;
             }
         }
 	}

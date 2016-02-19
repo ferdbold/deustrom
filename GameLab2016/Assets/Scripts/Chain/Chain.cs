@@ -76,21 +76,42 @@ namespace Simoncouche.Chain {
         public void Update() {
             if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
                 if (_currentLinkNumberBeginningHook < _maximumLinksPerChain) {
-                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection(thrower.transform);
+                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
                     _endingLinkBeginningHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
                     _currentLinkNumberBeginningHook++;
                 }
-                ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkBeginningHook);
+                //ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkBeginningHook); //We clamp the distance of the closet link to the player to a maximum distance from the player
             }
-            if (_endingHook!=null && 
-                Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
+
+            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold){
                 if (_currentLinkNumberEndingHook < _maximumLinksPerChain)
                 {
-                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection(thrower.transform);
+                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
                     _endingLinkEndingHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
                     _currentLinkNumberEndingHook++;
                 }
-                ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkEndingHook);
+            }
+            if(_beginningHook != null) {
+                ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkBeginningHook); //We clamp the distance of the closet link to the player to a maximum distance from the player
+            }
+
+            if (_endingHook != null){
+                ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkEndingHook); //We clamp the distance of the closet link to the player to a maximum distance from the player
+            }
+
+            if (Vector2.Distance(_beginningHook.GetComponent<Rigidbody2D>().position,thrower.GetComponent<Rigidbody2D>().position) > 15f)
+            {
+                _beginningHook.GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+                while (_beginningHook.joint.connectedBody != null)
+                {
+                    Rigidbody2D tempBody = _beginningHook.joint.connectedBody;
+
+                }
+            }
+
+            if (Vector2.Distance(_endingHook.GetComponent<Rigidbody2D>().position, thrower.GetComponent<Rigidbody2D>().position) > 15f)
+            {
+
             }
         }
 
@@ -103,13 +124,13 @@ namespace Simoncouche.Chain {
         /// <param name="chainSection"></param>
         private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance, ChainSection chainSection)
         {
-            float currentDistance = Vector3.Distance(chainSection.transform.position, throwerPosition.position);
+            float currentDistance = Vector3.Distance(chainSection.GetComponent<Rigidbody2D>().position, throwerPosition.position);
             if (currentDistance > maxDistance)
             {
-                Vector3 vect = throwerPosition.position - chainSection.transform.position;
+                Vector2 vect = throwerPosition.position - (Vector3) chainSection.GetComponent<Rigidbody2D>().position;
                 vect = vect.normalized;
                 vect *= (currentDistance - maxDistance);
-                chainSection.transform.position += vect;
+                chainSection.GetComponent<Rigidbody2D>().position +=  vect;
             }
         }
 
