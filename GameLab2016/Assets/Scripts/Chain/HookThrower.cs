@@ -9,6 +9,15 @@ namespace Simoncouche.Chain {
 	[RequireComponent(typeof(SpringJoint2D))]
 	public class HookThrower : MonoBehaviour {
 
+        enum State
+        {
+            NoHook,
+            OneHook,
+            TwoHook
+        }
+
+        private State _currentState;
+
 		[Tooltip("Reference to the grappling hook prefab")]
 		[SerializeField]
 		private Hook _hookPrefab;
@@ -26,10 +35,12 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		private float _spawnChainDistanceThreshold = 4f;
 
-		/// <summary>
-		/// The list of all the chains thrown by this thrower currently in play
-		/// </summary>
-		private List<Chain> _chains = new List<Chain>();
+        public float spawnChainDistanceThreshold { get { return _spawnChainDistanceThreshold; }}
+
+        /// <summary>
+        /// The list of all the chains thrown by this thrower currently in play
+        /// </summary>
+        private List<Chain> _chains = new List<Chain>();
 
 		/// <summary>
 		/// The current aim orientation as set by the right analog input
@@ -37,12 +48,6 @@ namespace Simoncouche.Chain {
 		public float aimOrientation { get; private set; }
 
 
-        /// <summary>
-        /// The current aim orientation as set by the right analog input
-        /// </summary>
-        [Tooltip("Maximum number of links per chain")]
-        [SerializeField]
-        private int maximumLinksPerChain=30;
 
         /// <summary>
         /// The distance the first hook is in front of the player
@@ -62,6 +67,7 @@ namespace Simoncouche.Chain {
 		// METHODS
 
 		public void Awake() {
+            _currentState = State.NoHook;
 			_joint = GetComponent<SpringJoint2D>();
 			_aimIndicator = transform.Find("AimIndicator");
 
@@ -76,33 +82,29 @@ namespace Simoncouche.Chain {
 		}
 
 		public void Update() {
-			// Generate new sections if the distance to the linked section exceeds the threshold
-			// TODO: Unfuck this
-			if (_chains.Count > 0 && _joint.connectedBody != null) {
-				if (Vector3.Distance(transform.position, _joint.connectedBody.position) > _spawnChainDistanceThreshold) {
-                    foreach(Chain chain in _chains){
-                        if (chain.currentLinkNumber <= maximumLinksPerChain) {
-                            chain.IncrementLinkNumber();
-                            _joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
-                        }
-                    }
-				}
-			}
-            foreach (Chain chain in _chains)
-            {
-                if (chain.endingLink) chain.endingLink.GetComponent<Rigidbody2D>().position = this.transform.position + transform.right * distanceHookInFrontOfPlayer;
-            }
-
-                // Apply rotation continously to the aimIndicator to prevent character rotation from updating the indicator
-                _aimIndicator.transform.rotation = Quaternion.Euler(0, 0, this.aimOrientation);
+            _aimIndicator.transform.rotation = Quaternion.Euler(0, 0, this.aimOrientation);
 		}
 
 		/// <summary>
 		/// Handle user input to throw a new chain and hook
 		/// </summary>
 		private void Fire() {
-			_chains.Add(Chain.Create(this, _initialForceAmount));
-			_joint.enabled = true;
+            if (_currentState == State.NoHook)
+            {
+                _chains.Add(Chain.Create(this, _initialForceAmount));
+                _joint.enabled = true;
+                _currentState = State.OneHook;
+            }
+            else if(_currentState == State.OneHook)
+            {
+                _chains[_chains.Count - 1].CreateSecondHook();
+                _currentState = State.TwoHook;
+            }
+            else if(_currentState == State.TwoHook)
+            {
+                _currentState = State.NoHook;
+            }
+			
 		}
 
 		/// <summary>

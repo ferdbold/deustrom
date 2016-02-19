@@ -75,13 +75,13 @@ namespace Simoncouche.Chain {
 		/// <summary>
 		/// Generate a new ChainSection and link it to this section
 		/// </summary>
-		public void SpawnNewSection() {
-            Vector3 nextChainSectionPosition = transform.position - transform.right * transform.localScale.x;
-            _nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, _rigidbody);
-            _chain.endingLink = _nextChainSection;
+		public void SpawnNewSection(Transform playerTransform) {
+            //Vector3 nextChainSectionPosition = transform.position - transform.right * transform.localScale.x;
+            //_nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, _rigidbody);
+            _nextChainSection = ChainSection.Create(playerTransform.position + playerTransform.right, _chain, _rigidbody);
         }
 
-		public void SetChain(Chain value) {
+		private void SetChain(Chain value) {
 			_chain = value;
 		}
 	}
