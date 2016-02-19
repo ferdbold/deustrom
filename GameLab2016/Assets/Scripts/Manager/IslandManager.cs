@@ -20,7 +20,7 @@ namespace Simoncouche.Islands {
         [Header("Visuals")]
 
         [SerializeField] [Tooltip("Particle spawned when island assemble")]
-        private GameObject AssembleParticlePrefab;
+        private GameObject[] AssembleParticlePrefab;
 
         [SerializeField]
         [Tooltip("The time it takes for 2 chunks to do their merging anim")]
@@ -85,7 +85,7 @@ namespace Simoncouche.Islands {
                     _chunkMergeTime
                 );
 
-                OnJoinChunk(b_anchor);
+                OnJoinChunk(b_anchor, b.color);
                 StartCoroutine(TimerIslandRemove(_chunkMergeTime, isA ? b_IslandLink : a_IslandLink));
 			} 
 
@@ -184,16 +184,24 @@ namespace Simoncouche.Islands {
                 targetIsland,
                 _chunkMergeTime
             );
-            OnJoinChunk(b_anchor);
+            OnJoinChunk(b_anchor, b.color);
         }
 
         /// <summary>
         /// Event when a chunk is joined to another (same for island to island merge)
         /// </summary>
         /// <param name="anchor">The anchor to spawn the particle</param>
-        private void OnJoinChunk(IslandAnchorPoints anchor) {
+        private void OnJoinChunk(IslandAnchorPoints anchor, Islands.IslandUtils.color color) {
+            //Get Particles Index from color
+            int type = -1;
+            switch (color) {
+                case Islands.IslandUtils.color.red: type = 0; break;
+                case Islands.IslandUtils.color.blue: type = 1; break;
+                default: Debug.Log("Island color is not not blue or red ! "); break;
+            }
+            
             //Instantiate Particles FX
-            GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab, anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+            GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[type], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
             ParticleGO.transform.parent = anchor.transform;
         }
 
