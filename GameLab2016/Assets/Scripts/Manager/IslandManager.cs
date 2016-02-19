@@ -67,7 +67,8 @@ namespace Simoncouche.Islands {
 					a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint((isA ? b : a).transform.position, 
 																		 (isA ? a : b).transform.position), 
 																		 (isA ? a : b).transform.rotation.eulerAngles);
-				}
+                    CheckPlayerGrab(chunk.gravityBody);
+                }
 
                 //Call the to island to be connected (The many ternary operator are for the possible value if one or the other island are assembled (hi hi)
                 (isA ? b_IslandLink : a_IslandLink).ConnectIslandToIsland(
@@ -86,7 +87,6 @@ namespace Simoncouche.Islands {
 
                 OnJoinChunk(b_anchor);
                 StartCoroutine(TimerIslandRemove(_chunkMergeTime, isA ? b_IslandLink : a_IslandLink));
-                CheckPlayerGrab(chunk.gravityBody);
 			} 
 
 			//If a is contained in a Island
