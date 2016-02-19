@@ -34,6 +34,13 @@ namespace Simoncouche.Controller {
             }
         }
 
+        public void SetupInput(bool isPlayerOne) {
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_pushButton : InputManager.Button.p2_pushButton,
+                this.Throw
+            );
+        }
+
         void Update() {
             if (grabbedBody != null && Input.GetKeyDown(KeyCode.F)) {
                 Throw();
@@ -93,7 +100,7 @@ namespace Simoncouche.Controller {
 
 
             } else {
-                Debug.LogError("Attempted to throw when grabbedBody is null.");
+                Debug.LogWarning("Attempted to throw when grabbedBody is null.");
             }
         }
 

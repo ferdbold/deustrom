@@ -21,6 +21,8 @@ public class InputManager : MonoBehaviour {
     private EventButton _startButton;
 	private EventButton p1_fireHookButton;
     private EventButton p2_fireHookButton;
+    private EventButton p1_pushButton;
+    private EventButton p2_pushButton;
 
     #region Add Event
     /// <summary>
@@ -50,7 +52,7 @@ public class InputManager : MonoBehaviour {
 	/// <summary>
 	/// The name of every buttons
 	/// </summary>
-	public enum Button { start, p1_fireHook, p2_fireHook }
+	public enum Button { start, p1_fireHook, p2_fireHook, p1_pushButton, p2_pushButton }
 	/// <summary>
 	/// Link a function to an event
 	/// </summary>
@@ -61,6 +63,8 @@ public class InputManager : MonoBehaviour {
 			case Button.start: _startButton += eventFunction; break;
 			case Button.p1_fireHook: p1_fireHookButton += eventFunction; break;
             case Button.p2_fireHook: p2_fireHookButton += eventFunction; break;
+            case Button.p1_pushButton: p1_pushButton += eventFunction; break;
+            case Button.p2_pushButton: p2_pushButton += eventFunction; break;
 
             //Error
             default:
@@ -79,7 +83,9 @@ public class InputManager : MonoBehaviour {
             new AxisTuple("P2 Right Analog", p2_rightAnalog, Input.GetAxis("P2_R_Horizontal"), Input.GetAxis("P2_R_Vertical"))
         };
 		List<ButtonTuple> buttons = new List<ButtonTuple>() {
-			new ButtonTuple("P1 Fire Hook", p1_fireHookButton, Input.GetButtonDown("P1_FireHook")),
+            new ButtonTuple("P1 Push", p1_pushButton, Input.GetButtonDown("P1_Push")),
+            new ButtonTuple("P2 Push", p2_pushButton, Input.GetButtonDown("P2_Push")),
+            new ButtonTuple("P1 Fire Hook", p1_fireHookButton, Input.GetButtonDown("P1_FireHook")),
             new ButtonTuple("P2 Fire Hook", p2_fireHookButton, Input.GetButtonDown("P2_FireHook")),
             new ButtonTuple("Start", _startButton, Input.GetButtonDown("Start"))
 		};
@@ -92,7 +98,7 @@ public class InputManager : MonoBehaviour {
 
 		foreach (ButtonTuple button in buttons) {
 			if (button.Item1 != null) {
-				if (button.Item3) {
+				if (button.Item3 && button.Item2 != null) {
                     button.Item2.Invoke();
 				}
 			}

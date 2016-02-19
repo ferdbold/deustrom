@@ -96,6 +96,10 @@ namespace Simoncouche.Controller {
             if (_aimController != null) {
                 _aimController.SetupInput(isPlayerOne);
             }
+
+            if (_playerGrab != null) {
+                _playerGrab.SetupInput(isPlayerOne);
+            }
 	    }
 
         /// <summary>
