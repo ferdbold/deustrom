@@ -157,6 +157,26 @@ namespace Simoncouche.Islands {
 			Destroy(Island.gameObject);
 		}
 
+        #region Destroy Island/Chunks
+        /// <summary>
+        /// Handles the destruction of the chunk
+        /// </summary>
+        /// <param name="chunk">chunk to destroy</param>
+        public void DestroyChunk(IslandChunk chunk) {
+            CheckPlayerGrab(chunk.gravityBody);
+            chunk.gravityBody.DestroyGravityBody();
+        }
+
+        /// <summary> Remove Island from the list and call a destroyChunk for each chunk of the island </summary>
+        /// <param name="island">island to destroy</param>
+        public void DestroyIsland(Island island) {
+            foreach (IslandChunk chunk in island.chunks) DestroyChunk(chunk);      
+            RemoveIsland(island);
+        }
+
+
+        #endregion
+
         /// <summary> Check if player is currently grabbinb bodyToMerge. If so, make the player release the object </summary>
         /// <param name="bodyToMerge">Gravity body of the body to merge</param>
         private void CheckPlayerGrab(GravityBody bodyToMerge) {

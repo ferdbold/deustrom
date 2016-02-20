@@ -168,7 +168,7 @@ namespace Simoncouche.Islands {
         public void OnMaelstromEnter() {
             if (parentIsland != null) parentIsland.OnMaelstromEnter(this);
             else {
-                gravityBody.DestroyGravityBody();
+                GameManager.islandManager.DestroyChunk(this);
             }
         }
 

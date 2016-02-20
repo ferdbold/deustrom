@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Simoncouche.Islands;
 
 namespace Simoncouche.Controller {
@@ -24,14 +25,24 @@ namespace Simoncouche.Controller {
         /// <summary> Reference to the Player Controller</summary>
         private PlayerController _controller;
 
+        /// <summary> List of references to all playerGrabs. Used to avoid Searching the map everytime we grab.</summary>
+        private static List<PlayerGrab> _allPlayerGrabs = new List<PlayerGrab>();
+
         void Awake() {
             _controller = GetComponent<PlayerController>();
             _aimController = GetComponent<AimController>();
             grabbedBody = null;
 
+            //Add to static playergrab list
+            _allPlayerGrabs.Add(this);
+
             if (_aimController == null) {
                 Debug.LogError("Player/AimController cannot be found!");
             }
+        }
+
+        void OnDestroy() {
+            _allPlayerGrabs.Remove(this);
         }
 
         public void SetupInput(bool isPlayerOne) {
@@ -49,6 +60,8 @@ namespace Simoncouche.Controller {
                 IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
 
                 if (targetChunk != null) { //Make sure we are trying to grab an IslandChunk
+                    //Before grabbing, make the other players release this chunk
+                    MakeOtherPlayerRelease(targetChunk);
 
                     if (targetChunk.parentIsland == null) {
                         grabbedBody = targetBody;
@@ -131,6 +144,7 @@ namespace Simoncouche.Controller {
             grabbedBody = null;
         }
 
+
         /// <summary> Remove collision with given collider2D after a amount of time </summary>
         /// <param name="otherCol">collider to unIgnore</param>
         /// <param name="time">time before unignore</param>
@@ -138,6 +152,22 @@ namespace Simoncouche.Controller {
         IEnumerator RemoveCollision(Collider2D otherCol, float time) {
             yield return new WaitForSeconds(time);
             Physics2D.IgnoreCollision(GetComponent<Collider2D>(), otherCol, false);
+        }
+
+        /// <summary> Make other player release the target chunk if they're holding it.</summary>
+        /// <param name="targetChunk">Chunk to release</param>
+        private void MakeOtherPlayerRelease(IslandChunk targetChunk) {
+            //Get list of chunks to try and make release
+            List<IslandChunk> ChunksToTest = new List<IslandChunk>();
+            if (targetChunk.parentIsland == null) ChunksToTest.Add(targetChunk);
+            else foreach(IslandChunk childChunk in targetChunk.parentIsland.chunks) ChunksToTest.Add(childChunk);
+
+            //Check each player to see if they are grabbing predetermined chunk
+            foreach (PlayerGrab pg in _allPlayerGrabs) {
+                if (pg.grabbedBody == targetChunk.gravityBody) {
+                    pg.Release();
+                }
+            }
         }
 
     }
