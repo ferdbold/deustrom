@@ -43,6 +43,9 @@ namespace Simoncouche.Controller {
         /// <summary>  Is the player moving vertical? </summary>
         private bool _isMovingVertical;
 
+        /// <summary> Start drag of the player's rigid body</summary>
+        private float _startDrag;
+
 
 	    /// <summary>
 	    /// Vector of player inputs
@@ -68,6 +71,7 @@ namespace Simoncouche.Controller {
             _aimController = GetComponent<AimController>();
             _hookThrower = GetComponentInChildren<HookThrower>();
             _playerGrab = GetComponent<PlayerGrab>();
+            _startDrag = _playerRigidBody.drag;
 
             if (_playerGrab == null) {
                 Debug.LogError("Player/PlayerGrab cannot be found!");
@@ -107,9 +111,16 @@ namespace Simoncouche.Controller {
         /// </summary>
         void FixedUpdate() {
             CharacterMovement();
+            UpdateGrabDrag();
         }
 
+        /// <summary>
+        /// modifies the player's drag based on the grabbed object
+        /// </summary>
+        private void UpdateGrabDrag() {
+            _playerRigidBody.drag = _playerGrab.GetGrabbedWeight() + _startDrag;
 
+        }
 
         #region movement
         /// <summary>
@@ -168,6 +179,7 @@ namespace Simoncouche.Controller {
 
         }
         #endregion
+
 
         #region Collision
         

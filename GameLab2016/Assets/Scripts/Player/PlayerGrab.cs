@@ -9,10 +9,8 @@ namespace Simoncouche.Controller {
         //Attributes
         [Tooltip("Magnitude of the force applied to the thrown gravity body")][SerializeField]
         private float THROW_FORCE = 15f;
-
         /// <summary> Parent of grabbed gravity body. Used to reposition  body at the right place when releasing. </summary>
         private Transform _grabbedBodyParent = null;
-
 
 
         //Components
@@ -28,6 +26,7 @@ namespace Simoncouche.Controller {
         /// <summary> List of references to all playerGrabs. Used to avoid Searching the map everytime we grab.</summary>
         private static List<PlayerGrab> _allPlayerGrabs = new List<PlayerGrab>();
 
+
         void Awake() {
             _controller = GetComponent<PlayerController>();
             _aimController = GetComponent<AimController>();
@@ -42,6 +41,7 @@ namespace Simoncouche.Controller {
         }
 
         void OnDestroy() {
+            //Remove ref to in static playergrab
             _allPlayerGrabs.Remove(this);
         }
 
@@ -52,6 +52,16 @@ namespace Simoncouche.Controller {
             );
         }
 
+        public float GetGrabbedWeight() {
+            if (grabbedBody == null) return 0f;
+            IslandChunk c = grabbedBody.GetComponent<IslandChunk>();
+            Island i = c.parentIsland;
+            if (i == null) return c.weight;
+            else return i.weight;
+
+        }
+
+        #region Grab & Release
 
         /// <summary> Attemps to grab gravity body if one is not already grabbed</summary>
         /// <param name="targetBody">target gravity body to grab</param>
@@ -154,7 +164,9 @@ namespace Simoncouche.Controller {
             Physics2D.IgnoreCollision(GetComponent<Collider2D>(), otherCol, false);
         }
 
-        
+        #endregion
+
+        #region Static Utils
         /// <summary> Make other player release the target chunk if they're holding it.</summary>
         /// <param name="targetChunk">Chunk to release</param>
         private static void MakeOtherPlayerRelease(IslandChunk targetChunk) {
@@ -197,6 +209,8 @@ namespace Simoncouche.Controller {
                 }
             }
         }
+
+        #endregion
 
     }
 }
