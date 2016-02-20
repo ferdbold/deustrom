@@ -109,7 +109,7 @@ namespace Simoncouche.Islands {
         public void CenterIslandRoot() {
             //Avoid error if chunks aren't properly initialized
             if (chunks.Count == 0) {
-                Debug.Log("There are no chunks ! ");
+                Debug.Log("Trying to center an island without chunks.");
                 return; 
             }
 

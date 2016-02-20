@@ -154,9 +154,10 @@ namespace Simoncouche.Controller {
             Physics2D.IgnoreCollision(GetComponent<Collider2D>(), otherCol, false);
         }
 
+        
         /// <summary> Make other player release the target chunk if they're holding it.</summary>
         /// <param name="targetChunk">Chunk to release</param>
-        private void MakeOtherPlayerRelease(IslandChunk targetChunk) {
+        private static void MakeOtherPlayerRelease(IslandChunk targetChunk) {
             //Get list of chunks to try and make release
             List<IslandChunk> ChunksToTest = new List<IslandChunk>();
             if (targetChunk.parentIsland == null) ChunksToTest.Add(targetChunk);
@@ -164,8 +165,35 @@ namespace Simoncouche.Controller {
 
             //Check each player to see if they are grabbing predetermined chunk
             foreach (PlayerGrab pg in _allPlayerGrabs) {
-                if (pg.grabbedBody == targetChunk.gravityBody) {
+                foreach (IslandChunk chunks in ChunksToTest) {
+                    if (pg.grabbedBody == chunks.gravityBody) {                    
+                        //Debug.Log(pg.name + " ungrabbed " + chunks.name + " because someone else grabbed it.");
+                        pg.Release();
+                    }
+                }
+            }
+        }
+
+        /// <summary> Check if any player is currently grabbinb bodyToMerge. If so, make that player release the object </summary>
+        /// <param name="bodyToMerge">Gravity body of the body to merge</param>
+        public static void UngrabBody(GravityBody bodyToMerge) {
+            foreach (PlayerGrab pg in _allPlayerGrabs) {
+                //Debug.Log(pg.grabbedBody);
+                if (pg.grabbedBody == bodyToMerge ) {
+                    //Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " because it was merged.");
                     pg.Release();
+                }
+            }
+        }
+
+        /// <summary> Check if anyplayer is grabbing island, if so make him ignore chunk </summary>
+        /// <param name="island"></param>
+        /// <param name="Chunk"></param>
+        public static void RemoveCollisionIfGrabbed(Island island, IslandChunk Chunk) {
+            foreach (PlayerGrab pg in _allPlayerGrabs) {
+                if (pg.grabbedBody != null && pg.grabbedBody.GetComponent<IslandChunk>().parentIsland == island) {
+                    //Debug.Log(pg.name + " ignored " + Chunk);
+                    Physics2D.IgnoreCollision(pg.GetComponent<Collider2D>(), Chunk.GetComponent<Collider2D>(), false);
                 }
             }
         }
