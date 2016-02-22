@@ -20,13 +20,22 @@ namespace Simoncouche.Controller {
         [SerializeField] [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
         private AnimationCurve VelocityFalloffCurve;
 
+        [SerializeField] [Tooltip("Degrees of rotation the player can rotate per second.")]
+        private float ROTATION_SPEED = 720f;
+
         [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
         private bool isPlayerOne = true;
+
+        [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player rotation when grabbing an object.")]
+        private float GRAB_RATIO_ROTATION = 1f;
+
+        [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player movement speed when grabbing an object.")]
+        private float GRAB_RATIO_MOVEMENT = 0.75f;
 
         #endregion
 
         #region PrivateVariables
-        //Components
+        //Componentsgit 
         /// <summary>  Reference of player's rigidbody  </summary>
         private Rigidbody2D _playerRigidBody;
 
@@ -42,6 +51,9 @@ namespace Simoncouche.Controller {
 
         /// <summary>  Is the player moving vertical? </summary>
         private bool _isMovingVertical;
+
+        /// <summary> Start drag of the player's rigid body</summary>
+        private float _startDrag;
 
 
 	    /// <summary>
@@ -68,6 +80,7 @@ namespace Simoncouche.Controller {
             _aimController = GetComponent<AimController>();
             _hookThrower = GetComponentInChildren<HookThrower>();
             _playerGrab = GetComponent<PlayerGrab>();
+            _startDrag = _playerRigidBody.drag;
 
             if (_playerGrab == null) {
                 Debug.LogError("Player/PlayerGrab cannot be found!");
@@ -107,9 +120,16 @@ namespace Simoncouche.Controller {
         /// </summary>
         void FixedUpdate() {
             CharacterMovement();
+            UpdateGrabDrag();
         }
 
+        /// <summary>
+        /// modifies the player's drag based on the grabbed object
+        /// </summary>
+        private void UpdateGrabDrag() {
+            _playerRigidBody.drag = _playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag;
 
+        }
 
         #region movement
         /// <summary>
@@ -121,7 +141,8 @@ namespace Simoncouche.Controller {
             VelocityCalculation();
 
             //Orientation modification
-            ModifyOrientation();
+            //ModifyOrientation();
+            RotateTowardTargetRotation();
 
         }
 
@@ -155,7 +176,7 @@ namespace Simoncouche.Controller {
         /// <summary>
         /// Modify Orientation based on analog inputs
         /// </summary>
-        private void ModifyOrientation() {
+        private void GetTargetOrientation() {
             if (_isMovingHorizontal || _isMovingVertical) {
                 float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
                 Vector3 tempRotation = transform.rotation.eulerAngles;
@@ -163,11 +184,34 @@ namespace Simoncouche.Controller {
                 if (_leftAnalogHorizontal < 0.0f) {
                     tempRotation.z -= 180.0f;
                 }
+
                 transform.eulerAngles = tempRotation; //We apply the rotation
             }
 
         }
+
+        /// <summary>
+        /// Lerp the player's rotation toward its target rotation based on his rotation speed 
+        /// </summary>
+        private void RotateTowardTargetRotation() {
+            float target = Mathf.Atan2(_leftAnalogVertical, _leftAnalogHorizontal) * Mathf.Rad2Deg;
+            float current = transform.eulerAngles.z;
+
+            //Get Quaternion values
+            Quaternion targetQ = Quaternion.Euler(0, 0, target);
+            Quaternion currentQ = Quaternion.Euler(0, 0, current);
+            Quaternion diffQ = targetQ * Quaternion.Inverse(currentQ);
+            Quaternion diffQ2 = currentQ * Quaternion.Inverse(targetQ);
+
+            //Calculate step of the lerp Based on angle to turn and turnspeed
+            float rotationSpeed = ROTATION_SPEED / (1 + _playerGrab.GetGrabbedWeight() * GRAB_RATIO_ROTATION);
+            float lerpStep = Mathf.Clamp(rotationSpeed / Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z) * Time.deltaTime, 0f, 1f);
+            //Lerp rotation
+            transform.rotation = Quaternion.Lerp(currentQ, targetQ, lerpStep);
+        }
+
         #endregion
+
 
         #region Collision
         
