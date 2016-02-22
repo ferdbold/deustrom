@@ -16,7 +16,6 @@ namespace Simoncouche.Islands {
         [SerializeField][Tooltip("Current Island this islandChunk is attached to. Only modify this to create group of island chunks before in the editor.")]
         public Island parentIsland = null;
         
-
         [SerializeField] [Tooltip("The Assign color of the Island")]
 		private IslandUtils.color _color;	
 		public IslandUtils.color color {
@@ -46,6 +45,8 @@ namespace Simoncouche.Islands {
 
         public List<IslandAnchorPoints> anchors { get; private set; }
 
+        public List<IslandChunk> connectedChunk { get; private set; }
+
         /// <summary> Gravity Body associated with this island chunk </summary>
         public GravityBody gravityBody {get; private set;}
 
@@ -61,10 +62,27 @@ namespace Simoncouche.Islands {
 				_anchorPointObject = Resources.Load("Island/AnchorPoints") as GameObject;
 			}
             _audioSource = GetComponent<AudioSource>();
+            connectedChunk = new List<IslandChunk>();
 			SpawnAnchorPoints();
         }
 
-		#region Connection Anim
+		#region Connection
+
+        /// <summary>
+        /// Add a target chunk from connected chunk
+        /// </summary>
+        /// <param name="other">target chunk</param>
+        public void AddConnectedChunk(IslandChunk other) {
+            connectedChunk.Add(other);
+        }
+
+        /// <summary>
+        /// Remove a target chunk from connected chunk
+        /// </summary>
+        /// <param name="other">chunk</param>
+        public void RemoveConnectedChunk(IslandChunk other) {
+            connectedChunk.Remove(other);
+        }
 
 		/// <summary>
 		/// Start the connection between 2 chunk/island

@@ -93,6 +93,10 @@ namespace Simoncouche.Islands {
 
                 OnJoinChunk(b_anchor, b.color);
                 StartCoroutine(TimerIslandRemove(_chunkMergeTime, isA ? b_IslandLink : a_IslandLink));
+
+                //Create a link between two chunk
+                a.AddConnectedChunk(b);
+                b.AddConnectedChunk(a);
 			} 
 
 			//If only a is contained in a Island
