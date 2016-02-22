@@ -9,6 +9,7 @@ namespace Simoncouche.Controller {
         //Attributes
         [Tooltip("Magnitude of the force applied to the thrown gravity body")][SerializeField]
         private float THROW_FORCE = 15f;
+
         /// <summary> Parent of grabbed gravity body. Used to reposition  body at the right place when releasing. </summary>
         private Transform _grabbedBodyParent = null;
 
@@ -114,7 +115,8 @@ namespace Simoncouche.Controller {
                 Release();
                 //Add Force
                 Vector2 forceDirection = _aimController.aimOrientationVector2.normalized;
-                bodyToAddForce.Velocity += forceDirection * THROW_FORCE;
+
+                bodyToAddForce.Velocity = forceDirection * THROW_FORCE / Mathf.Max(1,bodyToAddForce.Weight / 10f);
 
 
             } else {

@@ -94,6 +94,7 @@ public class GravityBody : GravityObject {
         Destroy(gameObject);
     }
 
+
     #region Components Initialization
 
     void SetupRigidbody() {

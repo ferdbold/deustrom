@@ -23,6 +23,9 @@ namespace Simoncouche.Controller {
         [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
         private bool isPlayerOne = true;
 
+        [SerializeField] [Tooltip("Ratio of the grabbed object to take into account when slowing the player when grabbing an object.")]
+        private float DragFromGrabRatio = 0.75f;
+
         #endregion
 
         #region PrivateVariables
@@ -118,7 +121,7 @@ namespace Simoncouche.Controller {
         /// modifies the player's drag based on the grabbed object
         /// </summary>
         private void UpdateGrabDrag() {
-            _playerRigidBody.drag = _playerGrab.GetGrabbedWeight() + _startDrag;
+            _playerRigidBody.drag = _playerGrab.GetGrabbedWeight() * DragFromGrabRatio + _startDrag;
 
         }
 
