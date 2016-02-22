@@ -21,15 +21,14 @@ namespace Simoncouche.Controller {
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
 
-        /// <summary> Reference to the Player Controller</summary>
-        private PlayerController _controller;
-
         /// <summary> List of references to all playerGrabs. Used to avoid Searching the map everytime we grab.</summary>
         private static List<PlayerGrab> _allPlayerGrabs = new List<PlayerGrab>();
 
+        /// <summary> List of currently running coroutines. Used to keep track of running coroutine that re-enable collision in case we need to stop them. </summary>
+        private Dictionary<string, Coroutine> collisionCoroutines = new Dictionary<string, Coroutine>();
+
 
         void Awake() {
-            _controller = GetComponent<PlayerController>();
             _aimController = GetComponent<AimController>();
             grabbedBody = null;
 
@@ -80,7 +79,7 @@ namespace Simoncouche.Controller {
                         _grabbedBodyParent = targetChunk.transform.parent;
                         targetChunk.transform.parent = transform;
                         //Ignore Collision
-                        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+                        DeactivateCollision(targetChunk.GetComponent<Collider2D>());
                         //Deactivate gravity body
                         grabbedBody.DeactivateGravityBody();
                     } else {
@@ -91,7 +90,7 @@ namespace Simoncouche.Controller {
                         parentIsland.transform.parent = transform;
                         //Ignore Collision
                         foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
-                            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), iChunk.GetComponent<Collider2D>(), true);
+                            DeactivateCollision(iChunk.GetComponent<Collider2D>());
                         }
                         //Deactivate gravity body
                         parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
@@ -136,7 +135,7 @@ namespace Simoncouche.Controller {
                 _grabbedBodyParent = null;
                 grabbedBody.ActivateGravityBody();
                 //UnIgnore Collision
-                StartCoroutine(RemoveCollision(targetChunk.GetComponent<Collider2D>(), 1f));
+                ReactivateCollision(targetChunk.GetComponent<Collider2D>(), 1f);
             }
             //If chunk has a parent island
             else { 
@@ -148,7 +147,8 @@ namespace Simoncouche.Controller {
                 _grabbedBodyParent = null;   
                 //UnIgnore Collision
                 foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
-                    StartCoroutine(RemoveCollision(iChunk.GetComponent<Collider2D>(), 1f));
+                    ReactivateCollision(iChunk.GetComponent<Collider2D>(), 1f);
+                    
                 }
             }
 
@@ -156,14 +156,38 @@ namespace Simoncouche.Controller {
             grabbedBody = null;
         }
 
+        private void ReactivateCollision(Collider2D otherCol, float time) {
+            Coroutine disableCoroutine = StartCoroutine(ResumeCollision(otherCol, time));
 
-        /// <summary> Remove collision with given collider2D after a amount of time </summary>
+            //Add coroutine to a dictionnary until is done in case it needs to be interrupted
+            string colID = otherCol.GetInstanceID().ToString();
+            collisionCoroutines.Add(colID, disableCoroutine);
+        }
+
+        /// <summary> Resume collision with given collider2D after a amount of time </summary>
         /// <param name="otherCol">collider to unIgnore</param>
         /// <param name="time">time before unignore</param>
         /// <returns></returns>
-        IEnumerator RemoveCollision(Collider2D otherCol, float time) {
+        IEnumerator ResumeCollision(Collider2D otherCol, float time) {
             yield return new WaitForSeconds(time);
             Physics2D.IgnoreCollision(GetComponent<Collider2D>(), otherCol, false);
+
+            //Remove coroutine from dictionnary since it is finished
+            string colID = otherCol.GetInstanceID().ToString();
+            if (collisionCoroutines.ContainsKey(colID)) {
+                collisionCoroutines.Remove(colID);
+            }
+        }
+
+        private void DeactivateCollision(Collider2D otherCol) {
+            Physics2D.IgnoreCollision(GetComponent<Collider2D>(), otherCol.GetComponent<Collider2D>(), true);
+
+            //if collider was pending for reactivation of collision, stop that coroutine since we juste deactivated its collision
+            string colID = otherCol.GetComponent<Collider2D>().GetInstanceID().ToString();
+            if (collisionCoroutines.ContainsKey(colID)) {
+                StopCoroutine(collisionCoroutines[colID]);
+                collisionCoroutines.Remove(colID);
+            }
         }
 
         #endregion
@@ -207,7 +231,7 @@ namespace Simoncouche.Controller {
             foreach (PlayerGrab pg in _allPlayerGrabs) {
                 if (pg.grabbedBody != null && pg.grabbedBody.GetComponent<IslandChunk>().parentIsland == island) {
                     //Debug.Log(pg.name + " ignored " + Chunk);
-                    Physics2D.IgnoreCollision(pg.GetComponent<Collider2D>(), Chunk.GetComponent<Collider2D>(), false);
+                    pg.DeactivateCollision(Chunk.GetComponent<Collider2D>());
                 }
             }
         }

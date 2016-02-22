@@ -35,7 +35,7 @@ namespace Simoncouche.Controller {
         #endregion
 
         #region PrivateVariables
-        //Components
+        //Componentsgit 
         /// <summary>  Reference of player's rigidbody  </summary>
         private Rigidbody2D _playerRigidBody;
 
@@ -51,9 +51,6 @@ namespace Simoncouche.Controller {
 
         /// <summary>  Is the player moving vertical? </summary>
         private bool _isMovingVertical;
-
-        /// <summary> current target rotation the player is trying to lerp to</summary>
-        private Vector3 _targetRotation = Vector3.zero;
 
         /// <summary> Start drag of the player's rigid body</summary>
         private float _startDrag;
