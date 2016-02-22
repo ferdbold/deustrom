@@ -45,6 +45,8 @@ namespace Simoncouche.Controller {
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
 
+        private Animator _animator;
+
         //Inputs
         /// <summary>  Is the player moving horizontally? </summary>
         private bool _isMovingHorizontal;
@@ -54,6 +56,7 @@ namespace Simoncouche.Controller {
 
         /// <summary> Start drag of the player's rigid body</summary>
         private float _startDrag;
+
 
 
 	    /// <summary>
@@ -79,6 +82,7 @@ namespace Simoncouche.Controller {
             _playerRigidBody = GetComponent<Rigidbody2D>();
             _aimController = GetComponent<AimController>();
             _hookThrower = GetComponentInChildren<HookThrower>();
+            _animator = GetComponentInChildren<Animator>();
             _playerGrab = GetComponent<PlayerGrab>();
             _startDrag = _playerRigidBody.drag;
 
