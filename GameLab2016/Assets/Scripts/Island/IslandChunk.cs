@@ -78,7 +78,7 @@ namespace Simoncouche.Islands {
             //Debug.Log(targetPos + " " + targetRot);
 			transform.DOLocalRotate(targetRot, time);
 			transform.DOLocalMove(targetPos, time);
-            StartCoroutine(Delay_CenterIslandRoot(time+0.1f, targetIsland));
+            //StartCoroutine(Delay_CenterIslandRoot(time, targetIsland, targetChunk));
         }
 
         /// <summary>
@@ -98,7 +98,11 @@ namespace Simoncouche.Islands {
 
 
         /// <summary> Calls Center Island root function on a delay t in seconds </summary>
-        private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland) { yield return new WaitForSeconds(t); targetIsland.CenterIslandRoot(); }
+        private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland, IslandChunk targetChunk) {
+            yield return new WaitForSeconds(t);
+            targetIsland.CenterIslandRoot();
+            Debug.Log(Vector3.Distance(transform.position, targetChunk.transform.position));
+        }
 
 		#endregion
 

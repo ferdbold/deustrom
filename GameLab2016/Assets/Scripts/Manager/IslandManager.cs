@@ -81,7 +81,7 @@ namespace Simoncouche.Islands {
                     FindTargetLocalPosition(
                         isA ? b_anchor : a_anchor,
                         isA ? b_IslandLink : a_IslandLink,
-                        isA ? a_anchor : b_anchor
+                        isA ? b : a
                     ),
                     FindTargetRotForAnchor(
                         isA ? b_anchor : a_anchor,
@@ -216,7 +216,7 @@ namespace Simoncouche.Islands {
         private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor, Island targetIsland) {
             //Debug.Log(a.transform.localPosition + " " + b.transform.localPosition);
             a.ConnectChunk(
-                FindTargetLocalPosition(a_anchor, b, b_anchor),
+                FindTargetLocalPosition(b, b_anchor),
                 FindTargetRotForAnchor(a_anchor, b_anchor),
                 b,
                 targetIsland,
@@ -259,8 +259,8 @@ namespace Simoncouche.Islands {
         /// <param name="a">The anchor of the island to merge</param>
         /// <param name="b_chunk">Island to be merge to</param>
         /// <returns></returns>
-        private Vector3 FindTargetLocalPosition(IslandAnchorPoints a, IslandChunk b_chunk, IslandAnchorPoints b) {
-            return b_chunk.transform.localPosition - a.position + b.position;
+        private Vector3 FindTargetLocalPosition(IslandChunk b_chunk, IslandAnchorPoints b) {
+            return b_chunk.transform.localPosition + 2f * (b.transform.position - b_chunk.transform.position);
         }
 
         /// <summary>
@@ -269,8 +269,8 @@ namespace Simoncouche.Islands {
         /// <param name="a">The anchor of the island to merge</param>
         /// <param name="b_chunk">Island to be merge to</param>
         /// <returns></returns>
-        private Vector3 FindTargetLocalPosition(IslandAnchorPoints a, Island a_island, IslandAnchorPoints b) {
-            return a_island.transform.position - a.position + b.position;
+        private Vector3 FindTargetLocalPosition(IslandAnchorPoints b, Island b_island, IslandChunk b_chunk) {
+            return b_island.transform.localPosition + 2f * (b.transform.position - b_chunk.transform.position);
         }
 
         /// <summary>
