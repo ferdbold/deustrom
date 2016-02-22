@@ -21,13 +21,16 @@ namespace Simoncouche.Controller {
         private AnimationCurve VelocityFalloffCurve;
 
         [SerializeField] [Tooltip("Degrees of rotation the player can rotate per second.")]
-        private float rotationSpeed = 180f;
+        private float ROTATION_SPEED = 720f;
 
         [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
         private bool isPlayerOne = true;
 
-        [SerializeField] [Tooltip("Ratio of the grabbed object to take into account when slowing the player when grabbing an object.")]
-        private float DragFromGrabRatio = 0.75f;
+        [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player rotation when grabbing an object.")]
+        private float GRAB_RATIO_ROTATION = 1f;
+
+        [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player movement speed when grabbing an object.")]
+        private float GRAB_RATIO_MOVEMENT = 0.75f;
 
         #endregion
 
@@ -127,7 +130,7 @@ namespace Simoncouche.Controller {
         /// modifies the player's drag based on the grabbed object
         /// </summary>
         private void UpdateGrabDrag() {
-            _playerRigidBody.drag = _playerGrab.GetGrabbedWeight() * DragFromGrabRatio + _startDrag;
+            _playerRigidBody.drag = _playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag;
 
         }
 
@@ -194,11 +197,20 @@ namespace Simoncouche.Controller {
         /// Lerp the player's rotation toward its target rotation based on his rotation speed 
         /// </summary>
         private void RotateTowardTargetRotation() {
-            float target = Mathf.Atan2(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal")) * Mathf.Rad2Deg;
+            float target = Mathf.Atan2(_leftAnalogVertical, _leftAnalogHorizontal) * Mathf.Rad2Deg;
             float current = transform.eulerAngles.z;
-            //Get smallest diff between target and current
 
-            //rotate toward target with speed
+            //Get Quaternion values
+            Quaternion targetQ = Quaternion.Euler(0, 0, target);
+            Quaternion currentQ = Quaternion.Euler(0, 0, current);
+            Quaternion diffQ = targetQ * Quaternion.Inverse(currentQ);
+            Quaternion diffQ2 = currentQ * Quaternion.Inverse(targetQ);
+
+            //Calculate step of the lerp Based on angle to turn and turnspeed
+            float rotationSpeed = ROTATION_SPEED / (1 + _playerGrab.GetGrabbedWeight() * GRAB_RATIO_ROTATION);
+            float lerpStep = Mathf.Clamp(rotationSpeed / Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z) * Time.deltaTime, 0f, 1f);
+            //Lerp rotation
+            transform.rotation = Quaternion.Lerp(currentQ, targetQ, lerpStep);
         }
 
         #endregion
