@@ -20,6 +20,9 @@ namespace Simoncouche.Controller {
         [SerializeField] [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
         private AnimationCurve VelocityFalloffCurve;
 
+        [SerializeField] [Tooltip("Degrees of rotation the player can rotate per second.")]
+        private float rotationSpeed = 180f;
+
         [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
         private bool isPlayerOne = true;
 
@@ -45,6 +48,9 @@ namespace Simoncouche.Controller {
 
         /// <summary>  Is the player moving vertical? </summary>
         private bool _isMovingVertical;
+
+        /// <summary> current target rotation the player is trying to lerp to</summary>
+        private Vector3 _targetRotation = Vector3.zero;
 
         /// <summary> Start drag of the player's rigid body</summary>
         private float _startDrag;
@@ -135,7 +141,8 @@ namespace Simoncouche.Controller {
             VelocityCalculation();
 
             //Orientation modification
-            ModifyOrientation();
+            //ModifyOrientation();
+            RotateTowardTargetRotation();
 
         }
 
@@ -169,7 +176,7 @@ namespace Simoncouche.Controller {
         /// <summary>
         /// Modify Orientation based on analog inputs
         /// </summary>
-        private void ModifyOrientation() {
+        private void GetTargetOrientation() {
             if (_isMovingHorizontal || _isMovingVertical) {
                 float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
                 Vector3 tempRotation = transform.rotation.eulerAngles;
@@ -177,10 +184,23 @@ namespace Simoncouche.Controller {
                 if (_leftAnalogHorizontal < 0.0f) {
                     tempRotation.z -= 180.0f;
                 }
+
                 transform.eulerAngles = tempRotation; //We apply the rotation
             }
 
         }
+
+        /// <summary>
+        /// Lerp the player's rotation toward its target rotation based on his rotation speed 
+        /// </summary>
+        private void RotateTowardTargetRotation() {
+            float target = Mathf.Atan2(Input.GetAxis("Vertical"), Input.GetAxis("Horizontal")) * Mathf.Rad2Deg;
+            float current = transform.eulerAngles.z;
+            //Get smallest diff between target and current
+
+            //rotate toward target with speed
+        }
+
         #endregion
 
 
