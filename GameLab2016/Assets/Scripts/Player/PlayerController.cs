@@ -201,7 +201,8 @@ namespace Simoncouche.Controller {
             transform.rotation = Quaternion.Lerp(currentQ, targetQ, lerpStep);
 
             //Handle Player Animation
-            HandleRotateAnimation(Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z), true);
+            bool direction = diffQ.z < diffQ2.z;
+            HandleRotateAnimation(Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z), direction);
         }
 
         /// <summary>
