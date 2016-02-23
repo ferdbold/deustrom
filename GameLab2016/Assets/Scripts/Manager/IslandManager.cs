@@ -44,14 +44,16 @@ namespace Simoncouche.Islands {
             }
         }
 
-		/// <summary>
-		/// Creates a Island from 2 chunk, Will not work for multiple piece of the same letter in one scene
-		/// </summary>
-		/// <param name="a">the first chunk</param>
-		/// /// <param name="a_anchor">the anchor associated to a</param>
-		/// <param name="b">the second chunk</param>
-		/// <param name="b_anchor">the anchor associated to b</param>
-		public void HandleChunkCollision(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor) {
+        #region HandleCollision
+
+        /// <summary>
+        /// Creates a Island from 2 chunk, Will not work for multiple piece of the same letter in one scene
+        /// </summary>
+        /// <param name="a">the first chunk</param>
+        /// /// <param name="a_anchor">the anchor associated to a</param>
+        /// <param name="b">the second chunk</param>
+        /// <param name="b_anchor">the anchor associated to b</param>
+        public void HandleChunkCollision(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor) {
 			Island a_IslandLink = ChunkContainedInIsland(a);
 			Island b_IslandLink = ChunkContainedInIsland(b);
 			
@@ -187,6 +189,7 @@ namespace Simoncouche.Islands {
             Destroy(Island.gameObject);
         }
 
+        #endregion
 
         #region Destroy Island/Chunks
         /// <summary>
@@ -205,6 +208,37 @@ namespace Simoncouche.Islands {
             RemoveIsland(island);
         }
 
+
+        #endregion
+
+        #region Take Damage
+
+        /// <summary>
+        /// Handle the damage of a chunk and it's division
+        /// </summary>
+        /// <param name="chunk">The chunk affected by this</param>
+        /// <param name="damage">The number of chunk affected</param>
+        public void TakeDamageHandler(IslandChunk chunk, int damage) {
+            //If the chunk has no connection
+            if (chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
+                return;
+            }
+
+            Island islandLink = ChunkContainedInIsland(chunk);
+
+            //Check if the damage is too high for the island (the maximum is to divided the island in 2
+            if (islandLink.chunks.Count <= damage) {
+                damage = Mathf.CeilToInt(islandLink.chunks.Count / 2f);
+            }
+        }
+
+        private List<IslandChunk> DamageConnectedIsland(IslandChunk current, List<IslandChunk> islandRemoved, int damage) {
+            if (!islandRemoved.Contains(current)) {
+                
+            }
+
+            return null; //TODO
+        }
 
         #endregion
 

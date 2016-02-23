@@ -185,6 +185,14 @@ namespace Simoncouche.Islands {
 		}
 
         /// <summary>
+        /// The damage taken by the island connected to this chunk. A chunk not part of an island does not take damage
+        /// </summary>
+        /// <param name="damage">The number of chunk affected by the division</param>
+        public void TakeDamage(int damage) {
+            GameManager.islandManager.TakeDamageHandler(this, damage);
+        }
+
+        /// <summary>
         /// Method called when entering the maelstrom
         /// </summary>
         public void OnMaelstromEnter() {
