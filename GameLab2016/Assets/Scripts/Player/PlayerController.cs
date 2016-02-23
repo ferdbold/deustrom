@@ -145,7 +145,6 @@ namespace Simoncouche.Controller {
             VelocityCalculation();
 
             //Orientation modification
-            //ModifyOrientation();
             RotateTowardTargetRotation();
 
         }
@@ -163,7 +162,7 @@ namespace Simoncouche.Controller {
                 //If we're trying to move in the direction of the player's velocity, reduce the movement by a factor of the current speed divided by max speed
                 float speedMult = Mathf.Max(0f, (1f - (projection.magnitude / maximumVelocity)));
                 speedMult = VelocityFalloffCurve.Evaluate(speedMult);
-
+                //if we're trying to go backward, add speed.
                 if (!(movementDirection.normalized == projection.normalized)) {
                     speedMult += 0.5f;
                 }
@@ -174,25 +173,13 @@ namespace Simoncouche.Controller {
 
                 //Apply transformations
                 _playerRigidBody.velocity += addedAcceleration;
+
+                //Check for Idle animation
+                if (movementDirection.x == 0 && movementDirection.y == 0) _animator.SetBool("Idle", true);
+                else _animator.SetBool("Idle", false);
             }
         }
 
-        /// <summary>
-        /// Modify Orientation based on analog inputs
-        /// </summary>
-        private void GetTargetOrientation() {
-            if (_isMovingHorizontal || _isMovingVertical) {
-                float angle = Mathf.Atan((_leftAnalogVertical / (_leftAnalogHorizontal != 0.0f ? _leftAnalogHorizontal : 0.000001f))) * Mathf.Rad2Deg; //Ternary condition due to a possibility of divide by 0
-                Vector3 tempRotation = transform.rotation.eulerAngles;
-                tempRotation.z = angle;
-                if (_leftAnalogHorizontal < 0.0f) {
-                    tempRotation.z -= 180.0f;
-                }
-
-                transform.eulerAngles = tempRotation; //We apply the rotation
-            }
-
-        }
 
         /// <summary>
         /// Lerp the player's rotation toward its target rotation based on his rotation speed 
@@ -212,6 +199,33 @@ namespace Simoncouche.Controller {
             float lerpStep = Mathf.Clamp(rotationSpeed / Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z) * Time.deltaTime, 0f, 1f);
             //Lerp rotation
             transform.rotation = Quaternion.Lerp(currentQ, targetQ, lerpStep);
+
+            //Handle Player Animation
+            HandleRotateAnimation(Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z), true);
+        }
+
+        /// <summary>
+        /// Set the turn anim of the animator.
+        /// if 0 : Swim
+        /// if 1 : TurnLeft90
+        /// if 2 : TurnLeft180
+        /// if 3 : TurnRight90
+        /// if 4 : TurnRight180
+        /// </summary>
+        /// <param name="rotateRate">Difference between current angle and target angle</param>
+        /// <param name="right">Are we turning right</param>
+        private void HandleRotateAnimation(float rotateRate, bool right) {
+            if (_animator == null) return;
+            int animState = 0;
+            if(right) {
+                if (rotateRate > 90) animState = 4;
+                else if (rotateRate > 0) animState = 3;
+            } else {
+                if (rotateRate > 90) animState = 2;
+                else if (rotateRate > 0) animState = 1;
+            }
+
+            _animator.SetInteger("TurnAnim", animState);
         }
 
         #endregion
