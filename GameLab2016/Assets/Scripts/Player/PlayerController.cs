@@ -89,6 +89,9 @@ namespace Simoncouche.Controller {
             if (_playerGrab == null) {
                 Debug.LogError("Player/PlayerGrab cannot be found!");
             }
+            if(_animator == null) {
+                Debug.LogError("Player/Animator cannot be found!");
+            }
 
         }
 
@@ -185,24 +188,36 @@ namespace Simoncouche.Controller {
         /// Lerp the player's rotation toward its target rotation based on his rotation speed 
         /// </summary>
         private void RotateTowardTargetRotation() {
-            float target = Mathf.Atan2(_leftAnalogVertical, _leftAnalogHorizontal) * Mathf.Rad2Deg;
-            float current = transform.eulerAngles.z;
+            //Check if idle
+            if (_leftAnalogHorizontal == 0 && _leftAnalogVertical == 0) {
+                _animator.SetBool("Idle", true);
+                _animator.SetInteger("TurnAnim", 0);
+            } else {
+                _animator.SetBool("Idle", false);
 
-            //Get Quaternion values
-            Quaternion targetQ = Quaternion.Euler(0, 0, target);
-            Quaternion currentQ = Quaternion.Euler(0, 0, current);
-            Quaternion diffQ = targetQ * Quaternion.Inverse(currentQ);
-            Quaternion diffQ2 = currentQ * Quaternion.Inverse(targetQ);
+                float target = Mathf.Atan2(_leftAnalogVertical, _leftAnalogHorizontal) * Mathf.Rad2Deg;
+                float current = transform.eulerAngles.z;
 
-            //Calculate step of the lerp Based on angle to turn and turnspeed
-            float rotationSpeed = ROTATION_SPEED / (1 + _playerGrab.GetGrabbedWeight() * GRAB_RATIO_ROTATION);
-            float lerpStep = Mathf.Clamp(rotationSpeed / Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z) * Time.deltaTime, 0f, 1f);
-            //Lerp rotation
-            transform.rotation = Quaternion.Lerp(currentQ, targetQ, lerpStep);
+                //Get Quaternion values
+                Quaternion targetQ = Quaternion.Euler(0, 0, target);
+                Quaternion currentQ = Quaternion.Euler(0, 0, current);
+                Quaternion diffQ = targetQ * Quaternion.Inverse(currentQ);
+                Quaternion diffQ2 = currentQ * Quaternion.Inverse(targetQ);
 
-            //Handle Player Animation
-            bool direction = diffQ.z < diffQ2.z;
-            HandleRotateAnimation(Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z), direction);
+                //Calculate step of the lerp Based on angle to turn and turnspeed
+                float rotationSpeed = ROTATION_SPEED / (1 + _playerGrab.GetGrabbedWeight() * GRAB_RATIO_ROTATION);
+                float lerpStep = Mathf.Clamp(rotationSpeed / Mathf.Min(diffQ.eulerAngles.z, diffQ2.eulerAngles.z) * Time.deltaTime, 0f, 1f);
+                //Lerp rotation
+                transform.rotation = Quaternion.Lerp(currentQ, targetQ, lerpStep);
+
+                //Handle Player Animation
+                //Get angle difference between player orientation and player velocity
+                float velocityAngle = Vector3.Angle(_playerRigidBody.velocity, Vector2.right);
+                if (Vector3.Cross(_playerRigidBody.velocity, Vector2.right).z > 0) velocityAngle = 360 - velocityAngle;     
+                float diffAngle = (transform.eulerAngles.z - velocityAngle);
+                //Change swim anim state
+                HandleRotateAnimation(Mathf.Abs(diffAngle), diffAngle < 0);
+            }
         }
 
         /// <summary>
@@ -220,10 +235,10 @@ namespace Simoncouche.Controller {
             int animState = 0;
             if(right) {
                 if (rotateRate > 90) animState = 4;
-                else if (rotateRate > 0) animState = 3;
+                else if (rotateRate > 20) animState = 3;
             } else {
                 if (rotateRate > 90) animState = 2;
-                else if (rotateRate > 0) animState = 1;
+                else if (rotateRate > 20) animState = 1;
             }
 
             _animator.SetInteger("TurnAnim", animState);
@@ -253,11 +268,8 @@ namespace Simoncouche.Controller {
             _leftAnalogHorizontal = input[0];
             _leftAnalogVertical = input[1];
 
-            if (Mathf.Abs(_leftAnalogHorizontal) > 0.0f) {
-                _isMovingHorizontal = true;
-            } else {
-                _isMovingHorizontal = false;
-            }
+            if (Mathf.Abs(_leftAnalogHorizontal) > 0.0f)  _isMovingHorizontal = true;
+            else _isMovingHorizontal = false;
 
             if (Mathf.Abs(_leftAnalogVertical) > 0.0f) _isMovingVertical = true;
             else _isMovingVertical = false;
