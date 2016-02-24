@@ -10,9 +10,11 @@ namespace Simoncouche.Chain {
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
-        enum State {
+        enum State
+        {
             NoHook,
             OneHook,
+            TwoHook
         }
 
         private State _currentState;
@@ -54,23 +56,25 @@ namespace Simoncouche.Chain {
 		/// Handle user input to throw a new chain and hook
 		/// </summary>
 		private void Fire() {
-			switch (_currentState) {
-			case State.NoHook:
-				_chains.Add(Chain.Create(this, _initialForceAmount));
-				joint.enabled = true;
-				_currentState = State.OneHook;
-				break;
-
-			case State.OneHook:
-				_chains[_chains.Count - 1].CreateSecondHook();
-				joint.enabled = false;
-				_currentState = State.NoHook;
-				break;
-			}
-		}
+            if (_currentState == State.NoHook) //If we press fire when we don't have any hook, we create a hook and switch the currentState to OneHook
+            {
+                _chains.Add(Chain.Create(this, _initialForceAmount));
+                joint.enabled = true;
+                //_currentState = State.OneHook;
+            }
+            //TODO: MODIFIER POUR LIER LES 2 CHAINES
+            else if(_currentState == State.OneHook) //If we press fire when we have 1 hook, we create a hook and switch the currentState to NoHook
+            {
+                _chains[_chains.Count - 1].CreateSecondHook();
+                joint.enabled = false;
+                //_currentState = State.NoHook;
+                //_currentState = State.TwoHook;
+            }
+            else if(_currentState == State.TwoHook)
+            {
+                _currentState = State.NoHook;
+            }
 			
-		public void OnDestroyChain() {
-			_currentState = State.NoHook;
 		}
 	}
 }
