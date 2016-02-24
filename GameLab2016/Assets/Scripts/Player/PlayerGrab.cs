@@ -21,6 +21,9 @@ namespace Simoncouche.Controller {
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
 
+        /// <summary> Reference to the player controller </summary>
+        private PlayerController _playerController;
+
         /// <summary> List of references to all playerGrabs. Used to avoid Searching the map everytime we grab.</summary>
         private static List<PlayerGrab> _allPlayerGrabs = new List<PlayerGrab>();
 
@@ -30,6 +33,7 @@ namespace Simoncouche.Controller {
 
         void Awake() {
             _aimController = GetComponent<AimController>();
+            _playerController = GetComponent<PlayerController>();
             grabbedBody = null;
 
             //Add to static playergrab list
@@ -37,6 +41,9 @@ namespace Simoncouche.Controller {
 
             if (_aimController == null) {
                 Debug.LogError("Player/AimController cannot be found!");
+            }
+            if(_playerController == null) {
+                Debug.LogError("Player/PlayerController cannot be found!");
             }
         }
 
@@ -114,9 +121,10 @@ namespace Simoncouche.Controller {
                 Release();
                 //Add Force
                 Vector2 forceDirection = _aimController.aimOrientationVector2.normalized;
-
                 bodyToAddForce.Velocity = forceDirection * THROW_FORCE / Mathf.Max(1,bodyToAddForce.Weight / 10f);
 
+                //Animation
+                _playerController.HandlePushAnimation();
 
             } else {
                 Debug.LogWarning("Attempted to throw when grabbedBody is null.");

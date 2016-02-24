@@ -220,6 +220,10 @@ namespace Simoncouche.Controller {
             }
         }
 
+        #endregion
+
+        #region animations handling
+
         /// <summary>
         /// Set the turn anim of the animator.
         /// if 0 : Swim
@@ -233,22 +237,31 @@ namespace Simoncouche.Controller {
         private void HandleRotateAnimation(float rotateRate, bool right) {
             if (_animator == null) return;
             int animState = 0;
-            if(right) {
+            if (right) {
                 if (rotateRate > 90) animState = 4;
-                else if (rotateRate > 20) animState = 3;
+                else if (rotateRate > 45) animState = 3;
             } else {
                 if (rotateRate > 90) animState = 2;
-                else if (rotateRate > 20) animState = 1;
+                else if (rotateRate > 45) animState = 1;
             }
 
             _animator.SetInteger("TurnAnim", animState);
         }
 
+        /// <summary> Activate Push animation trigger</summary>
+        public void HandlePushAnimation() {
+            _animator.SetTrigger("Push");
+        }
+
+        /// <summary> Activate Throw animation trigger</summary>
+        public void HandleThrowAnimation() {
+            _animator.SetTrigger("Throw");
+        }
+
         #endregion
 
-
         #region Collision
-        
+
         public void OnCollisionEnter2D(Collision2D col) {
             GravityBody otherGB = col.collider.gameObject.GetComponent<GravityBody>();
             if(otherGB != null) {
