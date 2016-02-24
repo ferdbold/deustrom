@@ -70,11 +70,11 @@ namespace Simoncouche.Chain {
 		}
 
 		public void Start() {
-			_beginningHook = Hook.Create(this);
+			CreateBeginningHook();
 		}
 
         public void Update() {
-            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold) {
+            /*if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold) {
                 if (_beginningHookLinkCount < _maximumLinksPerChain) {
                     thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
                     _beginningLink = thrower.joint.connectedBody.GetComponent<ChainSection>();
@@ -89,7 +89,7 @@ namespace Simoncouche.Chain {
                     _endingLink = thrower.joint.connectedBody.GetComponent<ChainSection>();
                     _endingHookLinkCount++;
                 }
-            }
+            }*/
         }
 
         /// <summary>
@@ -108,8 +108,14 @@ namespace Simoncouche.Chain {
             }
         }
 
+		public void CreateBeginningHook() {
+			_beginningHook = Hook.Create(this, true);
+			_beginningHook.chainJoint.connectedBody = this.thrower.rigidbody;
+		}
+
         public void CreateSecondHook() {
-            _endingHook = Hook.Create(this);
+            _endingHook = Hook.Create(this, false);
+			_beginningHook.chainJoint.connectedBody = _endingHook.rigidbody;
         }
     }
 }

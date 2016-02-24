@@ -6,17 +6,18 @@ namespace Simoncouche.Chain {
 	/// <summary>
 	/// A Hook is an ending element of a Chain that can snap itself either to a character or an IslandAnchorPoint.
 	/// </summary>
+	[RequireComponent(typeof(DistanceJoint2D))]
 	[RequireComponent(typeof(FixedJoint2D))]
 	public class Hook : MonoBehaviour {
+
+		[Tooltip("The mass of this hook once attached to an island")]
+		[SerializeField]
+		private float ATTACHED_MASS = 10f;
 
 		/// <summary>
 		/// Self-reference to the hook prefab for factory purposes
 		/// </summary>
 		private static GameObject _hookPrefab;
-
-        [Tooltip("This is the maximum distance between the hook and the player")]
-        [SerializeField]
-        private float _maxDistanceBetweenPlayerAndHook=10f;
 
 		/// <summary>
 		/// The chain this hook is part of
@@ -28,18 +29,30 @@ namespace Simoncouche.Chain {
 		/// </summary>
 		private ChainSection _nextChain;
 
+		/// <summary>
+		/// Whether this hook is currently attached to a target
+		/// </summary>
+		private bool _attachedToTarget = false;
+
 		// COMPONENTS
 
-		private FixedJoint2D _joint;
-		public FixedJoint2D joint { get { return _joint; } }
+		public FixedJoint2D targetJoint { get; private set; }
 
-		private Rigidbody2D _rigidbody;
+		/// <summary>
+		/// The joint linking this hook to the other edge of the chain,
+		/// (which will be the thrower or the second Hook of a chain). 
+		/// This joint is only used by the beginning Hook of a Chain.
+		/// </summary>
+		public DistanceJoint2D chainJoint { get; private set; }
+
+		public new Rigidbody2D rigidbody { get; private set; }
 
 		/// <summary>
 		/// Spawn a new hook inside a chain
 		/// </summary>
 		/// <param name="chain">The parent chain</param>
-		public static Hook Create(Chain chain) {
+		/// <param name="isBeginningHook">Is this hook the beginning hook of a chain</param> 
+		public static Hook Create(Chain chain, bool isBeginningHook) {
 			if (_hookPrefab == null) {
 				_hookPrefab = Resources.Load("Chain/Hook") as GameObject;
 			}
@@ -51,40 +64,41 @@ namespace Simoncouche.Chain {
 			)).GetComponent<Hook>();
 
 			hook.transform.parent = chain.transform;
+			hook.name = (isBeginningHook) ? "BeginningHook" : "EndingHook";
+			hook.chainJoint.enabled = isBeginningHook;
 			hook.SetChain(chain);
 
 			return hook;
 		}
 
 		public void Awake() {
-			_joint = GetComponent<FixedJoint2D>();
-			_rigidbody = GetComponent<Rigidbody2D>();
+			this.chainJoint = GetComponent<DistanceJoint2D>();
+			this.targetJoint = GetComponent<FixedJoint2D>();
+			this.rigidbody = GetComponent<Rigidbody2D>();
 		}
 
 		public void Start() {
-			_nextChain = ChainSection.Create(transform.position, _chain, _rigidbody);
-			_rigidbody.AddForce(transform.rotation * new Vector2(_chain.initialForce, 0));
+			//_nextChain = ChainSection.Create(transform.position, _chain, _rigidbody);
+			this.rigidbody.AddForce(transform.rotation * new Vector2(_chain.initialForce, 0));
 		}
 
 		public void OnTriggerEnter2D(Collider2D coll) {
-			if (_joint.connectedBody == null) {
-				if (coll.gameObject.GetComponent<IslandAnchorPoints>() != null) {
-					_joint.enabled = true;
-					_joint.connectedBody = coll.GetComponent<Rigidbody2D>();
+			if (!_attachedToTarget) {
+				IslandAnchorPoints anchorPoint = coll.gameObject.GetComponent<IslandAnchorPoints>();
+
+				if (anchorPoint != null) {
+					this.AttachTo(anchorPoint);
 				}
 			}
 		}
         //TODO: Destroy the chain when the distance is higher than a certain value
         void Update() {
-            if(Vector2.Distance(this._rigidbody.position, _chain.thrower.transform.position) > _maxDistanceBetweenPlayerAndHook) {
-                _rigidbody.velocity = Vector2.zero;
+            if(Vector2.Distance(this.rigidbody.position, _chain.thrower.transform.position) > this.chainJoint.distance) {
+                this.rigidbody.velocity = Vector2.zero;
             }
+				
             //if (_joint.connectedBody == null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
         }
-
-		public void SetChain(Chain value) {
-			_chain = value;
-		}
 
         /// <summary>
         /// Restrain the closest link of a chain with a maxDistance from the thrower's position
@@ -93,15 +107,24 @@ namespace Simoncouche.Chain {
         /// <param name="maxDistance"></param>
         private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance) {
             Debug.Log("ON CLAMP LE HOOK");
-            float currentDistance = Vector3.Distance(_rigidbody.position, throwerPosition.position);
+            float currentDistance = Vector3.Distance(this.rigidbody.position, throwerPosition.position);
             if (currentDistance > maxDistance) {
-                Vector2 vect =  throwerPosition.position - (Vector3) _rigidbody.position;
+                Vector2 vect =  throwerPosition.position - (Vector3) this.rigidbody.position;
                 vect = vect.normalized;
                 vect *= (currentDistance - maxDistance);
-                _rigidbody.position += vect;
+                this.rigidbody.position += vect;
             }
         }
 
-
+		public void AttachTo(IslandAnchorPoints anchor) {
+			this.targetJoint.enabled = true;
+			this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
+			this.rigidbody.velocity = Vector2.zero;
+			this.rigidbody.mass = this.ATTACHED_MASS;
+		}
+		
+		public void SetChain(Chain value) {
+			_chain = value;
+		}
 	}
 }

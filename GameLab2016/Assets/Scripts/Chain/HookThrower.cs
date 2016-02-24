@@ -36,15 +36,23 @@ namespace Simoncouche.Chain {
 		// COMPONENTS   
             
 		public HingeJoint2D joint { get; private set; }
+		public new Rigidbody2D rigidbody { get; private set; }
 		public AimController aimController { get; private set; }
         public PlayerController playerController { get; private set; }
         public PlayerAudio playerAudio { get; private set; }
 
         public void Awake() {
 			this.joint = GetComponent<HingeJoint2D>();
+			this.rigidbody = GetComponent<Rigidbody2D>();
             this.aimController = GetComponent<AimController>();
             this.playerController = GetComponent<PlayerController>();
             this.playerAudio = GetComponent<PlayerAudio>();
+		}
+
+		public void Update() {
+			foreach (Chain chain in _chains) {
+				chain.Update();
+			}
 		}
 
 		public void SetupInput(bool isPlayerOne) {
@@ -64,7 +72,7 @@ namespace Simoncouche.Chain {
 			// we create a hook and switch the currentState to OneHook
 			case State.NoHook:
 				_chains.Add(Chain.Create(this, _initialForceAmount));
-				joint.enabled = true;
+				//joint.enabled = true;
 				_currentState = State.OneHook;
 
 				// Animation handling

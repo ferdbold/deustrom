@@ -42,5 +42,14 @@ namespace Simoncouche.Islands {
 		void OnTriggerEnter2D(Collider2D other) {
 			_parentRef.HandleAnchorPointCollision(other, this);
 		}
+
+		/// Returns the IslandChunk component related to this anchor point
+		public IslandChunk GetIslandChunk() {
+			IslandChunk chunk = transform.parent.parent.GetComponent<IslandChunk>();
+
+			UnityEngine.Assertions.Assert.IsNotNull(chunk, "Island chunk component could not be found");
+
+			return chunk;
+		}
 	}
 }

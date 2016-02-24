@@ -30,7 +30,7 @@ namespace Simoncouche.Chain {
 		// COMPONENTS
 
 		public HingeJoint2D joint { get; private set; }
-		public Rigidbody2D rigidbody { get; private set; }
+		public new Rigidbody2D rigidbody { get; private set; }
 
 		public Transform pivot { get; private set; }
 		public Transform mesh { get; private set; }
