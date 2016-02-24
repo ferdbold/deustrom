@@ -103,6 +103,9 @@ namespace Simoncouche.Controller {
                         parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
                     }
 
+                    //Animation
+                    _playerController.HandleGrabStartAnimation();
+
                 }
                 
             }
@@ -133,35 +136,44 @@ namespace Simoncouche.Controller {
 
         /// <summary> Releases the gravity body </summary>
         public void Release() {
-            
-            IslandChunk targetChunk = grabbedBody.gameObject.GetComponent<IslandChunk>();
 
-            //If chunk has no parent island
-            if (targetChunk.parentIsland == null) {
-                //Unparent chunk & activate GravBody
-                targetChunk.transform.parent = _grabbedBodyParent;
-                _grabbedBodyParent = null;
-                grabbedBody.ActivateGravityBody();
-                //UnIgnore Collision
-                ReactivateCollision(targetChunk.GetComponent<Collider2D>(), 1f);
-            }
-            //If chunk has a parent island
-            else { 
-                //Get island and reactivate it
-                Island parentIsland = targetChunk.parentIsland;
-                parentIsland.gravityBody.ActivateGravityBody();
-                //Reparent island
-                parentIsland.transform.parent = _grabbedBodyParent;
-                _grabbedBodyParent = null;   
-                //UnIgnore Collision
-                foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
-                    ReactivateCollision(iChunk.GetComponent<Collider2D>(), 1f);
-                    
+            if (grabbedBody != null) {
+                IslandChunk targetChunk = grabbedBody.gameObject.GetComponent<IslandChunk>();
+
+                //If chunk has no parent island
+                if (targetChunk.parentIsland == null) {
+                    //Unparent chunk & activate GravBody
+                    targetChunk.transform.parent = _grabbedBodyParent;
+                    _grabbedBodyParent = null;
+                    grabbedBody.ActivateGravityBody();
+                    //UnIgnore Collision
+                    ReactivateCollision(targetChunk.GetComponent<Collider2D>(), 1f);
                 }
-            }
+                //If chunk has a parent island
+                else {
+                    //Get island and reactivate it
+                    Island parentIsland = targetChunk.parentIsland;
+                    parentIsland.gravityBody.ActivateGravityBody();
+                    //Reparent island
+                    parentIsland.transform.parent = _grabbedBodyParent;
+                    _grabbedBodyParent = null;
+                    //UnIgnore Collision
+                    foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
+                        ReactivateCollision(iChunk.GetComponent<Collider2D>(), 1f);
 
-            //Mark grabbed body as null
-            grabbedBody = null;
+                    }
+                }
+
+                //Mark grabbed body as null
+                grabbedBody = null;
+
+                //Animation
+                _playerController.HandleGrabStopAnimation();
+
+
+            } else {
+                Debug.LogError("Grabbed body is null and trying to release !");
+            }
         }
 
         private void ReactivateCollision(Collider2D otherCol, float time) {

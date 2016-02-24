@@ -251,11 +251,29 @@ namespace Simoncouche.Controller {
         /// <summary> Activate Push animation trigger</summary>
         public void HandlePushAnimation() {
             _animator.SetTrigger("Push");
+            HandleGrabStopAnimation();
         }
 
-        /// <summary> Activate Throw animation trigger</summary>
-        public void HandleThrowAnimation() {
+        /// <summary> Handles the animations when player shoots first hook </summary>
+        public void HandleFirstHookAnimation() {
             _animator.SetTrigger("Throw");
+            _animator.SetBool("State_ChainGrab", true);
+        }
+
+        /// <summary> Handles the animations when player shoots second hook </summary>
+        public void HandleSecondHookAnimation() {
+            _animator.SetTrigger("Throw");
+            _animator.SetBool("State_ChainGrab", false);
+        }
+
+        /// <summary> Handles the animations when player grabs an island </summary>
+        public void HandleGrabStartAnimation() {
+            _animator.SetBool("State_IslandGrab", true);
+        }
+
+        /// <summary> Handles the animations when player releases an island </summary>
+        public void HandleGrabStopAnimation() {
+            _animator.SetBool("State_IslandGrab", false);
         }
 
         #endregion

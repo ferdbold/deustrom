@@ -39,10 +39,12 @@ namespace Simoncouche.Chain {
             
 		public HingeJoint2D joint { get; private set; }
 		public AimController aimController { get; private set; }
+        public PlayerController playerController { get; private set; }
 
         public void Awake() {
 			this.joint = GetComponent<HingeJoint2D>();
             this.aimController = GetComponent<AimController>();
+            this.playerController = GetComponent<PlayerController>();
 		}
 
 		public void SetupInput(bool isPlayerOne) {
@@ -61,6 +63,9 @@ namespace Simoncouche.Chain {
                 _chains.Add(Chain.Create(this, _initialForceAmount));
                 joint.enabled = true;
                 //_currentState = State.OneHook;
+
+                //Animation handling
+                playerController.HandleFirstHookAnimation();
             }
             //TODO: MODIFIER POUR LIER LES 2 CHAINES
             else if(_currentState == State.OneHook) //If we press fire when we have 1 hook, we create a hook and switch the currentState to NoHook
@@ -69,11 +74,15 @@ namespace Simoncouche.Chain {
                 joint.enabled = false;
                 //_currentState = State.NoHook;
                 //_currentState = State.TwoHook;
+
+                //Animation handling
+                playerController.HandleSecondHookAnimation();
             }
             else if(_currentState == State.TwoHook)
             {
                 _currentState = State.NoHook;
             }
+
 			
 		}
 	}
