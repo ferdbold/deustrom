@@ -11,10 +11,6 @@ namespace Simoncouche.Chain {
 
 		private static GameObject _chainSectionPrefab;
 
-		[Tooltip("Reference to the ChainSection prefab")]
-		[SerializeField]
-		//private ChainSection _chainSectionPrefab;
-
 		/// <summary>
 		/// The ChainSection that is linked to this section
 		/// </summary>
