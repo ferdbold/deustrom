@@ -10,11 +10,9 @@ namespace Simoncouche.Chain {
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
-        enum State
-        {
+        enum State {
             NoHook,
-            OneHook,
-            TwoHook
+            OneHook
         }
 
         private State _currentState;
@@ -58,32 +56,32 @@ namespace Simoncouche.Chain {
 		/// Handle user input to throw a new chain and hook
 		/// </summary>
 		private void Fire() {
-            if (_currentState == State.NoHook) //If we press fire when we don't have any hook, we create a hook and switch the currentState to OneHook
-            {
-                _chains.Add(Chain.Create(this, _initialForceAmount));
-                joint.enabled = true;
-                //_currentState = State.OneHook;
+			switch (_currentState) {
 
-                //Animation handling
-                playerController.HandleFirstHookAnimation();
-            }
-            //TODO: MODIFIER POUR LIER LES 2 CHAINES
-            else if(_currentState == State.OneHook) //If we press fire when we have 1 hook, we create a hook and switch the currentState to NoHook
-            {
-                _chains[_chains.Count - 1].CreateSecondHook();
-                joint.enabled = false;
-                //_currentState = State.NoHook;
-                //_currentState = State.TwoHook;
+			// If we press fire when we don't have any hook,
+			// we create a hook and switch the currentState to OneHook
+			case State.NoHook:
+				_chains.Add(Chain.Create(this, _initialForceAmount));
+				joint.enabled = true;
+				_currentState = State.OneHook;
 
-                //Animation handling
-                playerController.HandleSecondHookAnimation();
-            }
-            else if(_currentState == State.TwoHook)
-            {
-                _currentState = State.NoHook;
-            }
-
+				// Animation handling
+				playerController.HandleFirstHookAnimation();
+				break;
 			
+			// If we press fire when we have 1 hook, 
+			// we create a hook and switch the currentState to NoHook
+			// TODO: MODIFIER POUR LIER LES 2 CHAINES
+			case State.OneHook: 
+				_chains[_chains.Count - 1].CreateSecondHook();
+				joint.enabled = false;
+				_currentState = State.NoHook;
+
+				// Animation handling
+				playerController.HandleSecondHookAnimation();
+
+				break;
+            }
 		}
 	}
 }
