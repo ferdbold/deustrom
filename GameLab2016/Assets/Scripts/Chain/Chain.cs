@@ -8,30 +8,34 @@ namespace Simoncouche.Chain {
     /// </summary>
     public class Chain : MonoBehaviour {
 
-        [Tooltip("This is the maximum distance between the hook and the player")]
-        [SerializeField]
-        private float _maximumDistanceBetweenPlayer = 5.0f;
-
         /// <summary>
         /// Self-reference to the chain prefab for factory purposes
         /// </summary>
         private static GameObject _chainPrefab;
 
         private Hook _beginningHook;
-        private Hook _endingHook;
+        
+		/// <summary>
+        /// The section directly linked to the beginning hook
+        /// </summary>
+		private ChainSection _beginningLink = null;
 
-        private ChainSection _endingLinkBeginningHook=null;
-        private ChainSection _endingLinkEndingHook = null;
+		private Hook _endingHook;
+
+		/// <summary>
+		/// The section directly linked to the ending hook
+		/// </summary>
+        private ChainSection _endingLink = null;
 
         /// <summary>
-        /// The current number of links in the biginning hook
+        /// The current number of links in the beginning hook
         /// </summary>
-        private int _currentLinkNumberBeginningHook;
+        private int _beginningHookLinkCount;
 
         /// <summary>
-        /// The current number of links in the biginning hook
+        /// The current number of links in the ending hook
         /// </summary>
-        private int _currentLinkNumberEndingHook;
+        private int _endingHookLinkCount;
 
         /// <summary>
         /// The current aim orientation as set by the right analog input
@@ -39,6 +43,8 @@ namespace Simoncouche.Chain {
         [Tooltip("Maximum number of links per chain")]
         [SerializeField]
         private int _maximumLinksPerChain = 30;
+
+		private int _linkCount = 0;
 
         public HookThrower thrower { get; set; }
 		public float initialForce { get; set; }
@@ -70,21 +76,19 @@ namespace Simoncouche.Chain {
 		}
 
         public void Update() {
+			// If we need to spawn an additional chain section
             if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold) {
-                if (_currentLinkNumberBeginningHook < _maximumLinksPerChain) {
+                if (_beginningHookLinkCount < _maximumLinksPerChain) {
                     thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
-                    _endingLinkBeginningHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
-                    _currentLinkNumberBeginningHook++;
+                    _beginningLink = thrower.joint.connectedBody.GetComponent<ChainSection>();
+                    _beginningHookLinkCount++;
                 }
-                //ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkBeginningHook); //We clamp the distance of the closet link to the player to a maximum distance from the player
-            }
 
-            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold) {
-                if (_currentLinkNumberEndingHook < _maximumLinksPerChain) {
-                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
-                    _endingLinkEndingHook = thrower.joint.connectedBody.GetComponent<ChainSection>();
-                    _currentLinkNumberEndingHook++;
-                }
+				if (_endingHookLinkCount < _maximumLinksPerChain) {
+					thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
+					_endingLink = thrower.joint.connectedBody.GetComponent<ChainSection>();
+					_endingHookLinkCount++;
+				}
             }
         }
 
@@ -104,8 +108,37 @@ namespace Simoncouche.Chain {
             }
         }
 
+		/// <summary>
+		/// Raises the chain maximum length event.
+		/// </summary>
+		private void OnChainMaximumLength() {
+			if (_beginningHook.joint.connectedBody == null) {
+				DestroyChain();
+			}
+		}
+
+		private void DestroyChain() {
+			this.thrower.OnDestroyChain();
+			Destroy(gameObject);
+		}
+
         public void CreateSecondHook() {
             _endingHook = Hook.Create(this);
         }
+
+		public int linkCount {
+			get {
+				return _linkCount;
+			}
+			set {
+				if (_linkCount < _maximumLinksPerChain) {
+					_linkCount = value;
+
+					if (_linkCount == _maximumLinksPerChain) {
+						OnChainMaximumLength();
+					}
+				}
+			}
+		}
     }
 }

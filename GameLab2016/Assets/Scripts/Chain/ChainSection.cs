@@ -11,10 +11,6 @@ namespace Simoncouche.Chain {
 
 		private static GameObject _chainSectionPrefab;
 
-		[Tooltip("Reference to the ChainSection prefab")]
-		[SerializeField]
-		//private ChainSection _chainSectionPrefab;
-
 		/// <summary>
 		/// The ChainSection that is linked to this section
 		/// </summary>
@@ -85,7 +81,8 @@ namespace Simoncouche.Chain {
 		public void SpawnNewSection() {
             Vector3 nextChainSectionPosition = transform.position - transform.right * transform.localScale.x;
 			_nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, this.rigidbody, this.mesh.localRotation);
-        }
+			_chain.linkCount++;
+		}
 
 		private void SetChain(Chain value) {
 			_chain = value;
