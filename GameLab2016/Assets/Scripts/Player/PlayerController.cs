@@ -32,37 +32,46 @@ namespace Simoncouche.Controller {
         [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player movement speed when grabbing an object.")]
         private float GRAB_RATIO_MOVEMENT = 0.75f;
 
+        [SerializeField] [Tooltip("Force to apply when bumping another player")]
+        private float BUMP_FORCE = 1.5f;
+
+        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
+        private AudioClip FX_PlayerBumpGrunt;
+
         #endregion
 
         #region PrivateVariables
         //Componentsgit 
         /// <summary>  Reference of player's rigidbody  </summary>
         private Rigidbody2D _playerRigidBody;
-
-        /// <summary> Reference to the playerGrab which handles gravity body grabbing</summary>
+       /// <summary> Reference to the playerGrab which handles gravity body grabbing</summary>
         private PlayerGrab _playerGrab;
-
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
-
+        /// <summary> Reference to the animator of the player </summary>
         private Animator _animator;
+        /// <summary> Reference to the playerAudio of the player</summary>
+        private PlayerAudio _playerAudio;
 
         //Inputs
         /// <summary>  Is the player moving horizontally? </summary>
         private bool _isMovingHorizontal;
-
         /// <summary>  Is the player moving vertical? </summary>
         private bool _isMovingVertical;
-
         /// <summary> Start drag of the player's rigid body</summary>
         private float _startDrag;
+ 
+        /// <summary> can the player bump right now </summary>
+        private bool _canPlayerBump = true;
+        /// <summary> Cooldown for a player bump</summary>
+        private float _playerBumpCooldown = 0.5f;
 
 
 
-	    /// <summary>
-	    /// Vector of player inputs
-	    /// </summary>
-	    private Vector2 _currentPlayerMovementInputs=Vector2.zero;
+        /// <summary>
+        /// Vector of player inputs
+        /// </summary>
+        private Vector2 _currentPlayerMovementInputs=Vector2.zero;
 
         /// <summary> Reference to the hook thrower attached to this object </summary>
         private HookThrower _hookThrower;
@@ -84,13 +93,18 @@ namespace Simoncouche.Controller {
             _hookThrower = GetComponentInChildren<HookThrower>();
             _animator = GetComponentInChildren<Animator>();
             _playerGrab = GetComponent<PlayerGrab>();
+            _playerAudio = GetComponent<PlayerAudio>();
             _startDrag = _playerRigidBody.drag;
+
 
             if (_playerGrab == null) {
                 Debug.LogError("Player/PlayerGrab cannot be found!");
             }
             if(_animator == null) {
                 Debug.LogError("Player/Animator cannot be found!");
+            }
+            if(_playerAudio == null) {
+                Debug.LogError("Player/PlayerAudio cannont be found!");
             }
 
         }
@@ -283,12 +297,40 @@ namespace Simoncouche.Controller {
         public void OnCollisionEnter2D(Collision2D col) {
             GravityBody otherGB = col.collider.gameObject.GetComponent<GravityBody>();
             if(otherGB != null) {
+                //Check for grab
                 if (_playerGrab.gameObject.activeInHierarchy) _playerGrab.AttemptGrab(otherGB);
+                //Check for player bump
+                PlayerController otherPlayer = otherGB.GetComponent<PlayerController>();
+                if(otherPlayer != null) {
+                    //If this is the player with the highest velocity, bump other
+                    if (_canPlayerBump && _playerRigidBody.velocity.magnitude > otherGB.Velocity.magnitude) { 
+                        //Bump other player and start other Bump cooldown
+                        otherGB.Velocity = otherGB.Velocity + col.relativeVelocity * BUMP_FORCE;
+                        otherPlayer.StartPlayerBumpCooldown();
+                        //Decrease speed and start Bump cooldown
+                        _playerRigidBody.velocity = _playerRigidBody.velocity - col.relativeVelocity;
+                        StartPlayerBumpCooldown();
+
+                        //Play Audio
+                        _playerAudio.PlaySound(FX_PlayerBumpGrunt);
+                    }
+                }
             }
         }
 
-        #endregion
+        /// <summary> Starts the player bump cooldown </summary>
+        public void StartPlayerBumpCooldown() {
+            _canPlayerBump = false;
+            StartCoroutine(PlayerBumpCooldown());
+        }
+        /// <summary> Coroutine that manages the bump cooldown </summary>
+        IEnumerator PlayerBumpCooldown() {
+            yield return new WaitForSeconds(_playerBumpCooldown);
+            _canPlayerBump = true;
 
+        }
+
+        #endregion
 
         #region PlayerInputs
 

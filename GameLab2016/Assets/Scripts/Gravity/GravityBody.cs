@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
@@ -53,7 +54,6 @@ public class GravityBody : GravityObject {
 
     override protected void Start () {
         base.Start();
-
     }
 
     void Update() {
@@ -185,7 +185,6 @@ public class GravityBody : GravityObject {
         collisionEnabled = false;
          _collider.enabled = false;
     }
-
 
 
     #endregion
