@@ -129,7 +129,7 @@ namespace Simoncouche.Islands {
         }
 
         private void AddChunkToExistingIsland(Island islandLink, IslandChunk chunk, IslandChunk a, IslandChunk b) {
-            islandLink.AddChunkToIsland(chunk, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
+            islandLink.AddChunkToIsland(chunk);
             PlayerGrab.UngrabBody(a.gravityBody);
             PlayerGrab.RemoveCollisionIfGrabbed(islandLink, chunk);
         }
@@ -159,7 +159,7 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="a">First chunk</param>
         /// <param name="b">Second chunk</param>
-        private void CreateIsland(IslandChunk a, IslandChunk b) {
+        private Island CreateIsland(IslandChunk a, IslandChunk b) {
             GameObject island = Instantiate(_islandComponent, a.transform.position, a.transform.rotation) as GameObject;
             island.name = "Island";
             if (_islandSubFolder != null) {
@@ -178,6 +178,8 @@ namespace Simoncouche.Islands {
             */
 
             _island.Add(island.GetComponent<Island>());
+
+			return island.GetComponent<Island>();
         }
 
         /// <summary>
@@ -219,6 +221,11 @@ namespace Simoncouche.Islands {
         /// <param name="chunk">The chunk affected by this</param>
         /// <param name="damage">The number of chunk affected</param>
         public void TakeDamageHandler(IslandChunk chunk, int damage) {
+			//If no damage
+			if (damage < 1) {
+				return;
+			}
+
             //If the chunk has no connection
             if (chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
                 return;
@@ -230,14 +237,61 @@ namespace Simoncouche.Islands {
             if (islandLink.chunks.Count <= damage) {
                 damage = Mathf.CeilToInt(islandLink.chunks.Count / 2f);
             }
+
+			//Recursivly remove island
+			List<IslandChunk> islandRemoved = new List<IslandChunk>();
+			islandRemoved.Add(chunk);
+			if (damage > 1) {
+				islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
+			}
+
+			//Divide Island
+			if (islandRemoved.Count > 1)  { //Multiple Chunk
+				Island island = CreateIsland(islandRemoved[0], islandRemoved[1]);
+				if (islandRemoved.Count >= 3) {
+					for (int i = 2; i < islandRemoved.Count; i++) {
+						island.AddChunkToIsland(islandRemoved[i]);
+					}
+				}
+			}
+
+			//Remove connection (only need to remove the connection from one side, one chunk removes the connection from both)
+			foreach (IslandChunk c in islandLink.chunks) {
+				if (!islandRemoved.Contains(c)) {
+					c.RemoveConnectedChunk(islandRemoved);
+				}
+			}
+
         }
 
+		/// <summary>
+		/// The recursive helper to disconnected chunks
+		/// </summary>
+		/// <param name="current">the current island chunk to check</param>
+		/// <param name="islandRemoved">the list of chunk currently being removed</param>
+		/// <param name="damage">the number of chunk remaining to damage</param>
+		/// <returns></returns>
         private List<IslandChunk> DamageConnectedIsland(IslandChunk current, List<IslandChunk> islandRemoved, int damage) {
-            if (!islandRemoved.Contains(current)) {
-                
-            }
+			for (int i = current.connectedChunk.Count - 1; i >= 0; i++) { //Starts from end to get chunk recently removed
+				if (islandRemoved.Count == damage) {
+					return islandRemoved;
+				}
 
-            return null; //TODO
+				if (!islandRemoved.Contains(current.connectedChunk[i])) {
+					islandRemoved.Add(current.connectedChunk[i]);
+				}
+			}
+
+			//DamageConnected Island
+			for (int i = current.connectedChunk.Count - 1; i >= 0; i++) { //Starts from end to get chunk recently removed
+				if (islandRemoved.Count == damage) {
+					return islandRemoved;
+				}
+
+				islandRemoved = DamageConnectedIsland(current.connectedChunk[i], islandRemoved, damage);
+			}
+
+			return islandRemoved;
         }
 
         #endregion

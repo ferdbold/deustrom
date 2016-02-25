@@ -45,15 +45,11 @@ namespace Simoncouche.Islands {
 		/// Add a chunk to this Island, used when a chunk collides with a Island
 		/// </summary>
 		/// <param name="chunk">Reference to the collinding chunk</param>
-		/// <param name="pos">The position of the chunk</param>
-		/// <param name="rot">The rotation of the chunk</param>
-		public void AddChunkToIsland(IslandChunk chunk, Vector3 pos, Vector3 rot) {
+		public void AddChunkToIsland(IslandChunk chunk) {
 			if (!chunks.Contains(chunk)) {
                 chunk.parentIsland = this;
 				chunk.transform.SetParent(transform);
 				chunks.Add(chunk);
-				/*chunk.transform.localPosition = pos;
-				chunk.transform.localRotation = Quaternion.Euler(rot);*/
 				ChangeGravityBodyWhenMerging(chunk);
 			}
         }

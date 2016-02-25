@@ -77,12 +77,28 @@ namespace Simoncouche.Islands {
         }
 
         /// <summary>
-        /// Remove a target chunk from connected chunk
+		/// Remove a target chunks from connected chunk, also remove this chunk from target chunk connected chunk
         /// </summary>
-        /// <param name="other">chunk</param>
-        public void RemoveConnectedChunk(IslandChunk other) {
-            connectedChunk.Remove(other);
+        /// <param name="chunks">chunk</param>
+        public void RemoveConnectedChunk(List<IslandChunk> chunks) {
+			foreach (IslandChunk chunk in chunks) {
+				connectedChunk.Remove(chunk);
+				if (chunk.connectedChunk.Contains(this)) {
+					chunk.RemoveConnectedChunk(this);
+				}
+			}
         }
+
+		/// <summary>
+		/// Remove a target chunk from connected chunk, also remove this chunk from target chunk connected chunk
+		/// </summary>
+		/// <param name="chunk">chunk</param>
+		public void RemoveConnectedChunk(IslandChunk chunk) {
+			connectedChunk.Remove(chunk);
+			if (chunk.connectedChunk.Contains(this)) {
+				chunk.RemoveConnectedChunk(this);
+			}
+		}
 
 		/// <summary>
 		/// Start the connection between 2 chunk/island
