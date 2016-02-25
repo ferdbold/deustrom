@@ -4,11 +4,31 @@ using System.Collections;
 
 namespace Simoncouche.Controller {
 
+    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond};
+
     [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(PlayerController))]
     public class PlayerAudio : MonoBehaviour {
 
         #region PublicVariables
+        [Header("Sound List")]
+        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
+        private AudioClip FX_PlayerBump;
+
+        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
+        private AudioClip FX_PlayerPush;
+
+        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
+        private AudioClip FX_PlayerGrab;
+
+        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
+        private AudioClip FX_PlayerChain_ThrowFirst;
+
+        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
+        private AudioClip FX_PlayerChain_ThrowSecond;
+
+
+
         [Header("Swimming Sound Properties")]
         /// <summary>
         /// This is the maximum pitch of our sound when he goes fast
@@ -90,8 +110,28 @@ namespace Simoncouche.Controller {
 
         /// <summary> Plays a sound on the action audio source </summary>
         /// <param name="ac"> audioclip to play </param>
-        public void PlaySound(AudioClip ac) {
-            _actionAudioSource.PlayOneShot(ac);
+        public void PlaySound(PlayerSounds ac) {
+            switch(ac) {
+                case PlayerSounds.PlayerBump :
+                    _actionAudioSource.PlayOneShot(FX_PlayerBump);
+                    break;
+                case PlayerSounds.PlayerPush :
+                    _actionAudioSource.PlayOneShot(FX_PlayerPush);
+                    break;
+                case PlayerSounds.PlayerGrab :
+                    _actionAudioSource.PlayOneShot(FX_PlayerGrab);
+                    break;
+                case PlayerSounds.PlayerChainFirst:
+                    _actionAudioSource.PlayOneShot(FX_PlayerChain_ThrowFirst);
+                    break;
+                case PlayerSounds.PlayerChainSecond:
+                    _actionAudioSource.PlayOneShot(FX_PlayerChain_ThrowSecond);
+                    break;
+                default:
+                    Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");
+                    break;
+            }
+            
         }
 
         /// <summary>

@@ -24,6 +24,9 @@ namespace Simoncouche.Controller {
         /// <summary> Reference to the player controller </summary>
         private PlayerController _playerController;
 
+        /// <summary> Reference to the playerAudio of the player</summary>
+        private PlayerAudio _playerAudio;
+
         /// <summary> List of references to all playerGrabs. Used to avoid Searching the map everytime we grab.</summary>
         private static List<PlayerGrab> _allPlayerGrabs = new List<PlayerGrab>();
 
@@ -34,6 +37,7 @@ namespace Simoncouche.Controller {
         void Awake() {
             _aimController = GetComponent<AimController>();
             _playerController = GetComponent<PlayerController>();
+            _playerAudio = GetComponent<PlayerAudio>();
             grabbedBody = null;
 
             //Add to static playergrab list
@@ -44,6 +48,9 @@ namespace Simoncouche.Controller {
             }
             if(_playerController == null) {
                 Debug.LogError("Player/PlayerController cannot be found!");
+            }
+            if (_playerAudio == null) {
+                Debug.LogError("Player/PlayerAudio cannont be found!");
             }
         }
 
@@ -105,6 +112,8 @@ namespace Simoncouche.Controller {
 
                     //Animation
                     _playerController.HandleGrabStartAnimation();
+                    //Sounds
+                    _playerAudio.PlaySound(PlayerSounds.PlayerGrab);
 
                 }
                 
@@ -128,6 +137,8 @@ namespace Simoncouche.Controller {
 
                 //Animation
                 _playerController.HandlePushAnimation();
+                //Sounds
+                _playerAudio.PlaySound(PlayerSounds.PlayerPush);
 
             } else {
                 Debug.LogWarning("Attempted to throw when grabbedBody is null.");

@@ -38,11 +38,13 @@ namespace Simoncouche.Chain {
 		public HingeJoint2D joint { get; private set; }
 		public AimController aimController { get; private set; }
         public PlayerController playerController { get; private set; }
+        public PlayerAudio playerAudio { get; private set; }
 
         public void Awake() {
 			this.joint = GetComponent<HingeJoint2D>();
             this.aimController = GetComponent<AimController>();
             this.playerController = GetComponent<PlayerController>();
+            this.playerAudio = GetComponent<PlayerAudio>();
 		}
 
 		public void SetupInput(bool isPlayerOne) {
@@ -67,6 +69,9 @@ namespace Simoncouche.Chain {
 
 				// Animation handling
 				playerController.HandleFirstHookAnimation();
+                //Audio
+                playerAudio.PlaySound(PlayerSounds.PlayerChainFirst);
+
 				break;
 			
 			// If we press fire when we have 1 hook, 
@@ -79,6 +84,8 @@ namespace Simoncouche.Chain {
 
 				// Animation handling
 				playerController.HandleSecondHookAnimation();
+                //Audio
+                playerAudio.PlaySound(PlayerSounds.PlayerChainSecond);
 
 				break;
             }
