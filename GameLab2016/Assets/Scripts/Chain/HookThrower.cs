@@ -24,10 +24,13 @@ namespace Simoncouche.Chain {
 		private float _spawnChainDistanceThreshold = 4f;
         public float spawnChainDistanceThreshold { get { return _spawnChainDistanceThreshold; } }
 
-        /// The list of all the chains thrown by this thrower currently in play
+        /// <summary>The list of all the chains thrown by this thrower currently in play</summary>
         private List<Chain> _chains = new List<Chain>();
 
 		// COMPONENTS
+
+        /// <summary>The kinematic rigidbody to hook the visual chain to during OneHook state</summary>
+        public Rigidbody2D chainLinker { get; private set; }
             
 		public new Rigidbody2D rigidbody { get; private set; }
 		public AimController aimController { get; private set; }
@@ -39,6 +42,8 @@ namespace Simoncouche.Chain {
             this.aimController = GetComponent<AimController>();
             this.playerController = GetComponent<PlayerController>();
             this.playerAudio = GetComponent<PlayerAudio>();
+
+            this.chainLinker = transform.Find("ChainLinker").GetComponent<Rigidbody2D>();
 		}
 
 		public void SetupInput(bool isPlayerOne) {
@@ -48,7 +53,7 @@ namespace Simoncouche.Chain {
             );
 		}
 			
-		/// Handle user input to throw a new chain and hook
+        /// <summary>Handle user input to throw a new chain and hook</summary>
 		private void Fire() {
 			switch (_currentState) {
 

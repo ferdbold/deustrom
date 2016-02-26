@@ -105,7 +105,7 @@ namespace Simoncouche.Chain {
 			);
 
 			// Connect the new chain section to the player
-			chainSection.joint.connectedBody = this.chain.thrower.rigidbody;
+            chainSection.joint.connectedBody = this.chain.thrower.chainLinker;
 
 			// Attach the visual joint to this first chain section
 			this.visualChainJoint.enabled = true;
