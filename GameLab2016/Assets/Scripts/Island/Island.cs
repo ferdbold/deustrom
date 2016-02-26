@@ -69,6 +69,15 @@ namespace Simoncouche.Islands {
         /// <summary> Calls Center Island root function on a delay t in seconds </summary>
         private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland) { yield return new WaitForSeconds(t); targetIsland.CenterIslandRoot(); }
 
+		/// <summary>
+		/// Recreate island connection for every chunk in island
+		/// </summary>
+		public void RecreateIslandChunkConnection() {
+			foreach (IslandChunk chunk in chunks) {
+				chunk.CheckConnection();
+			}
+		}
+
         /// <summary>
         /// Remove a chunk of this island.
         /// </summary>
