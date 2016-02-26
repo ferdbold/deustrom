@@ -94,10 +94,8 @@ namespace Simoncouche.Chain {
 		/// <summary>Spawns the first chain section and attach to it</summary>
 		/// <returns>The chain section</returns>
 		public ChainSection SpawnChainSection() {
-			Vector3 chainSectionPosition = transform.position - transform.right * transform.localScale.x;
-
 			ChainSection chainSection = ChainSection.Create(
-				chainSectionPosition, 
+                transform.position, 
 				this.rigidbody.transform.rotation, 
 				this.chain, 
 				this.gameObject, 
