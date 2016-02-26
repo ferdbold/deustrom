@@ -55,10 +55,20 @@ namespace Simoncouche.Chain {
 				Quaternion.Euler(0, 0, chain.thrower.aimController.aimOrientation)
 			)).GetComponent<Hook>();
 
-			hook.transform.parent = chain.transform;
 			hook.name = (isBeginningHook) ? "BeginningHook" : "EndingHook";
-			hook.chainJoint.enabled = isBeginningHook;
+			hook.transform.parent = chain.transform;
 			hook.chain = chain;
+
+			hook.chainJoint.enabled = isBeginningHook;
+			hook.visualChainJoint.enabled = isBeginningHook;
+
+			if (isBeginningHook) {
+				// Hook the beginning hook's chain joint to the player to enable physics tension
+				hook.chainJoint.connectedBody = chain.thrower.rigidbody;
+
+				// Hook the beginning hook's visual joint to the player for the chain to initialize
+				hook.visualChainJoint.connectedBody = chain.thrower.rigidbody;
+			}
 
 			return hook;
 		}
@@ -86,12 +96,34 @@ namespace Simoncouche.Chain {
 		}
         // TODO: Destroy the chain when the distance is higher than a certain value
         void Update() {
-            if(Vector2.Distance(this.rigidbody.position, chain.thrower.transform.position) > this.chainJoint.distance) {
+            /*if(Vector2.Distance(this.rigidbody.position, chain.thrower.transform.position) > this.chainJoint.distance) {
                 this.rigidbody.velocity = Vector2.zero;
-            }
+            }*/
 				
             //if (_joint.connectedBody == null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
         }
+
+		/// <summary>Spawns the first chain section and attach to it</summary>
+		/// <returns>The chain section</returns>
+		public ChainSection SpawnChainSection() {
+			Vector3 chainSectionPosition = transform.position - transform.right * transform.localScale.x;
+
+			ChainSection chainSection = ChainSection.Create(
+				chainSectionPosition, 
+				this.rigidbody.transform.rotation, 
+				this.chain, 
+				this.gameObject, 
+				Quaternion.identity
+			);
+
+			// Connect the new chain section to the end of the chain
+			chainSection.joint.connectedBody = this.visualChainJoint.connectedBody;
+
+			// Attach the visual joint to this first chain section
+			this.visualChainJoint.connectedBody = chainSection.rigidbody;
+
+			return chainSection;
+		}
 
         /// <summary>Restrain the closest link of a chain with a maxDistance from the thrower's position</summary>
         /// <param name="throwerPosition"></param>
@@ -114,6 +146,15 @@ namespace Simoncouche.Chain {
 			this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
 			this.rigidbody.velocity = Vector2.zero;
 			this.rigidbody.mass = this.ATTACHED_MASS;
+		}
+
+		/// <summary>
+		/// Attach this section's joint to another rigidbody. 
+		/// This is useful for deleting sections of a chain
+		/// </summary>
+		/// <param name="rb">The new rigidbody to attach to</param>
+		public void AttachVisualJointTo(Rigidbody2D rb) {
+			this.visualChainJoint.connectedBody = rb;
 		}
 	}
 }

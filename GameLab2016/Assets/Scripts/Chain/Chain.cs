@@ -10,6 +10,10 @@ namespace Simoncouche.Chain {
         /// Self-reference to the chain prefab for factory purposes
         private static GameObject _chainPrefab;
 
+		[Tooltip("The length of a single chain section")]
+		[SerializeField]
+		private float _chainSectionLength = 1;
+
 		/// The first hook thrown by the player
         private Hook _beginningHook;
         
@@ -18,10 +22,6 @@ namespace Simoncouche.Chain {
 
 		/// The chain sections currently generated for visual effect
 		private List<ChainSection> _chainSections;
-
-        // [Tooltip("Maximum number of links per chain")]
-        // [SerializeField]
-        // private int _maximumLinksPerChain = 30;
 
         public HookThrower thrower { get; set; }
 		public float initialForce { get; set; }
@@ -46,28 +46,42 @@ namespace Simoncouche.Chain {
 			return chain;
 		}
 
+		public void Awake() {
+			this._chainSections = new List<ChainSection>();
+		}
+
 		public void Start() {
 			CreateBeginningHook();
 		}
 
         public void Update() {
-            /*if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold) {
-                if (_beginningHookLinkCount < _maximumLinksPerChain) {
-                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
-                    _beginningLink = thrower.joint.connectedBody.GetComponent<ChainSection>();
-                    _beginningHookLinkCount++;
-                }
-                //ClampDistanceWithPlayerPos(thrower.transform, _maximumDistanceBetweenPlayer, _endingLinkBeginningHook); //We clamp the distance of the closet link to the player to a maximum distance from the player
-            }
-
-            if (Vector3.Distance(transform.position, thrower.joint.connectedBody.position) > thrower.spawnChainDistanceThreshold) {
-                if (_endingHookLinkCount < _maximumLinksPerChain) {
-                    thrower.joint.connectedBody.GetComponent<ChainSection>().SpawnNewSection();
-                    _endingLink = thrower.joint.connectedBody.GetComponent<ChainSection>();
-                    _endingHookLinkCount++;
-                }
-            }*/
+			RecalculateChainSections();
         }
+			
+		/// Sync the number of chain sections with the current distance between the two edges of the chain
+		private void RecalculateChainSections() {
+			Vector3 chainBeginning = _beginningHook.transform.position;
+			Vector3 chainEnding = (_endingHook != null)
+				? _endingHook.transform.position
+				: this.thrower.transform.position;
+
+			int neededSections = (int)(Vector3.Distance(chainBeginning, chainEnding) / _chainSectionLength);
+
+			// Too few sections : Create more sections until we achieve the right number
+			while (_chainSections.Count < neededSections) {
+				if (_chainSections.Count == 0) {
+					_chainSections.Add(_beginningHook.SpawnChainSection());
+				} else {
+					_chainSections.Add(_chainSections[_chainSections.Count - 1].SpawnNewSection());
+				}
+			}
+
+			// Too many sections : Destroy the links until we achieve the right number
+			while (_chainSections.Count > neededSections) {
+				_chainSections[_chainSections.Count - 1].Remove();
+				_chainSections.RemoveAt(_chainSections.Count - 1);
+			}
+		}
 
         /// <summary>Restrain the closest link of a chain with a maxDistance from the thrower's position</summary>
         /// <param name="throwerPosition"></param>
@@ -82,15 +96,23 @@ namespace Simoncouche.Chain {
                 chainSection.GetComponent<Rigidbody2D>().position +=  vect;
             }
         }
-
+			
+		/// Create and configure the beginning hook
 		public void CreateBeginningHook() {
 			_beginningHook = Hook.Create(this, true);
-			_beginningHook.chainJoint.connectedBody = this.thrower.rigidbody;
+
+			Debug.Log(_beginningHook.visualChainJoint.connectedBody);
 		}
 
-        public void CreateSecondHook() {
+		/// Create and configure the ending hook
+        public void CreateEndingHook() {
             _endingHook = Hook.Create(this, false);
+
+			// Reroute the beginning hook from the player to the ending hook
 			_beginningHook.chainJoint.connectedBody = _endingHook.rigidbody;
+
+			// Reroute the visual chain from the player to the ending hook
+			_chainSections[_chainSections.Count - 1].joint.connectedBody = _endingHook.rigidbody;
         }
     }
 }

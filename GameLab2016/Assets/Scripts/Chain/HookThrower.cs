@@ -5,7 +5,7 @@ using Simoncouche.Controller;
 namespace Simoncouche.Chain {
 
     /// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
-    [RequireComponent(typeof(HingeJoint2D))]
+	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
@@ -27,16 +27,14 @@ namespace Simoncouche.Chain {
         /// The list of all the chains thrown by this thrower currently in play
         private List<Chain> _chains = new List<Chain>();
 
-		// COMPONENTS   
+		// COMPONENTS
             
-		public HingeJoint2D joint { get; private set; }
 		public new Rigidbody2D rigidbody { get; private set; }
 		public AimController aimController { get; private set; }
         public PlayerController playerController { get; private set; }
         public PlayerAudio playerAudio { get; private set; }
 
         public void Awake() {
-			this.joint = GetComponent<HingeJoint2D>();
 			this.rigidbody = GetComponent<Rigidbody2D>();
             this.aimController = GetComponent<AimController>();
             this.playerController = GetComponent<PlayerController>();
@@ -64,12 +62,12 @@ namespace Simoncouche.Chain {
 			// we create a hook and switch the currentState to OneHook
 			case State.NoHook:
 				_chains.Add(Chain.Create(this, _initialForceAmount));
-				//joint.enabled = true;
 				_currentState = State.OneHook;
 
 				// Animation handling
 				playerController.HandleFirstHookAnimation();
-                //Audio
+
+                // Audio
                 playerAudio.PlaySound(PlayerSounds.PlayerChainFirst);
 
 				break;
@@ -78,13 +76,13 @@ namespace Simoncouche.Chain {
 			// we create a hook and switch the currentState to NoHook
 			// TODO: MODIFIER POUR LIER LES 2 CHAINES
 			case State.OneHook: 
-				_chains[_chains.Count - 1].CreateSecondHook();
-				joint.enabled = false;
+				_chains[_chains.Count - 1].CreateEndingHook();
 				_currentState = State.NoHook;
 
 				// Animation handling
 				playerController.HandleSecondHookAnimation();
-                //Audio
+
+                // Audio
                 playerAudio.PlaySound(PlayerSounds.PlayerChainSecond);
 
 				break;
