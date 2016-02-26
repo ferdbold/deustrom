@@ -3,29 +3,21 @@ using System.Collections;
 
 namespace Simoncouche.Chain {
 
-	/// <summary>
 	/// A ChainSection is an element of a chain that links to another section or a Hook and is also linked by another section.
-	/// </summary>
 	[RequireComponent(typeof(HingeJoint2D))]
 	public class ChainSection : MonoBehaviour {
 
+		/// Self-reference to the chain section prefab for factory purposes
 		private static GameObject _chainSectionPrefab;
 
-		/// <summary>
 		/// The ChainSection that is linked to this section
-		/// </summary>
 		private ChainSection _nextChainSection;
 
-		/// <summary>
 		/// The chain this ChainSection is part of
-		/// </summary>
-		public Chain _chain;
-		
-		/// <summary>
+		public Chain chain { get; private set; }
+
 		/// The angle difference from the last link in the chain
-		/// </summary>
-		[Tooltip("The angle difference from the last link in the chain")]
-		private static float chainAngleDiff = 90f;
+		private const float CHAIN_ANGLE_DIFF = 90f;
 
 		// COMPONENTS
 
@@ -35,9 +27,7 @@ namespace Simoncouche.Chain {
 		public Transform pivot { get; private set; }
 		public Transform mesh { get; private set; }
 
-        /// <summary>
-        /// Spawn a new ChainSection inside a chain
-        /// </summary>
+        /// <summary>Spawn a new ChainSection inside a chain</summary>
         /// <param name="position">The world position for this new section</param>
         /// <param name="chain">The parent chain</param>
         /// <param name="previousRigidbody">The previous link in the chain</param>
@@ -55,8 +45,8 @@ namespace Simoncouche.Chain {
 				
 			chainSection.transform.parent = chain.transform;
 			chainSection.joint.connectedBody = previousRigidbody;
-			chainSection.SetChain(chain);
-			chainSection.mesh.localRotation = previousLinkRotation * Quaternion.Euler(0, chainAngleDiff, 0);
+			chainSection.chain = chain;
+			chainSection.mesh.localRotation = previousLinkRotation * Quaternion.Euler(0, CHAIN_ANGLE_DIFF, 0);
 			chain.thrower.joint.connectedBody = chainSection.rigidbody;
 
 			return chainSection;
@@ -74,17 +64,11 @@ namespace Simoncouche.Chain {
 			this.pivot.LookAt(this.joint.connectedBody.transform.position);
 			this.pivot.Rotate(-90, 0, 0);
 		}
-
-		/// <summary>
+			
 		/// Generate a new ChainSection and link it to this section
-		/// </summary>
 		public void SpawnNewSection() {
             Vector3 nextChainSectionPosition = transform.position - transform.right * transform.localScale.x;
-			_nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, this.rigidbody, this.mesh.localRotation);
+			_nextChainSection = ChainSection.Create(nextChainSectionPosition, this.chain, this.rigidbody, this.mesh.localRotation);
         }
-
-		private void SetChain(Chain value) {
-			_chain = value;
-		}
 	}
 }

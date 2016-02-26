@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using Simoncouche.Controller;
 
 namespace Simoncouche.Chain {
-    /// <summary>
+
     /// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
-    /// </summary>
     [RequireComponent(typeof(HingeJoint2D))]
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
@@ -21,16 +20,11 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private float _initialForceAmount = 10f;
 
-		/// <summary>
 		/// The minimum distance needed between the thrower and a chain's last ChainSection to spawn a new ChainSection
-		/// </summary>
 		private float _spawnChainDistanceThreshold = 4f;
+        public float spawnChainDistanceThreshold { get { return _spawnChainDistanceThreshold; } }
 
-        public float spawnChainDistanceThreshold { get { return _spawnChainDistanceThreshold; }}
-
-        /// <summary>
         /// The list of all the chains thrown by this thrower currently in play
-        /// </summary>
         private List<Chain> _chains = new List<Chain>();
 
 		// COMPONENTS   
@@ -61,10 +55,8 @@ namespace Simoncouche.Chain {
                 this.Fire
             );
 		}
-
-		/// <summary>
+			
 		/// Handle user input to throw a new chain and hook
-		/// </summary>
 		private void Fire() {
 			switch (_currentState) {
 

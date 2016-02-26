@@ -1,55 +1,32 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Simoncouche.Chain {
 
-    /// <summary>
     /// A Chain is a group of ChainSection game objects linked together, with one Hook object at either end.
-    /// </summary>
     public class Chain : MonoBehaviour {
 
-        /// <summary>
         /// Self-reference to the chain prefab for factory purposes
-        /// </summary>
         private static GameObject _chainPrefab;
 
+		/// The first hook thrown by the player
         private Hook _beginningHook;
         
-		/// <summary>
-        /// The section directly linked to the beginning hook
-        /// </summary>
-		private ChainSection _beginningLink = null;
-
+		/// The second hook thrown by the player
 		private Hook _endingHook;
 
-		/// <summary>
-		/// The section directly linked to the ending hook
-		/// </summary>
-        private ChainSection _endingLink = null;
+		/// The chain sections currently generated for visual effect
+		private List<ChainSection> _chainSections;
 
-        /// <summary>
-        /// The current number of links in the beginning hook
-        /// </summary>
-        private int _beginningHookLinkCount;
-
-        /// <summary>
-        /// The current number of links in the ending hook
-        /// </summary>
-        private int _endingHookLinkCount;
-
-        /// <summary>
-        /// The current aim orientation as set by the right analog input
-        /// </summary>
-        [Tooltip("Maximum number of links per chain")]
-        [SerializeField]
-        private int _maximumLinksPerChain = 30;
+        // [Tooltip("Maximum number of links per chain")]
+        // [SerializeField]
+        // private int _maximumLinksPerChain = 30;
 
         public HookThrower thrower { get; set; }
 		public float initialForce { get; set; }
 
-		/// <summary>
-		/// Spawn a new chain in the scene
-		/// </summary>
+		/// <summary>Spawn a new chain in the scene</summary>
 		/// <param name="thrower">The game object that threw this chain</param>
 		/// <param name="initialForce">The initial force to give to the first hook</param>
 		public static Chain Create(HookThrower thrower, float initialForce) {
@@ -92,9 +69,7 @@ namespace Simoncouche.Chain {
             }*/
         }
 
-        /// <summary>
-        /// Restrain the closest link of a chain with a maxDistance from the thrower's position
-        /// </summary>
+        /// <summary>Restrain the closest link of a chain with a maxDistance from the thrower's position</summary>
         /// <param name="throwerPosition"></param>
         /// <param name="maxDistance"></param>
         /// <param name="chainSection"></param>
