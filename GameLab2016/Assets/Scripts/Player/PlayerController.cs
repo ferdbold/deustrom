@@ -81,9 +81,7 @@ namespace Simoncouche.Controller {
 
         #endregion
 
-        /// <summary>
-        /// Getting multiple needed components (Rigidbody, ...)
-        /// </summary>
+        /// <summary> Getting multiple needed components (Rigidbody, ...)  </summary>
         void Awake() {
             _playerRigidBody = GetComponent<Rigidbody2D>();
             _aimController = GetComponent<AimController>();
@@ -106,9 +104,7 @@ namespace Simoncouche.Controller {
 
         }
 
-        /// <summary>
-        /// Initialization of variables
-        /// </summary>
+        /// <summary>  Initialization of variables </summary>
         void Start() {
             _playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
 
@@ -133,17 +129,13 @@ namespace Simoncouche.Controller {
             }
 	    }
 
-        /// <summary>
-        /// FixedUpdate pour le character avec rigidbody (sujet à changements)
-        /// </summary>
+        /// <summary> FixedUpdate pour le character avec rigidbody (sujet à changements)  </summary>
         void FixedUpdate() {
             CharacterMovement();
             UpdateGrabDrag();
         }
 
-        /// <summary>
-        /// modifies the player's drag based on the grabbed object
-        /// </summary>
+        /// <summary> modifies the player's drag based on the grabbed object </summary>
         private void UpdateGrabDrag() {
             _playerRigidBody.drag = _playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag;
 
@@ -238,10 +230,12 @@ namespace Simoncouche.Controller {
         /// <summary>
         /// Set the turn anim of the animator.
         /// if 0 : Swim
-        /// if 1 : TurnLeft90
-        /// if 2 : TurnLeft180
-        /// if 3 : TurnRight90
-        /// if 4 : TurnRight180
+        /// if 1 : TurnLeftSmooth
+        /// if 2 : TurnLeft90
+        /// if 3 : TurnLeft180
+        /// if 4 : TurnRightSmooth
+        /// if 5 : TurnRight90
+        /// if 6 : TurnRight180
         /// </summary>
         /// <param name="rotateRate">Difference between current angle and target angle</param>
         /// <param name="right">Are we turning right</param>
@@ -249,11 +243,13 @@ namespace Simoncouche.Controller {
             if (_animator == null) return;
             int animState = 0;
             if (right) {
-                if (rotateRate > 90) animState = 4;
-                else if (rotateRate > 45) animState = 3;
+                if (rotateRate > 120) animState = 6;
+                else if (rotateRate > 60) animState = 5;
+                else if (rotateRate > 15) animState = 4;
             } else {
-                if (rotateRate > 90) animState = 2;
-                else if (rotateRate > 45) animState = 1;
+                if (rotateRate > 120) animState = 3;
+                else if (rotateRate > 60) animState = 2;
+                else if (rotateRate > 15) animState = 1;
             }
 
             _animator.SetInteger("TurnAnim", animState);
@@ -287,6 +283,11 @@ namespace Simoncouche.Controller {
             _animator.SetBool("State_IslandGrab", false);
         }
 
+        /// <summary> Handles the animation when player gets hit (bumped) by other player </summary>
+        public void HandleHitAnimation() {
+            _animator.SetTrigger("GotBumped");
+        }
+
         #endregion
 
         #region Collision
@@ -301,15 +302,17 @@ namespace Simoncouche.Controller {
                 if(otherPlayer != null) {
                     //If this is the player with the highest velocity, bump other
                     if (_canPlayerBump && _playerRigidBody.velocity.magnitude > otherGB.Velocity.magnitude) { 
-                        //Bump other player and start other Bump cooldown
+                        //Bump other player, start other Bump cooldown and start Bump animation
                         otherGB.Velocity = otherGB.Velocity + col.relativeVelocity * BUMP_FORCE;
                         otherPlayer.StartPlayerBumpCooldown();
+                        otherPlayer.HandleHitAnimation();
                         //Decrease speed and start Bump cooldown
                         _playerRigidBody.velocity = _playerRigidBody.velocity - col.relativeVelocity;
                         StartPlayerBumpCooldown();
 
                         //Play Audio
                         _playerAudio.PlaySound(PlayerSounds.PlayerBump);
+                        
                     }
                 }
             }
@@ -331,9 +334,7 @@ namespace Simoncouche.Controller {
 
         #region PlayerInputs
 
-        /// <summary>
-        /// Function called in Update to register player inputs
-        /// </summary>
+        /// <summary> Function called in Update to register player inputs </summary>
         private void PlayerInputs(params float[] input) {
             _leftAnalogHorizontal = input[0];
             _leftAnalogVertical = input[1];
@@ -354,18 +355,12 @@ namespace Simoncouche.Controller {
             return _currentPlayerMovementInputs;
         }
 
-        /// <summary>
-        /// Fonction which returns the right analog horizontal input
-        /// </summary>
-        /// <returns></returns>
+        /// <summary>  Fonction which returns the right analog horizontal input </summary>
         public float GetLeftAnalogHorizontal() {
             return _leftAnalogHorizontal;
         }
 
-        /// <summary>
-        /// Fonction which returns the left analog vertical input
-        /// </summary>
-        /// <returns></returns>
+        /// <summary> Fonction which returns the left analog vertical input </summary>
         public float GetLeftAnalogVertical() {
             return _leftAnalogVertical;
         }
