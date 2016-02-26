@@ -128,9 +128,16 @@ namespace Simoncouche.Islands {
             }
         }
 
+        /// <summary>
+        /// Adds a chunk to an island
+        /// </summary>
+        /// <param name="islandLink">Island to add chunk to</param>
+        /// <param name="chunk">Chunk to add to island</param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
         private void AddChunkToExistingIsland(Island islandLink, IslandChunk chunk, IslandChunk a, IslandChunk b) {
             islandLink.AddChunkToIsland(chunk);
-            PlayerGrab.UngrabBody(a.gravityBody);
+            PlayerGrab.UngrabBody(chunk.gravityBody);
             PlayerGrab.RemoveCollisionIfGrabbed(islandLink, chunk);
         }
 

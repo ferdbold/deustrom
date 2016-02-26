@@ -297,6 +297,7 @@ namespace Simoncouche.Controller {
             if(otherGB != null) {
                 //Check for grab
                 if (_playerGrab.gameObject.activeInHierarchy) _playerGrab.AttemptGrab(otherGB);
+                
                 //Check for player bump
                 PlayerController otherPlayer = otherGB.GetComponent<PlayerController>();
                 if(otherPlayer != null) {
@@ -315,6 +316,7 @@ namespace Simoncouche.Controller {
                         
                     }
                 }
+                
             }
         }
 

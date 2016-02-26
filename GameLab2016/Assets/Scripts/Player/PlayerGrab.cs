@@ -247,7 +247,7 @@ namespace Simoncouche.Controller {
         /// <param name="bodyToMerge">Gravity body of the body to merge</param>
         public static void UngrabBody(GravityBody bodyToMerge) {
             foreach (PlayerGrab pg in _allPlayerGrabs) {
-                //Debug.Log(pg.grabbedBody);
+                //Debug.Log("checking if " + pg.name + " is grabbing " + bodyToMerge + "      he's grabbing " + pg.grabbedBody);
                 if (pg.grabbedBody == bodyToMerge ) {
                     //Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " because it was merged.");
                     pg.Release();
