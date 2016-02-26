@@ -41,12 +41,6 @@ namespace Simoncouche.Chain {
             this.playerAudio = GetComponent<PlayerAudio>();
 		}
 
-		public void Update() {
-			foreach (Chain chain in _chains) {
-				chain.Update();
-			}
-		}
-
 		public void SetupInput(bool isPlayerOne) {
 			GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Button.p1_fireHook : InputManager.Button.p2_fireHook, 

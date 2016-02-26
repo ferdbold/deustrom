@@ -100,8 +100,6 @@ namespace Simoncouche.Chain {
 		/// Create and configure the beginning hook
 		public void CreateBeginningHook() {
 			_beginningHook = Hook.Create(this, true);
-
-			Debug.Log(_beginningHook.visualChainJoint.connectedBody);
 		}
 
 		/// Create and configure the ending hook
