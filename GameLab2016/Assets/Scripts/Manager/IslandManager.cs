@@ -95,20 +95,18 @@ namespace Simoncouche.Islands {
 
                 OnJoinChunk(b_anchor, b.color);
                 StartCoroutine(TimerIslandRemove(_chunkMergeTime, isA ? b_IslandLink : a_IslandLink));
-
-                //Create a link between two chunk
-                a.AddConnectedChunk(b);
-                b.AddConnectedChunk(a);
+				(isA ? b_IslandLink : a_IslandLink).RecreateIslandChunkConnection();
 			} 
 
 			//If only a is contained in a Island
 			else if (a_IslandLink != null) {
-               AddChunkToExistingIsland(a_IslandLink,b, b, a);
+				AddChunkToExistingIsland(a_IslandLink,b, b, a);
                
-               //a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-               //PlayerGrab.UngrabBody(b.gravityBody);
+				//a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
+				//PlayerGrab.UngrabBody(b.gravityBody);
                
-               JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
+				JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
+				a_IslandLink.RecreateIslandChunkConnection();
            } 
 
            //If only b is contained in a Island
@@ -119,12 +117,14 @@ namespace Simoncouche.Islands {
                 //PlayerGrab.UngrabBody(a.gravityBody);
                 
                 JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
+				b_IslandLink.RecreateIslandChunkConnection();
             } 
 
             //If a & b are not contained in a Island
             else {
-                CreateIsland(a, b);
-                JoinTwoChunk(b, b_anchor, a, a_anchor, ChunkContainedInIsland(a));
+                Island createdIsland = CreateIsland(a, b);
+                JoinTwoChunk(b, b_anchor, a, a_anchor, createdIsland);
+				createdIsland.RecreateIslandChunkConnection();
             }
         }
 
@@ -259,6 +259,8 @@ namespace Simoncouche.Islands {
 			foreach (IslandChunk c in islandLink.chunks) {
 				if (!islandRemoved.Contains(c)) {
 					c.RemoveConnectedChunk(islandRemoved);
+				} else {
+					Debug.Log(islandRemoved);
 				}
 			}
 

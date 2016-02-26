@@ -142,6 +142,20 @@ namespace Simoncouche.Islands {
 
 		#region Anchor Points Handling
 
+		/// <summary>
+		/// Check every anchor point to create the 
+		/// </summary>
+		public void CheckConnection() {
+			List<IslandChunk> connected = new List<IslandChunk>();
+			foreach (IslandAnchorPoints anchor in anchors) {
+				IslandChunk chunk = anchor.GetConnectedIsland();
+				if (chunk != null && chunk != this) {
+					connected.Add(chunk);
+				}
+			}
+			connectedChunk = connected;
+		}
+
 		/// <summary> Spawn Every Anchor points around the island </summary>
 		void SpawnAnchorPoints () {
 			anchors = new List<IslandAnchorPoints>();
