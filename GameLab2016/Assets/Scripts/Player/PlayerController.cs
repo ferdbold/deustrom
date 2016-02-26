@@ -35,9 +35,6 @@ namespace Simoncouche.Controller {
         [SerializeField] [Tooltip("Force to apply when bumping another player")]
         private float BUMP_FORCE = 1.5f;
 
-        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
-        private AudioClip FX_PlayerBumpGrunt;
-
         #endregion
 
         #region PrivateVariables
@@ -312,7 +309,7 @@ namespace Simoncouche.Controller {
                         StartPlayerBumpCooldown();
 
                         //Play Audio
-                        _playerAudio.PlaySound(FX_PlayerBumpGrunt);
+                        _playerAudio.PlaySound(PlayerSounds.PlayerBump);
                     }
                 }
             }
