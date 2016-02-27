@@ -58,11 +58,11 @@ namespace Simoncouche.Controller {
             //Create and setup second audiosource exactly like swimming audio source
             _actionAudioSource = gameObject.AddComponent<AudioSource>();
             _actionAudioSource.outputAudioMixerGroup = _swimmingAudioSource.outputAudioMixerGroup;
-			_actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.swimSound;
           
         }
 
         void Start() {
+			_actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.swimSound;
             _volumeSwimming = _swimmingAudioSource.volume;
         }
 
