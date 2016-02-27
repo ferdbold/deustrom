@@ -11,7 +11,9 @@ namespace Simoncouche.Islands {
 	[RequireComponent(typeof(GravityBody))]
 	public class IslandChunk : MonoBehaviour {
 
-        [Header("Island Property")]
+		//VARIABLES
+		#region Inspector Variables
+		[Header("Island Property")]
 
         [SerializeField][Tooltip("Current Island this islandChunk is attached to. Only modify this to create group of island chunks before in the editor.")]
         public Island parentIsland = null;
@@ -35,15 +37,9 @@ namespace Simoncouche.Islands {
 
 		[SerializeField] [Tooltip("The radius of the anchor trigger zone")]
 		private float _anchorPointRadius = 0.2f;
-
-        [Header("Audio Clip (temporary until audio manager)")]
-        [SerializeField] [Tooltip("Collision Sound Clip")]
-        private AudioClip _collisionSound;
-
-        [SerializeField] [Tooltip("Merge Sound Clip")]
-        private AudioClip _mergeSound;
-
-        public List<IslandAnchorPoints> anchors { get; private set; }
+		#endregion
+		#region Component Ref
+		public List<IslandAnchorPoints> anchors { get; private set; }
 
         public List<IslandChunk> connectedChunk { get; private set; }
 
@@ -55,8 +51,9 @@ namespace Simoncouche.Islands {
 
         /// <summary> audio source of the chunk </summary>
         private AudioSource _audioSource;
-
-        void Awake() {
+		#endregion
+		
+		void Awake() {
             gravityBody = GetComponent<GravityBody>();
 			if (_anchorPointObject == null) {
 				_anchorPointObject = Resources.Load("Island/AnchorPoints") as GameObject;
@@ -196,7 +193,7 @@ namespace Simoncouche.Islands {
                 
 				//Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
 				GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
-                _audioSource.PlayOneShot(_mergeSound);
+                _audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.mergeSound);
 			}
 		}
 
@@ -210,7 +207,7 @@ namespace Simoncouche.Islands {
 			if (chunk != null && chunk.color != _color) {
 
                 //Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
-                _audioSource.PlayOneShot(_collisionSound);
+				_audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.collisionSound);
             }
 		}
 

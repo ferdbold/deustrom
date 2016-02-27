@@ -11,21 +11,6 @@ namespace Simoncouche.Controller {
     public class PlayerAudio : MonoBehaviour {
 
         #region PublicVariables
-        [Header("Sound List")]
-        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
-        private AudioClip FX_PlayerBump;
-
-        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
-        private AudioClip FX_PlayerPush;
-
-        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
-        private AudioClip FX_PlayerGrab;
-
-        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
-        private AudioClip FX_PlayerChain_ThrowFirst;
-
-        [SerializeField] [Tooltip("Audioclip played when two players Bump")]
-        private AudioClip FX_PlayerChain_ThrowSecond;
 
 
 
@@ -73,6 +58,7 @@ namespace Simoncouche.Controller {
             //Create and setup second audiosource exactly like swimming audio source
             _actionAudioSource = gameObject.AddComponent<AudioSource>();
             _actionAudioSource.outputAudioMixerGroup = _swimmingAudioSource.outputAudioMixerGroup;
+			_actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.swimSound;
           
         }
 
@@ -113,19 +99,19 @@ namespace Simoncouche.Controller {
         public void PlaySound(PlayerSounds ac) {
             switch(ac) {
                 case PlayerSounds.PlayerBump :
-                    _actionAudioSource.PlayOneShot(FX_PlayerBump);
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.bumpSound);
                     break;
                 case PlayerSounds.PlayerPush :
-                    _actionAudioSource.PlayOneShot(FX_PlayerPush);
+					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.pushSound);
                     break;
                 case PlayerSounds.PlayerGrab :
-                    _actionAudioSource.PlayOneShot(FX_PlayerGrab);
+					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.grabSound);
                     break;
                 case PlayerSounds.PlayerChainFirst:
-                    _actionAudioSource.PlayOneShot(FX_PlayerChain_ThrowFirst);
+					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowFirstSound);
                     break;
                 case PlayerSounds.PlayerChainSecond:
-                    _actionAudioSource.PlayOneShot(FX_PlayerChain_ThrowSecond);
+					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowSecondSound);
                     break;
                 default:
                     Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");

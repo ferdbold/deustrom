@@ -8,8 +8,6 @@ public class DestroyGravityBodyOnImpact : MonoBehaviour {
     
     [Tooltip("NOT FOR EDIT. Layers of objects to teleport into wormhole")] [SerializeField] private LayerMask GravityLayerMask;
 
-    [Header("SOUND FX")]
-    [Tooltip("Sound to play when an object get destroyed by maelstrom")] [SerializeField] public AudioClip DestroySound;
     private AudioSource audioSource;
 
 
@@ -28,13 +26,13 @@ public class DestroyGravityBodyOnImpact : MonoBehaviour {
             //Check if islandChunk exist. If so, call Maelstrom Collision Method
             if(islandChunk != null) {
                 islandChunk.OnMaelstromEnter();
-                audioSource.PlayOneShot(DestroySound);
+				audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
             }
             //Else if gravity body exists, call destroy method
             else if (gravityBodyScript != null) {
                 if (gravityBodyScript.collisionEnabled == true) {
                     gravityBodyScript.DestroyGravityBody();
-                    audioSource.PlayOneShot(DestroySound);
+					audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
                 }
             }
         }

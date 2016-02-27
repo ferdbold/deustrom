@@ -9,12 +9,14 @@ public class GameManager : MonoBehaviour {
 	// Link to every managers
 	public static InputManager inputManager { get; private set; }
 	public static IslandManager islandManager { get; private set; }
+	public static AudioManager audioManager { get; private set; }
 
 	void Awake() {
 		if (Instance == null) {
 			Instance = this;
 			inputManager = GetComponent<InputManager>();
 			islandManager = GetComponent<IslandManager>();
+			audioManager = GetComponent<AudioManager>();
 			DontDestroyOnLoad(gameObject);
 		}
 		else {
