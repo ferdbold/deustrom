@@ -9,8 +9,8 @@ namespace Simoncouche.Controller {
     public class PlayerController : MonoBehaviour {
 
 	    #region InspectorVariables
-        [Header("Player Speed Properties :")]
 
+        [Header("Player Speed Properties :")]
         [SerializeField] [Tooltip("Acceleration of the player in unit per second")]
 	    private float playerAcceleration;
 
@@ -24,15 +24,25 @@ namespace Simoncouche.Controller {
         private float ROTATION_SPEED = 720f;
 
         [Header("Grab Related Properties :")]
-
         [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player rotation when grabbing an object.")]
         private float GRAB_RATIO_ROTATION = 1f;
 
         [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player movement speed when grabbing an object.")]
         private float GRAB_RATIO_MOVEMENT = 0.75f;
 
-        [Header("Other :")]
+        [Header("Death : ")]
+        [SerializeField] [Tooltip("Time in the spinning animation of respawn. Total death time is a combination of RESPAWN_SPIN_TIME and RESPAWN_UNDERWATER_TIME")]
+        private float RESPAWN_SPIN_TIME = 2f;
+        [SerializeField] [Tooltip("Speed at which the player spins when in respawn")]
+        private float RESPAWN_SPIN_RATE = 270f;
+        [SerializeField] [Tooltip("Time in the underwater animation of respawn. Total death time is a combination of RESPAWN_SPIN_TIME and RESPAWN_UNDERWATER_TIME")]
+        private float RESPAWN_UNDERWATER_TIME = 3f;
+        [SerializeField] [Tooltip("Z position under water when respawning. Can be changed independently for each character depending on their height.")]
+        private float Z_UNDER_WATER = 1.25f;
 
+
+
+        [Header("Other :")]
         [SerializeField] [Tooltip("Force to apply when bumping another player")]
         private float BUMP_FORCE = 1.5f;
 
@@ -54,35 +64,41 @@ namespace Simoncouche.Controller {
         private Animator _animator;
         /// <summary> Reference to the playerAudio of the player</summary>
         private PlayerAudio _playerAudio;
+        /// <summary> Reference to the hook thrower attached to this object </summary>
+        private HookThrower _hookThrower;
+        /// <summary> Reference to the script that position the player on Z background </summary>
+        private PositionZOnBackground _positionZOnBackground;
 
         //Inputs
         /// <summary>  Is the player moving horizontally? </summary>
         private bool _isMovingHorizontal;
         /// <summary>  Is the player moving vertical? </summary>
         private bool _isMovingVertical;
-        /// <summary> Start drag of the player's rigid body</summary>
-        private float _startDrag;
- 
+        /// <summary> Vector of player inputs </summary>
+        private Vector2 _currentPlayerMovementInputs = Vector2.zero;
+        /// <summary> Input of left analog at the horizontal  </summary>
+        private float _leftAnalogHorizontal;
+        /// <summary> Input of left analog at the vertical </summary>
+        private float _leftAnalogVertical;
+
+        //States 
         /// <summary> can the player bump right now </summary>
         private bool _canPlayerBump = true;
+        /// <summary> is the player in respawn state </summary>
+        private bool _inRespawnState = false;
+
+        //Private attibutes
+        /// <summary> Start drag of the player's rigid body</summary>
+        private float _startDrag;
+        /// <summary> Start zDepth of PositionZOnBackground script</summary>
+        private float _startZOffset;
         /// <summary> Cooldown for a player bump</summary>
         private float _playerBumpCooldown = 0.5f;
 
+        
 
 
-        /// <summary>
-        /// Vector of player inputs
-        /// </summary>
-        private Vector2 _currentPlayerMovementInputs=Vector2.zero;
 
-        /// <summary> Reference to the hook thrower attached to this object </summary>
-        private HookThrower _hookThrower;
-
-        /// <summary> Input of left analog at the horizontal  </summary>
-        private float _leftAnalogHorizontal;
-
-        /// <summary> Input of left analog at the vertical </summary>
-        private float _leftAnalogVertical;
 
         #endregion
 
@@ -94,8 +110,10 @@ namespace Simoncouche.Controller {
             _animator = GetComponentInChildren<Animator>();
             _playerGrab = GetComponent<PlayerGrab>();
             _playerAudio = GetComponent<PlayerAudio>();
-            _startDrag = _playerRigidBody.drag;
+            _positionZOnBackground = GetComponent<PositionZOnBackground>();
 
+            _startDrag = _playerRigidBody.drag;
+            _startZOffset = _positionZOnBackground._zOffset;
 
             if (_playerGrab == null) {
                 Debug.LogError("Player/PlayerGrab cannot be found!");
@@ -105,6 +123,15 @@ namespace Simoncouche.Controller {
             }
             if(_playerAudio == null) {
                 Debug.LogError("Player/PlayerAudio cannont be found!");
+            }
+            if(_hookThrower == null) {
+                Debug.LogError("Player/HookThrower cannont be found!");
+            }
+            if(_aimController == null) {
+                Debug.LogError("Player/AimController cannont be found!");
+            }
+            if(_positionZOnBackground == null) {
+                Debug.LogError("Player/PositionOnZBackground cannont be found!");
             }
 
         }
@@ -118,24 +145,14 @@ namespace Simoncouche.Controller {
                 isPlayerOne ? InputManager.Axis.p1_leftAnalog : InputManager.Axis.p2_leftAnalog,
                 this.PlayerInputs
             );
-
-            if (_hookThrower != null) {
-                _hookThrower.SetupInput(isPlayerOne);
-            } else {
-                Debug.LogError("Their is no hook thrower attached or child of this object");
-            }
-
-            if (_aimController != null) {
-
-            }
-
-            if (_playerGrab != null) {
-                _playerGrab.SetupInput(isPlayerOne);
-            }
+            //No need to check for null since we do it in Awake
+            _hookThrower.SetupInput(isPlayerOne);
+            _playerGrab.SetupInput(isPlayerOne);
 	    }
 
         /// <summary> FixedUpdate pour le character avec rigidbody (sujet à changements)  </summary>
         void FixedUpdate() {
+            if (_inRespawnState) return; //dont do logic if player is in respawn
             CharacterMovement();
             UpdateGrabDrag();
         }
@@ -146,6 +163,69 @@ namespace Simoncouche.Controller {
 
         }
 
+        //Death when entering maelstrom and respawn on map edges
+        #region Death and Respawn
+        public void OnMaelstromEnter(Vector3 deathPosition) {
+            if(!_inRespawnState) {
+                StartRespawnState();
+                StartCoroutine(Respawn_Spin(deathPosition));
+            }
+        }
+
+        private void StartRespawnState() {
+            _inRespawnState = true;
+            GetComponent<CircleCollider2D>().enabled = false;
+            _playerRigidBody.isKinematic = true;
+        }
+
+        private void StopRespawnState() {
+            _inRespawnState = false;
+            GetComponent<CircleCollider2D>().enabled = true;
+            _playerRigidBody.isKinematic = false;
+            _playerRigidBody.velocity = Vector2.zero;
+            StartCoroutine(Respawn_Resurface());
+        }
+
+        IEnumerator Respawn_Spin(Vector3 tP) {
+            Vector2 sP = transform.position;
+            float sZ = _positionZOnBackground._zOffset;
+            float tZ = Z_UNDER_WATER;
+
+            for(float i =0f; i < 1f; i += Time.deltaTime / RESPAWN_SPIN_TIME) {
+                Vector2 lerpV2 = Vector2.Lerp(sP, (Vector2)tP, i);
+                transform.position = new Vector3(lerpV2.x, lerpV2.y, transform.position.z);
+                transform.Rotate(new Vector3(0, 0, RESPAWN_SPIN_RATE / Time.deltaTime));
+                _positionZOnBackground._zOffset = Mathf.Lerp(sZ, tZ, i);
+                yield return null;
+            }
+            StartCoroutine(Respawn_ReachEdgeUnderwater());
+        }
+
+        IEnumerator Respawn_ReachEdgeUnderwater() {
+            Vector2 startPosition = (Vector2)transform.position;
+            Vector2 targetPosition = Random.insideUnitCircle.normalized * 25f;
+
+            for (float i = 0f; i < 1f; i += Time.deltaTime / RESPAWN_UNDERWATER_TIME) {
+                Vector2 lerpV2 = Vector2.Lerp(startPosition, targetPosition, i);
+                transform.position = new Vector3(lerpV2.x, lerpV2.y, transform.position.z);
+                transform.Rotate(new Vector3(0, 0, RESPAWN_SPIN_RATE / Time.deltaTime));
+                yield return null;
+            }
+            StopRespawnState();
+        } 
+
+        IEnumerator Respawn_Resurface() {
+            float sZ = _positionZOnBackground._zOffset;
+            for (float i = 0f; i < 1f; i += Time.deltaTime / 1f) {
+                _positionZOnBackground._zOffset = Mathf.Lerp(sZ, _startZOffset, i);
+                yield return null;
+            }
+            _positionZOnBackground._zOffset = _startZOffset;
+        }
+
+        #endregion
+
+        //Player Movements
         #region movement
         /// <summary>
         /// Function that is called right after PlayerInputs inside Update in order to apply movement to our character
@@ -230,6 +310,7 @@ namespace Simoncouche.Controller {
 
         #endregion
 
+        //Methods called by various scripts to configure the variable of the player's animator
         #region animations handling
 
         /// <summary>
@@ -295,6 +376,7 @@ namespace Simoncouche.Controller {
 
         #endregion
 
+        //Collision Methods. Includes Unity collision methods
         #region Collision
 
         public void OnCollisionEnter2D(Collision2D col) {
@@ -355,6 +437,7 @@ namespace Simoncouche.Controller {
 
         #endregion
 
+        //Methods linked to player inputs
         #region PlayerInputs
 
         /// <summary> Function called in Update to register player inputs </summary>
