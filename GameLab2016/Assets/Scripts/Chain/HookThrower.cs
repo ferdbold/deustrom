@@ -55,6 +55,8 @@ namespace Simoncouche.Chain {
 			
         /// <summary>Handle user input to throw a new chain and hook</summary>
 		private void Fire() {
+            if (playerController.InRespawnState == true) return; //Deactivate hook if currently respawning
+
 			switch (_currentState) {
 
 			// If we press fire when we don't have any hook,

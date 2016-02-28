@@ -85,7 +85,7 @@ namespace Simoncouche.Controller {
         /// <summary> can the player bump right now </summary>
         private bool _canPlayerBump = true;
         /// <summary> is the player in respawn state </summary>
-        private bool _inRespawnState = false;
+        public bool InRespawnState { get; private set; }
 
         //Private attibutes
         /// <summary> Start drag of the player's rigid body</summary>
@@ -139,6 +139,7 @@ namespace Simoncouche.Controller {
         /// <summary>  Initialization of variables </summary>
         void Start() {
             _playerRigidBody.interpolation = RigidbodyInterpolation2D.Interpolate; //Setting the interpolation of _playerRigidBody on to have more fluidity
+            InRespawnState = false;
 
             //Setup input
             GameManager.inputManager.AddEvent(
@@ -152,7 +153,7 @@ namespace Simoncouche.Controller {
 
         /// <summary> FixedUpdate pour le character avec rigidbody (sujet à changements)  </summary>
         void FixedUpdate() {
-            if (_inRespawnState) return; //dont do logic if player is in respawn
+            if (InRespawnState) return; //dont do logic if player is in respawn
             CharacterMovement();
             UpdateGrabDrag();
         }
@@ -166,20 +167,23 @@ namespace Simoncouche.Controller {
         //Death when entering maelstrom and respawn on map edges
         #region Death and Respawn
         public void OnMaelstromEnter(Vector3 deathPosition) {
-            if(!_inRespawnState) {
+            if(!InRespawnState) {
                 StartRespawnState();
                 StartCoroutine(Respawn_Spin(deathPosition));
             }
         }
 
         private void StartRespawnState() {
-            _inRespawnState = true;
+            InRespawnState = true;
             GetComponent<CircleCollider2D>().enabled = false;
             _playerRigidBody.isKinematic = true;
+
+            //Audio
+            _playerAudio.PlaySound(PlayerSounds.PlayerDeath);
         }
 
         private void StopRespawnState() {
-            _inRespawnState = false;
+            InRespawnState = false;
             GetComponent<CircleCollider2D>().enabled = true;
             _playerRigidBody.isKinematic = false;
             _playerRigidBody.velocity = Vector2.zero;

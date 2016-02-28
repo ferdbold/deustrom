@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Simoncouche.Controller {
 
-    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond};
+    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond, PlayerDeath};
 
     [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(PlayerController))]
@@ -41,7 +41,7 @@ namespace Simoncouche.Controller {
         /// <summary>
         /// Ref to the player controller in order to his inputs using getleftanalog functions
         /// </summary>
-        private PlayerController _pRef;
+        private PlayerController playerController;
         private float _currentPitchValue = 1.0f;
         private float _volumeSwimming;
         private AudioSource _swimmingAudioSource;
@@ -53,7 +53,7 @@ namespace Simoncouche.Controller {
 
 
         void Awake() {
-            _pRef = GetComponent<PlayerController>();
+            playerController = GetComponent<PlayerController>();
             _swimmingAudioSource = GetComponent<AudioSource>();
             //Create and setup second audiosource exactly like swimming audio source
             _actionAudioSource = gameObject.AddComponent<AudioSource>();
@@ -77,8 +77,8 @@ namespace Simoncouche.Controller {
 
             _swimmingAudioSource.pitch = _currentPitchValue;
 
-            if (Mathf.Abs(_pRef.GetLeftAnalogHorizontal()) > 0.0f
-                || Mathf.Abs(_pRef.GetLeftAnalogVertical()) > 0.0f) {
+            if (Mathf.Abs(playerController.GetLeftAnalogHorizontal()) > 0.0f
+                || Mathf.Abs(playerController.GetLeftAnalogVertical()) > 0.0f) {
                 //We reset the volume to the volume specified in the inspector
                 _swimmingAudioSource.volume = _volumeSwimming;
                 //We stop the coroutine and specify it in a boolean
@@ -113,6 +113,9 @@ namespace Simoncouche.Controller {
                 case PlayerSounds.PlayerChainSecond:
 					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowSecondSound);
                     break;
+                case PlayerSounds.PlayerDeath:
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerDeath);
+                    break;
                 default:
                     Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");
                     break;
@@ -125,8 +128,8 @@ namespace Simoncouche.Controller {
         /// </summary>
         /// <returns></returns>
         private float GetMovementValue() {
-            float x = Mathf.Pow(_pRef.GetCurrentPlayerMovementInputs().x, 2.0f);
-            float y = Mathf.Pow(_pRef.GetCurrentPlayerMovementInputs().y, 2.0f);
+            float x = Mathf.Pow(playerController.GetCurrentPlayerMovementInputs().x, 2.0f);
+            float y = Mathf.Pow(playerController.GetCurrentPlayerMovementInputs().y, 2.0f);
             float movementValue = Mathf.Clamp(Mathf.Sqrt(x + y), 0.0f, _axisMaxValue);
             return movementValue;
         }
