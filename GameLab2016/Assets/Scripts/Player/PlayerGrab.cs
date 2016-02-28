@@ -10,8 +10,18 @@ namespace Simoncouche.Controller {
         [Tooltip("Magnitude of the force applied to the thrown gravity body")][SerializeField]
         private float THROW_FORCE = 15f;
 
+        
+        [SerializeField][Tooltip("Angle in front of player at which the player can grab an island. If not in this angle, the island will just bump in the player.")]
+        private float MAX_GRAB_ANGLE = 75f;
+
+        [SerializeField] [Tooltip("Cooldown before a player can grab again after releasing")]
+        private float GRAB_COOLDOWN = 0.5f;
+
         /// <summary> Parent of grabbed gravity body. Used to reposition  body at the right place when releasing. </summary>
         private Transform _grabbedBodyParent = null;
+
+        /// <summary> Wheter the player is currently in grab cooldown or not</summary>
+        private bool _inGrabCooldown = false;
 
 
         //Components
@@ -80,44 +90,77 @@ namespace Simoncouche.Controller {
         /// <summary> Attemps to grab gravity body if one is not already grabbed</summary>
         /// <param name="targetBody">target gravity body to grab</param>
         public void AttemptGrab(GravityBody targetBody) {
-            if(grabbedBody == null) {
-                IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
-
-                if (targetChunk != null) { //Make sure we are trying to grab an IslandChunk
-                    //Before grabbing, make the other players release this chunk
-                    MakeOtherPlayerRelease(targetChunk);
-
-                    if (targetChunk.parentIsland == null) {
-                        grabbedBody = targetBody;
-                        //Set parent
-                        _grabbedBodyParent = targetChunk.transform.parent;
-                        targetChunk.transform.parent = transform;
-                        //Ignore Collision
-                        DeactivateCollision(targetChunk.GetComponent<Collider2D>());
-                        //Deactivate gravity body
-                        grabbedBody.DeactivateGravityBody();
-                    } else {
-                        Island parentIsland = targetChunk.parentIsland;
-                        grabbedBody = targetBody;
-                        //Set parent
-                        _grabbedBodyParent = parentIsland.transform.parent;
-                        parentIsland.transform.parent = transform;
-                        //Ignore Collision
-                        foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
-                            DeactivateCollision(iChunk.GetComponent<Collider2D>());
-                        }
-                        //Deactivate gravity body
-                        parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
+            if (grabbedBody == null && _inGrabCooldown == false) {
+                //Check if the grab andle isn't too big
+                //Get angle between playerfacing and relative target position
+                float playerTargetAngle = Vector2.Angle(transform.right, targetBody.transform.position - transform.position);
+                //Debug.Log(gameObject.name + "  " + playerTargetAngle);
+                if (playerTargetAngle <= MAX_GRAB_ANGLE) {  
+                    //Make sure we are trying to grab an IslandChunk
+                    IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
+                    if (targetChunk != null) { 
+                        //Initiate Grab
+                        Grab(targetBody, targetChunk);
                     }
-
-                    //Animation
-                    _playerController.HandleGrabStartAnimation();
-                    //Sounds
-                    _playerAudio.PlaySound(PlayerSounds.PlayerGrab);
-
                 }
-                
             }
+        }
+
+        private void Grab(GravityBody targetBody, IslandChunk targetChunk) {
+            //Before grabbing, make the other players release this chunk
+            MakeOtherPlayerRelease(targetChunk);
+
+            if (targetChunk.parentIsland == null) {
+                grabbedBody = targetBody;
+                //Set parent
+                _grabbedBodyParent = targetChunk.transform.parent;
+                targetChunk.transform.parent = transform;
+                //Ignore Collision
+                DeactivateCollision(targetChunk.GetComponent<Collider2D>());
+                //Deactivate gravity body
+                grabbedBody.DeactivateGravityBody();
+                //Move object in player's arm 
+                StartCoroutine(RepositionGrabbedBody(targetChunk.transform));
+
+            } else {
+                Island parentIsland = targetChunk.parentIsland;
+                grabbedBody = targetBody;
+                //Set parent
+                _grabbedBodyParent = parentIsland.transform.parent;
+                parentIsland.transform.parent = transform;
+                //Ignore Collision
+                foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
+                    DeactivateCollision(iChunk.GetComponent<Collider2D>());
+                }
+                //Deactivate gravity body
+                parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
+                //Move object in player's arm 
+                StartCoroutine(RepositionGrabbedBody(parentIsland.transform));
+            }
+
+            //Animation
+            _playerController.HandleGrabStartAnimation();
+            //Sounds
+            _playerAudio.PlaySound(PlayerSounds.PlayerGrab);
+        }
+
+
+        IEnumerator RepositionGrabbedBody(Transform transformToMove) {
+            //Get positions
+            float i = 0f;
+            float repositionTime = 1f;
+            Vector2 startPosition = transformToMove.localPosition;
+            Vector2 targetPosition = new Vector2(1.2f, 0);
+            if(grabbedBody.transform != transformToMove) targetPosition -= (Vector2) (transformToMove.localRotation * (grabbedBody.transform.localPosition* transformToMove.localScale.x));
+
+            //Lerp to target position
+            while (i < 1f && grabbedBody != null) { 
+                transformToMove.localPosition = Vector2.Lerp(startPosition, targetPosition, i);
+                yield return null;
+                i += Time.deltaTime / repositionTime;
+            }
+            //finish movement
+            if(grabbedBody != null) transformToMove.localPosition = targetPosition;
         }
         
         /// <summary> Throw gravity body in direction of player's aim controller</summary>
@@ -177,6 +220,8 @@ namespace Simoncouche.Controller {
 
                 //Mark grabbed body as null
                 grabbedBody = null;
+                //Start Cooldown
+                StartCoroutine(GrabCooldown());
 
                 //Animation
                 _playerController.HandleGrabStopAnimation();
@@ -187,6 +232,16 @@ namespace Simoncouche.Controller {
             }
         }
 
+        /// <summary> Handles the cooldown of the grab </summary>
+        IEnumerator GrabCooldown() {
+            _inGrabCooldown = true;
+            yield return new WaitForSeconds(GRAB_COOLDOWN);
+            _inGrabCooldown = false;
+        }
+
+        /// <summary> Calls the coroutine that resume collisions and add its reference to the coroutine list</summary>
+        /// <param name="otherCol">collider to unIgnore</param>
+        /// <param name="time">time before unignore</param>
         private void ReactivateCollision(Collider2D otherCol, float time) {
             Coroutine disableCoroutine = StartCoroutine(ResumeCollision(otherCol, time));
 

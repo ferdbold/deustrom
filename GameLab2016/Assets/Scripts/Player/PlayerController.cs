@@ -9,7 +9,7 @@ namespace Simoncouche.Controller {
     public class PlayerController : MonoBehaviour {
 
 	    #region InspectorVariables
-        [Header("Player Speed Properties")]
+        [Header("Player Speed Properties :")]
 
         [SerializeField] [Tooltip("Acceleration of the player in unit per second")]
 	    private float playerAcceleration;
@@ -23,8 +23,7 @@ namespace Simoncouche.Controller {
         [SerializeField] [Tooltip("Degrees of rotation the player can rotate per second.")]
         private float ROTATION_SPEED = 720f;
 
-        [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
-        private bool isPlayerOne = true;
+        [Header("Grab Related Properties :")]
 
         [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player rotation when grabbing an object.")]
         private float GRAB_RATIO_ROTATION = 1f;
@@ -32,8 +31,14 @@ namespace Simoncouche.Controller {
         [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player movement speed when grabbing an object.")]
         private float GRAB_RATIO_MOVEMENT = 0.75f;
 
+        [Header("Other :")]
+
         [SerializeField] [Tooltip("Force to apply when bumping another player")]
         private float BUMP_FORCE = 1.5f;
+
+        [SerializeField]
+        [Tooltip("Is the current controller for player 1 or player 2")]
+        private bool isPlayerOne = true;
 
         #endregion
 
@@ -296,27 +301,43 @@ namespace Simoncouche.Controller {
             GravityBody otherGB = col.collider.gameObject.GetComponent<GravityBody>();
             if(otherGB != null) {
                 //Check for grab
-                if (_playerGrab.gameObject.activeInHierarchy) _playerGrab.AttemptGrab(otherGB);
-                
-                //Check for player bump
-                PlayerController otherPlayer = otherGB.GetComponent<PlayerController>();
-                if(otherPlayer != null) {
-                    //If this is the player with the highest velocity, bump other
-                    if (_canPlayerBump && _playerRigidBody.velocity.magnitude > otherGB.Velocity.magnitude) { 
-                        //Bump other player, start other Bump cooldown and start Bump animation
-                        otherGB.Velocity = otherGB.Velocity + col.relativeVelocity * BUMP_FORCE;
-                        otherPlayer.StartPlayerBumpCooldown();
-                        otherPlayer.HandleHitAnimation();
-                        //Decrease speed and start Bump cooldown
-                        _playerRigidBody.velocity = _playerRigidBody.velocity - col.relativeVelocity;
-                        StartPlayerBumpCooldown();
+                CheckGrab(col, otherGB);
 
-                        //Play Audio
-                        _playerAudio.PlaySound(PlayerSounds.PlayerBump);
-                        
-                    }
+                //Check for player bump
+                CheckPlayerBump(col, otherGB);
+
+
+            }
+        }
+
+        /// <summary> Check if conditions are met for the player to grab the collided gravity body </summary>
+        /// <param name="col"> Collision2D </param>
+        /// <param name="otherGB"> Gravity body collided with </param>
+        private void CheckGrab(Collision2D col, GravityBody otherGB) {
+            if (_playerGrab.gameObject.activeInHierarchy) {
+                _playerGrab.AttemptGrab(otherGB);
+            }
+        }
+
+        /// <summary> Checks if conditions for bump are met </summary>
+        /// <param name="col"> Collision2D </param>
+        /// <param name="otherGB"> Gravity body collided with </param>
+        private void CheckPlayerBump(Collision2D col, GravityBody otherGB) {
+            PlayerController otherPlayer = otherGB.GetComponent<PlayerController>();
+            if (otherPlayer != null) {
+                //If this is the player with the highest velocity, bump other
+                if (_canPlayerBump && _playerRigidBody.velocity.magnitude > otherGB.Velocity.magnitude) {
+                    //Bump other player, start other Bump cooldown and start Bump animation
+                    otherGB.Velocity = otherGB.Velocity + col.relativeVelocity * BUMP_FORCE;
+                    otherPlayer.StartPlayerBumpCooldown();
+                    otherPlayer.HandleHitAnimation();
+                    //Decrease speed and start Bump cooldown
+                    _playerRigidBody.velocity = _playerRigidBody.velocity - col.relativeVelocity;
+                    StartPlayerBumpCooldown();
+
+                    //Play Audio
+                    _playerAudio.PlaySound(PlayerSounds.PlayerBump);
                 }
-                
             }
         }
 
