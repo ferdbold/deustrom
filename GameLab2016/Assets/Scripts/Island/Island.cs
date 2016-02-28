@@ -146,7 +146,9 @@ namespace Simoncouche.Islands {
         public void OnMaelstromEnter(IslandChunk triggerChunk) {
             //Handle Score or island destruction
             RemoveChunkToIsland(triggerChunk);
+			triggerChunk.RemoveConnectedChunk(triggerChunk.connectedChunk);
             GameManager.islandManager.DestroyChunk(triggerChunk);
+			GameManager.islandManager.CheckIslandBroken(this);
         }
     }
 }

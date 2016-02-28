@@ -15,11 +15,6 @@ namespace Simoncouche.Islands {
 			green
 		}
 
-		/*/// <summary>
-		/// Island Chunk possible Letters
-		/// </summary>
-		public enum ChunkLetter { A, B, C, D, E, F, G, H, I, J }*/
-
 		/// <summary>
 		/// Creates a string from the Island information of a Island
 		/// </summary>

@@ -217,6 +217,42 @@ namespace Simoncouche.Islands {
             RemoveIsland(island);
         }
 
+		/// <summary>
+		/// Check if an island was broken by the destruction/disassembling of one of his chunk
+		/// </summary>
+		/// <param name="island">The target island to check</param>
+		public void CheckIslandBroken(Island island) {
+			List<IslandChunk> chunkIsland = new List<IslandChunk>();
+			chunkIsland = CheckIslandBroken_Helper(island.chunks[0], chunkIsland);
+			List<IslandChunk> chunkChecked = chunkIsland;
+
+			List<List<IslandChunk>> islands = new List<List<IslandChunk>>();
+			//is broken
+			while (chunkChecked.Count != island.chunks.Count) {
+				//TODO create islands with the remaining chunk
+			}
+		}
+
+		/// <summary>
+		/// The helper function to recursively check the island
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="islandChecked"></param>
+		/// <returns></returns>
+		private List<IslandChunk> CheckIslandBroken_Helper(IslandChunk current, List<IslandChunk> islandChecked) {
+			islandChecked.Add(current);
+
+			foreach (IslandChunk connection in current.connectedChunk) {
+				if (islandChecked.Count == current.parentIsland.chunks.Count) break;
+
+				if (connection != null && !islandChecked.Contains(connection)) {
+					CheckIslandBroken_Helper(connection, islandChecked);
+				}
+			}
+
+			return islandChecked;
+		}
+
 
         #endregion
 
@@ -238,7 +274,7 @@ namespace Simoncouche.Islands {
                 return;
             }
 
-            Island islandLink = ChunkContainedInIsland(chunk);
+            Island islandLink = chunk.parentIsland;
 
             //Check if the damage is too high for the island (the maximum is to divided the island in 2
             if (islandLink.chunks.Count <= damage) {
@@ -271,6 +307,7 @@ namespace Simoncouche.Islands {
 				}
 			}
 
+			CheckIslandBroken(islandLink);
         }
 
 		/// <summary>
