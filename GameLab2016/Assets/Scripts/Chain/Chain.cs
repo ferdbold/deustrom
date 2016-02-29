@@ -105,7 +105,7 @@ namespace Simoncouche.Chain {
             _chainSections[_chainSections.Count - 1].joint.connectedBody = _endingHook.rigidbody;
 
             // Set up listeners
-            _endingHook.attach.AddListener(this.OnEndingHookAttach);
+            _endingHook.Attach.AddListener(this.OnEndingHookAttach);
         }
 
         /// <summary>React to ending hook attaching itself to an island.</summary>

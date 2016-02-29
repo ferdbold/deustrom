@@ -43,15 +43,20 @@ namespace Simoncouche.Islands {
 		}
 
 		/// <summary>
-		/// Add a chunk to this Island, used when a chunk collides with a Island
+		/// Add a chunk to this Island, used when a chunk collides with a Island.
 		/// </summary>
-		/// <param name="chunk">Reference to the collinding chunk</param>
+		/// <param name="chunk">
+        /// Reference to the collinding chunk.
+        /// Raises the MergeIntoIsland event in the chunk.
+        /// </param>
 		public void AddChunkToIsland(IslandChunk chunk) {
 			if (!chunks.Contains(chunk)) {
                 chunk.parentIsland = this;
 				chunk.transform.SetParent(transform);
 				chunks.Add(chunk);
 				ChangeGravityBodyWhenMerging(chunk);
+
+                chunk.MergeIntoIsland.Invoke(this);
 			}
         }
 
@@ -133,8 +138,7 @@ namespace Simoncouche.Islands {
             }
             transform.position += medianPosition;
         }
-
-
+        
         /// <summary>
         /// Method called when entering the maelstrom
         /// </summary>
