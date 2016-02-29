@@ -242,12 +242,14 @@ namespace Simoncouche.Islands {
 
 				//Remove Chunk
 				if (chunkIsland.Count == 1) {
+					Debug.Log("IslandAlone");
 					island.chunks.Remove(chunkIsland[0]);
 					chunkIsland[0].transform.SetParent(island.transform.parent);
 				}
 
 				//Create Island
-				else {
+				else if (chunkIsland.Count != 0) {
+					Debug.Log("Multiple chunk " + chunkIsland.Count);
 					foreach (IslandChunk chunk in chunkIsland) {
 						island.chunks.Remove(chunk);
 					}
