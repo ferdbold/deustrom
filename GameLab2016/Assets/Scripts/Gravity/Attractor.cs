@@ -6,18 +6,21 @@
 /// </summary>
 public class Attractor : GravityModifier {
 
-    [Tooltip("Force of the attraction toward the center of the whirlpool")]
-    [SerializeField] private float FORCE = 1f;
+    [SerializeField] [Tooltip("Force of the attraction toward the center of the whirlpool")]
+    private float FORCE = 1f;
     public float Force { get { return FORCE; } private set { FORCE = value; }}
 
     /// <summary> multiplier of force applied from body's velocity compared to force towards body </summary>
-    [Tooltip("Force of the rotation of the attractor. Clockwise if positive, counter-clockwise if negative.")]
-    [SerializeField] private float SIDE_FORCE = 1f;
+    [SerializeField] [Tooltip("Force of the rotation of the attractor. Clockwise if positive, counter-clockwise if negative.")]
+     private float SIDE_FORCE = 1f;
+
+    [SerializeField] [Tooltip("Past this distance from the attractor, the player is not longer affected by it's physics.")]
+    private float MAX_DISTANCE_PLAYER = 20f; 
 
     //Drag Values
     [Header("Linear Drag :")]
-    [Tooltip("Min and max linear drag values to add to gravity body based on distance between attractor and body.")]
-    [SerializeField] private Vector2 _dragMaximums = new Vector2(0f, 1.5f);
+    [SerializeField] [Tooltip("Min and max linear drag values to add to gravity body based on distance between attractor and body.")]
+    private Vector2 _dragMaximums = new Vector2(0f, 1.5f);
     private float _additionnalDragRate = 0.025f;
     private float _additionnalDragDistance = 0.75f;
 
@@ -42,6 +45,13 @@ public class Attractor : GravityModifier {
     /// <param name="body">Gravity body affected by attractor </param>
     /// <returns>Acceleration to add to the gravity body</returns>
     public override Vector2 ApplyGravityForce(GravityBody body) {
+        //Check player distance and abort if too far
+        if(body.gameObject.tag == "Player") {
+            float distance = Vector2.Distance(transform.position, body.transform.position);
+            Debug.Log(distance);
+            if (distance > MAX_DISTANCE_PLAYER) return Vector2.zero;
+        }
+
         //Apply force toward Attractor
         Vector2 accFromAttraction = ApplyAttractionForce(body);
 
