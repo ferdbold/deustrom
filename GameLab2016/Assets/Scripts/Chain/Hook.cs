@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using Simoncouche.Islands;
 
 namespace Simoncouche.Chain {
 
-	/// A Hook is an ending element of a Chain that can snap itself either to a character or an IslandAnchorPoint.
+    /// <summary>
+    /// A Hook is an ending element of a Chain that can snap itself 
+    /// either to a character or an IslandAnchorPoint.
+    /// </summary>
 	[RequireComponent(typeof(DistanceJoint2D))]
 	[RequireComponent(typeof(FixedJoint2D))]
 	[RequireComponent(typeof(HingeJoint2D))]
@@ -13,30 +17,39 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private float ATTACHED_MASS = 10f;
 
-		/// Self-reference to the hook prefab for factory purposes
+        /// <summary>Self-reference to the hook prefab for factory purposes</summary>
 		private static GameObject _hookPrefab;
 
-		/// The chain this hook is part of
+        /// <summary>The chain this hook is part of</summary>
 		public Chain chain { get; private set; }
 
-		/// The ChainSection linked to this hook
+        /// <summary>The ChainSection linked to this hook</summary>
 		private ChainSection _nextChain;
 
-		/// Whether this hook is currently attached to a target
+        /// <summary>Whether this hook is currently attached to a target</summary>
 		private bool _attachedToTarget = false;
+
+        // EVENTS
+
+        /// <summary>Invoked when this hook attaches itself to an island</summary>
+        public UnityEvent attach { get; private set; }
 
 		// COMPONENTS
 
-		/// The joint linking this hook to its target (an island)
+        /// <summary>The joint linking this hook to its target (an island)</summary>
 		public FixedJoint2D targetJoint { get; private set; }
 
-		/// The joint linking this hook to the other edge of the chain,
+        /// <summary>
+        /// The joint linking this hook to the other edge of the chain,
 		/// (which will be the thrower or the second Hook of a chain). 
-		/// Only used in the beginning hook.
+        /// Only used in the beginning hook.
+        /// </summary>
 		public DistanceJoint2D chainJoint { get; private set; }
 
-		/// The joint used to hang visual chain sections to this hook.
+        /// <summary>
+        /// The joint used to hang visual chain sections to this hook.
 		/// Only used in the beginning hook to hang the first chain section.
+        /// </summary>
 		public HingeJoint2D visualChainJoint { get; private set; }
 
 		public new Rigidbody2D rigidbody { get; private set; }
@@ -74,10 +87,11 @@ namespace Simoncouche.Chain {
 			this.targetJoint = GetComponent<FixedJoint2D>();
 			this.visualChainJoint = GetComponent<HingeJoint2D>();
 			this.rigidbody = GetComponent<Rigidbody2D>();
+
+            this.attach = new UnityEvent();
 		}
 
 		public void Start() {
-			//_nextChain = ChainSection.Create(transform.position, _chain, _rigidbody);
 			this.rigidbody.AddForce(transform.rotation * new Vector2(chain.initialForce, 0));
 		}
 
@@ -119,6 +133,8 @@ namespace Simoncouche.Chain {
 			this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
 			this.rigidbody.velocity = Vector2.zero;
 			this.rigidbody.mass = this.ATTACHED_MASS;
+
+            this.attach.Invoke();
 		}
 
 		/// <summary>
