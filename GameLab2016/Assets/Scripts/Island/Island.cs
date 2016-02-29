@@ -147,6 +147,7 @@ namespace Simoncouche.Islands {
             //Handle Score or island destruction
             RemoveChunkToIsland(triggerChunk);
             GameManager.islandManager.DestroyChunk(triggerChunk);
+			GameManager.islandManager.CheckIslandBroken(this);
         }
     }
 }

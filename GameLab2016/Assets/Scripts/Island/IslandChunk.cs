@@ -160,7 +160,7 @@ namespace Simoncouche.Islands {
 
 		#endregion
 
-		#region Anchor Points Handling
+		#region Anchor Points
 
 		/// <summary>
 		/// Check every anchor point to create the 
@@ -199,6 +199,10 @@ namespace Simoncouche.Islands {
 			}
 		}
 
+		#endregion
+
+		#region Collision Handling
+
 		/// <summary>
 		/// Handle a trigger collision with the anchors
         /// Raises the MergeIntoIsland event.
@@ -209,19 +213,17 @@ namespace Simoncouche.Islands {
 			IslandAnchorPoints otherAnchor = other.GetComponent<IslandAnchorPoints>();
 			IslandChunk chunk = other.GetComponentInParent<IslandChunk>();
 
-			if (otherAnchor != null && otherAnchor.transform.parent.gameObject != gameObject ) {
-                
+			if (otherAnchor != null && otherAnchor.transform.parent.gameObject != gameObject) {
+
 				if (IslandUtils.CheckIfOnSameIsland(chunk, this)) {
 					return;
 				}
-                
+
 				//Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
 				GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
                 _audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.mergeSound);
             }
 		}
-
-		#endregion
 
 		void OnCollisionEnter2D(Collision2D col) {
             Collider2D other = col.collider;
@@ -240,32 +242,25 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="damage">The number of chunk affected by the division</param>
         public void TakeDamage(int damage) {
-            GameManager.islandManager.TakeDamageHandler(this, damage);
+			if (damage > 0) {
+				GameManager.islandManager.TakeDamageHandler(this, damage);
+				_audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.disassembleSound);
+			} else {
+				Debug.LogWarning("The damage sent to the island chunk should be higher than 0");
+			}
         }
 
         /// <summary>
         /// Method called when entering the maelstrom
         /// </summary>
         public void OnMaelstromEnter() {
-            if (parentIsland != null) parentIsland.OnMaelstromEnter(this);
-            else {
-                GameManager.islandManager.DestroyChunk(this);
-            }
-        }
-
-        #region Legacy
-        /*/// <summary> Associated Chunk Letter </summary>
-		[SerializeField]
-		[Tooltip("The associated chunk letter")]
-		private IslandUtils.ChunkLetter _chunkLetter;
-
-		/// <summary> Accessors of _chunkLetter </summary>
-		public IslandUtils.ChunkLetter chunkLetter {
-			get {
-				return _chunkLetter;
+			if (parentIsland != null) {
+				parentIsland.OnMaelstromEnter(this);
+			} else {
+				GameManager.islandManager.DestroyChunk(this);
 			}
-			private set { }
-		}*/
-        #endregion
-    }
+		}
+
+		#endregion
+	}
 }
