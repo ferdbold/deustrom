@@ -81,9 +81,9 @@ namespace Simoncouche.Islands {
                 //Call the to island to be connected (The many ternary operator are for the possible value if one or the other island are assembled (hi hi)
                 (isA ? b_IslandLink : a_IslandLink).ConnectIslandToIsland(
                     FindTargetLocalPosition(
+						isA ? b : a,
                         isA ? b_anchor : a_anchor,
-                        isA ? b_IslandLink : a_IslandLink,
-                        isA ? b : a
+                        isA ? b_IslandLink : a_IslandLink
                     ),
                     FindTargetRotForAnchor(
                         isA ? b_anchor : a_anchor,
@@ -351,7 +351,7 @@ namespace Simoncouche.Islands {
         /// <param name="b">Island that point a merges to</param>
         /// <returns>euler angle</returns>
         private Vector3 FindTargetRotForAnchor(IslandAnchorPoints a, IslandAnchorPoints b) {
-            return new Vector3(0, 0, a.angle - b.angle + 180);
+            return new Vector3(0, 0, a.angle - b.angle - b.GetIslandChunk().transform.localRotation.eulerAngles.z + 180);
         }
 
         /// <summary>
@@ -360,8 +360,15 @@ namespace Simoncouche.Islands {
         /// <param name="a">The anchor of the island to merge</param>
         /// <param name="b_chunk">Island to be merge to</param>
         /// <returns></returns>
-        private Vector3 FindTargetLocalPosition(IslandChunk b_chunk, IslandAnchorPoints b) {
-            return b_chunk.transform.localPosition + 2f * (b.transform.position - b_chunk.transform.position);
+        private Vector3 FindTargetLocalPosition(IslandChunk b_chunk, IslandAnchorPoints b_anchor) {
+			float distance = Vector3.Distance(Vector3.zero, b_anchor.position);
+			float angle = b_anchor.angle + b_chunk.transform.localRotation.eulerAngles.z;
+			Vector3 anchorProjection = new Vector3(
+				distance * Mathf.Cos(angle * Mathf.PI / 180f),
+				distance * Mathf.Sin(angle * Mathf.PI / 180f),
+				0
+			); //The projection of the anchor on the current angle of the chunk
+            return b_chunk.transform.localPosition + 2f * anchorProjection;
         }
 
         /// <summary>
@@ -370,8 +377,15 @@ namespace Simoncouche.Islands {
         /// <param name="a">The anchor of the island to merge</param>
         /// <param name="b_chunk">Island to be merge to</param>
         /// <returns></returns>
-        private Vector3 FindTargetLocalPosition(IslandAnchorPoints b, Island b_island, IslandChunk b_chunk) {
-            return b_island.transform.localPosition + 2f * (b.transform.position - b_chunk.transform.position);
+        private Vector3 FindTargetLocalPosition(IslandChunk b_chunk, IslandAnchorPoints b_anchor, Island b_island) {
+			float distance = Vector3.Distance(Vector3.zero, b_anchor.position);
+			float angle = b_anchor.angle + b_chunk.transform.localRotation.eulerAngles.z;
+			Vector3 anchorProjection = new Vector3(
+				distance * Mathf.Cos(angle * Mathf.PI / 180f),
+				distance * Mathf.Sin(angle * Mathf.PI / 180f),
+				0
+			); //The projection of the anchor on the current angle of the chunk
+			return b_island.transform.localPosition + b_chunk.transform.localPosition + 2f * anchorProjection;
         }
 
         /// <summary>
