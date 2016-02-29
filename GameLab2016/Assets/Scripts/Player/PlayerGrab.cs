@@ -30,12 +30,12 @@ namespace Simoncouche.Controller {
 
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
-
         /// <summary> Reference to the player controller </summary>
         private PlayerController _playerController;
-
         /// <summary> Reference to the playerAudio of the player</summary>
         private PlayerAudio _playerAudio;
+        /// <summary> Reference to the gravityBody of the player</summary>
+        private GravityBody _playerGravityBody;
 
         /// <summary> List of references to all playerGrabs. Used to avoid Searching the map everytime we grab.</summary>
         private static List<PlayerGrab> _allPlayerGrabs = new List<PlayerGrab>();
@@ -48,6 +48,7 @@ namespace Simoncouche.Controller {
             _aimController = GetComponent<AimController>();
             _playerController = GetComponent<PlayerController>();
             _playerAudio = GetComponent<PlayerAudio>();
+            _playerGravityBody = GetComponent<GravityBody>();
             grabbedBody = null;
 
             //Add to static playergrab list
@@ -61,6 +62,9 @@ namespace Simoncouche.Controller {
             }
             if (_playerAudio == null) {
                 Debug.LogError("Player/PlayerAudio cannont be found!");
+            }
+            if (_playerGravityBody == null) {
+                Debug.LogError("Player/PlayerGravityBody cannont be found!");
             }
         }
 
@@ -109,9 +113,10 @@ namespace Simoncouche.Controller {
         private void Grab(GravityBody targetBody, IslandChunk targetChunk) {
             //Before grabbing, make the other players release this chunk
             MakeOtherPlayerRelease(targetChunk);
+            grabbedBody = targetBody;
+            
 
             if (targetChunk.parentIsland == null) {
-                grabbedBody = targetBody;
                 //Set parent
                 _grabbedBodyParent = targetChunk.transform.parent;
                 targetChunk.transform.parent = transform;
@@ -119,12 +124,14 @@ namespace Simoncouche.Controller {
                 DeactivateCollision(targetChunk.GetComponent<Collider2D>());
                 //Deactivate gravity body
                 grabbedBody.DeactivateGravityBody();
+                //Set weight
+                _playerGravityBody.Weight = grabbedBody.Weight + _playerController._startPlayerWeight;
+
                 //Move object in player's arm 
                 StartCoroutine(RepositionGrabbedBody(targetChunk.transform));
 
             } else {
                 Island parentIsland = targetChunk.parentIsland;
-                grabbedBody = targetBody;
                 //Set parent
                 _grabbedBodyParent = parentIsland.transform.parent;
                 parentIsland.transform.parent = transform;
@@ -134,6 +141,8 @@ namespace Simoncouche.Controller {
                 }
                 //Deactivate gravity body
                 parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
+                //Set weight
+                _playerGravityBody.Weight = parentIsland.GetComponent<GravityBody>().Weight + _playerController._startPlayerWeight;
                 //Move object in player's arm 
                 StartCoroutine(RepositionGrabbedBody(parentIsland.transform));
             }
@@ -220,6 +229,8 @@ namespace Simoncouche.Controller {
 
                 //Mark grabbed body as null
                 grabbedBody = null;
+                //Set weight
+                _playerGravityBody.Weight =  _playerController._startPlayerWeight;
                 //Start Cooldown
                 StartCoroutine(GrabCooldown());
 

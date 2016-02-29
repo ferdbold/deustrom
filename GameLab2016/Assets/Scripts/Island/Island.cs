@@ -26,6 +26,7 @@ namespace Simoncouche.Islands {
 			chunks = new List<IslandChunk>();
 			_collider = GetComponent<CircleCollider2D>();
 			gravityBody = GetComponent<GravityBody>();
+
 		}
         
         private void Start() {

@@ -46,8 +46,7 @@ namespace Simoncouche.Controller {
         [SerializeField] [Tooltip("Force to apply when bumping another player")]
         private float BUMP_FORCE = 1.5f;
 
-        [SerializeField]
-        [Tooltip("Is the current controller for player 1 or player 2")]
+        [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
         private bool isPlayerOne = true;
 
         #endregion
@@ -94,8 +93,10 @@ namespace Simoncouche.Controller {
         private float _startZOffset;
         /// <summary> Cooldown for a player bump</summary>
         private float _playerBumpCooldown = 0.5f;
+        /// <summary> Start Player weight </summary>
+        public float _startPlayerWeight { get; private set; }
 
-        
+
 
 
 
@@ -114,6 +115,7 @@ namespace Simoncouche.Controller {
 
             _startDrag = _playerRigidBody.drag;
             _startZOffset = _positionZOnBackground._zOffset;
+            _startPlayerWeight = _playerRigidBody.mass;
 
             if (_playerGrab == null) {
                 Debug.LogError("Player/PlayerGrab cannot be found!");
@@ -160,7 +162,8 @@ namespace Simoncouche.Controller {
 
         /// <summary> modifies the player's drag based on the grabbed object </summary>
         private void UpdateGrabDrag() {
-            _playerRigidBody.drag = _playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag;
+            _playerRigidBody.drag = Mathf.Min(_playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag, 5f); //max drag to 5
+            Debug.Log("pg : " + _playerGrab.GetGrabbedWeight() + "   sd : " + _startDrag);
 
         }
 
