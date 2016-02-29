@@ -32,7 +32,7 @@ namespace Simoncouche.Chain {
         // EVENTS
 
         /// <summary>Invoked when this hook attaches itself to an island</summary>
-        public UnityEvent attach { get; private set; }
+        public UnityEvent Attach { get; private set; }
 
 		// COMPONENTS
 
@@ -88,7 +88,7 @@ namespace Simoncouche.Chain {
 			this.visualChainJoint = GetComponent<HingeJoint2D>();
 			this.rigidbody = GetComponent<Rigidbody2D>();
 
-            this.attach = new UnityEvent();
+            this.Attach = new UnityEvent();
 		}
 
 		public void Start() {
@@ -126,15 +126,31 @@ namespace Simoncouche.Chain {
 			return chainSection;
 		}
 
-		/// <summary>Attach this Hook to the Island associated to an anchor point</summary>
+		/// <summary>
+        /// Attach this Hook to the Island associated to an anchor point.
+        /// Raises the Attach event.
+        /// </summary>
 		/// <param name="anchor">The anchor point</param>
 		public void AttachToIsland(IslandAnchorPoints anchor) {
-			this.targetJoint.enabled = true;
-			this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
-			this.rigidbody.velocity = Vector2.zero;
-			this.rigidbody.mass = this.ATTACHED_MASS;
+            Island parentIsland = anchor.GetIslandChunk().parentIsland;
 
-            this.attach.Invoke();
+            this.rigidbody.velocity = Vector2.zero;
+            this.rigidbody.mass = this.ATTACHED_MASS;
+
+            this.targetJoint.enabled = true;
+
+            // Attach the joint to either the chunk or its parent island it it has one
+            if (parentIsland == null) {
+                this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
+            } else {
+                // FIXME: Expose Island's (or GravityBody's) rigidbody to avoid this GetComponent call
+                this.targetJoint.connectedBody = parentIsland.GetComponent<Rigidbody2D>();
+            }
+
+            // Add listeners
+            anchor.GetIslandChunk().MergeIntoIsland.AddListener(this.OnAttachedChunkMerge);
+
+            this.Attach.Invoke();
 		}
 
 		/// <summary>
@@ -145,5 +161,12 @@ namespace Simoncouche.Chain {
 		public void AttachVisualJointTo(Rigidbody2D rb) {
 			this.visualChainJoint.connectedBody = rb;
 		}
+
+        /// <summary>React to attached chunk being merged into island</summary>
+        /// <param name="newIsland">The resultant island</param>
+        private void OnAttachedChunkMerge(Island newIsland) {
+            // FIXME: Expose Island's (or GravityBody's) rigidbody to avoid this GetComponent call
+            this.chainJoint.connectedBody = newIsland.GetComponent<Rigidbody2D>();
+        }
 	}
 }
