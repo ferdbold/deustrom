@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Simoncouche.Islands {
+    public class IslandEvent : UnityEvent<Island> {}
+
 	/// <summary>
 	/// The structure related to an island chunk
 	/// </summary>
@@ -38,6 +41,15 @@ namespace Simoncouche.Islands {
 		[SerializeField] [Tooltip("The radius of the anchor trigger zone")]
 		private float _anchorPointRadius = 0.2f;
 		#endregion
+
+        #region Events
+
+        /// <summary>Invoked when this chunk is merged into a larger island</summary>
+        /// <param>The merge into island.</value>
+        public IslandEvent MergeIntoIsland { get; private set; }
+
+        #endregion
+
 		#region Component Ref
 		public List<IslandAnchorPoints> anchors { get; private set; }
 
@@ -51,6 +63,8 @@ namespace Simoncouche.Islands {
 
         /// <summary> audio source of the chunk </summary>
         private AudioSource _audioSource;
+        /// <summary> island visual randomizer </summary>
+        private RandomizeIslandVisual _randomizeIslandVisual;
 		#endregion
 		
 		void Awake() {
@@ -59,9 +73,18 @@ namespace Simoncouche.Islands {
 				_anchorPointObject = Resources.Load("Island/AnchorPoints") as GameObject;
 			}
             _audioSource = GetComponent<AudioSource>();
+            _randomizeIslandVisual = GetComponent<RandomizeIslandVisual>();
+
             connectedChunk = new List<IslandChunk>();
 			SpawnAnchorPoints();
+
+            this.MergeIntoIsland = new IslandEvent();
         }
+
+        void Start() {
+            _randomizeIslandVisual.SetIslandColorVisual(color);
+        }
+
 
 		#region Connection
 
@@ -178,6 +201,7 @@ namespace Simoncouche.Islands {
 
 		/// <summary>
 		/// Handle a trigger collision with the anchors
+        /// Raises the MergeIntoIsland event.
 		/// </summary>
 		/// <param name="other">The object that collided with the anchor</param>
 		/// <param name="anchor">The anchor sending the event</param>
@@ -194,7 +218,7 @@ namespace Simoncouche.Islands {
 				//Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
 				GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
                 _audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.mergeSound);
-			}
+            }
 		}
 
 		#endregion
