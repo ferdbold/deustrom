@@ -51,6 +51,8 @@ namespace Simoncouche.Islands {
 
         /// <summary> audio source of the chunk </summary>
         private AudioSource _audioSource;
+        /// <summary> island visual randomizer </summary>
+        private RandomizeIslandVisual _randomizeIslandVisual;
 		#endregion
 		
 		void Awake() {
@@ -59,9 +61,16 @@ namespace Simoncouche.Islands {
 				_anchorPointObject = Resources.Load("Island/AnchorPoints") as GameObject;
 			}
             _audioSource = GetComponent<AudioSource>();
+            _randomizeIslandVisual = GetComponent<RandomizeIslandVisual>();
+
             connectedChunk = new List<IslandChunk>();
 			SpawnAnchorPoints();
         }
+
+        void Start() {
+            _randomizeIslandVisual.SetIslandColorVisual(color);
+        }
+
 
 		#region Connection
 
