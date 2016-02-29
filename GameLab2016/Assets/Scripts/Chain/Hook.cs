@@ -3,47 +3,48 @@ using Simoncouche.Islands;
 
 namespace Simoncouche.Chain {
 
-	/// <summary>
 	/// A Hook is an ending element of a Chain that can snap itself either to a character or an IslandAnchorPoint.
-	/// </summary>
+	[RequireComponent(typeof(DistanceJoint2D))]
 	[RequireComponent(typeof(FixedJoint2D))]
+	[RequireComponent(typeof(HingeJoint2D))]
 	public class Hook : MonoBehaviour {
 
-		/// <summary>
+		[Tooltip("The mass of this hook once attached to an island")]
+		[SerializeField]
+		private float ATTACHED_MASS = 10f;
+
 		/// Self-reference to the hook prefab for factory purposes
-		/// </summary>
 		private static GameObject _hookPrefab;
 
-        [Tooltip("This is the maximum distance between the hook and the player")]
-        [SerializeField]
-        private float _maximumDistanceBetweenPlayer=10f;
-
-		[Tooltip("Reference to the ChainSection prefab")]
-		[SerializeField]
-		private ChainSection _chainSectionPrefab;
-
-		/// <summary>
 		/// The chain this hook is part of
-		/// </summary>
-		private Chain _chain;
+		public Chain chain { get; private set; }
 
-		/// <summary>
 		/// The ChainSection linked to this hook
-		/// </summary>
 		private ChainSection _nextChain;
+
+		/// Whether this hook is currently attached to a target
+		private bool _attachedToTarget = false;
 
 		// COMPONENTS
 
-		private FixedJoint2D _joint;
-		public FixedJoint2D joint { get { return _joint; } }
+		/// The joint linking this hook to its target (an island)
+		public FixedJoint2D targetJoint { get; private set; }
 
-		private Rigidbody2D _rigidbody;
+		/// The joint linking this hook to the other edge of the chain,
+		/// (which will be the thrower or the second Hook of a chain). 
+		/// Only used in the beginning hook.
+		public DistanceJoint2D chainJoint { get; private set; }
 
-		/// <summary>
-		/// Spawn a new hook inside a chain
-		/// </summary>
+		/// The joint used to hang visual chain sections to this hook.
+		/// Only used in the beginning hook to hang the first chain section.
+		public HingeJoint2D visualChainJoint { get; private set; }
+
+		public new Rigidbody2D rigidbody { get; private set; }
+
+		/// <summary>Spawn a new hook inside a chain</summary>
 		/// <param name="chain">The parent chain</param>
-		public static Hook Create(Chain chain) {
+		/// <param name="isBeginningHook">Is this hook the beginning hook of a chain</param> 
+		public static Hook Create(Chain chain, bool isBeginningHook) {
 			if (_hookPrefab == null) {
 				_hookPrefab = Resources.Load("Chain/Hook") as GameObject;
 			}
@@ -54,52 +55,79 @@ namespace Simoncouche.Chain {
 				Quaternion.Euler(0, 0, chain.thrower.aimController.aimOrientation)
 			)).GetComponent<Hook>();
 
+			hook.name = (isBeginningHook) ? "BeginningHook" : "EndingHook";
 			hook.transform.parent = chain.transform;
-			hook.SetChain(chain);
+			hook.chain = chain;
+
+			hook.chainJoint.enabled = isBeginningHook;
+
+			if (isBeginningHook) {
+				// Hook the beginning hook's chain joint to the player to enable physics tension
+				hook.chainJoint.connectedBody = chain.thrower.rigidbody;
+			}
 
 			return hook;
 		}
 
 		public void Awake() {
-			_joint = GetComponent<FixedJoint2D>();
-			_rigidbody = GetComponent<Rigidbody2D>();
+			this.chainJoint = GetComponent<DistanceJoint2D>();
+			this.targetJoint = GetComponent<FixedJoint2D>();
+			this.visualChainJoint = GetComponent<HingeJoint2D>();
+			this.rigidbody = GetComponent<Rigidbody2D>();
 		}
 
 		public void Start() {
-			_nextChain = ChainSection.Create(transform.position, _chain, _rigidbody);
-			_rigidbody.AddForce(transform.rotation * new Vector2(_chain.initialForce, 0));
+			//_nextChain = ChainSection.Create(transform.position, _chain, _rigidbody);
+			this.rigidbody.AddForce(transform.rotation * new Vector2(chain.initialForce, 0));
 		}
 
 		public void OnTriggerEnter2D(Collider2D coll) {
-			if (_joint.connectedBody == null) {
-				if (coll.gameObject.GetComponent<IslandAnchorPoints>() != null) {
-					_joint.enabled = true;
-					_joint.connectedBody = coll.GetComponent<Rigidbody2D>();
+			if (!_attachedToTarget) {
+				IslandAnchorPoints anchorPoint = coll.gameObject.GetComponent<IslandAnchorPoints>();
+
+				if (anchorPoint != null) {
+					this.AttachToIsland(anchorPoint);
 				}
 			}
 		}
 
-        void Update() {
-            if (_joint.connectedBody != null) ClampDistanceWithPlayerPos(_chain.thrower.transform, _maximumDistanceBetweenPlayer);
-        }
+		/// <summary>Spawns the first chain section and attach to it</summary>
+		/// <returns>The chain section</returns>
+		public ChainSection SpawnChainSection() {
+			ChainSection chainSection = ChainSection.Create(
+                transform.position, 
+				this.rigidbody.transform.rotation, 
+				this.chain, 
+				this.gameObject, 
+				Quaternion.identity
+			);
 
-		public void SetChain(Chain value) {
-			_chain = value;
+			// Connect the new chain section to the player
+            chainSection.joint.connectedBody = this.chain.thrower.chainLinker;
+
+			// Attach the visual joint to this first chain section
+			this.visualChainJoint.enabled = true;
+			this.visualChainJoint.connectedBody = chainSection.rigidbody;
+
+			return chainSection;
 		}
 
-        /// <summary>
-        /// Restrain the closest link of a chain with a maxDistance from the thrower's position
-        /// </summary>
-        /// <param name="throwerPosition"></param>
-        /// <param name="maxDistance"></param>
-        private void ClampDistanceWithPlayerPos(Transform throwerPosition, float maxDistance) {
-            float currentDistance = Vector3.Distance(transform.position, throwerPosition.position);
-            if (currentDistance > maxDistance) {
-                Vector3 vect = throwerPosition.position - transform.position;
-                vect = vect.normalized;
-                vect *= (currentDistance - maxDistance);
-                transform.position += vect;
-            }
-        }
+		/// <summary>Attach this Hook to the Island associated to an anchor point</summary>
+		/// <param name="anchor">The anchor point</param>
+		public void AttachToIsland(IslandAnchorPoints anchor) {
+			this.targetJoint.enabled = true;
+			this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
+			this.rigidbody.velocity = Vector2.zero;
+			this.rigidbody.mass = this.ATTACHED_MASS;
+		}
+
+		/// <summary>
+		/// Attach this section's joint to another rigidbody. 
+		/// This is useful for deleting sections of a chain
+		/// </summary>
+		/// <param name="rb">The new rigidbody to attach to</param>
+		public void AttachVisualJointTo(Rigidbody2D rb) {
+			this.visualChainJoint.connectedBody = rb;
+		}
 	}
 }

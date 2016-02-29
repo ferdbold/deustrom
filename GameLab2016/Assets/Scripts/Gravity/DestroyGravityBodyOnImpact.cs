@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Simoncouche.Islands;
+using Simoncouche.Controller;
 
 [RequireComponent(typeof(AudioSource))]
 public class DestroyGravityBodyOnImpact : MonoBehaviour {
@@ -8,8 +9,6 @@ public class DestroyGravityBodyOnImpact : MonoBehaviour {
     
     [Tooltip("NOT FOR EDIT. Layers of objects to teleport into wormhole")] [SerializeField] private LayerMask GravityLayerMask;
 
-    [Header("SOUND FX")]
-    [Tooltip("Sound to play when an object get destroyed by maelstrom")] [SerializeField] public AudioClip DestroySound;
     private AudioSource audioSource;
 
 
@@ -24,17 +23,22 @@ public class DestroyGravityBodyOnImpact : MonoBehaviour {
         if (((1 << other.gameObject.layer) & GravityLayerMask) != 0 && other.gameObject != gameObject) {
             GravityBody gravityBodyScript = other.gameObject.GetComponentInChildren<GravityBody>();
             IslandChunk islandChunk = other.gameObject.GetComponentInChildren<IslandChunk>();
+            PlayerController playerController = other.gameObject.GetComponentInChildren<PlayerController>();
 
             //Check if islandChunk exist. If so, call Maelstrom Collision Method
             if(islandChunk != null) {
                 islandChunk.OnMaelstromEnter();
-                audioSource.PlayOneShot(DestroySound);
+				audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
+            }
+            //Check if playercontroller exists. If so, call Maelstrom Collision Method
+            else if(playerController != null) {
+                playerController.OnMaelstromEnter(transform.position);
             }
             //Else if gravity body exists, call destroy method
             else if (gravityBodyScript != null) {
                 if (gravityBodyScript.collisionEnabled == true) {
                     gravityBodyScript.DestroyGravityBody();
-                    audioSource.PlayOneShot(DestroySound);
+					audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
                 }
             }
         }

@@ -45,15 +45,11 @@ namespace Simoncouche.Islands {
 		/// Add a chunk to this Island, used when a chunk collides with a Island
 		/// </summary>
 		/// <param name="chunk">Reference to the collinding chunk</param>
-		/// <param name="pos">The position of the chunk</param>
-		/// <param name="rot">The rotation of the chunk</param>
-		public void AddChunkToIsland(IslandChunk chunk, Vector3 pos, Vector3 rot) {
+		public void AddChunkToIsland(IslandChunk chunk) {
 			if (!chunks.Contains(chunk)) {
                 chunk.parentIsland = this;
 				chunk.transform.SetParent(transform);
 				chunks.Add(chunk);
-				/*chunk.transform.localPosition = pos;
-				chunk.transform.localRotation = Quaternion.Euler(rot);*/
 				ChangeGravityBodyWhenMerging(chunk);
 			}
         }
@@ -72,6 +68,15 @@ namespace Simoncouche.Islands {
 
         /// <summary> Calls Center Island root function on a delay t in seconds </summary>
         private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland) { yield return new WaitForSeconds(t); targetIsland.CenterIslandRoot(); }
+
+		/// <summary>
+		/// Recreate island connection for every chunk in island
+		/// </summary>
+		public void RecreateIslandChunkConnection() {
+			foreach (IslandChunk chunk in chunks) {
+				chunk.CheckConnection();
+			}
+		}
 
         /// <summary>
         /// Remove a chunk of this island.
@@ -109,7 +114,7 @@ namespace Simoncouche.Islands {
         public void CenterIslandRoot() {
             //Avoid error if chunks aren't properly initialized
             if (chunks.Count == 0) {
-                Debug.Log("There are no chunks ! ");
+                Debug.Log("Trying to center an island without chunks.");
                 return; 
             }
 
@@ -136,7 +141,7 @@ namespace Simoncouche.Islands {
         public void OnMaelstromEnter(IslandChunk triggerChunk) {
             //Handle Score or island destruction
             RemoveChunkToIsland(triggerChunk);
-            triggerChunk.gravityBody.DestroyGravityBody();
+            GameManager.islandManager.DestroyChunk(triggerChunk);
         }
     }
 }

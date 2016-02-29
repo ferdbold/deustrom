@@ -1,12 +1,19 @@
 ﻿using UnityEngine;
+using UnityEngine.Audio;
 using System.Collections;
 
 namespace Simoncouche.Controller {
 
+    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond, PlayerDeath};
+
     [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(PlayerController))]
     public class PlayerAudio : MonoBehaviour {
+
         #region PublicVariables
+
+
+
         [Header("Swimming Sound Properties")]
         /// <summary>
         /// This is the maximum pitch of our sound when he goes fast
@@ -34,22 +41,29 @@ namespace Simoncouche.Controller {
         /// <summary>
         /// Ref to the player controller in order to his inputs using getleftanalog functions
         /// </summary>
-        private PlayerController _pRef;
+        private PlayerController playerController;
         private float _currentPitchValue = 1.0f;
         private float _volumeSwimming;
-        private AudioSource _playerAudioSource;
+        private AudioSource _swimmingAudioSource;
+        private AudioSource _actionAudioSource;
+
         private bool _isCoroutineRunning;
         private const float _axisMaxValue = 1.0f;
         #endregion
 
 
         void Awake() {
-            _playerAudioSource = GetComponent<AudioSource>();
-            _pRef = GetComponent<PlayerController>();
+            playerController = GetComponent<PlayerController>();
+            _swimmingAudioSource = GetComponent<AudioSource>();
+            //Create and setup second audiosource exactly like swimming audio source
+            _actionAudioSource = gameObject.AddComponent<AudioSource>();
+            _actionAudioSource.outputAudioMixerGroup = _swimmingAudioSource.outputAudioMixerGroup;
+          
         }
 
         void Start() {
-            _volumeSwimming = _playerAudioSource.volume;
+			_actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.swimSound;
+            _volumeSwimming = _swimmingAudioSource.volume;
         }
 
 
@@ -61,23 +75,52 @@ namespace Simoncouche.Controller {
             //magnitude divided by Time.fixedDeltatime is done cause 
             _currentPitchValue = Mathf.Lerp(minPitch, maxPitch, GetMovementValue() / _axisMaxValue);
 
-            _playerAudioSource.pitch = _currentPitchValue;
+            _swimmingAudioSource.pitch = _currentPitchValue;
 
-            if (Mathf.Abs(_pRef.GetLeftAnalogHorizontal()) > 0.0f
-                || Mathf.Abs(_pRef.GetLeftAnalogVertical()) > 0.0f) {
+            if (Mathf.Abs(playerController.GetLeftAnalogHorizontal()) > 0.0f
+                || Mathf.Abs(playerController.GetLeftAnalogVertical()) > 0.0f) {
                 //We reset the volume to the volume specified in the inspector
-                _playerAudioSource.volume = _volumeSwimming;
+                _swimmingAudioSource.volume = _volumeSwimming;
                 //We stop the coroutine and specify it in a boolean
                 StopCoroutine("TimerUntilSoundStop");
                 _isCoroutineRunning = false;
 
 
 
-                if (!_playerAudioSource.isPlaying) _playerAudioSource.Play();
+                if (!_swimmingAudioSource.isPlaying) _swimmingAudioSource.Play();
             } else {
                 FadeAudioSource();
             }
 
+        }
+
+        /// <summary> Plays a sound on the action audio source </summary>
+        /// <param name="ac"> audioclip to play </param>
+        public void PlaySound(PlayerSounds ac) {
+            switch(ac) {
+                case PlayerSounds.PlayerBump :
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.bumpSound);
+                    break;
+                case PlayerSounds.PlayerPush :
+					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.pushSound);
+                    break;
+                case PlayerSounds.PlayerGrab :
+					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.grabSound);
+                    break;
+                case PlayerSounds.PlayerChainFirst:
+					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowFirstSound);
+                    break;
+                case PlayerSounds.PlayerChainSecond:
+					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowSecondSound);
+                    break;
+                case PlayerSounds.PlayerDeath:
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerDeath);
+                    break;
+                default:
+                    Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");
+                    break;
+            }
+            
         }
 
         /// <summary>
@@ -85,8 +128,8 @@ namespace Simoncouche.Controller {
         /// </summary>
         /// <returns></returns>
         private float GetMovementValue() {
-            float x = Mathf.Pow(_pRef.GetCurrentPlayerMovementInputs().x, 2.0f);
-            float y = Mathf.Pow(_pRef.GetCurrentPlayerMovementInputs().y, 2.0f);
+            float x = Mathf.Pow(playerController.GetCurrentPlayerMovementInputs().x, 2.0f);
+            float y = Mathf.Pow(playerController.GetCurrentPlayerMovementInputs().y, 2.0f);
             float movementValue = Mathf.Clamp(Mathf.Sqrt(x + y), 0.0f, _axisMaxValue);
             return movementValue;
         }
@@ -97,9 +140,9 @@ namespace Simoncouche.Controller {
         /// doing stop'n goes.
         /// </summary>
         private void FadeAudioSource() {
-            _playerAudioSource.volume -= Time.deltaTime * volumeFadeOutSpeed;
-            if (_playerAudioSource.volume < 0.05f) {
-                _playerAudioSource.Pause();
+            _swimmingAudioSource.volume -= Time.deltaTime * volumeFadeOutSpeed;
+            if (_swimmingAudioSource.volume < 0.05f) {
+                _swimmingAudioSource.Pause();
                 if (_isCoroutineRunning) {
                     TimerUntilSoundStop(timeUntileSoundStops);
                 }
@@ -114,7 +157,7 @@ namespace Simoncouche.Controller {
         private IEnumerator TimerUntilSoundStop(float time) {
             _isCoroutineRunning = true;
             yield return new WaitForSeconds(time);
-            _playerAudioSource.Stop();
+            _swimmingAudioSource.Stop();
             _isCoroutineRunning = false;
         }
     }

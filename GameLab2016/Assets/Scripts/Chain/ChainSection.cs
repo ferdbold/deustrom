@@ -3,50 +3,37 @@ using System.Collections;
 
 namespace Simoncouche.Chain {
 
-	/// <summary>
 	/// A ChainSection is an element of a chain that links to another section or a Hook and is also linked by another section.
-	/// </summary>
 	[RequireComponent(typeof(HingeJoint2D))]
 	public class ChainSection : MonoBehaviour {
 
+		/// Self-reference to the chain section prefab for factory purposes
 		private static GameObject _chainSectionPrefab;
 
-		[Tooltip("Reference to the ChainSection prefab")]
-		[SerializeField]
-		//private ChainSection _chainSectionPrefab;
+		/// The Hook or ChainSection that precedes this section in the chain
+		public GameObject prev { get; private set; }
 
-		/// <summary>
-		/// The ChainSection that is linked to this section
-		/// </summary>
-		private ChainSection _nextChainSection;
-
-		/// <summary>
 		/// The chain this ChainSection is part of
-		/// </summary>
-		public Chain _chain;
-		
-		/// <summary>
+		public Chain chain { get; private set; }
+
 		/// The angle difference from the last link in the chain
-		/// </summary>
-		[Tooltip("The angle difference from the last link in the chain")]
-		private static float chainAngleDiff = 90f;
+		private const float CHAIN_ANGLE_DIFF = 90f;
 
 		// COMPONENTS
 
 		public HingeJoint2D joint { get; private set; }
-		public Rigidbody2D rigidbody { get; private set; }
+		public new Rigidbody2D rigidbody { get; private set; }
 
 		public Transform pivot { get; private set; }
 		public Transform mesh { get; private set; }
 
-        /// <summary>
-        /// Spawn a new ChainSection inside a chain
-        /// </summary>
+        /// <summary>Spawn a new ChainSection inside a chain</summary>
         /// <param name="position">The world position for this new section</param>
+		/// <param name="rotation">The world rotation for this new section</param> 
         /// <param name="chain">The parent chain</param>
-        /// <param name="previousRigidbody">The previous link in the chain</param>
-		/// <param name="previousLinkRotation">The previous link local rotation</param>
-		public static ChainSection Create(Vector3 position, Chain chain, Rigidbody2D previousRigidbody, Quaternion previousLinkRotation = default(Quaternion)) {
+		/// <param name="previous">The previous element in the chain (either Hook or ChainSection)</param>
+		/// <param name="previousLinkRotation">The previous link local rotation (for 90° alternance)</param>
+		public static ChainSection Create(Vector3 position, Quaternion rotation, Chain chain, GameObject previous, Quaternion previousLinkRotation = default(Quaternion)) {
 			if (_chainSectionPrefab == null) {
 				_chainSectionPrefab = Resources.Load("Chain/ChainSection") as GameObject;
 			}
@@ -54,14 +41,14 @@ namespace Simoncouche.Chain {
             ChainSection chainSection = ((GameObject)Instantiate(
                 _chainSectionPrefab,
                 position,
-				previousRigidbody.transform.rotation
+				rotation
             )).GetComponent<ChainSection>();
 				
 			chainSection.transform.parent = chain.transform;
-			chainSection.joint.connectedBody = previousRigidbody;
-			chainSection.SetChain(chain);
-			chainSection.mesh.localRotation = previousLinkRotation * Quaternion.Euler(0, chainAngleDiff, 0);
-			chain.thrower.joint.connectedBody = chainSection.rigidbody;
+			chainSection.chain = chain;
+			chainSection.prev = previous;
+
+			chainSection.mesh.localRotation = previousLinkRotation * Quaternion.Euler(0, CHAIN_ANGLE_DIFF, 0);
 
 			return chainSection;
 		}
@@ -78,18 +65,39 @@ namespace Simoncouche.Chain {
 			this.pivot.LookAt(this.joint.connectedBody.transform.position);
 			this.pivot.Rotate(-90, 0, 0);
 		}
+			
+		/// Generate a new ChainSection and link it to this section
+		public ChainSection SpawnNewSection() {
+			ChainSection nextChainSection = ChainSection.Create(
+                transform.position, 
+				this.rigidbody.transform.rotation, 
+				this.chain, 
+				this.gameObject, 
+				this.mesh.localRotation
+			);
+
+			// Connect the new section to the end of the chain
+			nextChainSection.joint.connectedBody = this.joint.connectedBody;
+
+			// Connect to this new section instead of the end of the chain
+			this.joint.connectedBody = nextChainSection.rigidbody;
+
+			return nextChainSection;
+		}
+
+		/// Remove this section from the chain and ensure proper linkage between the previous and the next.
+		public void Remove() {
+			this.prev.SendMessage("AttachVisualJointTo", this.joint.connectedBody, SendMessageOptions.RequireReceiver);
+			Destroy(this.gameObject);
+		}
 
 		/// <summary>
-		/// Generate a new ChainSection and link it to this section
+		/// Attach this section's joint to another rigidbody. 
+		/// This is useful for deleting sections of a chain
 		/// </summary>
-		public void SpawnNewSection() {
-            Vector3 nextChainSectionPosition = transform.position - transform.right * transform.localScale.x;
-			_nextChainSection = ChainSection.Create(nextChainSectionPosition, _chain, this.rigidbody, this.mesh.localRotation);
-            _chain.endingLink = _nextChainSection;
-        }
-
-		private void SetChain(Chain value) {
-			_chain = value;
+		/// <param name="rb">The new rigidbody to attach to</param>
+		public void AttachVisualJointTo(Rigidbody2D rb) {
+			this.joint.connectedBody = rb;
 		}
 	}
 }

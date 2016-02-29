@@ -3,61 +3,47 @@ using System.Collections.Generic;
 using Simoncouche.Controller;
 
 namespace Simoncouche.Chain {
-    /// <summary>
+
     /// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
-    /// </summary>
-    [RequireComponent(typeof(SpringJoint2D))]
+	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
-        enum State
-        {
+        enum State {
             NoHook,
-            OneHook,
-            TwoHook
+            OneHook
         }
 
         private State _currentState;
-
-		[Tooltip("Reference to the grappling hook prefab")]
-		[SerializeField]
-		private Hook _hookPrefab;
 
 		[Tooltip("The initial force sent to the hook upon throwing it")]
 		[SerializeField]
 		private float _initialForceAmount = 10f;
 
-		/// <summary>
 		/// The minimum distance needed between the thrower and a chain's last ChainSection to spawn a new ChainSection
-		/// </summary>
 		private float _spawnChainDistanceThreshold = 4f;
+        public float spawnChainDistanceThreshold { get { return _spawnChainDistanceThreshold; } }
 
-        public float spawnChainDistanceThreshold { get { return _spawnChainDistanceThreshold; }}
-
-        /// <summary>
-        /// The list of all the chains thrown by this thrower currently in play
-        /// </summary>
+        /// <summary>The list of all the chains thrown by this thrower currently in play</summary>
         private List<Chain> _chains = new List<Chain>();
 
-
-        [Tooltip("Maximum number of links per chain")]
-        [SerializeField]
-        private int maximumLinksPerChain=30;
-
-        [Tooltip("The distance the first hook is in front of the player")]
-        [SerializeField]
-        private float distanceHookInFrontOfPlayer = 3f;
-
 		// COMPONENTS
-		        
-		public SpringJoint2D joint { get; private set; }
+
+        /// <summary>The kinematic rigidbody to hook the visual chain to during OneHook state</summary>
+        public Rigidbody2D chainLinker { get; private set; }
+            
+		public new Rigidbody2D rigidbody { get; private set; }
 		public AimController aimController { get; private set; }
-
-
+        public PlayerController playerController { get; private set; }
+        public PlayerAudio playerAudio { get; private set; }
 
         public void Awake() {
-			this.joint = GetComponent<SpringJoint2D>();
+			this.rigidbody = GetComponent<Rigidbody2D>();
             this.aimController = GetComponent<AimController>();
+            this.playerController = GetComponent<PlayerController>();
+            this.playerAudio = GetComponent<PlayerAudio>();
+
+            this.chainLinker = transform.Find("ChainLinker").GetComponent<Rigidbody2D>();
 		}
 
 		public void SetupInput(bool isPlayerOne) {
@@ -66,48 +52,42 @@ namespace Simoncouche.Chain {
                 this.Fire
             );
 		}
-
-		public void Update() {
-            _aimIndicator.transform.rotation = Quaternion.Euler(0, 0, this.aimOrientation);
-		}
-
-		/// <summary>
-		/// Handle user input to throw a new chain and hook
-		/// </summary>
-		private void Fire() {
-            if (_currentState == State.NoHook)
-            {
-                _chains.Add(Chain.Create(this, _initialForceAmount));
-                _joint.enabled = true;
-                _currentState = State.OneHook;
-            }
-            else if(_currentState == State.OneHook)
-            {
-                _chains[_chains.Count - 1].CreateSecondHook();
-                _currentState = State.TwoHook;
-            }
-            else if(_currentState == State.TwoHook)
-            {
-                _currentState = State.NoHook;
-            }
 			
-		}
+        /// <summary>Handle user input to throw a new chain and hook</summary>
+		private void Fire() {
+            if (playerController.InRespawnState == true) return; //Deactivate hook if currently respawning
 
-		/// <summary>
-		/// Handle user input to update the aim indicator
-		/// </summary>
-		/// <param name="axisValues">Axis values.</param>
-		private void Aim(float[] axisValues) {
-			Vector2 orientation = new Vector2(axisValues[0], axisValues[1]);
+			switch (_currentState) {
 
-			// Only apply aiming if the user input is relevant (higher than the deadzone)
-			if (orientation.magnitude > _aimDeadzone) {
-				this.aimOrientation = Vector2.Angle(Vector2.right, orientation);
+			// If we press fire when we don't have any hook,
+			// we create a hook and switch the currentState to OneHook
+			case State.NoHook:
+				_chains.Add(Chain.Create(this, _initialForceAmount));
+				_currentState = State.OneHook;
 
-				if (axisValues[1] < 0) {
-					this.aimOrientation = 360f - this.aimOrientation;
-				}
-			}
+				// Animation handling
+				playerController.HandleFirstHookAnimation();
+
+                // Audio
+                playerAudio.PlaySound(PlayerSounds.PlayerChainFirst);
+
+				break;
+			
+			// If we press fire when we have 1 hook, 
+			// we create a hook and switch the currentState to NoHook
+			// TODO: MODIFIER POUR LIER LES 2 CHAINES
+			case State.OneHook: 
+				_chains[_chains.Count - 1].CreateEndingHook();
+				_currentState = State.NoHook;
+
+				// Animation handling
+				playerController.HandleSecondHookAnimation();
+
+                // Audio
+                playerAudio.PlaySound(PlayerSounds.PlayerChainSecond);
+
+				break;
+            }
 		}
 	}
 }
