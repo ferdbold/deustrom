@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections.Generic;
 using DG.Tweening;
 using System.Collections;
@@ -18,6 +19,14 @@ namespace Simoncouche.Islands {
         /// <summary> The many part of the Island </summary>
         public List<IslandChunk> chunks { get; private set; }
 
+        // EVENTS
+
+        /// <summary>Invoked when this island or one of its chunks are grabbed by the player</summary>
+        public PlayerGrabEvent GrabbedByPlayer;
+
+        /// <summary>Invoked when this island or one of its chunks are released by the player</summary>
+        public Rigidbody2DEvent ReleasedByPlayer;
+
         //Island's Components
         private CircleCollider2D _collider;
         public GravityBody gravityBody { get; private set; }
@@ -29,8 +38,9 @@ namespace Simoncouche.Islands {
 			gravityBody = GetComponent<GravityBody>();
             rigidbody = GetComponent<Rigidbody2D>();
 
-
-        }
+            this.GrabbedByPlayer = new PlayerGrabEvent();
+            this.ReleasedByPlayer = new Rigidbody2DEvent();
+		}
         
         private void Start() {
             if (_collider != null) _collider.isTrigger = true;

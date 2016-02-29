@@ -232,6 +232,13 @@ public class GravityBody : GravityObject {
          _collider.enabled = false;
     }
 
+    #endregion
+
+    #region Properties
+
+    public new Rigidbody2D rigidbody {
+        get { return _rigidBody; }
+    }
 
     #endregion
 }

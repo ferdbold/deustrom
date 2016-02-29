@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using Simoncouche.Islands;
+using Simoncouche.Controller;
 
 namespace Simoncouche.Chain {
 
@@ -151,6 +152,8 @@ namespace Simoncouche.Chain {
 
             // Add listeners
             anchor.GetIslandChunk().MergeIntoIsland.AddListener(this.OnAttachedChunkMerge);
+            anchor.GetIslandChunk().GrabbedByPlayer.AddListener(this.OnAttachedChunkPlayerGrab);
+            anchor.GetIslandChunk().ReleasedByPlayer.AddListener(this.OnAttachedChunkPlayerRelease);
 
             this.Attach.Invoke();
 
@@ -170,11 +173,22 @@ namespace Simoncouche.Chain {
         /// <summary>React to attached chunk being merged into island</summary>
         /// <param name="newIsland">The resultant isl+and</param>
         private void OnAttachedChunkMerge(Island newIsland) {
-            if (this.chainJoint.connectedBody != null) {
-                //if (this.chainJoint.connectedBody.tag != "Player") this.chainJoint.connectedBody = newIsland.rigidbody;
-            }
             // Attach the joints to its parent island
             this.targetJoint.connectedBody = newIsland.rigidbody;
+        }
+
+        /// <summary>React to attached chunk being grabbed by a player</summary>
+        /// <param name="playerGrab">The player who grabbed the chunk</param> 
+        private void OnAttachedChunkPlayerGrab(PlayerGrab playerGrab) {
+            // Reroute the chain to the player
+            this.targetJoint.connectedBody = playerGrab.rigidbody;
+        }
+
+        /// <summary>React to attached chunk being released by a player</summary>
+        /// <param name="rb">The rigidbody the player was holding</param> 
+        private void OnAttachedChunkPlayerRelease(Rigidbody2D rb) {
+            // Reroute the chain back to the island or chunk
+            this.targetJoint.connectedBody = rb;
         }
 	}
 }

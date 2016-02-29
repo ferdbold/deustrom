@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Simoncouche.Islands;
 
 namespace Simoncouche.Controller {
+    
+    [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerGrab : MonoBehaviour {
 
         //Attributes
@@ -40,7 +42,8 @@ namespace Simoncouche.Controller {
 
         //Components
         /// <summary> Currently Grabbed GravityBody</summary>
-        public GravityBody grabbedBody { get; private set;}
+        public GravityBody grabbedBody { get; private set; }
+        public new Rigidbody2D rigidbody { get; private set; }
 
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
@@ -69,6 +72,7 @@ namespace Simoncouche.Controller {
             _chargeParticles = new List<ParticleSystem>(transform.Find("P_ChargeParticles").GetComponentsInChildren<ParticleSystem>());
             _chargeParticlesMax = new List<ParticleSystem>(transform.Find("P_MaxChargeParticles").GetComponentsInChildren<ParticleSystem>());
             grabbedBody = null;
+            this.rigidbody = GetComponent<Rigidbody2D>();
 
             //Add to static playergrab list
             _allPlayerGrabs.Add(this);
@@ -169,6 +173,8 @@ namespace Simoncouche.Controller {
                 //Move object in player's arm 
                 StartCoroutine(RepositionGrabbedBody(targetChunk.transform));
 
+                targetChunk.GrabbedByPlayer.Invoke(this);
+
             } else {
                 Island parentIsland = targetChunk.parentIsland;
                 //Set parent
@@ -184,6 +190,8 @@ namespace Simoncouche.Controller {
                 _playerGravityBody.Weight = parentIsland.GetComponent<GravityBody>().Weight + _playerController._startPlayerWeight;
                 //Move object in player's arm 
                 StartCoroutine(RepositionGrabbedBody(parentIsland.transform));
+
+                parentIsland.GrabbedByPlayer.Invoke(this);
             }
 
             //Check grab particles 
@@ -279,7 +287,10 @@ namespace Simoncouche.Controller {
 
         }
 
-        /// <summary> Releases the gravity body </summary>
+        /// <summary>
+        /// Releases the gravity body.
+        /// Raises the ReleasedByPlayer event in the targeted Island or IslandChunk.
+        /// </summary>
         public void Release() {
 
             if (grabbedBody != null) {
@@ -293,7 +304,10 @@ namespace Simoncouche.Controller {
                     grabbedBody.ActivateGravityBody();
                     //UnIgnore Collision
                     ReactivateCollision(targetChunk.GetComponent<Collider2D>(), 0.5f);
+
+                    targetChunk.ReleasedByPlayer.Invoke(targetChunk.gravityBody.rigidbody);
                 }
+
                 //If chunk has a parent island
                 else {
                     //Get island and reactivate it
@@ -305,8 +319,9 @@ namespace Simoncouche.Controller {
                     //UnIgnore Collision
                     foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
                         ReactivateCollision(iChunk.GetComponent<Collider2D>(), 0.5f);
-
                     }
+
+                    parentIsland.ReleasedByPlayer.Invoke(parentIsland.rigidbody);
                 }
 
                 //Mark grabbed body as null

@@ -5,8 +5,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Simoncouche.Islands {
+    public class Rigidbody2DEvent : UnityEvent<Rigidbody2D> {}
     public class IslandEvent : UnityEvent<Island> {}
-
+    public class PlayerGrabEvent : UnityEvent<Simoncouche.Controller.PlayerGrab> {}
+    
 	/// <summary>
 	/// The structure related to an island chunk
 	/// </summary>
@@ -19,8 +21,8 @@ namespace Simoncouche.Islands {
 		[Header("Island Property")]
 
         [SerializeField][Tooltip("Current Island this islandChunk is attached to. Only modify this to create group of island chunks before in the editor.")]
-        public Island parentIsland = null;
-        
+        public Island _parentIsland = null;
+
         [SerializeField] [Tooltip("The Assign color of the Island")]
 		private IslandUtils.color _color;	
 		public IslandUtils.color color {
@@ -45,8 +47,15 @@ namespace Simoncouche.Islands {
         #region Events
 
         /// <summary>Invoked when this chunk is merged into a larger island</summary>
-        /// <param>The merge into island.</value>
+        /// <param>The resulting parent island</param>
         public IslandEvent MergeIntoIsland { get; private set; }
+
+        /// <summary>Invoked when this chunk (or its parent island) gets grabbed by a player</summary>
+        /// <param>The grabbing player</param>
+        public PlayerGrabEvent GrabbedByPlayer { get; private set; }
+
+        /// <summary>Invoked when this chunk (or its parent island) is released by a player</summary>
+        public Rigidbody2DEvent ReleasedByPlayer { get; private set; }
 
         #endregion
 
@@ -79,6 +88,8 @@ namespace Simoncouche.Islands {
 			SpawnAnchorPoints();
 
             this.MergeIntoIsland = new IslandEvent();
+            this.GrabbedByPlayer = new PlayerGrabEvent();
+            this.ReleasedByPlayer = new Rigidbody2DEvent();
         }
 
         void Start() {
@@ -256,13 +267,45 @@ namespace Simoncouche.Islands {
         /// Method called when entering the maelstrom
         /// </summary>
         public void OnMaelstromEnter() {
-			if (parentIsland != null) {
-				parentIsland.OnMaelstromEnter(this);
-			} else {
-				GameManager.islandManager.DestroyChunk(this);
-			}
-		}
+            if (parentIsland != null) {
+                parentIsland.OnMaelstromEnter(this);
+            } else {
+                GameManager.islandManager.DestroyChunk(this);
+            }
+        }
+        
+        private void OnParentIslandGrabbedByPlayer(Simoncouche.Controller.PlayerGrab playerGrab) {
+            // Bubble up player grab event
+            this.GrabbedByPlayer.Invoke(playerGrab);
+        }
 
-		#endregion
-	}
+        private void OnParentIslandReleasedByPlayer(Rigidbody2D rb) {
+            // Bubble up player release event
+            this.ReleasedByPlayer.Invoke(rb);
+        }
+
+        #endregion
+
+        #region Properties
+
+        public Island parentIsland {
+            get {
+                return _parentIsland;
+            }
+            set {
+                if (_parentIsland != null) {
+                    _parentIsland.GrabbedByPlayer.RemoveListener(this.OnParentIslandGrabbedByPlayer);
+                    _parentIsland.ReleasedByPlayer.RemoveListener(this.OnParentIslandReleasedByPlayer);
+                }
+                _parentIsland = value;
+
+                if (_parentIsland != null) {
+                    _parentIsland.GrabbedByPlayer.AddListener(this.OnParentIslandGrabbedByPlayer);
+                    _parentIsland.ReleasedByPlayer.AddListener(this.OnParentIslandReleasedByPlayer);
+                }
+            }
+        }
+
+        #endregion
+    }
 }
