@@ -7,8 +7,10 @@ namespace Simoncouche.Controller {
     public class PlayerGrab : MonoBehaviour {
 
         //Attributes
-        [Tooltip("Magnitude of the force applied to the thrown gravity body")][SerializeField]
+        [SerializeField] [Tooltip("Magnitude of the force applied to the thrown gravity body. This is reduces by the grabbed object's weight")]
         private float THROW_FORCE = 15f;
+        [SerializeField] [Tooltip("Minimum force to apply to object no matter the grabbed Object weight. ")]
+        private float MIN_THROW_FORCE = 9f;
 
         
         [SerializeField][Tooltip("Angle in front of player at which the player can grab an island. If not in this angle, the island will just bump in the player.")]
@@ -22,6 +24,8 @@ namespace Simoncouche.Controller {
 
         /// <summary> Wheter the player is currently in grab cooldown or not</summary>
         private bool _inGrabCooldown = false;
+
+        
 
 
         //Components
@@ -185,8 +189,10 @@ namespace Simoncouche.Controller {
                 Release();
                 //Add Force
                 Vector2 forceDirection = _aimController.aimOrientationVector2.normalized;
-                bodyToAddForce.Velocity = forceDirection * THROW_FORCE / Mathf.Max(1,bodyToAddForce.Weight / 10f);
-
+                float finalThrowForce = Mathf.Max(MIN_THROW_FORCE, THROW_FORCE / Mathf.Max(1, bodyToAddForce.Weight / 10f));
+                bodyToAddForce.Velocity = forceDirection * finalThrowForce;
+                //Remove Force from player
+                _playerGravityBody.Velocity /= 4f;
                 //Animation
                 _playerController.HandlePushAnimation();
                 //Sounds
@@ -210,7 +216,7 @@ namespace Simoncouche.Controller {
                     _grabbedBodyParent = null;
                     grabbedBody.ActivateGravityBody();
                     //UnIgnore Collision
-                    ReactivateCollision(targetChunk.GetComponent<Collider2D>(), 1f);
+                    ReactivateCollision(targetChunk.GetComponent<Collider2D>(), 0.5f);
                 }
                 //If chunk has a parent island
                 else {
@@ -222,7 +228,7 @@ namespace Simoncouche.Controller {
                     _grabbedBodyParent = null;
                     //UnIgnore Collision
                     foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
-                        ReactivateCollision(iChunk.GetComponent<Collider2D>(), 1f);
+                        ReactivateCollision(iChunk.GetComponent<Collider2D>(), 0.5f);
 
                     }
                 }

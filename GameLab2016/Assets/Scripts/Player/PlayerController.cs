@@ -13,20 +13,17 @@ namespace Simoncouche.Controller {
         [Header("Player Speed Properties :")]
         [SerializeField] [Tooltip("Acceleration of the player in unit per second")]
 	    private float playerAcceleration;
-
         [SerializeField] [Tooltip("Maximum velocity of the player")]
-	    private float maximumVelocity;
-    
+	    private float maximumVelocity; 
         [SerializeField] [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
         private AnimationCurve VelocityFalloffCurve;
-
         [SerializeField] [Tooltip("Degrees of rotation the player can rotate per second.")]
         private float ROTATION_SPEED = 720f;
+
 
         [Header("Grab Related Properties :")]
         [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player rotation when grabbing an object.")]
         private float GRAB_RATIO_ROTATION = 1f;
-
         [SerializeField] [Tooltip("Ratio of the grabbed object's weight to take into account when slowing the player movement speed when grabbing an object.")]
         private float GRAB_RATIO_MOVEMENT = 0.75f;
 
@@ -39,8 +36,6 @@ namespace Simoncouche.Controller {
         private float RESPAWN_UNDERWATER_TIME = 3f;
         [SerializeField] [Tooltip("Z position under water when respawning. Can be changed independently for each character depending on their height.")]
         private float Z_UNDER_WATER = 1.25f;
-
-
 
         [Header("Other :")]
         [SerializeField] [Tooltip("Force to apply when bumping another player")]
@@ -96,11 +91,6 @@ namespace Simoncouche.Controller {
         /// <summary> Start Player weight </summary>
         public float _startPlayerWeight { get; private set; }
 
-
-
-
-
-
         #endregion
 
         /// <summary> Getting multiple needed components (Rigidbody, ...)  </summary>
@@ -135,7 +125,6 @@ namespace Simoncouche.Controller {
             if(_positionZOnBackground == null) {
                 Debug.LogError("Player/PositionOnZBackground cannont be found!");
             }
-
         }
 
         /// <summary>  Initialization of variables </summary>
@@ -162,9 +151,7 @@ namespace Simoncouche.Controller {
 
         /// <summary> modifies the player's drag based on the grabbed object </summary>
         private void UpdateGrabDrag() {
-            _playerRigidBody.drag = Mathf.Min(_playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag, 5f); //max drag to 5
-            Debug.Log("pg : " + _playerGrab.GetGrabbedWeight() + "   sd : " + _startDrag);
-
+            _playerRigidBody.drag = Mathf.Min(_playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag, 3.5f); //max drag to 3.5
         }
 
         //Death when entering maelstrom and respawn on map edges
