@@ -66,8 +66,8 @@ namespace Simoncouche.Islands {
 
 				List<IslandChunk> chunks = isA ? b_IslandLink.chunks : a_IslandLink.chunks;
 				foreach (IslandChunk chunk in chunks) {
-                    if (isA) AddChunkToExistingIsland(a_IslandLink, chunk, b, a);
-                    else AddChunkToExistingIsland(a_IslandLink, chunk, a, b);
+                    if (isA) AddChunkToExistingIsland(a_IslandLink, chunk);
+                    else AddChunkToExistingIsland(a_IslandLink, chunk);
 
                     /*
                     a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint((isA ? b : a).transform.position, 
@@ -100,7 +100,7 @@ namespace Simoncouche.Islands {
 
 			//If only a is contained in a Island
 			else if (a_IslandLink != null) {
-				AddChunkToExistingIsland(a_IslandLink,b, b, a);
+				AddChunkToExistingIsland(a_IslandLink,b);
                
 				//a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
 				//PlayerGrab.UngrabBody(b.gravityBody);
@@ -111,7 +111,7 @@ namespace Simoncouche.Islands {
 
            //If only b is contained in a Island
            else if (b_IslandLink != null) {
-                AddChunkToExistingIsland(b_IslandLink, a, a, b);
+                AddChunkToExistingIsland(b_IslandLink, a);
                 
                 //b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
                 //PlayerGrab.UngrabBody(a.gravityBody);
@@ -135,7 +135,7 @@ namespace Simoncouche.Islands {
         /// <param name="chunk">Chunk to add to island</param>
         /// <param name="a"></param>
         /// <param name="b"></param>
-        private void AddChunkToExistingIsland(Island islandLink, IslandChunk chunk, IslandChunk a, IslandChunk b) {
+        private void AddChunkToExistingIsland(Island islandLink, IslandChunk chunk) {
             islandLink.AddChunkToIsland(chunk);
             PlayerGrab.UngrabBody(chunk.gravityBody);
             PlayerGrab.RemoveCollisionIfGrabbed(islandLink, chunk);
@@ -174,8 +174,8 @@ namespace Simoncouche.Islands {
             }
 
 
-            AddChunkToExistingIsland(island.GetComponent<Island>(), a, b, a);
-            AddChunkToExistingIsland(island.GetComponent<Island>(), b, b, a);
+            AddChunkToExistingIsland(island.GetComponent<Island>(), a);
+            AddChunkToExistingIsland(island.GetComponent<Island>(), b);
 
             /*
             island.GetComponent<Island>().AddChunkToIsland(a, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
@@ -229,8 +229,36 @@ namespace Simoncouche.Islands {
 			List<List<IslandChunk>> islands = new List<List<IslandChunk>>();
 			//is broken
 			while (chunkChecked.Count != island.chunks.Count) {
-				//TODO create islands with the remaining chunk
+				//Find list of Chunk that should be island
+				chunkIsland.Clear();
+				foreach (IslandChunk chunk in island.chunks) {
+					if (!chunkChecked.Contains(chunk)) {
+						chunkIsland = CheckIslandBroken_Helper(chunk, chunkIsland);
+						break;
+					}
+				}
+
+				chunkChecked.AddRange(chunkIsland);
+
+				//Remove Chunk
+				if (chunkIsland.Count == 1) {
+					island.chunks.Remove(chunkIsland[0]);
+					chunkIsland[0].transform.SetParent(island.transform.parent);
+				}
+
+				//Create Island
+				else {
+					foreach (IslandChunk chunk in chunkIsland) {
+						island.chunks.Remove(chunk);
+					}
+					Island newIsland = CreateIsland(chunkIsland[0], chunkIsland[1]);
+					for (int i = 2; i < chunkIsland.Count; i++) {
+						AddChunkToExistingIsland(newIsland, chunkIsland[i]);
+					}
+					newIsland.RecreateIslandChunkConnection();
+				}
 			}
+			island.RecreateIslandChunkConnection();
 		}
 
 		/// <summary>
