@@ -48,7 +48,6 @@ public class Attractor : GravityModifier {
         //Check player distance and abort if too far
         if(body.gameObject.tag == "Player") {
             float distance = Vector2.Distance(transform.position, body.transform.position);
-            Debug.Log(distance);
             if (distance > MAX_DISTANCE_PLAYER) return Vector2.zero;
         }
 
