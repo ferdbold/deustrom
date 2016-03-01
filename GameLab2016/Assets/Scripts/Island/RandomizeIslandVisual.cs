@@ -82,14 +82,18 @@ namespace Simoncouche.Islands {
             //remove previously created objects
             RemoveAllModelChildren();
             //create basic empty islansd for both sides
-            _CT_island = new GameObject();
-            _CT_island.name = "CTHULHU_ISLAND";
-            _CT_island.transform.parent = _islandModel.parent;
-            _CT_island.transform.localPosition = Vector3.zero;
+            //Sobek
             _SO_island = new GameObject();
-            _SO_island.transform.parent = _islandModel.parent;
+            _SO_island.transform.parent = _islandModel;
             _SO_island.name = "SOBEK_ISLAND";
             _SO_island.transform.localPosition = Vector3.zero;
+            _SO_island.transform.localScale = Vector3.one;
+            //Cthulhu
+            _CT_island = new GameObject();
+            _CT_island.name = "CTHULHU_ISLAND";
+            _CT_island.transform.parent = _islandModel;
+            _CT_island.transform.localPosition = Vector3.zero;
+            _CT_island.transform.localScale = Vector3.one;
             //Create random islands and populate them
             RandomizeIslandBase();
             ApplyVariation();
@@ -110,11 +114,13 @@ namespace Simoncouche.Islands {
             GameObject soBase = (GameObject)Instantiate(ISLANDS_BASE_SOBEK[randNum], _SO_island.transform.position, Quaternion.identity);
             soBase.transform.parent = _SO_island.transform;
             soBase.transform.localPosition = Vector3.zero;
+            soBase.transform.localScale = Vector3.one;
             //Create cthulhu Island
             randNum = Random.Range(0, ISLANDS_BASE_CTHULHU.Count);
             GameObject ctBase = (GameObject)Instantiate(ISLANDS_BASE_CTHULHU[randNum], _CT_island.transform.position, Quaternion.identity);
             ctBase.transform.parent = _CT_island.transform;
             ctBase.transform.localPosition = Vector3.zero;
+            ctBase.transform.localScale = Vector3.one;
             //Add Props to islands
             RandomizeIslandProps(soBase, ctBase);
         }
@@ -128,11 +134,13 @@ namespace Simoncouche.Islands {
             GameObject soProps = (GameObject)Instantiate(ISLANDS_PROPS_SOBEK[randNum], _islandModel.transform.position, Quaternion.identity);
             soProps.transform.parent = soBase.transform;
             soProps.transform.localPosition = Vector3.zero;
+            soProps.transform.localScale = Vector3.one;
             //Create cthulhu Island
             randNum = Random.Range(0, ISLANDS_PROPS_CTHULHU.Count);
             GameObject ctProps = (GameObject)Instantiate(ISLANDS_PROPS_CTHULHU[randNum], _islandModel.transform.position, Quaternion.identity);
             ctProps.transform.parent = ctBase.transform;
-            soProps.transform.localPosition = Vector3.zero;
+            ctProps.transform.localPosition = Vector3.zero;
+            ctProps.transform.localScale = Vector3.one;
         }
 
         /// <summary> Modify the visuals of the island's model </summary>
