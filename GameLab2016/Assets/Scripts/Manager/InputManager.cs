@@ -15,8 +15,12 @@ public class InputManager : MonoBehaviour {
 	//Possible Event
 	private EventAxis p1_leftAnalog;
 	private EventAxis p1_rightAnalog;
+    private EventAxis p1_leftTrigger;
+    private EventAxis p1_rightTrigger;
     private EventAxis p2_leftAnalog;
     private EventAxis p2_rightAnalog;
+    private EventAxis p2_leftTrigger;
+    private EventAxis p2_rightTrigger;
 
     private EventButton _startButton;
 	private EventButton p1_fireHookButton;
@@ -28,7 +32,7 @@ public class InputManager : MonoBehaviour {
     /// <summary>
     /// The name of every axis
     /// </summary>
-    public enum Axis { p1_leftAnalog, p1_rightAnalog, p2_leftAnalog, p2_rightAnalog }
+    public enum Axis { p1_leftAnalog, p1_rightAnalog, p1_leftTrigger, p1_rightTrigger, p2_leftAnalog, p2_rightAnalog, p2_leftTrigger, p2_rightTrigger }
 	/// <summary>
 	/// Link a function to an event
 	/// </summary>
@@ -38,13 +42,17 @@ public class InputManager : MonoBehaviour {
 		switch (axis) {
 			case Axis.p1_leftAnalog: p1_leftAnalog += eventFunction; break;
 			case Axis.p1_rightAnalog: p1_rightAnalog += eventFunction; break;
+            case Axis.p1_leftTrigger: p1_leftTrigger += eventFunction; break;
+            case Axis.p1_rightTrigger: p1_rightTrigger += eventFunction; break;
             case Axis.p2_leftAnalog: p2_leftAnalog += eventFunction; break;
             case Axis.p2_rightAnalog: p2_rightAnalog += eventFunction; break;
+            case Axis.p2_leftTrigger: p2_leftTrigger += eventFunction; break;
+            case Axis.p2_rightTrigger: p2_rightTrigger += eventFunction; break;
 
             //Error
             default:
-				Debug.LogError("Tried to add an event to the input manager for a button that does not exist."+
-							   "You might want to axis instead of button.");
+				Debug.LogError("Tried to add an event to the input manager for an axis that does not exist."+
+							   "You might want to use button instead of axis.");
 				break;
 		}
 	}
@@ -69,7 +77,7 @@ public class InputManager : MonoBehaviour {
             //Error
             default:
 				Debug.LogError("Tried to add an event to the input manager for a button that does not exist." + 
-							   "You might want to axis instead of button.");
+							   "You might want to use axis instead of button.");
 				break;
 		}
 	}
@@ -77,14 +85,18 @@ public class InputManager : MonoBehaviour {
 
 	#region Remove Event
 
-	/// <summary>Resets every inputs to null</summary>
+	/// <summary>Resets every inputs to null. Used when  reloading a scene</summary>
 	public void ResetInputs() {
 		p1_leftAnalog = null;
 		p1_rightAnalog = null;
-		p2_leftAnalog = null;
+        p1_leftTrigger = null;
+        p1_rightTrigger = null;
+        p2_leftAnalog = null;
 		p2_rightAnalog = null;
+        p2_leftTrigger = null;
+        p2_rightTrigger = null;
 
-		_startButton = null;
+        _startButton = null;
 		p1_fireHookButton = null;
 		p2_fireHookButton = null;
 		p1_pushButton = null;
@@ -97,8 +109,12 @@ public class InputManager : MonoBehaviour {
 		List<AxisTuple> axii = new List<AxisTuple>() {
 			new AxisTuple("P1 Left Analog", p1_leftAnalog, Input.GetAxis("P1_L_Horizontal"), Input.GetAxis("P1_L_Vertical")),
 			new AxisTuple("P1 Right Analog", p1_rightAnalog, Input.GetAxis("P1_R_Horizontal"), Input.GetAxis("P1_R_Vertical")),
+            new AxisTuple("P2 Left Trigger", p1_leftTrigger, Input.GetAxis("P1_L_Trigger"), 0),                                     //This axis has only 1 direction
+            new AxisTuple("P2 Right Trigger", p1_rightTrigger, Input.GetAxis("P1_R_Trigger"), 0),                                   //This axis has only 1 direction
             new AxisTuple("P2 Left Analog", p2_leftAnalog, Input.GetAxis("P2_L_Horizontal"), Input.GetAxis("P2_L_Vertical")),
-            new AxisTuple("P2 Right Analog", p2_rightAnalog, Input.GetAxis("P2_R_Horizontal"), Input.GetAxis("P2_R_Vertical"))
+            new AxisTuple("P2 Right Analog", p2_rightAnalog, Input.GetAxis("P2_R_Horizontal"), Input.GetAxis("P2_R_Vertical")),
+            new AxisTuple("P2 Left Trigger", p2_leftTrigger, Input.GetAxis("P2_L_Trigger"), 0),                                     //This axis has only 1 direction
+            new AxisTuple("P2 Right Trigger", p2_rightTrigger, Input.GetAxis("P2_R_Trigger"), 0)                                    //This axis has only 1 direction
         };
 		List<ButtonTuple> buttons = new List<ButtonTuple>() {
             new ButtonTuple("P1 Push", p1_pushButton, Input.GetButtonDown("P1_Push")),

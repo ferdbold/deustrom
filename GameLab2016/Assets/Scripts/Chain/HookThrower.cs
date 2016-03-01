@@ -9,10 +9,7 @@ namespace Simoncouche.Chain {
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
-        enum State {
-            NoHook,
-            OneHook
-        }
+        enum State { NoHook, OneHook }
 
         private State _currentState;
 
@@ -31,14 +28,16 @@ namespace Simoncouche.Chain {
         private List<Chain> _chains = new List<Chain>();
 
 		// COMPONENTS
-
         /// <summary>The kinematic rigidbody to hook the visual chain to during OneHook state</summary>
-        public Rigidbody2D chainLinker { get; private set; }
-            
+        public Rigidbody2D chainLinker { get; private set; }        
 		public new Rigidbody2D rigidbody { get; private set; }
 		public AimController aimController { get; private set; }
         public PlayerController playerController { get; private set; }
         public PlayerAudio playerAudio { get; private set; }
+
+        //PROPERTIES
+        private bool _triggerIsHeld = false;
+
 
         public void Awake() {
 			this.rigidbody = GetComponent<Rigidbody2D>();
@@ -51,8 +50,8 @@ namespace Simoncouche.Chain {
 
 		public void SetupInput(bool isPlayerOne) {
 			GameManager.inputManager.AddEvent(
-                isPlayerOne ? InputManager.Button.p1_fireHook : InputManager.Button.p2_fireHook, 
-                this.Fire
+                isPlayerOne ? InputManager.Axis.p1_leftTrigger : InputManager.Axis.p2_leftTrigger, 
+                this.CheckPlayerInputs
             );
 		}
 			
@@ -61,7 +60,6 @@ namespace Simoncouche.Chain {
             if (playerController.InRespawnState == true) return; //Deactivate hook if currently respawning
 
 			switch (_currentState) {
-
 			// If we press fire when we don't have any hook,
 			// we create a hook and switch the currentState to OneHook
 			case State.NoHook:
@@ -92,5 +90,22 @@ namespace Simoncouche.Chain {
 				break;
             }
 		}
+
+
+        private void CheckPlayerInputs(params float[] input) {
+            if (playerController.InRespawnState == true) return; //Deactivate hook if currently respawning
+            bool isCurrentlyHeld = (input[0] == 1);
+
+            if(_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
+                _triggerIsHeld = false;
+                Fire();
+                aimController.ToggleAimIndicator(false);
+            } else if(!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
+                _triggerIsHeld = true;
+                aimController.ToggleAimIndicator(true);
+
+            }
+
+        }
 	}
 }
