@@ -21,11 +21,12 @@ namespace Simoncouche.Controller {
 
         /// <summary> Parent of grabbed gravity body. Used to reposition  body at the right place when releasing. </summary>
         private Transform _grabbedBodyParent = null;
-
         /// <summary> Wheter the player is currently in grab cooldown or not</summary>
         private bool _inGrabCooldown = false;
+        /// <summary> Is the grab trigger currently held or not</summary>
+        private bool _triggerIsHeld = false;
 
-        
+
 
 
         //Components
@@ -79,11 +80,21 @@ namespace Simoncouche.Controller {
 
         public void SetupInput(bool isPlayerOne) {
             GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Axis.p1_rightTrigger : InputManager.Axis.p2_rightTrigger,
+                this.CheckPlayerInputs
+            );
+
+            //For Keyboard use
+            #if UNITY_EDITOR
+            GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Button.p1_pushButton : InputManager.Button.p2_pushButton,
                 this.Throw
             );
+            #endif
         }
 
+        /// <summary> Get weight of currently grabbed object </summary>
+        /// <returns> float representign the weight</returns>
         public float GetGrabbedWeight() {
             if (grabbedBody == null) return 0f;
             IslandChunk c = grabbedBody.GetComponent<IslandChunk>();
@@ -341,5 +352,16 @@ namespace Simoncouche.Controller {
 
         #endregion
 
+
+        private void CheckPlayerInputs(params float[] input) {
+            bool isCurrentlyHeld = (input[0] == 1);
+
+            if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
+                _triggerIsHeld = false;
+                Throw();
+            } else if (!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
+                _triggerIsHeld = true;
+            }
+        }
     }
 }

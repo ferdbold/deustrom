@@ -113,7 +113,6 @@ namespace Simoncouche.Chain {
                 aimController.ToggleAimIndicator(true);
 
             }
-
         }
 	}
 }
