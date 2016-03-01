@@ -368,6 +368,16 @@ namespace Simoncouche.Controller {
             _animator.SetTrigger("GotBumped");
         }
 
+        /// <summary> Handles the animation when the player starts aiming </summary>
+        public void HandleAimStartAnimation() {
+            _animator.SetBool("State_Aiming", true);
+        }
+
+        /// <summary> Handles the animation when the player stops aiming </summary>
+        public void HandleAimStopAnimation() {
+            _animator.SetBool("State_Aiming", false);
+        }
+
         #endregion
 
         //Collision Methods. Includes Unity collision methods

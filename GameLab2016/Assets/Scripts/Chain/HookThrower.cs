@@ -80,6 +80,7 @@ namespace Simoncouche.Chain {
                 // Audio
                 playerAudio.PlaySound(PlayerSounds.PlayerChainFirst);
 
+
 				break;
 			
 			// If we press fire when we have 1 hook, 
@@ -107,10 +108,14 @@ namespace Simoncouche.Chain {
             if(_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
                 _triggerIsHeld = false;
                 Fire();
+                //animation
                 aimController.ToggleAimIndicator(false);
+                playerController.HandleAimStopAnimation();
             } else if(!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
                 _triggerIsHeld = true;
+                //animation
                 aimController.ToggleAimIndicator(true);
+                playerController.HandleAimStartAnimation();
 
             }
         }
