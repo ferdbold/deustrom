@@ -3,20 +3,23 @@ using System.Collections;
 
 namespace Simoncouche.Chain {
 
-	/// A ChainSection is an element of a chain that links to another section or a Hook and is also linked by another section.
+    /// <summary>
+    /// A ChainSection is an element of a chain that links to another section 
+    /// or a Hook and is also linked by another section.
+    /// </summary>
 	[RequireComponent(typeof(HingeJoint2D))]
 	public class ChainSection : MonoBehaviour {
 
-		/// Self-reference to the chain section prefab for factory purposes
+        /// <summary>Self-reference to the chain section prefab for factory purposes</summary>
 		private static GameObject _chainSectionPrefab;
 
-		/// The Hook or ChainSection that precedes this section in the chain
+        /// <summary>The Hook or ChainSection that precedes this section in the chain</summary>
 		public GameObject prev { get; private set; }
 
-		/// The chain this ChainSection is part of
+        /// <summary>The chain this ChainSection is part of</summary>
 		public Chain chain { get; private set; }
 
-		/// The angle difference from the last link in the chain
+        /// <summary>The angle difference from the last link in the chain</summary>
 		private const float CHAIN_ANGLE_DIFF = 90f;
 
 		// COMPONENTS
@@ -66,7 +69,7 @@ namespace Simoncouche.Chain {
 			this.pivot.Rotate(-90, 0, 0);
 		}
 			
-		/// Generate a new ChainSection and link it to this section
+        /// <summary>Generate a new ChainSection and link it to this section</summary>
 		public ChainSection SpawnNewSection() {
 			ChainSection nextChainSection = ChainSection.Create(
                 transform.position, 
@@ -85,7 +88,10 @@ namespace Simoncouche.Chain {
 			return nextChainSection;
 		}
 
-		/// Remove this section from the chain and ensure proper linkage between the previous and the next.
+        /// <summary>
+        /// Remove this section from the chain and ensure proper linkage 
+        /// between the previous and the next.
+        /// </summary>
 		public void Remove() {
 			this.prev.SendMessage("AttachVisualJointTo", this.joint.connectedBody, SendMessageOptions.RequireReceiver);
 			Destroy(this.gameObject);

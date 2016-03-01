@@ -75,6 +75,24 @@ public class InputManager : MonoBehaviour {
 	}
 	#endregion
 
+	#region Remove Event
+
+	/// <summary>Resets every inputs to null</summary>
+	public void ResetInputs() {
+		p1_leftAnalog = null;
+		p1_rightAnalog = null;
+		p2_leftAnalog = null;
+		p2_rightAnalog = null;
+
+		_startButton = null;
+		p1_fireHookButton = null;
+		p2_fireHookButton = null;
+		p1_pushButton = null;
+		p2_pushButton = null;
+	}
+
+	#endregion
+
 	void Update() {
 		List<AxisTuple> axii = new List<AxisTuple>() {
 			new AxisTuple("P1 Left Analog", p1_leftAnalog, Input.GetAxis("P1_L_Horizontal"), Input.GetAxis("P1_L_Vertical")),

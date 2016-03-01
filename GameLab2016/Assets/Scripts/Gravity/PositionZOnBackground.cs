@@ -23,8 +23,8 @@ public class PositionZOnBackground : MonoBehaviour {
         RaycastHit hit;
         float targetZ = 0;
 
-        Debug.DrawRay(transform.position, new Vector3(0, 0, 1000));
-        Debug.DrawRay(transform.position, new Vector3(0, 0, -1000));
+        //Debug.DrawRay(transform.position, new Vector3(0, 0, 1000));
+        //Debug.DrawRay(transform.position, new Vector3(0, 0, -1000));
         if (Physics.Raycast(rayZ, out hit, 1000, _backgroundLayerMask)) {       
             targetZ = hit.point.z;        
         } else if(Physics.Raycast(rayInverseZ, out hit, 1000, _backgroundLayerMask)) {

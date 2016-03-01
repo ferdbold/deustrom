@@ -7,8 +7,10 @@ namespace Simoncouche.Controller {
     public class PlayerGrab : MonoBehaviour {
 
         //Attributes
-        [Tooltip("Magnitude of the force applied to the thrown gravity body")][SerializeField]
+        [SerializeField] [Tooltip("Magnitude of the force applied to the thrown gravity body. This is reduces by the grabbed object's weight")]
         private float THROW_FORCE = 15f;
+        [SerializeField] [Tooltip("Minimum force to apply to object no matter the grabbed Object weight. ")]
+        private float MIN_THROW_FORCE = 9f;
 
         
         [SerializeField][Tooltip("Angle in front of player at which the player can grab an island. If not in this angle, the island will just bump in the player.")]
@@ -23,6 +25,8 @@ namespace Simoncouche.Controller {
         /// <summary> Wheter the player is currently in grab cooldown or not</summary>
         private bool _inGrabCooldown = false;
 
+        
+
 
         //Components
         /// <summary> Currently Grabbed GravityBody</summary>
@@ -30,12 +34,12 @@ namespace Simoncouche.Controller {
 
         /// <summary> Reference to the aim controller </summary>
         private AimController _aimController;
-
         /// <summary> Reference to the player controller </summary>
         private PlayerController _playerController;
-
         /// <summary> Reference to the playerAudio of the player</summary>
         private PlayerAudio _playerAudio;
+        /// <summary> Reference to the gravityBody of the player</summary>
+        private GravityBody _playerGravityBody;
 
         /// <summary> List of references to all playerGrabs. Used to avoid Searching the map everytime we grab.</summary>
         private static List<PlayerGrab> _allPlayerGrabs = new List<PlayerGrab>();
@@ -48,6 +52,7 @@ namespace Simoncouche.Controller {
             _aimController = GetComponent<AimController>();
             _playerController = GetComponent<PlayerController>();
             _playerAudio = GetComponent<PlayerAudio>();
+            _playerGravityBody = GetComponent<GravityBody>();
             grabbedBody = null;
 
             //Add to static playergrab list
@@ -61,6 +66,9 @@ namespace Simoncouche.Controller {
             }
             if (_playerAudio == null) {
                 Debug.LogError("Player/PlayerAudio cannont be found!");
+            }
+            if (_playerGravityBody == null) {
+                Debug.LogError("Player/PlayerGravityBody cannont be found!");
             }
         }
 
@@ -109,9 +117,10 @@ namespace Simoncouche.Controller {
         private void Grab(GravityBody targetBody, IslandChunk targetChunk) {
             //Before grabbing, make the other players release this chunk
             MakeOtherPlayerRelease(targetChunk);
+            grabbedBody = targetBody;
+            
 
             if (targetChunk.parentIsland == null) {
-                grabbedBody = targetBody;
                 //Set parent
                 _grabbedBodyParent = targetChunk.transform.parent;
                 targetChunk.transform.parent = transform;
@@ -119,12 +128,14 @@ namespace Simoncouche.Controller {
                 DeactivateCollision(targetChunk.GetComponent<Collider2D>());
                 //Deactivate gravity body
                 grabbedBody.DeactivateGravityBody();
+                //Set weight
+                _playerGravityBody.Weight = grabbedBody.Weight + _playerController._startPlayerWeight;
+
                 //Move object in player's arm 
                 StartCoroutine(RepositionGrabbedBody(targetChunk.transform));
 
             } else {
                 Island parentIsland = targetChunk.parentIsland;
-                grabbedBody = targetBody;
                 //Set parent
                 _grabbedBodyParent = parentIsland.transform.parent;
                 parentIsland.transform.parent = transform;
@@ -134,6 +145,8 @@ namespace Simoncouche.Controller {
                 }
                 //Deactivate gravity body
                 parentIsland.GetComponent<GravityBody>().DeactivateGravityBody();
+                //Set weight
+                _playerGravityBody.Weight = parentIsland.GetComponent<GravityBody>().Weight + _playerController._startPlayerWeight;
                 //Move object in player's arm 
                 StartCoroutine(RepositionGrabbedBody(parentIsland.transform));
             }
@@ -176,8 +189,10 @@ namespace Simoncouche.Controller {
                 Release();
                 //Add Force
                 Vector2 forceDirection = _aimController.aimOrientationVector2.normalized;
-                bodyToAddForce.Velocity = forceDirection * THROW_FORCE / Mathf.Max(1,bodyToAddForce.Weight / 10f);
-
+                float finalThrowForce = Mathf.Max(MIN_THROW_FORCE, THROW_FORCE / Mathf.Max(1, bodyToAddForce.Weight / 10f));
+                bodyToAddForce.Velocity = forceDirection * finalThrowForce;
+                //Remove Force from player
+                _playerGravityBody.Velocity /= 4f;
                 //Animation
                 _playerController.HandlePushAnimation();
                 //Sounds
@@ -201,7 +216,7 @@ namespace Simoncouche.Controller {
                     _grabbedBodyParent = null;
                     grabbedBody.ActivateGravityBody();
                     //UnIgnore Collision
-                    ReactivateCollision(targetChunk.GetComponent<Collider2D>(), 1f);
+                    ReactivateCollision(targetChunk.GetComponent<Collider2D>(), 0.5f);
                 }
                 //If chunk has a parent island
                 else {
@@ -213,13 +228,15 @@ namespace Simoncouche.Controller {
                     _grabbedBodyParent = null;
                     //UnIgnore Collision
                     foreach (IslandChunk iChunk in parentIsland.GetComponentsInChildren<IslandChunk>()) {
-                        ReactivateCollision(iChunk.GetComponent<Collider2D>(), 1f);
+                        ReactivateCollision(iChunk.GetComponent<Collider2D>(), 0.5f);
 
                     }
                 }
 
                 //Mark grabbed body as null
                 grabbedBody = null;
+                //Set weight
+                _playerGravityBody.Weight =  _playerController._startPlayerWeight;
                 //Start Cooldown
                 StartCoroutine(GrabCooldown());
 

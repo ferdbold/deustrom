@@ -4,7 +4,7 @@ using Simoncouche.Controller;
 
 namespace Simoncouche.Chain {
 
-    /// A HookThrower controls a character's aiming and spawns hooks and chains upon user input.
+    /// <summary>A HookThrower controls a character's aiming and spawns hooks and chains upon user input.</summary>
 	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
@@ -20,7 +20,10 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private float _initialForceAmount = 10f;
 
-		/// The minimum distance needed between the thrower and a chain's last ChainSection to spawn a new ChainSection
+        /// <summary>
+        /// The minimum distance needed between the thrower and a chain's 
+        /// last ChainSection to spawn a new ChainSection
+        /// </summary>
 		private float _spawnChainDistanceThreshold = 4f;
         public float spawnChainDistanceThreshold { get { return _spawnChainDistanceThreshold; } }
 
