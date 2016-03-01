@@ -226,7 +226,6 @@ namespace Simoncouche.Islands {
 			chunkIsland = CheckIslandBroken_Helper(island.chunks[0], chunkIsland);
 			List<IslandChunk> chunkChecked = chunkIsland;
 
-			List<List<IslandChunk>> islands = new List<List<IslandChunk>>();
 			//is broken
 			while (chunkChecked.Count != island.chunks.Count) {
 				//Find list of Chunk that should be island
@@ -242,14 +241,12 @@ namespace Simoncouche.Islands {
 
 				//Remove Chunk
 				if (chunkIsland.Count == 1) {
-					Debug.Log("IslandAlone");
 					island.chunks.Remove(chunkIsland[0]);
 					chunkIsland[0].transform.SetParent(island.transform.parent);
 				}
 
 				//Create Island
 				else if (chunkIsland.Count != 0) {
-					Debug.Log("Multiple chunk " + chunkIsland.Count);
 					foreach (IslandChunk chunk in chunkIsland) {
 						island.chunks.Remove(chunk);
 					}
@@ -326,19 +323,61 @@ namespace Simoncouche.Islands {
 						island.AddChunkToIsland(islandRemoved[i]);
 					}
 				}
+				island.CenterIslandRoot();
 			}
 
 			//Remove connection (only need to remove the connection from one side, one chunk removes the connection from both)
 			foreach (IslandChunk c in islandLink.chunks) {
 				if (!islandRemoved.Contains(c)) {
 					c.RemoveConnectedChunk(islandRemoved);
-				} else {
-					Debug.Log(islandRemoved);
+				} 
+			}
+
+			//Check if the island is broken in pieces
+			CheckIslandBroken(islandLink);
+
+			//Find the chunk to give velocity to
+			List<IslandChunk> chunkAccelerated = new List<IslandChunk>();
+			List<Island> islandAccelerated = new List<Island>();
+			foreach (IslandChunk c in islandRemoved) {
+				Collider2D[] others = Physics2D.OverlapCircleAll(c.transform.position, 2f);
+
+				foreach (Collider2D other in others) {
+					IslandChunk chk = other.GetComponent<IslandChunk>();
+
+					if (chk != null && !islandRemoved.Contains(chk)) {
+						if (chk.parentIsland != null && !islandAccelerated.Contains(chk.parentIsland)) {
+							islandAccelerated.Add(chk.parentIsland);
+						} else if (!chunkAccelerated.Contains(chk)) {
+							chunkAccelerated.Add(chk);
+						}
+					}
 				}
 			}
 
-			CheckIslandBroken(islandLink);
+			//Give velocity to chunks around the destroyed ones
+			Vector2 removedCenter = islandRemoved.Count > 1 ? islandRemoved[0].parentIsland.transform.localPosition : islandRemoved[0].transform.position;
+
+			foreach (IslandChunk c in chunkAccelerated) {
+				c.gravityBody.Velocity = CalculateVelocityAfterHit((Vector2)c.transform.localPosition - removedCenter, damage, 1);
+			}
+			foreach (Island i in islandAccelerated) {
+				i.gravityBody.Velocity = CalculateVelocityAfterHit((Vector2)i.transform.localPosition - removedCenter, damage, i.chunks.Count);
+			}
+
+			Debug.Log(islandLink.chunks.Count);
         }
+
+		/// <summary>
+		/// Calculate the velocity resulting from a chunk being destroyed
+		/// </summary>
+		/// <param name="dir">The direction vector</param>
+		/// <param name="power">The power of the impact</param>
+		/// <param name="weight">The weight of the thing being impacted</param>
+		/// <returns>The resulting velocity</returns>
+		private Vector2 CalculateVelocityAfterHit(Vector2 dir, int power, int weight) {
+			return dir * (Mathf.Max(1, (float)power - (Mathf.Floor((float)weight / 4))));
+		}
 
 		/// <summary>
 		/// The recursive helper to disconnected chunks
@@ -435,7 +474,7 @@ namespace Simoncouche.Islands {
 				distance * Mathf.Sin(angle * Mathf.PI / 180f),
 				0
 			); //The projection of the anchor on the current angle of the chunk
-            return b_chunk.transform.localPosition + 2f * anchorProjection;
+            return (Vector2)b_chunk.transform.localPosition + 2f * (Vector2)anchorProjection;
         }
 
         /// <summary>
@@ -452,7 +491,7 @@ namespace Simoncouche.Islands {
 				distance * Mathf.Sin(angle * Mathf.PI / 180f),
 				0
 			); //The projection of the anchor on the current angle of the chunk
-			return b_island.transform.localPosition + b_chunk.transform.localPosition + 2f * anchorProjection;
+			return (Vector2)b_island.transform.localPosition + (Vector2)b_chunk.transform.localPosition + 2f * (Vector2)anchorProjection;
         }
 
         /// <summary>
