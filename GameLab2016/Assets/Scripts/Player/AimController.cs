@@ -10,16 +10,18 @@ namespace Simoncouche.Controller {
     /// </summary>
     public class AimController : MonoBehaviour {
 
-        [Tooltip("Input axis threshold before applying aiming")]
-        [SerializeField]
-        private float _aimDeadzone = 0.01f;
-
         /// <summary> The current aim orientation as set by the right analog input </summary>
         public float aimOrientation { get; private set; }
-
         /// <summary> The current aim orientation in vector2 as set by the right analog input </summary>
         public Vector2 aimOrientationVector2 { get; private set; }
 
+
+        private GameObject _aimIndicator;
+
+        void Awake() {
+            _aimIndicator = transform.Find("AimIndicator").gameObject;
+            ToggleAimIndicator(false);
+        }
 
         void Update() {
             UpdateAim();
@@ -30,17 +32,34 @@ namespace Simoncouche.Controller {
         /// Update the aim of the player
         /// </summary>
         private void UpdateAim() {
+            //Get orientation as a Vector2 value (x, y)
             Vector2 orientation = transform.right;
             aimOrientationVector2 = orientation;
 
-            if (orientation.magnitude > _aimDeadzone) {
-                this.aimOrientation = Vector2.Angle(Vector2.right, orientation);
-
-                if (orientation.y < 0) {
-                    this.aimOrientation = 360f - this.aimOrientation;
-                }
+            //Get orientation as a float value (degrees around circle)
+            this.aimOrientation = Vector2.Angle(Vector2.right, orientation);
+            //Correct angle if in lower quadrants
+            if (orientation.y < 0) {
+                this.aimOrientation = 360f - this.aimOrientation;
             }
+            
         }
+
+        /// <summary> Public method call to toggle indicator on or off from the outside </summary>
+        /// <param name="active">If true, activate. Otherwise, deactivate.</param>
+        public void ToggleAimIndicator(bool active) {
+            if (active) ActivateIndicator();
+            else DeactivateIndicator();
+        }
+        /// <summary> Deactivate Indicator </summary>
+        private void DeactivateIndicator() {
+            _aimIndicator.SetActive(false);
+        }
+        /// <summary> Activate Indicator </summary>
+        private void ActivateIndicator() {
+            _aimIndicator.SetActive(true);
+        }
+
 
     }
 
