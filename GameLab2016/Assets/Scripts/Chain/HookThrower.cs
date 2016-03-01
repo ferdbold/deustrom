@@ -53,7 +53,15 @@ namespace Simoncouche.Chain {
                 isPlayerOne ? InputManager.Axis.p1_leftTrigger : InputManager.Axis.p2_leftTrigger, 
                 this.CheckPlayerInputs
             );
-		}
+
+            //For keyboard use
+            #if UNITY_EDITOR
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_fireHook : InputManager.Button.p2_fireHook,
+                this.Fire
+            );
+            #endif
+        }
 			
         /// <summary>Handle user input to throw a new chain and hook</summary>
 		private void Fire() {
