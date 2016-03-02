@@ -11,6 +11,12 @@ namespace Simoncouche.Controller {
         private float THROW_FORCE = 15f;
         [SerializeField] [Tooltip("Minimum force to apply to object no matter the grabbed Object weight. ")]
         private float MIN_THROW_FORCE = 9f;
+        [SerializeField] [Tooltip("Maximum multiplier of the force when charged")]
+        private float CHARGED_MAX_MULTIPLIER = 2f;
+        [SerializeField] [Tooltip("Time to reach full charge")]
+        private float CHARGE_TIME = 3f;
+
+       
 
         
         [SerializeField][Tooltip("Angle in front of player at which the player can grab an island. If not in this angle, the island will just bump in the player.")]
@@ -25,7 +31,10 @@ namespace Simoncouche.Controller {
         private bool _inGrabCooldown = false;
         /// <summary> Is the grab trigger currently held or not</summary>
         private bool _triggerIsHeld = false;
-
+        /// <summary> current charge force multiplier. Goes up the more trigger is held.</summary>
+        private float _curChargeMultiplier = 1f;
+        /// <summary> Has maxed charge been reached </summary>
+        private bool _maxChargeReached = false;
 
 
 
@@ -41,6 +50,9 @@ namespace Simoncouche.Controller {
         private PlayerAudio _playerAudio;
         /// <summary> Reference to the gravityBody of the player</summary>
         private GravityBody _playerGravityBody;
+        /// <summary> List of all particle systems used for charge animation </summary>
+        private List<ParticleSystem> _chargeParticles;
+        private List<ParticleSystem> _chargeParticlesMax;
 
         /// <summary> List of references to all playerGrabs. Used to avoid Searching the map everytime we grab.</summary>
         private static List<PlayerGrab> _allPlayerGrabs = new List<PlayerGrab>();
@@ -54,6 +66,8 @@ namespace Simoncouche.Controller {
             _playerController = GetComponent<PlayerController>();
             _playerAudio = GetComponent<PlayerAudio>();
             _playerGravityBody = GetComponent<GravityBody>();
+            _chargeParticles = new List<ParticleSystem>(transform.Find("P_ChargeParticles").GetComponentsInChildren<ParticleSystem>());
+            _chargeParticlesMax = new List<ParticleSystem>(transform.Find("P_MaxChargeParticles").GetComponentsInChildren<ParticleSystem>());
             grabbedBody = null;
 
             //Add to static playergrab list
@@ -70,6 +84,17 @@ namespace Simoncouche.Controller {
             }
             if (_playerGravityBody == null) {
                 Debug.LogError("Player/PlayerGravityBody cannont be found!");
+            }
+        }
+
+        void Start() {
+            ToggleChargeParticles(false); // toggle off particles
+        }
+
+        void Update() {
+            //Charge if trigger is held
+            if (_triggerIsHeld) {
+                Charge();
             }
         }
 
@@ -129,7 +154,6 @@ namespace Simoncouche.Controller {
             //Before grabbing, make the other players release this chunk
             MakeOtherPlayerRelease(targetChunk);
             grabbedBody = targetBody;
-            
 
             if (targetChunk.parentIsland == null) {
                 //Set parent
@@ -186,7 +210,35 @@ namespace Simoncouche.Controller {
             //finish movement
             if(grabbedBody != null) transformToMove.localPosition = targetPosition;
         }
-        
+
+        /// <summary> Charges the throw multiplier </summary>
+        private void Charge() {
+            float rate = (CHARGED_MAX_MULTIPLIER - 1f) / CHARGE_TIME;
+            _curChargeMultiplier += rate * Time.deltaTime;
+            _curChargeMultiplier = Mathf.Clamp(_curChargeMultiplier, 1f, CHARGED_MAX_MULTIPLIER);
+
+            if (!_maxChargeReached && _curChargeMultiplier == CHARGED_MAX_MULTIPLIER) {
+                _maxChargeReached = true;
+                ChargeParticlesMaxReached(); //emit ready particles
+            }
+        }
+
+        /// <summary> Toggle the emission of charge particles </summary>
+        /// <param name="on"></param>
+        private void ToggleChargeParticles(bool on) {
+            foreach (ParticleSystem ps in _chargeParticles) {
+                if (on) ps.enableEmission = true;
+                else ps.enableEmission = false;
+            }
+        }
+
+        private void ChargeParticlesMaxReached() {
+            foreach (ParticleSystem ps in _chargeParticlesMax) {
+                ps.Emit(200);
+            }
+           
+        }
+
         /// <summary> Throw gravity body in direction of player's aim controller</summary>
         private void Throw() {
             if(grabbedBody != null) {
@@ -201,17 +253,22 @@ namespace Simoncouche.Controller {
                 //Add Force
                 Vector2 forceDirection = _aimController.aimOrientationVector2.normalized;
                 float finalThrowForce = Mathf.Max(MIN_THROW_FORCE, THROW_FORCE / Mathf.Max(1, bodyToAddForce.Weight / 10f));
-                bodyToAddForce.Velocity = forceDirection * finalThrowForce;
+                bodyToAddForce.Velocity = forceDirection * finalThrowForce * _curChargeMultiplier;
                 //Remove Force from player
                 _playerGravityBody.Velocity /= 4f;
+
                 //Animation
                 _playerController.HandlePushAnimation();
                 //Sounds
                 _playerAudio.PlaySound(PlayerSounds.PlayerPush);
 
+
             } else {
-                Debug.LogWarning("Attempted to throw when grabbedBody is null.");
+                Debug.LogWarning("Attempted to throw when grabbedBody is null.");             
             }
+            //reset charge multiplier
+            _curChargeMultiplier = 1f;
+            _maxChargeReached = false;
         }
 
         /// <summary> Releases the gravity body </summary>
@@ -357,10 +414,12 @@ namespace Simoncouche.Controller {
             bool isCurrentlyHeld = (input[0] == 1);
 
             if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
+                ToggleChargeParticles(false);
                 _triggerIsHeld = false;
                 Throw();
-            } else if (!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
-                _triggerIsHeld = true;
+            } else if (!_triggerIsHeld && isCurrentlyHeld && grabbedBody != null) {//If just started pressing
+                ToggleChargeParticles(true);
+                _triggerIsHeld = true; 
             }
         }
     }
