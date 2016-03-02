@@ -53,7 +53,7 @@ namespace Simoncouche.Islands {
 		#region Component Ref
 		public List<IslandAnchorPoints> anchors { get; private set; }
 
-        public List<IslandChunk> connectedChunk { get; private set; }
+        public List<IslandChunk> connectedChunk;/* { get; private set; }*/
 
         /// <summary> Gravity Body associated with this island chunk </summary>
         public GravityBody gravityBody {get; private set;}
@@ -128,11 +128,13 @@ namespace Simoncouche.Islands {
 		/// <param name="time">the time taken</param>
 		/// <param name="targetChunk">the other chunk</param>
 		public void ConnectChunk(Vector3 targetPos, Vector3 targetRot, IslandChunk targetChunk, Island targetIsland, float time = 0.5f) {
-            ChangeCollisionBetweenChunk(targetChunk);
-            //Debug.Log(targetPos + " " + targetRot);
+			parentIsland.ChangeCollisionInIsland(this, false);
+            //Debug.Log(targetPos);
+			/*transform.localPosition = targetPos;
+			transform.localRotation = Quaternion.Euler(targetRot);*/
 			transform.DOLocalRotate(targetRot, time);
 			transform.DOLocalMove(targetPos, time);
-            //StartCoroutine(Delay_CenterIslandRoot(time, targetIsland, targetChunk));
+            //StartCoroutine(Delay_CenterIslandRoot(0f, targetIsland, targetChunk));
         }
 
         /// <summary>
@@ -140,11 +142,12 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="targetChunk">the target chunk</param
         /// <param name="colliding">is the target colliding with this chunk</param>
-        private void ChangeCollisionBetweenChunk(IslandChunk targetChunk, bool colliding = false) {
+        public void ChangeCollisionBetweenChunk(IslandChunk targetChunk, bool colliding = false) {
             Physics2D.IgnoreCollision(GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), !colliding);
             foreach (IslandAnchorPoints point in anchors) {
+				Physics2D.IgnoreCollision(point.GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), !colliding);
                 foreach (IslandAnchorPoints targetPoint in targetChunk.anchors) {
-                    Physics2D.IgnoreCollision(point.GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), !colliding);
+                    Physics2D.IgnoreCollision(point.GetComponent<Collider2D>(), targetPoint.GetComponent<Collider2D>(), !colliding);
                 }
             }
 
@@ -155,7 +158,6 @@ namespace Simoncouche.Islands {
         private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland, IslandChunk targetChunk) {
             yield return new WaitForSeconds(t);
             targetIsland.CenterIslandRoot();
-            Debug.Log(Vector3.Distance(transform.position, targetChunk.transform.position));
         }
 
 		#endregion
