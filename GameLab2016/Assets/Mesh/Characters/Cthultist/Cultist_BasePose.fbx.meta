@@ -1,0 +1,116 @@
+fileFormatVersion: 2
+guid: 123e2c6e02be4914ab128c963da17960
+timeCreated: 1456958323
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Cultist_geo
+    100004: Cultist_Head
+    100006: Cultist_Hips
+    100008: Cultist_LeftArm
+    100010: Cultist_LeftFoot
+    100012: Cultist_LeftForeArm
+    100014: Cultist_LeftHand
+    100016: Cultist_LeftLeg
+    100018: Cultist_LeftShoulder
+    100020: Cultist_LeftUpLeg
+    100022: Cultist_Reference
+    100024: Cultist_RightArm
+    100026: Cultist_RightFoot
+    100028: Cultist_RightForeArm
+    100030: Cultist_RightHand
+    100032: Cultist_RightLeg
+    100034: Cultist_RightShoulder
+    100036: Cultist_RightUpLeg
+    100038: Cultist_Spine
+    100040: Cultist_Weapon
+    400000: //RootNode
+    400002: Cultist_geo
+    400004: Cultist_Head
+    400006: Cultist_Hips
+    400008: Cultist_LeftArm
+    400010: Cultist_LeftFoot
+    400012: Cultist_LeftForeArm
+    400014: Cultist_LeftHand
+    400016: Cultist_LeftLeg
+    400018: Cultist_LeftShoulder
+    400020: Cultist_LeftUpLeg
+    400022: Cultist_Reference
+    400024: Cultist_RightArm
+    400026: Cultist_RightFoot
+    400028: Cultist_RightForeArm
+    400030: Cultist_RightHand
+    400032: Cultist_RightLeg
+    400034: Cultist_RightShoulder
+    400036: Cultist_RightUpLeg
+    400038: Cultist_Spine
+    400040: Cultist_Weapon
+    4300000: Cultist_geo
+    9500000: //RootNode
+    13700000: Cultist_geo
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleRotations: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

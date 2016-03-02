@@ -149,5 +149,17 @@ namespace Simoncouche.Islands {
             GameManager.islandManager.DestroyChunk(triggerChunk);
 			GameManager.islandManager.CheckIslandBroken(this);
         }
+
+		/// <summary>
+		/// Changes the collision between target chunk and island
+		/// </summary>
+		/// <param name="?"></param>
+		public void ChangeCollisionInIsland(IslandChunk t_chunk, bool nowColliding) {
+			foreach (IslandChunk chunk in chunks) {
+				if (chunk != t_chunk) {
+					chunk.ChangeCollisionBetweenChunk(t_chunk, nowColliding);
+				}
+			}
+		}
     }
 }
