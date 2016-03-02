@@ -1,0 +1,122 @@
+fileFormatVersion: 2
+guid: 55137dada6f379f4483be32ba31e9428
+timeCreated: 1456958274
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Egyptian_geo
+    100004: Egyptian_Head
+    100006: Egyptian_Hips
+    100008: Egyptian_LeftArm
+    100010: Egyptian_LeftFoot
+    100012: Egyptian_LeftForeArm
+    100014: Egyptian_LeftHand
+    100016: Egyptian_LeftLeg
+    100018: Egyptian_LeftShoulder
+    100020: Egyptian_LeftToeBase
+    100022: Egyptian_LeftUpLeg
+    100024: Egyptian_Neck
+    100026: Egyptian_Reference
+    100028: Egyptian_RightArm
+    100030: Egyptian_RightFoot
+    100032: Egyptian_RightForeArm
+    100034: Egyptian_RightHand
+    100036: Egyptian_RightLeg
+    100038: Egyptian_RightShoulder
+    100040: Egyptian_RightToeBase
+    100042: Egyptian_RightUpLeg
+    100044: Egyptian_Spine
+    100046: Egyptian_weapon
+    400000: //RootNode
+    400002: Egyptian_geo
+    400004: Egyptian_Head
+    400006: Egyptian_Hips
+    400008: Egyptian_LeftArm
+    400010: Egyptian_LeftFoot
+    400012: Egyptian_LeftForeArm
+    400014: Egyptian_LeftHand
+    400016: Egyptian_LeftLeg
+    400018: Egyptian_LeftShoulder
+    400020: Egyptian_LeftToeBase
+    400022: Egyptian_LeftUpLeg
+    400024: Egyptian_Neck
+    400026: Egyptian_Reference
+    400028: Egyptian_RightArm
+    400030: Egyptian_RightFoot
+    400032: Egyptian_RightForeArm
+    400034: Egyptian_RightHand
+    400036: Egyptian_RightLeg
+    400038: Egyptian_RightShoulder
+    400040: Egyptian_RightToeBase
+    400042: Egyptian_RightUpLeg
+    400044: Egyptian_Spine
+    400046: Egyptian_weapon
+    4300000: Egyptian_geo
+    9500000: //RootNode
+    13700000: Egyptian_geo
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleRotations: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
