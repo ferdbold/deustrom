@@ -333,10 +333,16 @@ namespace Simoncouche.Islands {
 				} 
 			}
 
+			/*DEBUG Destruction TODO replace with separation*/
+			foreach (IslandChunk c in islandRemoved) {
+				Destroy(c.gameObject);
+			}
+
 			//Check if the island is broken in pieces
 			CheckIslandBroken(islandLink);
 
 			//Find the chunk to give velocity to
+			/*
 			List<IslandChunk> chunkAccelerated = new List<IslandChunk>();
 			List<Island> islandAccelerated = new List<Island>();
 			foreach (IslandChunk c in islandRemoved) {
@@ -354,7 +360,7 @@ namespace Simoncouche.Islands {
 					}
 				}
 			}
-
+			
 			//Give velocity to chunks around the destroyed ones
 			Vector2 removedCenter = islandRemoved.Count > 1 ? islandRemoved[0].parentIsland.transform.localPosition : islandRemoved[0].transform.position;
 
@@ -363,9 +369,7 @@ namespace Simoncouche.Islands {
 			}
 			foreach (Island i in islandAccelerated) {
 				i.gravityBody.Velocity = CalculateVelocityAfterHit((Vector2)i.transform.localPosition - removedCenter, damage, i.chunks.Count);
-			}
-
-			Debug.Log(islandLink.chunks.Count);
+			}/**/
         }
 
 		/// <summary>
