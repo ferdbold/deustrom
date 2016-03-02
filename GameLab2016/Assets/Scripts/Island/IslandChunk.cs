@@ -129,7 +129,7 @@ namespace Simoncouche.Islands {
 		/// <param name="targetChunk">the other chunk</param>
 		public void ConnectChunk(Vector3 targetPos, Vector3 targetRot, IslandChunk targetChunk, Island targetIsland, float time = 0.5f) {
 			parentIsland.ChangeCollisionInIsland(this, false);
-            Debug.Log(targetPos);
+            //Debug.Log(targetPos);
 			/*transform.localPosition = targetPos;
 			transform.localRotation = Quaternion.Euler(targetRot);*/
 			transform.DOLocalRotate(targetRot, time);
