@@ -222,6 +222,11 @@ namespace Simoncouche.Islands {
 		/// </summary>
 		/// <param name="island">The target island to check</param>
 		public void CheckIslandBroken(Island island) {
+			if (island == null || island.chunks.Count <= 0) {
+				return;
+			}
+
+			island.RecreateIslandChunkConnection();
 			List<IslandChunk> chunkIsland = new List<IslandChunk>();
 			chunkIsland = CheckIslandBroken_Helper(island.chunks[0], chunkIsland);
 			List<IslandChunk> chunkChecked = chunkIsland;
