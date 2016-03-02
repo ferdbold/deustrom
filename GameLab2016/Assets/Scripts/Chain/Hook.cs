@@ -27,7 +27,7 @@ namespace Simoncouche.Chain {
 		private ChainSection _nextChain;
 
         /// <summary>Whether this hook is currently attached to a target</summary>
-		private bool _attachedToTarget = false;
+		public bool attachedToTarget { get; private set;}
 
         // EVENTS
 
@@ -92,11 +92,12 @@ namespace Simoncouche.Chain {
 		}
 
 		public void Start() {
+            attachedToTarget = false;
 			this.rigidbody.AddForce(transform.rotation * new Vector2(chain.initialForce, 0));
 		}
 
 		public void OnTriggerEnter2D(Collider2D coll) {
-			if (!_attachedToTarget) {
+			if (!attachedToTarget) {
 				IslandAnchorPoints anchorPoint = coll.gameObject.GetComponent<IslandAnchorPoints>();
 
 				if (anchorPoint != null) {
@@ -151,6 +152,9 @@ namespace Simoncouche.Chain {
             anchor.GetIslandChunk().MergeIntoIsland.AddListener(this.OnAttachedChunkMerge);
 
             this.Attach.Invoke();
+
+            //The hook is now attached to a target
+            attachedToTarget = true;
 		}
 
 		/// <summary>

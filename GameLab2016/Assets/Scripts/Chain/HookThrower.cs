@@ -9,7 +9,7 @@ namespace Simoncouche.Chain {
 	[RequireComponent(typeof(AimController))]
 	public class HookThrower : MonoBehaviour {
 
-        enum State { NoHook, OneHook }
+        enum State { NoHook, OneHook, Waiting}
 
         private State _currentState;
 
@@ -72,7 +72,7 @@ namespace Simoncouche.Chain {
 			// we create a hook and switch the currentState to OneHook
 			case State.NoHook:
 				_chains.Add(Chain.Create(this, _initialForceAmount));
-				_currentState = State.OneHook;
+                _currentState = State.Waiting;
 
 				// Animation handling
 				playerController.HandleFirstHookAnimation();
@@ -88,7 +88,7 @@ namespace Simoncouche.Chain {
 			// TODO: MODIFIER POUR LIER LES 2 CHAINES
 			case State.OneHook: 
 				_chains[_chains.Count - 1].CreateEndingHook();
-				_currentState = State.NoHook;
+                _currentState = State.Waiting;
 
 				// Animation handling
 				playerController.HandleSecondHookAnimation();
@@ -118,6 +118,40 @@ namespace Simoncouche.Chain {
                 playerController.HandleAimStartAnimation();
 
             }
+        }
+
+
+        /// <summary>
+        /// Function called by a chain when the first throw missed
+        /// Here we remove the current chain from the list and set back the state to NoHook
+        /// </summary>
+        public void BeginningHookMissed() {
+            _chains.RemoveAt(_chains.Count - 1);
+            _currentState = State.NoHook;
+            playerController.HandleSecondHookAnimation();
+        }
+
+        /// <summary>
+        /// Function called by a chain when the first throw missed
+        /// In case we miss our second throw, we set back our state to OneHook
+        /// </summary>
+        public void EndingHookMissed() {
+            _currentState = State.OneHook;
+            playerController.HandleSecondHookAnimation();
+        }
+
+        /// <summary>
+        /// Function called to update the state of our hookthrower when the beginning hook hit something
+        /// </summary>
+        public void BeginningHookHit() {
+            _currentState = State.OneHook;
+        }
+
+        /// <summary>
+        /// Function called to update the state of our hookthrower when the ending hook hit something
+        /// </summary>
+        public void EndingHookHit() {
+            _currentState = State.NoHook;
         }
 	}
 }
