@@ -170,6 +170,8 @@ namespace Simoncouche.Controller {
 
             //Audio
             _playerAudio.PlaySound(PlayerSounds.PlayerDeath);
+            //Animation
+            HandleKnockedOutStartAnimation();
         }
 
         private void StopRespawnState() {
@@ -178,6 +180,9 @@ namespace Simoncouche.Controller {
             _playerRigidBody.isKinematic = false;
             _playerRigidBody.velocity = Vector2.zero;
             StartCoroutine(Respawn_Resurface());
+
+            //Animation
+            HandleKnockedOutStopAnimation();
         }
 
         IEnumerator Respawn_Spin(Vector3 tP) {
@@ -346,7 +351,6 @@ namespace Simoncouche.Controller {
             _animator.SetTrigger("Throw");
             _animator.SetBool("State_ChainGrab", true);
         }
-
         /// <summary> Handles the animations when player shoots second hook </summary>
         public void HandleSecondHookAnimation() {
             _animator.SetTrigger("Throw");
@@ -357,7 +361,6 @@ namespace Simoncouche.Controller {
         public void HandleGrabStartAnimation() {
             _animator.SetBool("State_IslandGrab", true);
         }
-
         /// <summary> Handles the animations when player releases an island </summary>
         public void HandleGrabStopAnimation() {
             _animator.SetBool("State_IslandGrab", false);
@@ -372,10 +375,18 @@ namespace Simoncouche.Controller {
         public void HandleAimStartAnimation() {
             _animator.SetBool("State_Aiming", true);
         }
-
         /// <summary> Handles the animation when the player stops aiming </summary>
         public void HandleAimStopAnimation() {
             _animator.SetBool("State_Aiming", false);
+        }
+
+        /// <summary> Handles the animation when the player starts being knocked out (entering maelstrom) </summary>
+        public void HandleKnockedOutStartAnimation() {
+            _animator.SetBool("State_KnockedOut", true);
+        }
+        /// <summary> Handles the animation when the player stops being knocked out (leaving maelstrom stun) </summary>
+        public void HandleKnockedOutStopAnimation() {
+            _animator.SetBool("State_KnockedOut", false);
         }
 
         #endregion
