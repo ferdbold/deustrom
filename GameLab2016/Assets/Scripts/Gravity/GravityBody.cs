@@ -18,7 +18,7 @@ public class GravityBody : GravityObject {
     //Speed at which gravity bodies leave DestroyMode
     private float _destroyModeMinSpeed = 8.5f;
     //Is this gravity body currently in destroy mode
-    public bool _inDestroyMode { get; private set; }
+    public bool inDestroyMode { get; private set; }
 
 
 
@@ -89,7 +89,7 @@ public class GravityBody : GravityObject {
     #region Destroy Mode
 
     private void SetupDestroyMode() {
-        _inDestroyMode = false;
+        inDestroyMode = false;
         _DestroyModeFX = (GameObject) Instantiate(Resources.Load("Particles/P_DestroyMode"), transform.position, Quaternion.identity);
         _DestroyModeFX.transform.parent = transform;
         _DestroyModeFX.SetActive(false);
@@ -97,8 +97,8 @@ public class GravityBody : GravityObject {
 
     /// <summary> Starts destroy mode. In destroy mode, gravity body will inflict damage objects it collides with </summary>
     public void StartDestroyMode() {
-        if (_inDestroyMode == false) {
-            _inDestroyMode = true;
+        if (inDestroyMode == false) {
+            inDestroyMode = true;
             StartCoroutine(CheckDestroyModeEnd());
         }
     }
@@ -106,9 +106,9 @@ public class GravityBody : GravityObject {
     /// <summary> Coroutine that checks if conditions for destroy mode to remain are true. If not, stop destroy mode.</summary>
     IEnumerator CheckDestroyModeEnd() {
         _DestroyModeFX.SetActive(true);
-        while (_inDestroyMode) {
+        while (inDestroyMode) {
             if(Velocity.magnitude < _destroyModeMinSpeed) {
-                _inDestroyMode = false;
+                inDestroyMode = false;
             }
             yield return new WaitForSeconds(0.05f);
         }

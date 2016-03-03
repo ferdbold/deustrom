@@ -321,7 +321,7 @@ namespace Simoncouche.Controller {
 
 
             } else {
-                Debug.LogError("Grabbed body is null and trying to release !");
+                Debug.LogWarning("Grabbed body is null and trying to release !");
             }
 
             //Reset charge multiplier
