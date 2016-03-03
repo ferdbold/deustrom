@@ -397,8 +397,13 @@ namespace Simoncouche.Controller {
         public void OnCollisionEnter2D(Collision2D col) {
             GravityBody otherGB = col.collider.gameObject.GetComponent<GravityBody>();
             if(otherGB != null) {
-                //Check for grab
-                CheckGrab(col, otherGB);
+               
+                if (otherGB.inDestroyMode) {  //Check for destroy mode
+                    GetBumped(otherGB.Velocity / 1.5f);
+                    otherGB.Velocity = Vector2.zero;
+                } else {  //else Check for grab
+                    CheckGrab(col, otherGB);
+                }
 
                 //Check for player bump
                 CheckPlayerBump(col, otherGB);
@@ -425,21 +430,28 @@ namespace Simoncouche.Controller {
                 //If this is the player with the highest velocity, bump other
                 if (_canPlayerBump && _playerRigidBody.velocity.magnitude > otherGB.Velocity.magnitude) {
                     //Bump other player, start other Bump cooldown and start Bump animation
-                    otherGB.Velocity = otherGB.Velocity + col.relativeVelocity * BUMP_FORCE;
-                    otherPlayer.StartPlayerBumpCooldown();
-                    otherPlayer.HandleHitAnimation();
+                    otherPlayer.GetBumped(col.relativeVelocity * BUMP_FORCE);
                     //Decrease speed and start Bump cooldown
                     _playerRigidBody.velocity = _playerRigidBody.velocity - col.relativeVelocity;
-                    StartPlayerBumpCooldown();
-
-                    //Play Audio
-                    _playerAudio.PlaySound(PlayerSounds.PlayerBump);
+                    StartPlayerBumpCooldown();                   
                 }
             }
         }
 
+        /// <summary> Bumps the player with given force</summary>
+        /// <param name="bumpForce">Vector2 representing the force of the push to be made</param>
+        public void GetBumped(Vector2 bumpForce) {
+            _playerRigidBody.velocity += bumpForce;
+            StartPlayerBumpCooldown();
+            HandleHitAnimation();
+            //Release object
+            _playerGrab.Release();
+            //Play Audio
+            _playerAudio.PlaySound(PlayerSounds.PlayerBump);
+        }
+
         /// <summary> Starts the player bump cooldown </summary>
-        public void StartPlayerBumpCooldown() {
+        private void StartPlayerBumpCooldown() {
             _canPlayerBump = false;
             StartCoroutine(PlayerBumpCooldown());
         }
