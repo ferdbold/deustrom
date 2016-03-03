@@ -186,10 +186,16 @@ namespace Simoncouche.Controller {
                 StartCoroutine(RepositionGrabbedBody(parentIsland.transform));
             }
 
+            //Check grab particles 
+            if(_triggerIsHeld) {
+                ToggleChargeParticles(true);
+            }
             //Animation
             _playerController.HandleGrabStartAnimation();
             //Sounds
             _playerAudio.PlaySound(PlayerSounds.PlayerGrab);
+
+
         }
 
 
@@ -254,6 +260,7 @@ namespace Simoncouche.Controller {
                 Vector2 forceDirection = _aimController.aimOrientationVector2.normalized;
                 float finalThrowForce = Mathf.Max(MIN_THROW_FORCE, THROW_FORCE / Mathf.Max(1, bodyToAddForce.Weight / 10f));
                 bodyToAddForce.Velocity = forceDirection * finalThrowForce * _curChargeMultiplier;
+                if (_maxChargeReached) bodyToAddForce.StartDestroyMode();
                 //Remove Force from player
                 _playerGravityBody.Velocity /= 4f;
 
@@ -266,9 +273,10 @@ namespace Simoncouche.Controller {
             } else {
                 Debug.LogWarning("Attempted to throw when grabbedBody is null.");             
             }
-            //reset charge multiplier
-            _curChargeMultiplier = 1f;
-            _maxChargeReached = false;
+
+            //Reset charge multiplier
+            StartCoroutine(ResetChargeMultiplier());
+
         }
 
         /// <summary> Releases the gravity body </summary>
@@ -315,6 +323,21 @@ namespace Simoncouche.Controller {
             } else {
                 Debug.LogError("Grabbed body is null and trying to release !");
             }
+
+            //Reset charge multiplier
+            StartCoroutine(ResetChargeMultiplier());
+        }
+
+        /// <summary>
+        /// Reset charge multiplier
+        /// Use a coroutine to deactivate charge multiplier since it can be deactivated in both release and Throw but the values are still needed for throw.
+        /// </summary>
+        IEnumerator ResetChargeMultiplier() {
+            yield return new WaitForEndOfFrame();
+            //reset charge multiplier        
+            _curChargeMultiplier = 1f;
+            _maxChargeReached = false;
+            ToggleChargeParticles(false);
         }
 
         /// <summary> Handles the cooldown of the grab </summary>
