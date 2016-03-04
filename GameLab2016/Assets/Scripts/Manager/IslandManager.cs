@@ -173,7 +173,7 @@ namespace Simoncouche.Islands {
                 island.transform.SetParent(_islandSubFolder);
             }
 
-
+            
             AddChunkToExistingIsland(island.GetComponent<Island>(), a);
             AddChunkToExistingIsland(island.GetComponent<Island>(), b);
 
