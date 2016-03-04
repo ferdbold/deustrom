@@ -155,13 +155,14 @@ namespace Simoncouche.Chain {
         private void RetractChainsReleased() {
             _retractButtonIsHeld = false;
             StopCoroutine("RetractChains");
+            if(_chains.Count>0) _chains[_chains.Count - 1].RetractChainReleaseBehaviour();
         }
 
         IEnumerator RetractChains(float time) {
 
             while (_retractButtonIsHeld) {
                 if (_chains.Count > 0) {
-                    if(_chains[0]._endingHookIsSet) playerAudio.PlaySound(PlayerSounds.PlayerRetractChains);
+                    playerAudio.PlaySound(PlayerSounds.PlayerRetractChains);
                     foreach (Chain chain in _chains) {
                         chain.RetractChain(_distanceRetractionValue);
                     }
@@ -176,7 +177,6 @@ namespace Simoncouche.Chain {
         /// Here we remove the current chain from the list and set back the state to NoHook
         /// </summary>
         public void BeginningHookMissed() {
-            _chains.RemoveAt(_chains.Count - 1);
             _currentState = State.NoHook;
             playerController.HandleSecondHookAnimation();
         }
@@ -202,6 +202,18 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void EndingHookHit() {
             _currentState = State.NoHook;
+        }
+
+        /// <summary>
+        /// This function is called in the hookThrower in order to remove chains that are destroyed
+        /// </summary>
+        /// <param name="chain"></param>
+        public void RemoveChainFromChains(Chain chain) {
+            if (!chain._endingHookIsSet) { //IF SO, it means that the chain being destroyed is the one attached to the player
+                _currentState = State.NoHook; //MUST SWITCH STATE: we can't throw the second hook now !
+                playerController.HandleSecondHookAnimation();
+            }
+            _chains.Remove(chain);
         }
 	}
 }

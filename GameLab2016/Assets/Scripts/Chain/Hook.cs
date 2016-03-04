@@ -144,8 +144,7 @@ namespace Simoncouche.Chain {
             if (parentIsland == null) {
                 this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
             } else {
-                // FIXME: Expose Island's (or GravityBody's) rigidbody to avoid this GetComponent call
-                this.targetJoint.connectedBody = parentIsland.GetComponent<Rigidbody2D>();
+                this.targetJoint.connectedBody = parentIsland.rigidbody;
             }
 
             // Add listeners
@@ -167,10 +166,13 @@ namespace Simoncouche.Chain {
 		}
 
         /// <summary>React to attached chunk being merged into island</summary>
-        /// <param name="newIsland">The resultant island</param>
+        /// <param name="newIsland">The resultant isl+and</param>
         private void OnAttachedChunkMerge(Island newIsland) {
-            // FIXME: Expose Island's (or GravityBody's) rigidbody to avoid this GetComponent call
-            this.chainJoint.connectedBody = newIsland.GetComponent<Rigidbody2D>();
+            if (this.chainJoint.connectedBody != null) {
+                if (this.chainJoint.connectedBody.tag != "Player") this.chainJoint.connectedBody = newIsland.rigidbody;
+            }
+            // Attach the joints to its parent island
+            this.targetJoint.connectedBody = newIsland.rigidbody;
         }
 	}
 }

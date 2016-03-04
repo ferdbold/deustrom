@@ -107,6 +107,7 @@ namespace Simoncouche.Chain {
         public void Update() {
 			RecalculateChainSections();
             ChainMissAndHitUpdate();
+            AttachedHookToIslandsUpdate();
         }
 			
         /// <summary>
@@ -174,6 +175,20 @@ namespace Simoncouche.Chain {
             _beginningHook.chainJoint.distance = distance;
         }
 
+        private void AttachedHookToIslandsUpdate() {
+            bool mustDestroyChain = false;
+            if (_beginningHookIsSet) {
+                if(_beginningHook.targetJoint.connectedBody == null) {
+                    mustDestroyChain = true;
+                }else if (_endingHookIsSet) {
+                    if(_endingHook.targetJoint.connectedBody == null) {
+                        mustDestroyChain = true;
+                    }
+                }
+            }
+            if (mustDestroyChain) DestroyChain();
+        }
+
         /// <summary>
         /// We check check if our hooks are beyond a certain distance from the player, if so they are considered as a miss if they didnt hit a island
         /// </summary>
@@ -227,16 +242,10 @@ namespace Simoncouche.Chain {
         /// Destroy the chain when we miss the first throw
         /// </summary>
         private void DestroyBeginningHook() {
-            foreach(ChainSection section in _chainSections) {
-                Destroy(section.gameObject);
-            }
-
-            Destroy(_beginningHook.gameObject);
-
             //Tells the owner he missed the beginning hook
             thrower.BeginningHookMissed();
 
-            Destroy(this.gameObject);
+            this.DestroyChain();
         }
 
         /// <summary>
@@ -264,7 +273,11 @@ namespace Simoncouche.Chain {
 
             Destroy(_beginningHook.gameObject);
 
-            Destroy(_endingHook.gameObject);
+            if(_endingHook!=null) Destroy(_endingHook.gameObject);
+
+            this.thrower.RemoveChainFromChains(this);
+
+            this._destroySoundSource.PlayOneShot(GameManager.audioManager.chainSound.chainDestruction);
 
             Destroy(this.gameObject);
         }
@@ -323,11 +336,29 @@ namespace Simoncouche.Chain {
             }
         }
 
+        /// <summary>
+        /// Retracts the chain modifying chainJoint.distance
+        /// </summary>
+        /// <param name="retractDistance">The distance to retract per tick of this function</param>
         public void RetractChain(float retractDistance) {
-            if (_endingHookIsSet && _beginningHook.chainJoint!=null) {
+            if (_beginningHook.chainJoint!=null) {
+                if (_beginningHookIsSet && !_endingHookIsSet) {
+                    _beginningHook.chainJoint.distance = 
+                        Vector2.Distance(_beginningHook.chainJoint.connectedBody.transform.position, _beginningHook.transform.position);
+                }
                 float tempDistance = _beginningHook.chainJoint.distance;
                 tempDistance = Mathf.Clamp(tempDistance - retractDistance, 0f,_beginningHook.chainJoint.distance);
                 _beginningHook.chainJoint.distance = tempDistance;
+                
+            }
+        }
+
+        /// <summary>
+        /// In order to give the player some place to move around when he ends the retraction of a chain connected to the player
+        /// </summary>
+        public void RetractChainReleaseBehaviour() {
+            if (_beginningHookIsSet && !_endingHookIsSet) {
+                _beginningHook.chainJoint.distance = _maxDistanceBetweenTwoHooks/2; //Cause only 1 chain is set
             }
         }
 

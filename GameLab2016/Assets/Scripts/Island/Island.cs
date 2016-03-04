@@ -20,14 +20,17 @@ namespace Simoncouche.Islands {
 
         //Island's Components
         private CircleCollider2D _collider;
-        public GravityBody gravityBody { get; private set;}
+        public GravityBody gravityBody { get; private set; }
+        public Rigidbody2D rigidbody { get; private set;}
 
 		private void Awake() {
 			chunks = new List<IslandChunk>();
 			_collider = GetComponent<CircleCollider2D>();
 			gravityBody = GetComponent<GravityBody>();
+            rigidbody = GetComponent<Rigidbody2D>();
 
-		}
+
+        }
         
         private void Start() {
             if (_collider != null) _collider.isTrigger = true;
