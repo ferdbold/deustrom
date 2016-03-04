@@ -304,6 +304,15 @@ namespace Simoncouche.Islands {
                     _parentIsland.ReleasedByPlayer.AddListener(this.OnParentIslandReleasedByPlayer);
                 }
             }
+		}
+
+		#endregion
+
+        #region Conversion
+
+        public void ConvertChunkToAnotherColor(IslandUtils.color newColor) {
+            _color = newColor;
+            //TODO chnage mesh
         }
 
         #endregion
