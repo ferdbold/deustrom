@@ -9,9 +9,18 @@ using System.Collections.Generic;
 public class GravityBody : GravityObject {
 
     //Properties
-    [Tooltip("Default linear drag of this rigidbody")][SerializeField] private float DEFAULT_DRAG = 0.35f;
-    [Tooltip("Velocity of this gravity body when loading scene.")][SerializeField] private Vector2 START_VELOCITY = Vector2.zero;
-    private float _additionnalDrag = 0f; //Additionnal drag added by attractor
+    [SerializeField] [Tooltip("Default linear drag of this rigidbody")]
+    private float DEFAULT_DRAG = 0.35f;
+    [SerializeField][Tooltip("Velocity of this gravity body when loading scene.")]
+    private Vector2 START_VELOCITY = Vector2.zero;
+    //Additionnal drag added by attractor
+    private float _additionnalDrag = 0f;
+    //Speed at which gravity bodies leave DestroyMode
+    private float _destroyModeMinSpeed = 8.5f;
+    //Is this gravity body currently in destroy mode
+    public bool inDestroyMode { get; private set; }
+
+
 
     //Getters
     public float Weight { get { return _rigidBody.mass; }  set { _rigidBody.mass = value; } }
@@ -21,9 +30,11 @@ public class GravityBody : GravityObject {
     
     public float AdditionnalDrag { get { return _additionnalDrag; } set { _additionnalDrag = Mathf.Clamp(value, 0f, 2f); } }
     public float DefaultDrag { get { return DEFAULT_DRAG;  } private set { DEFAULT_DRAG = value; } }
+ 
 
     //Components
     private Rigidbody2D _rigidBody;
+    private GameObject _DestroyModeFX;
     //Collision
     private int gravityModifierLayerMask;  //Layermask of gravity modifier
     private int playerLayerMask; //Layermask of player
@@ -50,6 +61,7 @@ public class GravityBody : GravityObject {
 
         SetupRigidbody();
         SetupCollider();
+        SetupDestroyMode();
     }
 
     override protected void Start () {
@@ -74,6 +86,39 @@ public class GravityBody : GravityObject {
         _rigidBody.velocity += acceleration * Time.fixedDeltaTime;
     }
 
+    #region Destroy Mode
+
+    private void SetupDestroyMode() {
+        inDestroyMode = false;
+        _DestroyModeFX = (GameObject) Instantiate(Resources.Load("Particles/P_DestroyMode"), transform.position, Quaternion.identity);
+        _DestroyModeFX.transform.parent = transform;
+        _DestroyModeFX.SetActive(false);
+    }
+
+    /// <summary> Starts destroy mode. In destroy mode, gravity body will inflict damage objects it collides with </summary>
+    public void StartDestroyMode() {
+        if (inDestroyMode == false) {
+            inDestroyMode = true;
+            StartCoroutine(CheckDestroyModeEnd());
+        }
+    }
+
+    /// <summary> Coroutine that checks if conditions for destroy mode to remain are true. If not, stop destroy mode.</summary>
+    IEnumerator CheckDestroyModeEnd() {
+        _DestroyModeFX.SetActive(true);
+        while (inDestroyMode) {
+            if(Velocity.magnitude < _destroyModeMinSpeed) {
+                inDestroyMode = false;
+            }
+            yield return new WaitForSeconds(0.05f);
+        }
+        _DestroyModeFX.SetActive(false);
+    }
+
+    #endregion
+
+    #region Activation and Destruction
+
     /// <summary> Deactivates GravityBody  </summary>
     public void DeactivateGravityBody() {
         _activated = false;
@@ -94,6 +139,7 @@ public class GravityBody : GravityObject {
         Destroy(gameObject);
     }
 
+    #endregion
 
     #region Components Initialization
 

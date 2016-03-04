@@ -17,6 +17,10 @@ namespace Simoncouche.Chain {
 		[SerializeField]
 		private float _chainSectionLength = 1;
 
+        [Tooltip("Time until an attached (both hooks are attached to an island chain expires)")]
+        [SerializeField]
+        private float _timeUntilChainExpires = 10.0f;
+
         /// <summary>The first hook thrown by the player</summary>
         private Hook _beginningHook;
         
@@ -34,10 +38,29 @@ namespace Simoncouche.Chain {
 
         /// <summary>In order to know if the beginning and the ending hook are set</summary>
         private bool _beginningHookIsSet = false;
-        private bool _endingHookIsSet = false;
+        public bool _endingHookIsSet {  get;  private set; }         
+
+        [Tooltip("Color flickered when the chain has done more than 50% of it's duration")]
+        [SerializeField]
+        private Color _chainFlickerColor;
+        [Tooltip("Color when the chain has done 100% of it's duration")]
+        [SerializeField]
+        private Color _chainDamagedColor;
+
+        [Tooltip("When the chain is flickering starts flickering at 50% of it's duration, it pass this amount of time between each cycle")]
+        [SerializeField]
+        private float flickerTime = 0.25f;
+
+        [Tooltip("When the chain is at 75% of it's duration, we divide the flicker time by this factor to accelerate the rythm")]
+        [SerializeField]
+        private float flickerTimeDivider = 2f;
 
         public HookThrower thrower { get; set; }
 		public float initialForce { get; set; }
+
+
+        /// <summary>This is the sound which will be played on destroy of our chain over time</summary>
+        private AudioSource _destroySoundSource;
 
 		/// <summary>Spawn a new chain in the scene</summary>
 		/// <param name="thrower">The game object that threw this chain</param>
@@ -61,11 +84,14 @@ namespace Simoncouche.Chain {
 
 		public void Awake() {
 			this._chainSections = new List<ChainSection>();
+            this._destroySoundSource = this.GetComponentInChildren<AudioSource>();
+            
 		}
 
 		public void Start() {
+            this._endingHookIsSet = false;
 			CreateBeginningHook();
-            _maxDistanceBetweenTwoHooks = _beginningHook.chainJoint.distance;
+            this._maxDistanceBetweenTwoHooks = _beginningHook.chainJoint.distance;
 		}
 
         public void Update() {
@@ -174,6 +200,8 @@ namespace Simoncouche.Chain {
 
                     //Set this bool to true in order to stop the calls of thrower.EndingHookHit
                     _endingHookIsSet = true;
+
+                    StartCoroutine(DestroyTimer());
                 }
 
                 //Check if the ending hook is further than 
@@ -215,5 +243,82 @@ namespace Simoncouche.Chain {
             //Must reset the connected rigidbody!
             _beginningHook.chainJoint.connectedBody = this.thrower.rigidbody;
         }
+
+        /// <summary>
+        /// When an attached chain has passed a certain amount of time, we destroy it using this function
+        /// </summary>
+        private void DestroyChain() {
+            foreach (ChainSection section in _chainSections) {
+                Destroy(section.gameObject);
+            }
+
+            Destroy(_beginningHook.gameObject);
+
+            Destroy(_endingHook.gameObject);
+
+            Destroy(this.gameObject);
+        }
+
+        /// <summary>
+        /// Update the color of the chain sections and destroy the chain after a certain amount of time
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator DestroyTimer() {
+            float elapsedTime = 0.0f;
+            float elapsedTimeFlickering = 0.0f;
+            bool flickerRythmAccelerated = false;
+            bool soundIsPlaying = false;
+            while (elapsedTime < _timeUntilChainExpires) {
+                if (elapsedTime > _timeUntilChainExpires - _destroySoundSource.clip.length) {
+                    if (!soundIsPlaying) {
+                        soundIsPlaying = true;
+                        _destroySoundSource.PlayOneShot(_destroySoundSource.clip);
+                    }
+                }
+
+                if (elapsedTime > _timeUntilChainExpires * 3 / 4 && !flickerRythmAccelerated) {
+                    flickerRythmAccelerated = true;
+                    flickerTime /= flickerTimeDivider;
+                }
+
+                if (elapsedTime > _timeUntilChainExpires / 2  && elapsedTimeFlickering < flickerTime/2) {
+                    foreach (ChainSection section in _chainSections) {
+                        MeshRenderer mr = section.GetComponentInChildren<MeshRenderer>();
+                        mr.material.color = _chainFlickerColor;
+                    }
+                    elapsedTimeFlickering += Time.deltaTime;
+                }
+
+                if (elapsedTimeFlickering > flickerTime/2 || elapsedTime < _timeUntilChainExpires / 2) {
+                    elapsedTimeFlickering += Time.deltaTime;
+                    if (elapsedTimeFlickering > flickerTime) elapsedTimeFlickering = 0.0f;
+                    UpdateChainSectionsColor(elapsedTime);
+                }
+                elapsedTime += Time.deltaTime;
+                
+                yield return null;
+            }
+            DestroyChain();
+        }
+
+        /// <summary>
+        /// Simple function in order to lerp the color of the chain to red the longer it stays attached
+        /// </summary>
+        /// <param name="time"></param>
+        private void UpdateChainSectionsColor(float time) {
+            foreach (ChainSection section in _chainSections) {
+                MeshRenderer mr = section.GetComponentInChildren<MeshRenderer>();
+                mr.material.color = Color.Lerp(Color.white, _chainDamagedColor, time / _timeUntilChainExpires);
+            }
+        }
+
+        public void RetractChain(float retractDistance) {
+            if (_endingHookIsSet && _beginningHook.chainJoint!=null) {
+                float tempDistance = _beginningHook.chainJoint.distance;
+                tempDistance = Mathf.Clamp(tempDistance - retractDistance, 0f,_beginningHook.chainJoint.distance);
+                _beginningHook.chainJoint.distance = tempDistance;
+            }
+        }
+
     }
 }
