@@ -11,8 +11,11 @@ namespace Simoncouche.Islands {
 		/// Possible color of Islands
 		/// </summary>
 		public enum color {
+            /// <summary>Sobek </summary>
 			red,
+            /// <summary>Cthulu</summary>
 			blue,
+            /// <summary>Neutral</summary>
 			green
 		}
 

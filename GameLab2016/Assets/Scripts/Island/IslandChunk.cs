@@ -264,5 +264,14 @@ namespace Simoncouche.Islands {
 		}
 
 		#endregion
-	}
+
+        #region Conversion
+
+        public void ConvertChunkToAnotherColor(IslandUtils.color newColor) {
+            _color = newColor;
+            //TODO chnage mesh
+        }
+
+        #endregion
+    }
 }
