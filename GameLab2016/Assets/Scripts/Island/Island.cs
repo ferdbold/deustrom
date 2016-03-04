@@ -53,7 +53,7 @@ namespace Simoncouche.Islands {
         /// Raises the MergeIntoIsland event in the chunk.
         /// </param>
 		public void AddChunkToIsland(IslandChunk chunk) {
-			if (!chunks.Contains(chunk)) {
+			if (!chunks.Contains(chunk) && chunk!=null) {
                 chunk.parentIsland = this;
 				chunk.transform.SetParent(transform);
 				chunks.Add(chunk);

@@ -194,8 +194,11 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="Island">The Island that need to be removed</param>
         private void RemoveIsland(Island Island) {
+
             _island.Remove(Island);
-            Destroy(Island.gameObject);
+            if (Island != null) {
+                Destroy(Island.gameObject);
+            }
         }
 
         #endregion
