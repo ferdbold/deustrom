@@ -310,6 +310,13 @@ namespace Simoncouche.Chain {
             }
         }
 
+        public void RetractChain(float retractDistance) {
+            if (_endingHookIsSet && _beginningHook.chainJoint!=null) {
+                float tempDistance = _beginningHook.chainJoint.distance;
+                tempDistance = Mathf.Clamp(tempDistance - retractDistance, 0f,_beginningHook.chainJoint.distance);
+                _beginningHook.chainJoint.distance = tempDistance;
+            }
+        }
 
     }
 }

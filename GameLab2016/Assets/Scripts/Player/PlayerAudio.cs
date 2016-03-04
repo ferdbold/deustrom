@@ -4,40 +4,37 @@ using System.Collections;
 
 namespace Simoncouche.Controller {
 
-    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond, PlayerDeath};
+    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond, PlayerDeath, PlayerRetractChains};
 
     [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(PlayerController))]
     public class PlayerAudio : MonoBehaviour {
-
-        #region PublicVariables
-
-
-
+        #region PrivateVariables
         [Header("Swimming Sound Properties")]
         /// <summary>
         /// This is the maximum pitch of our sound when he goes fast
         /// </summary>
         [Tooltip("maximum pitch of our sound when he goes fast")]
-        public float maxPitch = 1.1f;
+        [SerializeField]
+        private float maxPitch = 1.1f;
         /// <summary>
         /// This is the minimum pitch of our sound when he goes slow
         /// </summary>
         [Tooltip("minimum pitch of our sound when he goes slow")]
-        public float minPitch = 1.0f;
+        [SerializeField]
+        private float minPitch = 1.0f;
         /// <summary>
         /// Fade out speed multipler which is used to decreased the volume multiplied with Time.deltaTime
         /// </summary>
         [Tooltip("Fade out speed multipler which is used to decreased the volume gradually until 0.  When 0, we pause the sound being played.")]
-        public float volumeFadeOutSpeed = 1.0f;
+        [SerializeField]
+        private float volumeFadeOutSpeed = 1.0f;
         /// <summary>
         /// Time in seconds until we stop the sound (not pause !) 
         /// </summary>
         [Tooltip("After this amounte of time, we stop the sound (after being paused precedently).  It's in order to start over completly the sounds when we stop and go quickly with the character")]
-        public float timeUntileSoundStops = 0.5f;
-        #endregion
+        private float timeUntileSoundStops = 0.5f;
 
-        #region PrivateVariables
         /// <summary>
         /// Ref to the player controller in order to his inputs using getleftanalog functions
         /// </summary>
@@ -115,6 +112,9 @@ namespace Simoncouche.Controller {
                     break;
                 case PlayerSounds.PlayerDeath:
                     _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerDeath);
+                    break;
+                case PlayerSounds.PlayerRetractChains:
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerRetractChains);
                     break;
                 default:
                     Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");

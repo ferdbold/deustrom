@@ -27,6 +27,10 @@ public class InputManager : MonoBehaviour {
     private EventButton p2_fireHookButton;
     private EventButton p1_pushButton;
     private EventButton p2_pushButton;
+    private EventButton p1_retractHooksButtonDown;
+    private EventButton p2_retractHooksButtonDown;
+    private EventButton p1_retractHooksButtonUp;
+    private EventButton p2_retractHooksButtonUp;
 
     #region Add Event
     /// <summary>
@@ -60,7 +64,7 @@ public class InputManager : MonoBehaviour {
 	/// <summary>
 	/// The name of every buttons
 	/// </summary>
-	public enum Button { start, p1_fireHook, p2_fireHook, p1_pushButton, p2_pushButton }
+    public enum Button { start, p1_fireHook, p2_fireHook, p1_pushButton, p2_pushButton, p1_retractHooksButtonDown, p2_retractHooksButtonDown, p1_retractHooksButtonUp, p2_retractHooksButtonUp }
 	/// <summary>
 	/// Link a function to an event
 	/// </summary>
@@ -73,6 +77,10 @@ public class InputManager : MonoBehaviour {
             case Button.p2_fireHook: p2_fireHookButton += eventFunction; break;
             case Button.p1_pushButton: p1_pushButton += eventFunction; break;
             case Button.p2_pushButton: p2_pushButton += eventFunction; break;
+            case Button.p1_retractHooksButtonDown: p1_retractHooksButtonDown += eventFunction; break;
+            case Button.p2_retractHooksButtonDown: p2_retractHooksButtonDown += eventFunction; break;
+            case Button.p1_retractHooksButtonUp: p1_retractHooksButtonUp += eventFunction; break;
+            case Button.p2_retractHooksButtonUp: p2_retractHooksButtonUp += eventFunction; break;
 
             //Error
             default:
@@ -101,6 +109,10 @@ public class InputManager : MonoBehaviour {
 		p2_fireHookButton = null;
 		p1_pushButton = null;
 		p2_pushButton = null;
+        p1_retractHooksButtonDown = null;
+        p2_retractHooksButtonDown = null;
+        p1_retractHooksButtonUp = null;
+        p2_retractHooksButtonUp = null;
 	}
 
 	#endregion
@@ -121,7 +133,11 @@ public class InputManager : MonoBehaviour {
             new ButtonTuple("P2 Push", p2_pushButton, Input.GetButtonDown("P2_Push")),
             new ButtonTuple("P1 Fire Hook", p1_fireHookButton, Input.GetButtonDown("P1_FireHook")),
             new ButtonTuple("P2 Fire Hook", p2_fireHookButton, Input.GetButtonDown("P2_FireHook")),
-            new ButtonTuple("Start", _startButton, Input.GetButtonDown("Start"))
+            new ButtonTuple("Start", _startButton, Input.GetButtonDown("Start")),
+            new ButtonTuple("P1 Retract Hooks Down", p1_retractHooksButtonDown, Input.GetButtonDown("P1_Retract_Hooks")),
+            new ButtonTuple("P2 Retract Hooks Down", p2_retractHooksButtonDown,Input.GetButtonDown("P2_Retract_Hooks")),
+            new ButtonTuple("P1 Retract Hooks Up", p1_retractHooksButtonUp, Input.GetButtonUp("P1_Retract_Hooks")),
+            new ButtonTuple("P2 Retract Hooks Up", p2_retractHooksButtonUp,Input.GetButtonUp("P2_Retract_Hooks"))
 		};
 
 		foreach(AxisTuple axis in axii) {

@@ -57,6 +57,10 @@ public class CharacterSound {
     [SerializeField]
     private AudioClip _playerDeath;
     public AudioClip playerDeath { get { return _playerDeath; } }
+
+    [SerializeField]
+    private AudioClip _playerRetractChains;
+    public AudioClip playerRetractChains { get { return _playerRetractChains; } }
 }
 
 [System.Serializable]
