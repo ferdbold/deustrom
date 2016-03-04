@@ -38,7 +38,7 @@ namespace Simoncouche.Chain {
 
         /// <summary>In order to know if the beginning and the ending hook are set</summary>
         private bool _beginningHookIsSet = false;
-        private bool _endingHookIsSet = false;
+        public bool _endingHookIsSet {  get;  private set; }         
 
         [Tooltip("Color flickered when the chain has done more than 50% of it's duration")]
         [SerializeField]
@@ -85,11 +85,13 @@ namespace Simoncouche.Chain {
 		public void Awake() {
 			this._chainSections = new List<ChainSection>();
             this._destroySoundSource = this.GetComponentInChildren<AudioSource>();
+            
 		}
 
 		public void Start() {
+            this._endingHookIsSet = false;
 			CreateBeginningHook();
-            _maxDistanceBetweenTwoHooks = _beginningHook.chainJoint.distance;
+            this._maxDistanceBetweenTwoHooks = _beginningHook.chainJoint.distance;
 		}
 
         public void Update() {

@@ -150,7 +150,6 @@ namespace Simoncouche.Chain {
                 _retractButtonIsHeld = true;
                 StartCoroutine(RetractChains(_timeBetweenChainLengthRetraction));
             }
-            Debug.Log("hit");
         }
 
         private void RetractChainsReleased() {
@@ -162,7 +161,7 @@ namespace Simoncouche.Chain {
 
             while (_retractButtonIsHeld) {
                 if (_chains.Count > 0) {
-                    playerAudio.PlaySound(PlayerSounds.PlayerRetractChains);
+                    if(_chains[0]._endingHookIsSet) playerAudio.PlaySound(PlayerSounds.PlayerRetractChains);
                     foreach (Chain chain in _chains) {
                         chain.RetractChain(_distanceRetractionValue);
                     }
