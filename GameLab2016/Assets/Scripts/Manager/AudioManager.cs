@@ -24,8 +24,12 @@ public class AudioManager : MonoBehaviour {
 	private EnvironmentSound _environmentSound;
 	public EnvironmentSound environmentSpecificSound { get { return _environmentSound; } }
 
-	//TODO replace certain sound with list and create function to random through list
-	//The get value of attribute will then return a random clip
+    [SerializeField]
+    private ChainSound _chainSound;
+    public ChainSound chainSound { get { return _chainSound; } }
+
+    //TODO replace certain sound with list and create function to random through list
+    //The get value of attribute will then return a random clip
 }
 
 [System.Serializable]
@@ -94,4 +98,12 @@ public class EnvironmentSound {
 	[SerializeField] [Tooltip("Sound played when island is destroyed in maelstrom")]
 	private AudioClip _maelstromDestruction;
 	public AudioClip maelstromDestructionSound { get { return _maelstromDestruction; } }
+}
+
+[System.Serializable]
+public class ChainSound {
+    [SerializeField]
+    [Tooltip("Sound played when an island is destroyed")]
+    private AudioClip _chainDestruction;
+    public AudioClip chainDestruction { get { return _chainDestruction; } }
 }

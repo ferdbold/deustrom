@@ -272,7 +272,8 @@ namespace Simoncouche.Chain {
                 if (elapsedTime > _timeUntilChainExpires - _destroySoundSource.clip.length) {
                     if (!soundIsPlaying) {
                         soundIsPlaying = true;
-                        _destroySoundSource.PlayOneShot(_destroySoundSource.clip);
+                        _destroySoundSource.PlayOneShot(GameManager.audioManager.chainSound.chainDestruction);
+                        
                     }
                 }
 
