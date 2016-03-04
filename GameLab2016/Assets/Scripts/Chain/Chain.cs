@@ -47,11 +47,21 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private Color _chainDamagedColor;
 
-        [Tooltip("When the chain is flickering starts flickering at 50% of it's duration, it pass this amount of time between each cycle")]
+        [Tooltip("The color starts a slow danger flickering when the chain lasts this ratio of time out of the chain life time")]
+        [SerializeField]
+        [Range(0.0f, 1.0f)]
+        private float _slowFlickerBeginningRatio = 0.5f;
+
+        [Tooltip("The color starts a high danger flickering when the chain lasts this ratio of time out of the chain life time")]
+        [SerializeField]
+        [Range(0.0f, 1.0f)]
+        private float _highFlickerBeginsAtRatio = 0.75f;
+
+        [Tooltip("When the chain is flickering starts flickering at _slowFlickerBeginningPercentage of it's duration, it pass this amount of time between each cycle")]
         [SerializeField]
         private float flickerTime = 0.25f;
 
-        [Tooltip("When the chain is at 75% of it's duration, we divide the flicker time by this factor to accelerate the rythm")]
+        [Tooltip("When the chain is at _highFlickerBeginsAtRatio of it's duration, we divide the flicker time by this factor to accelerate the rythm")]
         [SerializeField]
         private float flickerTimeDivider = 2f;
 
@@ -277,12 +287,12 @@ namespace Simoncouche.Chain {
                     }
                 }
 
-                if (elapsedTime > _timeUntilChainExpires * 3 / 4 && !flickerRythmAccelerated) {
+                if (elapsedTime > _timeUntilChainExpires * _highFlickerBeginsAtRatio && !flickerRythmAccelerated) {
                     flickerRythmAccelerated = true;
                     flickerTime /= flickerTimeDivider;
                 }
 
-                if (elapsedTime > _timeUntilChainExpires / 2  && elapsedTimeFlickering < flickerTime/2) {
+                if (elapsedTime > _timeUntilChainExpires * _slowFlickerBeginningRatio && elapsedTimeFlickering < flickerTime/2) {
                     foreach (ChainSection section in _chainSections) {
                         MeshRenderer mr = section.GetComponentInChildren<MeshRenderer>();
                         mr.material.color = _chainFlickerColor;
@@ -290,7 +300,7 @@ namespace Simoncouche.Chain {
                     elapsedTimeFlickering += Time.deltaTime;
                 }
 
-                if (elapsedTimeFlickering > flickerTime/2 || elapsedTime < _timeUntilChainExpires / 2) {
+                if (elapsedTimeFlickering > flickerTime/2 || elapsedTime < _timeUntilChainExpires * _slowFlickerBeginningRatio) {
                     elapsedTimeFlickering += Time.deltaTime;
                     if (elapsedTimeFlickering > flickerTime) elapsedTimeFlickering = 0.0f;
                     UpdateChainSectionsColor(elapsedTime);
