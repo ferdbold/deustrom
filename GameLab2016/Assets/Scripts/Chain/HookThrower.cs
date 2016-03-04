@@ -165,10 +165,9 @@ namespace Simoncouche.Chain {
                     foreach (Chain chain in _chains) {
                         chain.RetractChain(_distanceRetractionValue);
                     }
-                    yield return new WaitForSeconds(time);
                 }
+                yield return new WaitForSeconds(time);
             }
-            
         }
 
 
