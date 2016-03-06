@@ -139,7 +139,15 @@ namespace Simoncouche.Chain {
             if (!this.chain._beginningHookIsSet) this.chain.islandChunkBeginningHook = anchor.GetIslandChunk();//must set the beginning hook island chunk
             else this.chain.islandChunkEndingHook = anchor.GetIslandChunk();//must set the ending hook island chunk
 
-            if (this.chain.islandChunkBeginningHook == this.chain.islandChunkEndingHook) this.chain.DestroyChain(); //IF THE TWO HOOKS ARE ON THE SAME ISLAND -> DELETE THE CHAIN!
+            if (this.chain.islandChunkBeginningHook != null) {
+                if (this.chain.islandChunkEndingHook != null) {
+                    if (this.chain.islandChunkEndingHook == this.chain.islandChunkBeginningHook) this.chain.DestroyChain(); //IF THE TWO HOOKS ARE ON THE SAME ISLAND CHUNK -> DELETE THE CHAIN!
+                    if (this.chain.islandChunkEndingHook._parentIsland != null && this.chain.islandChunkBeginningHook.parentIsland != null) {
+                        if (this.chain.islandChunkEndingHook._parentIsland == this.chain.islandChunkBeginningHook.parentIsland) this.chain.DestroyChain(); //IF THE TWO HOOKS ARE ON THE SAME ISLAND -> DELETE THE CHAIN!
+                    }
+                }
+            }
+            
 
             Island parentIsland = anchor.GetIslandChunk().parentIsland;
 
