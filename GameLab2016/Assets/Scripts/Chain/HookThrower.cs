@@ -46,6 +46,8 @@ namespace Simoncouche.Chain {
         public PlayerController playerController { get; private set; }
         public PlayerAudio playerAudio { get; private set; }
 
+        public bool isPlayerOne;
+
         //PROPERTIES
         private bool _triggerIsHeld = false;
         private bool _retractButtonIsHeld = false;
@@ -61,6 +63,7 @@ namespace Simoncouche.Chain {
 		}
 
 		public void SetupInput(bool isPlayerOne) {
+            this.isPlayerOne = isPlayerOne;
 			GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Axis.p1_leftTrigger : InputManager.Axis.p2_leftTrigger, 
                 this.CheckPlayerInputs

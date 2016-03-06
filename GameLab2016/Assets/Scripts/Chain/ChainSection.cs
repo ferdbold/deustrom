@@ -36,9 +36,10 @@ namespace Simoncouche.Chain {
         /// <param name="chain">The parent chain</param>
 		/// <param name="previous">The previous element in the chain (either Hook or ChainSection)</param>
 		/// <param name="previousLinkRotation">The previous link local rotation (for 90° alternance)</param>
-		public static ChainSection Create(Vector3 position, Quaternion rotation, Chain chain, GameObject previous, Quaternion previousLinkRotation = default(Quaternion)) {
+		public static ChainSection Create(Vector3 position, Quaternion rotation, Chain chain, GameObject previous,  bool isPlayerOne , Quaternion previousLinkRotation = default(Quaternion)){
 			if (_chainSectionPrefab == null) {
-				_chainSectionPrefab = Resources.Load("Chain/ChainSection") as GameObject;
+                if(isPlayerOne) _chainSectionPrefab = Resources.Load("Chain/ChainSectionSobek") as GameObject;
+                else _chainSectionPrefab = Resources.Load("Chain/ChainSectionCthulhu") as GameObject;
 			}
 
             ChainSection chainSection = ((GameObject)Instantiate(
@@ -76,7 +77,8 @@ namespace Simoncouche.Chain {
 				this.rigidbody.transform.rotation, 
 				this.chain, 
 				this.gameObject, 
-				this.mesh.localRotation
+				chain.thrower.isPlayerOne,
+                this.mesh.localRotation
 			);
 
 			// Connect the new section to the end of the chain

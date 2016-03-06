@@ -38,7 +38,10 @@ namespace Simoncouche.Chain {
 
         /// <summary>In order to know if the beginning and the ending hook are set</summary>
         private bool _beginningHookIsSet = false;
-        public bool _endingHookIsSet {  get;  private set; }         
+        public bool _endingHookIsSet {  get;  private set; }  
+       
+        /// <summary>We have to disable the update when we play the sound on destroy (we disable the rendering and just play a sound here) </summary>
+        private bool _isPlayingSoundOnDestroy = false;
 
         [Tooltip("Color flickered when the chain has done more than 50% of it's duration")]
         [SerializeField]
@@ -105,9 +108,11 @@ namespace Simoncouche.Chain {
 		}
 
         public void Update() {
-			RecalculateChainSections();
-            ChainMissAndHitUpdate();
-            AttachedHookToIslandsUpdate();
+            if (!_isPlayingSoundOnDestroy) {
+                RecalculateChainSections();
+                ChainMissAndHitUpdate();
+                AttachedHookToIslandsUpdate();
+            }
         }
 			
         /// <summary>
@@ -125,7 +130,7 @@ namespace Simoncouche.Chain {
             // Too few sections : Create more sections until we achieve the right number
             while (_chainSections.Count < neededSections) {
                 if (_chainSections.Count == 0) {
-                    _chainSections.Add(_beginningHook.SpawnChainSection());
+                    _chainSections.Add(_beginningHook.SpawnChainSection(thrower.isPlayerOne));
                 } else {
                     _chainSections.Add(_chainSections[_chainSections.Count - 1].SpawnNewSection());
                 }
@@ -140,7 +145,7 @@ namespace Simoncouche.Chain {
 			
         /// <summary>Create and configure the beginning hook</summary>
 		public void CreateBeginningHook() {
-			_beginningHook = Hook.Create(this, true);
+			_beginningHook = Hook.Create(this, true, this.thrower.isPlayerOne);
 
             // Position where the player threw the hook
             throwerThrowPosition = this.thrower.transform.position;
@@ -148,7 +153,7 @@ namespace Simoncouche.Chain {
 
         /// <summary>Create and configure the ending hook</summary>
         public void CreateEndingHook() {
-            _endingHook = Hook.Create(this, false); 
+            _endingHook = Hook.Create(this, false, this.thrower.isPlayerOne); 
 
             // Reroute the visual chain from the player to the ending hook
             _chainSections[_chainSections.Count - 1].joint.connectedBody = _endingHook.rigidbody;
@@ -158,7 +163,7 @@ namespace Simoncouche.Chain {
 
             // Position where the player threw the hook
             throwerThrowPosition = this.thrower.transform.position;
-        }
+        } 
 
         /// <summary>React to ending hook attaching itself to an island.</summary>
         private void OnEndingHookAttach() {
@@ -175,6 +180,9 @@ namespace Simoncouche.Chain {
             _beginningHook.chainJoint.distance = distance;
         }
 
+        /// <summary>
+        /// Check if the connected islands of the hooks are null.  If they are, we destroy the chain.
+        /// </summary>
         private void AttachedHookToIslandsUpdate() {
             bool mustDestroyChain = false;
             if (_beginningHookIsSet) {
@@ -193,16 +201,16 @@ namespace Simoncouche.Chain {
         /// We check check if our hooks are beyond a certain distance from the player, if so they are considered as a miss if they didnt hit a island
         /// </summary>
         private void ChainMissAndHitUpdate() {
-            if (!_beginningHookIsSet) {
-                if (_beginningHook.attachedToTarget) {
+            if (!this._beginningHookIsSet) {
+                if (this._beginningHook.attachedToTarget) {
                     //Tells to the thrower he hit the hook
                     this.thrower.BeginningHookHit();
 
                     //Apply the maximum distance of the first hook (maxDistanceBetweenTwoHooks divided by 2)
-                    this._beginningHook.chainJoint.distance = _maxDistanceBetweenTwoHooks/2;
+                    this._beginningHook.chainJoint.distance = this._maxDistanceBetweenTwoHooks/2;
 
                     //Set this bool to true in order to stop the calls of thrower.BeginningHookHit
-                    _beginningHookIsSet = true;
+                    this._beginningHookIsSet = true;
                 }
 
                 //If the hook returns AND if it isn't attached (cause it can attach to an island when it's returning!) AND the distance between the hook and player is lower then a certain amount
@@ -220,7 +228,7 @@ namespace Simoncouche.Chain {
                     this.thrower.EndingHookHit();
 
                     // Reroute the beginning hook from the player to the ending hook
-                    _beginningHook.chainJoint.connectedBody = _endingHook.rigidbody;
+                    this._beginningHook.chainJoint.connectedBody = _endingHook.rigidbody;
                     //this._beginningHook.chainJoint.distance = _maxDistanceBetweenTwoHooks;
 
                     //Set this bool to true in order to stop the calls of thrower.EndingHookHit
@@ -243,7 +251,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void DestroyBeginningHook() {
             //Tells the owner he missed the beginning hook
-            thrower.BeginningHookMissed();
+            this.thrower.BeginningHookMissed();
 
             this.DestroyChain();
         }
@@ -257,10 +265,10 @@ namespace Simoncouche.Chain {
             Destroy(_endingHook.gameObject);
 
             //Tells the thrower he missed the ending hook throw
-            thrower.EndingHookMissed();
+            this.thrower.EndingHookMissed();
 
             //Must reset the connected rigidbody!
-            _beginningHook.chainJoint.connectedBody = this.thrower.rigidbody;
+            this._beginningHook.chainJoint.connectedBody = this.thrower.rigidbody;
         }
 
         /// <summary>
@@ -277,9 +285,9 @@ namespace Simoncouche.Chain {
 
             this.thrower.RemoveChainFromChains(this);
 
-            this._destroySoundSource.PlayOneShot(GameManager.audioManager.chainSound.chainDestruction);
-
-            Destroy(this.gameObject);
+            if (this._isPlayingSoundOnDestroy) { //IF the hook is destroyed and is playing a sound
+                Destroy(this.gameObject, GameManager.audioManager.chainSound.chainDestruction.length); 
+            } else Destroy(this.gameObject);
         }
 
         /// <summary>
@@ -290,16 +298,7 @@ namespace Simoncouche.Chain {
             float elapsedTime = 0.0f;
             float elapsedTimeFlickering = 0.0f;
             bool flickerRythmAccelerated = false;
-            bool soundIsPlaying = false;
             while (elapsedTime < _timeUntilChainExpires) {
-                if (elapsedTime > _timeUntilChainExpires - _destroySoundSource.clip.length) {
-                    if (!soundIsPlaying) {
-                        soundIsPlaying = true;
-                        _destroySoundSource.PlayOneShot(GameManager.audioManager.chainSound.chainDestruction);
-                        
-                    }
-                }
-
                 if (elapsedTime > _timeUntilChainExpires * _highFlickerBeginsAtRatio && !flickerRythmAccelerated) {
                     flickerRythmAccelerated = true;
                     flickerTime /= flickerTimeDivider;
@@ -322,6 +321,11 @@ namespace Simoncouche.Chain {
                 
                 yield return null;
             }
+
+            //Play a destroy sound
+            this._destroySoundSource.PlayOneShot(GameManager.audioManager.chainSound.chainDestruction);
+            _isPlayingSoundOnDestroy = true;
+
             DestroyChain();
         }
 

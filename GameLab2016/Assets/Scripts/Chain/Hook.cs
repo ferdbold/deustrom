@@ -57,9 +57,10 @@ namespace Simoncouche.Chain {
 		/// <summary>Spawn a new hook inside a chain</summary>
 		/// <param name="chain">The parent chain</param>
 		/// <param name="isBeginningHook">Is this hook the beginning hook of a chain</param> 
-		public static Hook Create(Chain chain, bool isBeginningHook) {
+		public static Hook Create(Chain chain, bool isBeginningHook, bool isPlayerOne) {
 			if (_hookPrefab == null) {
-				_hookPrefab = Resources.Load("Chain/Hook") as GameObject;
+                if (isPlayerOne) _hookPrefab = Resources.Load("Chain/Hook") as GameObject;
+                else _hookPrefab = Resources.Load("Chain/Hook") as GameObject;
 			}
 
 			Hook hook = ((GameObject)Instantiate(
@@ -108,12 +109,13 @@ namespace Simoncouche.Chain {
 
 		/// <summary>Spawns the first chain section and attach to it</summary>
 		/// <returns>The chain section</returns>
-		public ChainSection SpawnChainSection() {
+		public ChainSection SpawnChainSection(bool isPlayerOne) {
 			ChainSection chainSection = ChainSection.Create(
                 transform.position, 
 				this.rigidbody.transform.rotation, 
 				this.chain, 
 				this.gameObject, 
+                isPlayerOne,
 				Quaternion.identity
 			);
 
@@ -169,7 +171,7 @@ namespace Simoncouche.Chain {
         /// <param name="newIsland">The resultant isl+and</param>
         private void OnAttachedChunkMerge(Island newIsland) {
             if (this.chainJoint.connectedBody != null) {
-                if (this.chainJoint.connectedBody.tag != "Player") this.chainJoint.connectedBody = newIsland.rigidbody;
+                //if (this.chainJoint.connectedBody.tag != "Player") this.chainJoint.connectedBody = newIsland.rigidbody;
             }
             // Attach the joints to its parent island
             this.targetJoint.connectedBody = newIsland.rigidbody;
