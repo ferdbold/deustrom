@@ -8,13 +8,13 @@ namespace Simoncouche.Controller {
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerController : MonoBehaviour {
 
-	    #region InspectorVariables
+        #region InspectorVariables
 
         [Header("Player Speed Properties :")]
         [SerializeField] [Tooltip("Acceleration of the player in unit per second")]
-	    private float playerAcceleration;
+        private float playerAcceleration;
         [SerializeField] [Tooltip("Maximum velocity of the player")]
-	    private float maximumVelocity; 
+        private float maximumVelocity; 
         [SerializeField] [Tooltip("Curve of the velocity falloff when getting close to maximum speed")]
         private AnimationCurve VelocityFalloffCurve;
         [SerializeField] [Tooltip("Degrees of rotation the player can rotate per second.")]
@@ -140,7 +140,7 @@ namespace Simoncouche.Controller {
             //No need to check for null since we do it in Awake
             _hookThrower.SetupInput(isPlayerOne);
             _playerGrab.SetupInput(isPlayerOne);
-	    }
+        }
 
         /// <summary> FixedUpdate pour le character avec rigidbody (sujet à changements)  </summary>
         void FixedUpdate() {

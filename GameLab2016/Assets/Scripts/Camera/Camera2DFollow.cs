@@ -15,20 +15,20 @@ public class Camera2DFollow : MonoBehaviour {
     [Tooltip("Position on the Z axis of the camera")] [SerializeField] 
     private float Z_POSITION = -10f;
 
-	void Start () {
+    void Start () {
         if (target == null)  target = GameObject.FindGameObjectWithTag("Player").transform;
         transform.position = new Vector3(target.position.x, target.position.y, Z_POSITION);
     }
-	
-	// Update is called once per frame
-	void Update () {
+    
+    // Update is called once per frame
+    void Update () {
         Vector2 targetDirection = target.position - transform.position;
         Vector2 targetPosition = (Vector2)transform.position + (targetDirection.normalized * targetDirection.magnitude * INTERP_SPEED * Time.deltaTime);
         //Debug.Log(targetPosition);
         targetPosition = Vector2.Lerp(transform.position, targetPosition, LERP_SPEED);
         transform.position = new Vector3(targetPosition.x, targetPosition.y, Z_POSITION);
         
-	}
+    }
 
    
 }

@@ -48,26 +48,20 @@ namespace Simoncouche.Controller {
         private const float _axisMaxValue = 1.0f;
         #endregion
 
-
         void Awake() {
             playerController = GetComponent<PlayerController>();
             _swimmingAudioSource = GetComponent<AudioSource>();
             //Create and setup second audiosource exactly like swimming audio source
             _actionAudioSource = gameObject.AddComponent<AudioSource>();
             _actionAudioSource.outputAudioMixerGroup = _swimmingAudioSource.outputAudioMixerGroup;
-          
         }
 
         void Start() {
-			_actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.swimSound;
+            _actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.swimSound;
             _volumeSwimming = _swimmingAudioSource.volume;
         }
 
-
-        // Update is called once per frame
-
         void Update() {
-
             //We lerp the current added velocity by the player on the character to get a pitch higher or lower depending on velocity
             //magnitude divided by Time.fixedDeltatime is done cause 
             _currentPitchValue = Mathf.Lerp(minPitch, maxPitch, GetMovementValue() / _axisMaxValue);
@@ -82,13 +76,10 @@ namespace Simoncouche.Controller {
                 StopCoroutine("TimerUntilSoundStop");
                 _isCoroutineRunning = false;
 
-
-
                 if (!_swimmingAudioSource.isPlaying) _swimmingAudioSource.Play();
             } else {
                 FadeAudioSource();
             }
-
         }
 
         /// <summary> Plays a sound on the action audio source </summary>
@@ -99,16 +90,16 @@ namespace Simoncouche.Controller {
                     _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.bumpSound);
                     break;
                 case PlayerSounds.PlayerPush :
-					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.pushSound);
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.pushSound);
                     break;
                 case PlayerSounds.PlayerGrab :
-					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.grabSound);
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.grabSound);
                     break;
                 case PlayerSounds.PlayerChainFirst:
-					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowFirstSound);
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowFirstSound);
                     break;
                 case PlayerSounds.PlayerChainSecond:
-					_actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowSecondSound);
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowSecondSound);
                     break;
                 case PlayerSounds.PlayerDeath:
                     _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerDeath);
@@ -120,7 +111,6 @@ namespace Simoncouche.Controller {
                     Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");
                     break;
             }
-            
         }
 
         /// <summary>

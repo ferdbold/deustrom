@@ -11,15 +11,15 @@ public class KeepSamePosition : MonoBehaviour {
     private float yStartPos;
     private float zStartPos;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         xStartPos = transform.position.x;
         yStartPos = transform.position.y;
         zStartPos = transform.position.z;
-	}
-	
+    }
+    
 
-	void Update () {
+    void Update () {
         float newX, newY, newZ;
 
         if (lockXAxis) newX = xStartPos;
@@ -32,5 +32,5 @@ public class KeepSamePosition : MonoBehaviour {
         else newZ = transform.position.z;
 
         transform.position = new Vector3(newX, newY, newZ);
-	}
+    }
 }
