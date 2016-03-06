@@ -136,6 +136,9 @@ namespace Simoncouche.Chain {
         /// </summary>
 		/// <param name="anchor">The anchor point</param>
 		public void AttachToIsland(IslandAnchorPoints anchor) {
+            if (!chain._beginningHookIsSet) chain.islandChunkBeginningHook = anchor.GetIslandChunk();//must set the beginning hook island chunk
+            else chain.islandChunkEndingHook = anchor.GetIslandChunk();//must set the ending hook island chunk
+
             Island parentIsland = anchor.GetIslandChunk().parentIsland;
 
             this.rigidbody.velocity = Vector2.zero;
@@ -149,6 +152,7 @@ namespace Simoncouche.Chain {
             } else {
                 this.targetJoint.connectedBody = parentIsland.rigidbody;
             }
+            
 
             // Add listeners
             anchor.GetIslandChunk().MergeIntoIsland.AddListener(this.OnAttachedChunkMerge);
@@ -175,6 +179,15 @@ namespace Simoncouche.Chain {
         private void OnAttachedChunkMerge(Island newIsland) {
             // Attach the joints to its parent island
             this.targetJoint.connectedBody = newIsland.rigidbody;
+
+            // If the two hooks are united to the same Island, we destroy the hook
+            bool endingIslandChunkFound = false;
+            bool beginningIslandChunkFound = false;
+            foreach (IslandChunk iChunk in newIsland.chunks) {
+                if (iChunk == this.chain.islandChunkBeginningHook) beginningIslandChunkFound = true;
+                else if (iChunk == this.chain.islandChunkEndingHook) endingIslandChunkFound = true;
+            }
+            if (beginningIslandChunkFound && endingIslandChunkFound) this.chain.DestroyChain();
         }
 
         /// <summary>React to attached chunk being grabbed by a player</summary>
@@ -182,6 +195,7 @@ namespace Simoncouche.Chain {
         private void OnAttachedChunkPlayerGrab(PlayerGrab playerGrab) {
             // Reroute the chain to the player
             this.targetJoint.connectedBody = playerGrab.rigidbody;
+
         }
 
         /// <summary>React to attached chunk being released by a player</summary>

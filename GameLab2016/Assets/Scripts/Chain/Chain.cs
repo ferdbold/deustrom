@@ -37,11 +37,15 @@ namespace Simoncouche.Chain {
         private Vector3 throwerThrowPosition;
 
         /// <summary>In order to know if the beginning and the ending hook are set</summary>
-        private bool _beginningHookIsSet = false;
+        public bool _beginningHookIsSet { get; private set; }
         public bool _endingHookIsSet {  get;  private set; }  
        
         /// <summary>We have to disable the update when we play the sound on destroy (we disable the rendering and just play a sound here) </summary>
         private bool _isPlayingSoundOnDestroy = false;
+
+        /// <summary>A reference to an islandChunk in order to take care of the case were 2 hooks are now on the same island</summary>
+        public Islands.IslandChunk islandChunkBeginningHook;
+        public Islands.IslandChunk islandChunkEndingHook;
 
         [Tooltip("Color flickered when the chain has done more than 50% of it's duration")]
         [SerializeField]
@@ -274,7 +278,7 @@ namespace Simoncouche.Chain {
         /// <summary>
         /// When an attached chain has passed a certain amount of time, we destroy it using this function
         /// </summary>
-        private void DestroyChain() {
+        public void DestroyChain() {
             foreach (ChainSection section in _chainSections) {
                 Destroy(section.gameObject);
             }
