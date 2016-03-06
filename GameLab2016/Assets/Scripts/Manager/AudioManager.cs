@@ -65,6 +65,10 @@ public class CharacterSound {
     [SerializeField]
     private AudioClip _playerRetractChains;
     public AudioClip playerRetractChains { get { return _playerRetractChains; } }
+
+    [SerializeField]
+    private AudioClip _hookThrowCooldownFail;
+    public AudioClip hookThrowCooldownFail { get { return _hookThrowCooldownFail; } }
 }
 
 [System.Serializable]
