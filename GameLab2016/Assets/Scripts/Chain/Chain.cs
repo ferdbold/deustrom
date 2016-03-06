@@ -325,10 +325,15 @@ namespace Simoncouche.Chain {
             }
 
             //Play a destroy sound
-            this._destroySoundSource.PlayOneShot(GameManager.audioManager.chainSound.chainDestruction);
-            _isPlayingSoundOnDestroy = true;
+            PlayDestroySound();
 
             DestroyChain();
+        }
+
+        /// <summary>Plays a destroy sound</summary>
+        private void PlayDestroySound() {
+            this._destroySoundSource.PlayOneShot(GameManager.audioManager.chainSound.chainDestruction);
+            this._isPlayingSoundOnDestroy = true;
         }
 
         /// <summary>
@@ -365,6 +370,16 @@ namespace Simoncouche.Chain {
         public void RetractChainReleaseBehaviour() {
             if (_beginningHookIsSet && !_endingHookIsSet) {
                 _beginningHook.chainJoint.distance = _maxDistanceBetweenTwoHooks/2; //Cause only 1 chain is set
+            }
+        }
+
+        /// <summary>
+        /// Cut the link of the beginning hook if and only if the ending hook is null
+        /// </summary>
+        public void CutLinkBeginningHook() {
+            if (_endingHook == null) {
+                PlayDestroySound();
+                this.DestroyBeginningHook();
             }
         }
 

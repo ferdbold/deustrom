@@ -31,12 +31,24 @@ public class InputManager : MonoBehaviour {
     private EventButton p2_retractHooksButtonDown;
     private EventButton p1_retractHooksButtonUp;
     private EventButton p2_retractHooksButtonUp;
+    private EventButton p1_cutLinkWithChainButton;
+    private EventButton p2_cutLinkWithChainButton;
+
 
     #region Add Event
     /// <summary>
     /// The name of every axis
     /// </summary>
-    public enum Axis { p1_leftAnalog, p1_rightAnalog, p1_leftTrigger, p1_rightTrigger, p2_leftAnalog, p2_rightAnalog, p2_leftTrigger, p2_rightTrigger }
+    public enum Axis { 
+        p1_leftAnalog,
+        p1_rightAnalog,
+        p1_leftTrigger,
+        p1_rightTrigger, 
+        p2_leftAnalog, 
+        p2_rightAnalog, 
+        p2_leftTrigger,
+        p2_rightTrigger 
+    }
     /// <summary>
     /// Link a function to an event
     /// </summary>
@@ -64,7 +76,19 @@ public class InputManager : MonoBehaviour {
     /// <summary>
     /// The name of every buttons
     /// </summary>
-    public enum Button { start, p1_fireHook, p2_fireHook, p1_pushButton, p2_pushButton, p1_retractHooksButtonDown, p2_retractHooksButtonDown, p1_retractHooksButtonUp, p2_retractHooksButtonUp }
+    public enum Button { 
+        start, 
+        p1_fireHook, 
+        p2_fireHook, 
+        p1_pushButton,
+        p2_pushButton,
+        p1_retractHooksButtonDown,
+        p2_retractHooksButtonDown,
+        p1_retractHooksButtonUp,
+        p2_retractHooksButtonUp,
+        p1_cutLinkWithChainButton,
+        p2_cutLinkWithChainButton 
+    }
     /// <summary>
     /// Link a function to an event
     /// </summary>
@@ -81,6 +105,8 @@ public class InputManager : MonoBehaviour {
             case Button.p2_retractHooksButtonDown: p2_retractHooksButtonDown += eventFunction; break;
             case Button.p1_retractHooksButtonUp: p1_retractHooksButtonUp += eventFunction; break;
             case Button.p2_retractHooksButtonUp: p2_retractHooksButtonUp += eventFunction; break;
+            case Button.p1_cutLinkWithChainButton: p1_cutLinkWithChainButton += eventFunction; break;
+            case Button.p2_cutLinkWithChainButton: p2_cutLinkWithChainButton += eventFunction; break;
 
             //Error
             default:
@@ -113,6 +139,8 @@ public class InputManager : MonoBehaviour {
         p2_retractHooksButtonDown = null;
         p1_retractHooksButtonUp = null;
         p2_retractHooksButtonUp = null;
+        p1_cutLinkWithChainButton = null;
+        p2_cutLinkWithChainButton = null;
     }
 
     #endregion
@@ -137,7 +165,9 @@ public class InputManager : MonoBehaviour {
             new ButtonTuple("P1 Retract Hooks Down", p1_retractHooksButtonDown, Input.GetButtonDown("P1_Retract_Hooks")),
             new ButtonTuple("P2 Retract Hooks Down", p2_retractHooksButtonDown,Input.GetButtonDown("P2_Retract_Hooks")),
             new ButtonTuple("P1 Retract Hooks Up", p1_retractHooksButtonUp, Input.GetButtonUp("P1_Retract_Hooks")),
-            new ButtonTuple("P2 Retract Hooks Up", p2_retractHooksButtonUp,Input.GetButtonUp("P2_Retract_Hooks"))
+            new ButtonTuple("P2 Retract Hooks Up", p2_retractHooksButtonUp,Input.GetButtonUp("P2_Retract_Hooks")),
+            new ButtonTuple("P1 Cut Link Chain", p1_cutLinkWithChainButton, Input.GetButtonDown("P1_Cut_Link_Chain")),
+            new ButtonTuple("P2 Cut Link Chain", p2_cutLinkWithChainButton,Input.GetButtonDown("P2_Cut_Link_Chain"))
         };
 
         foreach(AxisTuple axis in axii) {

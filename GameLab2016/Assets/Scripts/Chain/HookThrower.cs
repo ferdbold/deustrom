@@ -33,6 +33,11 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private float _throwCooldown = 1.0f;
 
+        [Tooltip("Check this to replace hook already present on an island by new hook")]
+        [SerializeField]
+        private bool _doesHookReplacePresentHookOnIsland= false;
+
+
         /// <summary>
         /// The minimum distance needed between the thrower and a chain's 
         /// last ChainSection to spawn a new ChainSection
@@ -55,7 +60,7 @@ namespace Simoncouche.Chain {
         public PlayerAudio playerAudio { get; private set; }
         public AudioSource audioSource { get; private set; }
 
-        public bool isPlayerOne;
+        public bool isPlayerOne { get; private set; }
 
         // PROPERTIES
         private bool _triggerIsHeld = false;
@@ -87,6 +92,11 @@ namespace Simoncouche.Chain {
                 isPlayerOne ? InputManager.Button.p1_retractHooksButtonUp : InputManager.Button.p2_retractHooksButtonUp,
                 this.RetractChainsReleased
             );
+
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_cutLinkWithChainButton : InputManager.Button.p2_cutLinkWithChainButton,
+                this.CutChainLinkWithThrower
+                );
 
             //For keyboard use
             #if UNITY_EDITOR
@@ -165,17 +175,31 @@ namespace Simoncouche.Chain {
             }
         }
 
+        /// <summary>
+        /// This retracts the chains using by starting a coroutine
+        /// </summary>
         private void RetractChainsEngaged() {
             if (!_retractButtonIsHeld) { //If just stop pressing
                 _retractButtonIsHeld = true;
                 StartCoroutine(RetractChains(_timeBetweenChainLengthRetraction));
             }
         }
-
+        /// <summary>
+        /// This put a stop to the retraction of our chains by stoping the coroutine
+        /// </summary>
         private void RetractChainsReleased() {
             _retractButtonIsHeld = false;
             StopCoroutine("RetractChains");
             if(_chains.Count>0) _chains[_chains.Count - 1].RetractChainReleaseBehaviour();
+        }
+
+        /// <summary>
+        /// If the current chain is attached to the player, we cut the link with the player using this function
+        /// </summary>
+        private void CutChainLinkWithThrower() {
+            if (_chains.Count > 0) {
+                _chains[_chains.Count - 1].CutLinkBeginningHook();
+            }
         }
 
         IEnumerator RetractChains(float time) {
@@ -187,6 +211,7 @@ namespace Simoncouche.Chain {
                     }
                 }
                 yield return new WaitForSeconds(time);
+
             }
         }
 
@@ -213,6 +238,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void BeginningHookHit() {
             _currentState = State.OneHook;
+            if(_doHooksReplacePresentHooksOnIsland) HookAlreadyOnIslandCheck();
         }
 
         /// <summary>
@@ -220,6 +246,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void EndingHookHit() {
             _currentState = State.NoHook;
+            if (_doHooksReplacePresentHooksOnIsland) HookAlreadyOnIslandCheck();
         }
 
         /// <summary>
@@ -232,6 +259,52 @@ namespace Simoncouche.Chain {
                 playerController.HandleSecondHookAnimation();
             }
             _chains.Remove(chain);
+        }
+
+        /// <summary>
+        /// Check if there is already a hook on an island or a chunk.  If so, we destroy the precedent chain which posses the hook in question.
+        /// </summary>
+        private void HookAlreadyOnIslandCheck() {
+            if (_chains.Count > 1) {
+                bool mustDestroyChain = false;
+                int i = 0;
+                while (i < _chains.Count - 1 && !mustDestroyChain) {
+                    //4 possibles cases for the chunks
+                    if (_chains[_chains.Count - 1].islandChunkBeginningHook == _chains[i].islandChunkBeginningHook && _chains[i].islandChunkBeginningHook != null) {
+                        mustDestroyChain = true;
+                    } else if (_chains[_chains.Count - 1].islandChunkBeginningHook == _chains[i].islandChunkEndingHook && _chains[i].islandChunkEndingHook != null) {
+                        mustDestroyChain = true;
+                    } else if (_chains[_chains.Count - 1].islandChunkEndingHook == _chains[i].islandChunkEndingHook && _chains[i].islandChunkEndingHook != null) {
+                        mustDestroyChain = true;
+                    } else if (_chains[_chains.Count - 1].islandChunkEndingHook == _chains[i].islandChunkBeginningHook && _chains[i].islandChunkBeginningHook != null) {
+                        mustDestroyChain = true;
+                    }
+                    //4 cases for the islands (group of chunks)
+                    if (_chains[_chains.Count - 1].islandChunkBeginningHook != null && _chains[i].islandChunkBeginningHook != null) {
+                        if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland != null && _chains[i].islandChunkBeginningHook.parentIsland != null) {
+                            if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland == _chains[i].islandChunkBeginningHook.parentIsland) mustDestroyChain = true;
+                        }
+                    }
+                    if (_chains[_chains.Count - 1].islandChunkBeginningHook != null && _chains[i].islandChunkEndingHook != null) {
+                        if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland != null && _chains[i].islandChunkEndingHook.parentIsland != null) {
+                            if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland == _chains[i].islandChunkEndingHook.parentIsland) mustDestroyChain = true;
+                        }
+                    }
+                    if (_chains[_chains.Count - 1].islandChunkEndingHook != null && _chains[i].islandChunkBeginningHook != null) {
+                        if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland != null && _chains[i].islandChunkBeginningHook.parentIsland != null) {
+                            if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland == _chains[i].islandChunkBeginningHook.parentIsland) mustDestroyChain = true;
+                        }
+                    }
+                    if (_chains[_chains.Count - 1].islandChunkEndingHook != null && _chains[i].islandChunkEndingHook != null) {
+                        if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland != null && _chains[i].islandChunkEndingHook.parentIsland != null) {
+                            if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland == _chains[i].islandChunkEndingHook.parentIsland) mustDestroyChain = true;
+                        }
+                    }
+
+                    if (!mustDestroyChain) i++;
+                }
+                if(mustDestroyChain) _chains[i].DestroyChain();
+            }
         }
     }
 }
