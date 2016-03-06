@@ -99,9 +99,6 @@ namespace Simoncouche.Chain {
 
         private void Update() {
             _throwCooldownRemaining = Mathf.Max(0, _throwCooldownRemaining - Time.deltaTime);
-            if (_throwCooldownRemaining > 0) {
-                Debug.Log("Cooldown: " + _throwCooldownRemaining);
-            }
         }
 
         /// <summary>Handle user input to throw a new chain and hook</summary>
@@ -147,7 +144,6 @@ namespace Simoncouche.Chain {
             }
 
             // Apply cooldown
-            Debug.Log("FIRE!");
             _throwCooldownRemaining = _throwCooldown;
         }
 

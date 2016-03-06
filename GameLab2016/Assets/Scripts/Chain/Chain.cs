@@ -221,7 +221,6 @@ namespace Simoncouche.Chain {
                     //Then we destroy the chain
                 else if (!_beginningHook.attachedToTarget &&
                     Vector2.Distance(_beginningHook.transform.position, throwerThrowPosition) > _maxDistanceBetweenTwoHooks / 2) {
-                    Debug.Log("Destroy Beginning Hook");
                     DestroyBeginningHook();
                 }
             }
@@ -244,7 +243,6 @@ namespace Simoncouche.Chain {
                 //Check if the ending hook is further than 
                 else if (!_endingHook.attachedToTarget &&
                     Vector2.Distance(_endingHook.transform.position, throwerThrowPosition) > _maxDistanceBetweenTwoHooks / 2) {
-                    Debug.Log("Destroy Ending Hook");
                     DestroyEndingHook();
                 }
             }
