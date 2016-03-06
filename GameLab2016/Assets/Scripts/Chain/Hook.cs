@@ -136,8 +136,10 @@ namespace Simoncouche.Chain {
         /// </summary>
 		/// <param name="anchor">The anchor point</param>
 		public void AttachToIsland(IslandAnchorPoints anchor) {
-            if (!chain._beginningHookIsSet) chain.islandChunkBeginningHook = anchor.GetIslandChunk();//must set the beginning hook island chunk
-            else chain.islandChunkEndingHook = anchor.GetIslandChunk();//must set the ending hook island chunk
+            if (!this.chain._beginningHookIsSet) this.chain.islandChunkBeginningHook = anchor.GetIslandChunk();//must set the beginning hook island chunk
+            else this.chain.islandChunkEndingHook = anchor.GetIslandChunk();//must set the ending hook island chunk
+
+            if (this.chain.islandChunkBeginningHook == this.chain.islandChunkEndingHook) this.chain.DestroyChain(); //IF THE TWO HOOKS ARE ON THE SAME ISLAND -> DELETE THE CHAIN!
 
             Island parentIsland = anchor.GetIslandChunk().parentIsland;
 
