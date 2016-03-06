@@ -12,10 +12,10 @@ public class DestroyGravityBodyOnImpact : MonoBehaviour {
     private AudioSource audioSource;
 
 
-	void Start () {
+    void Start () {
         audioSource = GetComponent<AudioSource>();
-	}
-	
+    }
+    
 
     /// <summary> Destroy graviy body if triggered</summary>
     /// <param name="other"></param>
@@ -28,7 +28,7 @@ public class DestroyGravityBodyOnImpact : MonoBehaviour {
             //Check if islandChunk exist. If so, call Maelstrom Collision Method
             if(islandChunk != null) {
                 islandChunk.OnMaelstromEnter();
-				audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
+                audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
             }
             //Check if playercontroller exists. If so, call Maelstrom Collision Method
             else if(playerController != null) {
@@ -38,7 +38,7 @@ public class DestroyGravityBodyOnImpact : MonoBehaviour {
             else if (gravityBodyScript != null) {
                 if (gravityBodyScript.collisionEnabled == true) {
                     gravityBodyScript.DestroyGravityBody();
-					audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
+                    audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
                 }
             }
         }

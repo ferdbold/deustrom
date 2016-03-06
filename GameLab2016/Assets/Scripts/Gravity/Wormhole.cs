@@ -18,11 +18,11 @@ public class Wormhole : MonoBehaviour {
  
     
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         warpPosition = transform.position;
-	}
-	
+    }
+    
     /// <summary>
     /// Warps gravity body to the target wormhole
     /// </summary>

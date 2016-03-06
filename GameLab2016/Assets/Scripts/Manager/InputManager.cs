@@ -6,15 +6,15 @@ using ButtonTuple = Eppy.Tuple<string, InputManager.EventButton, bool>;
 
 public class InputManager : MonoBehaviour {
 
-	/// <summary>
-	/// Event structure
-	/// </summary>
-	public delegate void EventAxis(params float[] a);
-	public delegate void EventButton();
+    /// <summary>
+    /// Event structure
+    /// </summary>
+    public delegate void EventAxis(params float[] a);
+    public delegate void EventButton();
 
-	//Possible Event
-	private EventAxis p1_leftAnalog;
-	private EventAxis p1_rightAnalog;
+    //Possible Event
+    private EventAxis p1_leftAnalog;
+    private EventAxis p1_rightAnalog;
     private EventAxis p1_leftTrigger;
     private EventAxis p1_rightTrigger;
     private EventAxis p2_leftAnalog;
@@ -23,7 +23,7 @@ public class InputManager : MonoBehaviour {
     private EventAxis p2_rightTrigger;
 
     private EventButton _startButton;
-	private EventButton p1_fireHookButton;
+    private EventButton p1_fireHookButton;
     private EventButton p2_fireHookButton;
     private EventButton p1_pushButton;
     private EventButton p2_pushButton;
@@ -37,15 +37,15 @@ public class InputManager : MonoBehaviour {
     /// The name of every axis
     /// </summary>
     public enum Axis { p1_leftAnalog, p1_rightAnalog, p1_leftTrigger, p1_rightTrigger, p2_leftAnalog, p2_rightAnalog, p2_leftTrigger, p2_rightTrigger }
-	/// <summary>
-	/// Link a function to an event
-	/// </summary>
-	/// <param name="input">The event to be used</param>
-	/// <param name="eventFunction">The function to be call when the event is triggered</param>
-	public void AddEvent(Axis axis, EventAxis eventFunction) {
-		switch (axis) {
-			case Axis.p1_leftAnalog: p1_leftAnalog += eventFunction; break;
-			case Axis.p1_rightAnalog: p1_rightAnalog += eventFunction; break;
+    /// <summary>
+    /// Link a function to an event
+    /// </summary>
+    /// <param name="input">The event to be used</param>
+    /// <param name="eventFunction">The function to be call when the event is triggered</param>
+    public void AddEvent(Axis axis, EventAxis eventFunction) {
+        switch (axis) {
+            case Axis.p1_leftAnalog: p1_leftAnalog += eventFunction; break;
+            case Axis.p1_rightAnalog: p1_rightAnalog += eventFunction; break;
             case Axis.p1_leftTrigger: p1_leftTrigger += eventFunction; break;
             case Axis.p1_rightTrigger: p1_rightTrigger += eventFunction; break;
             case Axis.p2_leftAnalog: p2_leftAnalog += eventFunction; break;
@@ -55,25 +55,25 @@ public class InputManager : MonoBehaviour {
 
             //Error
             default:
-				Debug.LogError("Tried to add an event to the input manager for an axis that does not exist."+
-							   "You might want to use button instead of axis.");
-				break;
-		}
-	}
+                Debug.LogError("Tried to add an event to the input manager for an axis that does not exist."+
+                               "You might want to use button instead of axis.");
+                break;
+        }
+    }
 
-	/// <summary>
-	/// The name of every buttons
-	/// </summary>
+    /// <summary>
+    /// The name of every buttons
+    /// </summary>
     public enum Button { start, p1_fireHook, p2_fireHook, p1_pushButton, p2_pushButton, p1_retractHooksButtonDown, p2_retractHooksButtonDown, p1_retractHooksButtonUp, p2_retractHooksButtonUp }
-	/// <summary>
-	/// Link a function to an event
-	/// </summary>
-	/// <param name="button">The event to be used</param>
-	/// <param name="eventFunction">The function to be call when the event is triggered</param>
-	public void AddEvent(Button button, EventButton eventFunction) {
-		switch (button) {
-			case Button.start: _startButton += eventFunction; break;
-			case Button.p1_fireHook: p1_fireHookButton += eventFunction; break;
+    /// <summary>
+    /// Link a function to an event
+    /// </summary>
+    /// <param name="button">The event to be used</param>
+    /// <param name="eventFunction">The function to be call when the event is triggered</param>
+    public void AddEvent(Button button, EventButton eventFunction) {
+        switch (button) {
+            case Button.start: _startButton += eventFunction; break;
+            case Button.p1_fireHook: p1_fireHookButton += eventFunction; break;
             case Button.p2_fireHook: p2_fireHookButton += eventFunction; break;
             case Button.p1_pushButton: p1_pushButton += eventFunction; break;
             case Button.p2_pushButton: p2_pushButton += eventFunction; break;
@@ -84,43 +84,43 @@ public class InputManager : MonoBehaviour {
 
             //Error
             default:
-				Debug.LogError("Tried to add an event to the input manager for a button that does not exist." + 
-							   "You might want to use axis instead of button.");
-				break;
-		}
-	}
-	#endregion
+                Debug.LogError("Tried to add an event to the input manager for a button that does not exist." + 
+                               "You might want to use axis instead of button.");
+                break;
+        }
+    }
+    #endregion
 
-	#region Remove Event
+    #region Remove Event
 
-	/// <summary>Resets every inputs to null. Used when  reloading a scene</summary>
-	public void ResetInputs() {
-		p1_leftAnalog = null;
-		p1_rightAnalog = null;
+    /// <summary>Resets every inputs to null. Used when  reloading a scene</summary>
+    public void ResetInputs() {
+        p1_leftAnalog = null;
+        p1_rightAnalog = null;
         p1_leftTrigger = null;
         p1_rightTrigger = null;
         p2_leftAnalog = null;
-		p2_rightAnalog = null;
+        p2_rightAnalog = null;
         p2_leftTrigger = null;
         p2_rightTrigger = null;
 
         _startButton = null;
-		p1_fireHookButton = null;
-		p2_fireHookButton = null;
-		p1_pushButton = null;
-		p2_pushButton = null;
+        p1_fireHookButton = null;
+        p2_fireHookButton = null;
+        p1_pushButton = null;
+        p2_pushButton = null;
         p1_retractHooksButtonDown = null;
         p2_retractHooksButtonDown = null;
         p1_retractHooksButtonUp = null;
         p2_retractHooksButtonUp = null;
-	}
+    }
 
-	#endregion
+    #endregion
 
-	void Update() {
-		List<AxisTuple> axii = new List<AxisTuple>() {
-			new AxisTuple("P1 Left Analog", p1_leftAnalog, Input.GetAxis("P1_L_Horizontal"), Input.GetAxis("P1_L_Vertical")),
-			new AxisTuple("P1 Right Analog", p1_rightAnalog, Input.GetAxis("P1_R_Horizontal"), Input.GetAxis("P1_R_Vertical")),
+    void Update() {
+        List<AxisTuple> axii = new List<AxisTuple>() {
+            new AxisTuple("P1 Left Analog", p1_leftAnalog, Input.GetAxis("P1_L_Horizontal"), Input.GetAxis("P1_L_Vertical")),
+            new AxisTuple("P1 Right Analog", p1_rightAnalog, Input.GetAxis("P1_R_Horizontal"), Input.GetAxis("P1_R_Vertical")),
             new AxisTuple("P2 Left Trigger", p1_leftTrigger, Input.GetAxis("P1_L_Trigger"), 0),                                     //This axis has only 1 direction
             new AxisTuple("P2 Right Trigger", p1_rightTrigger, Input.GetAxis("P1_R_Trigger"), 0),                                   //This axis has only 1 direction
             new AxisTuple("P2 Left Analog", p2_leftAnalog, Input.GetAxis("P2_L_Horizontal"), Input.GetAxis("P2_L_Vertical")),
@@ -128,7 +128,7 @@ public class InputManager : MonoBehaviour {
             new AxisTuple("P2 Left Trigger", p2_leftTrigger, Input.GetAxis("P2_L_Trigger"), 0),                                     //This axis has only 1 direction
             new AxisTuple("P2 Right Trigger", p2_rightTrigger, Input.GetAxis("P2_R_Trigger"), 0)                                    //This axis has only 1 direction
         };
-		List<ButtonTuple> buttons = new List<ButtonTuple>() {
+        List<ButtonTuple> buttons = new List<ButtonTuple>() {
             new ButtonTuple("P1 Push", p1_pushButton, Input.GetButtonDown("P1_Push")),
             new ButtonTuple("P2 Push", p2_pushButton, Input.GetButtonDown("P2_Push")),
             new ButtonTuple("P1 Fire Hook", p1_fireHookButton, Input.GetButtonDown("P1_FireHook")),
@@ -138,20 +138,20 @@ public class InputManager : MonoBehaviour {
             new ButtonTuple("P2 Retract Hooks Down", p2_retractHooksButtonDown,Input.GetButtonDown("P2_Retract_Hooks")),
             new ButtonTuple("P1 Retract Hooks Up", p1_retractHooksButtonUp, Input.GetButtonUp("P1_Retract_Hooks")),
             new ButtonTuple("P2 Retract Hooks Up", p2_retractHooksButtonUp,Input.GetButtonUp("P2_Retract_Hooks"))
-		};
+        };
 
-		foreach(AxisTuple axis in axii) {
-			if (axis.Item2 != null) {
-				axis.Item2.Invoke(axis.Item3, axis.Item4);
-			}
-		}
+        foreach(AxisTuple axis in axii) {
+            if (axis.Item2 != null) {
+                axis.Item2.Invoke(axis.Item3, axis.Item4);
+            }
+        }
 
-		foreach (ButtonTuple button in buttons) {
-			if (button.Item1 != null) {
-				if (button.Item3 && button.Item2 != null) {
+        foreach (ButtonTuple button in buttons) {
+            if (button.Item1 != null) {
+                if (button.Item3 && button.Item2 != null) {
                     button.Item2.Invoke();
-				}
-			}
-		}
-	}
+                }
+            }
+        }
+    }
 }

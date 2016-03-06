@@ -9,10 +9,10 @@ public class PositionZOnBackground : MonoBehaviour {
     [Tooltip("Offset on z Axis from the z value of the background")][SerializeField] public float _zOffset = 0f;    
     [Tooltip("DO NOT TOUCH. Layers of the background collision.")][SerializeField] private LayerMask _backgroundLayerMask;
 
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update () {
         RepositionObjectZ();
-	}
+    }
 
     /// <summary>
     /// Reposition the object on the z axis based on the background

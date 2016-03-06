@@ -7,10 +7,10 @@ public class GravityForceZone : GravityModifier {
     [Tooltip("Force applied to gravity bodies inside this zone")][SerializeField] private Vector2 FORCE = Vector2.zero;
     private float gravityForceFactor = 0.1f; //Force applied by gravityForceZone is multiplied by this
 
-	// Use this for initialization
-	protected override void Start () {
+    // Use this for initialization
+    protected override void Start () {
         base.Start();
-	}
+    }
 
     /// <summary>
     /// Method called every FixedUpdate by objects affected by this gravity modifier
