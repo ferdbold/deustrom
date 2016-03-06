@@ -238,7 +238,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void BeginningHookHit() {
             _currentState = State.OneHook;
-            if(_doHooksReplacePresentHooksOnIsland) HookAlreadyOnIslandCheck();
+            if (_doesHookReplacePresentHookOnIsland) HookAlreadyOnIslandCheck();
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void EndingHookHit() {
             _currentState = State.NoHook;
-            if (_doHooksReplacePresentHooksOnIsland) HookAlreadyOnIslandCheck();
+            if (_doesHookReplacePresentHookOnIsland) HookAlreadyOnIslandCheck();
         }
 
         /// <summary>
