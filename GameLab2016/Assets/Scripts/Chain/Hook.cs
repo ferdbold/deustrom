@@ -27,6 +27,8 @@ namespace Simoncouche.Chain {
         /// <summary>The ChainSection linked to this hook</summary>
         private ChainSection _nextChain;
 
+        public IslandAnchorPoints currentAnchorPoint { get; private set; }
+
         /// <summary>Whether this hook is currently attached to a target</summary>
         public bool attachedToTarget { get; private set;}
 
@@ -102,7 +104,10 @@ namespace Simoncouche.Chain {
             if (!attachedToTarget) {
                 IslandAnchorPoints anchorPoint = coll.gameObject.GetComponent<IslandAnchorPoints>();
 
+                
+
                 if (anchorPoint != null) {
+                    this.currentAnchorPoint = anchorPoint;
                     this.AttachToIsland(anchorPoint);
                 }
             }
@@ -141,15 +146,17 @@ namespace Simoncouche.Chain {
 
             if (this.chain.islandChunkBeginningHook != null) {
                 if (this.chain.islandChunkEndingHook != null) {
-                    if (this.chain.islandChunkEndingHook == this.chain.islandChunkBeginningHook) this.chain.DestroyChain(); //IF THE TWO HOOKS ARE ON THE SAME ISLAND CHUNK -> DELETE THE CHAIN!
+                    if (this.chain.islandChunkEndingHook == this.chain.islandChunkBeginningHook) this.chain.DestroyChain(false); //IF THE TWO HOOKS ARE ON THE SAME ISLAND CHUNK -> DELETE THE CHAIN!
                     if (this.chain.islandChunkEndingHook._parentIsland != null && this.chain.islandChunkBeginningHook.parentIsland != null) {
-                        if (this.chain.islandChunkEndingHook._parentIsland == this.chain.islandChunkBeginningHook.parentIsland) this.chain.DestroyChain(); //IF THE TWO HOOKS ARE ON THE SAME ISLAND -> DELETE THE CHAIN!
+                        if (this.chain.islandChunkEndingHook._parentIsland == this.chain.islandChunkBeginningHook.parentIsland) this.chain.DestroyChain(false); //IF THE TWO HOOKS ARE ON THE SAME ISLAND -> DELETE THE CHAIN!
                     }
                 }
             }
             
 
             Island parentIsland = anchor.GetIslandChunk().parentIsland;
+            
+            chain.thrower.HookAlreadyOnIslandCheck(anchor);//must check if there is already a hook on this joint.  If so, we replace it with this one.
 
             this.rigidbody.velocity = Vector2.zero;
             this.rigidbody.mass = this.ATTACHED_MASS;
@@ -197,7 +204,7 @@ namespace Simoncouche.Chain {
                 if (iChunk == this.chain.islandChunkBeginningHook) beginningIslandChunkFound = true;
                 else if (iChunk == this.chain.islandChunkEndingHook) endingIslandChunkFound = true;
             }
-            if (beginningIslandChunkFound && endingIslandChunkFound) this.chain.DestroyChain();
+            if (beginningIslandChunkFound && endingIslandChunkFound) this.chain.DestroyChain(false);
         }
 
         /// <summary>React to attached chunk being grabbed by a player</summary>

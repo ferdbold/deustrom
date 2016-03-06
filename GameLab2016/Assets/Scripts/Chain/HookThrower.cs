@@ -238,7 +238,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void BeginningHookHit() {
             _currentState = State.OneHook;
-            if (_doesHookReplacePresentHookOnIsland) HookAlreadyOnIslandCheck();
+            //if (_doesHookReplacePresentHookOnIsland) HookAlreadyOnIslandCheck();
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void EndingHookHit() {
             _currentState = State.NoHook;
-            if (_doesHookReplacePresentHookOnIsland) HookAlreadyOnIslandCheck();
+            //if (_doesHookReplacePresentHookOnIsland) HookAlreadyOnIslandCheck();
         }
 
         /// <summary>
@@ -264,46 +264,58 @@ namespace Simoncouche.Chain {
         /// <summary>
         /// Check if there is already a hook on an island or a chunk.  If so, we destroy the precedent chain which posses the hook in question.
         /// </summary>
-        private void HookAlreadyOnIslandCheck() {
-            if (_chains.Count > 1) {
+        public void HookAlreadyOnIslandCheck(Islands.IslandAnchorPoints anchorPoint) {
+            if (_chains.Count > 1 && _doesHookReplacePresentHookOnIsland) {
                 bool mustDestroyChain = false;
                 int i = 0;
-                while (i < _chains.Count - 1 && !mustDestroyChain) {
-                    //4 possibles cases for the chunks
-                    if (_chains[_chains.Count - 1].islandChunkBeginningHook == _chains[i].islandChunkBeginningHook && _chains[i].islandChunkBeginningHook != null) {
-                        mustDestroyChain = true;
-                    } else if (_chains[_chains.Count - 1].islandChunkBeginningHook == _chains[i].islandChunkEndingHook && _chains[i].islandChunkEndingHook != null) {
-                        mustDestroyChain = true;
-                    } else if (_chains[_chains.Count - 1].islandChunkEndingHook == _chains[i].islandChunkEndingHook && _chains[i].islandChunkEndingHook != null) {
-                        mustDestroyChain = true;
-                    } else if (_chains[_chains.Count - 1].islandChunkEndingHook == _chains[i].islandChunkBeginningHook && _chains[i].islandChunkBeginningHook != null) {
+                while (i < _chains.Count - 1 && !mustDestroyChain) { //Count-1 cause we dont have to check the added hook 
+                    if (_chains[i].CheckAnchorPointInHooks(anchorPoint)) {
                         mustDestroyChain = true;
                     }
-                    //4 cases for the islands (group of chunks)
-                    if (_chains[_chains.Count - 1].islandChunkBeginningHook != null && _chains[i].islandChunkBeginningHook != null) {
-                        if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland != null && _chains[i].islandChunkBeginningHook.parentIsland != null) {
-                            if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland == _chains[i].islandChunkBeginningHook.parentIsland) mustDestroyChain = true;
-                        }
-                    }
-                    if (_chains[_chains.Count - 1].islandChunkBeginningHook != null && _chains[i].islandChunkEndingHook != null) {
-                        if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland != null && _chains[i].islandChunkEndingHook.parentIsland != null) {
-                            if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland == _chains[i].islandChunkEndingHook.parentIsland) mustDestroyChain = true;
-                        }
-                    }
-                    if (_chains[_chains.Count - 1].islandChunkEndingHook != null && _chains[i].islandChunkBeginningHook != null) {
-                        if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland != null && _chains[i].islandChunkBeginningHook.parentIsland != null) {
-                            if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland == _chains[i].islandChunkBeginningHook.parentIsland) mustDestroyChain = true;
-                        }
-                    }
-                    if (_chains[_chains.Count - 1].islandChunkEndingHook != null && _chains[i].islandChunkEndingHook != null) {
-                        if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland != null && _chains[i].islandChunkEndingHook.parentIsland != null) {
-                            if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland == _chains[i].islandChunkEndingHook.parentIsland) mustDestroyChain = true;
-                        }
-                    }
-
                     if (!mustDestroyChain) i++;
                 }
-                if(mustDestroyChain) _chains[i].DestroyChain();
+                if(mustDestroyChain) _chains[i].DestroyChain(true);
+                
+                #region DeprectatedVersion
+                ///LAST VERSION USING ISLANDS AND ISLANDS CHUNKS INSTEAD OF ANCHORS
+                //bool mustDestroyChain = false;
+                //int i = 0;
+                /* while (i < _chains.Count - 1 && !mustDestroyChain) {
+                     //4 possibles cases for the chunks
+                     if (_chains[_chains.Count - 1].islandChunkBeginningHook == _chains[i].islandChunkBeginningHook && _chains[i].islandChunkBeginningHook != null) {
+                         mustDestroyChain = true;
+                     } else if (_chains[_chains.Count - 1].islandChunkBeginningHook == _chains[i].islandChunkEndingHook && _chains[i].islandChunkEndingHook != null) {
+                         mustDestroyChain = true;
+                     } else if (_chains[_chains.Count - 1].islandChunkEndingHook == _chains[i].islandChunkEndingHook && _chains[i].islandChunkEndingHook != null) {
+                         mustDestroyChain = true;
+                     } else if (_chains[_chains.Count - 1].islandChunkEndingHook == _chains[i].islandChunkBeginningHook && _chains[i].islandChunkBeginningHook != null) {
+                         mustDestroyChain = true;
+                     }
+                     //4 cases for the islands (group of chunks)
+                     if (_chains[_chains.Count - 1].islandChunkBeginningHook != null && _chains[i].islandChunkBeginningHook != null) {
+                         if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland != null && _chains[i].islandChunkBeginningHook.parentIsland != null) {
+                             if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland == _chains[i].islandChunkBeginningHook.parentIsland) mustDestroyChain = true;
+                         }
+                     }
+                     if (_chains[_chains.Count - 1].islandChunkBeginningHook != null && _chains[i].islandChunkEndingHook != null) {
+                         if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland != null && _chains[i].islandChunkEndingHook.parentIsland != null) {
+                             if (_chains[_chains.Count - 1].islandChunkBeginningHook.parentIsland == _chains[i].islandChunkEndingHook.parentIsland) mustDestroyChain = true;
+                         }
+                     }
+                     if (_chains[_chains.Count - 1].islandChunkEndingHook != null && _chains[i].islandChunkBeginningHook != null) {
+                         if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland != null && _chains[i].islandChunkBeginningHook.parentIsland != null) {
+                             if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland == _chains[i].islandChunkBeginningHook.parentIsland) mustDestroyChain = true;
+                         }
+                     }
+                     if (_chains[_chains.Count - 1].islandChunkEndingHook != null && _chains[i].islandChunkEndingHook != null) {
+                         if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland != null && _chains[i].islandChunkEndingHook.parentIsland != null) {
+                             if (_chains[_chains.Count - 1].islandChunkEndingHook.parentIsland == _chains[i].islandChunkEndingHook.parentIsland) mustDestroyChain = true;
+                         }
+                     }
+
+                     if (!mustDestroyChain) i++;
+                 }*/
+                #endregion
             }
         }
     }

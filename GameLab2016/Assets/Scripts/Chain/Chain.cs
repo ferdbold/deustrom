@@ -186,6 +186,7 @@ namespace Simoncouche.Chain {
 
         /// <summary>
         /// Check if the connected islands of the hooks are null.  If they are, we destroy the chain.
+        /// TODO: CHANGE THIS TO AN EVENT CALL
         /// </summary>
         private void AttachedHookToIslandsUpdate() {
             bool mustDestroyChain = false;
@@ -198,7 +199,7 @@ namespace Simoncouche.Chain {
                     }
                 }
             }
-            if (mustDestroyChain) DestroyChain();
+            if (mustDestroyChain) DestroyChain(true);
         }
 
         /// <summary>
@@ -255,7 +256,7 @@ namespace Simoncouche.Chain {
             //Tells the owner he missed the beginning hook
             this.thrower.BeginningHookMissed();
 
-            this.DestroyChain();
+            this.DestroyChain(false);
         }
 
         /// <summary>
@@ -276,10 +277,12 @@ namespace Simoncouche.Chain {
         /// <summary>
         /// When an attached chain has passed a certain amount of time, we destroy it using this function
         /// </summary>
-        public void DestroyChain() {
+        public void DestroyChain(bool playDestroySound) {
             foreach (ChainSection section in _chainSections) {
                 Destroy(section.gameObject);
             }
+
+            if (playDestroySound) this.PlayDestroySound();
 
             Destroy(_beginningHook.gameObject);
 
@@ -308,8 +311,10 @@ namespace Simoncouche.Chain {
 
                 if (elapsedTime > _timeUntilChainExpires * _slowFlickerBeginningRatio && elapsedTimeFlickering < flickerTime/2) {
                     foreach (ChainSection section in _chainSections) {
-                        MeshRenderer mr = section.GetComponentInChildren<MeshRenderer>();
-                        mr.material.color = _chainFlickerColor;
+                        if (section != null) {
+                            MeshRenderer mr = section.GetComponentInChildren<MeshRenderer>();
+                            mr.material.color = _chainFlickerColor;
+                        }
                     }
                     elapsedTimeFlickering += Time.deltaTime;
                 }
@@ -323,11 +328,7 @@ namespace Simoncouche.Chain {
                 
                 yield return null;
             }
-
-            //Play a destroy sound
-            PlayDestroySound();
-
-            DestroyChain();
+            DestroyChain(true);
         }
 
         /// <summary>Plays a destroy sound</summary>
@@ -342,8 +343,10 @@ namespace Simoncouche.Chain {
         /// <param name="time"></param>
         private void UpdateChainSectionsColor(float time) {
             foreach (ChainSection section in _chainSections) {
-                MeshRenderer mr = section.GetComponentInChildren<MeshRenderer>();
-                mr.material.color = Color.Lerp(Color.white, _chainDamagedColor, time / _timeUntilChainExpires);
+                if (section != null) {
+                    MeshRenderer mr = section.GetComponentInChildren<MeshRenderer>();
+                    mr.material.color = Color.Lerp(Color.white, _chainDamagedColor, time / _timeUntilChainExpires);
+                }
             }
         }
 
@@ -387,6 +390,17 @@ namespace Simoncouche.Chain {
             get {
                 return (_beginningHook != null && _endingHook != null);
             }
+        }
+
+        /// <summary>
+        /// Allows us to check if the anchorPoint of a new hook is already present on an older hook
+        /// </summary>
+        /// <param name="anchorPoint">the anchor point of a new hook</param>
+        /// <returns>boolean that specifies if the passed anchorPoint corresponds to the connected anchor Point of one of our two hooks</returns>
+        public bool CheckAnchorPointInHooks(Islands.IslandAnchorPoints anchorPoint){
+            bool sameAnchorPoint = ((anchorPoint == _beginningHook.currentAnchorPoint && anchorPoint.GetIslandChunk()==_beginningHook.currentAnchorPoint.GetIslandChunk())
+                || (anchorPoint == _endingHook.currentAnchorPoint && anchorPoint.GetIslandChunk() == _endingHook.currentAnchorPoint.GetIslandChunk()));
+            return sameAnchorPoint;
         }
     }
 }
