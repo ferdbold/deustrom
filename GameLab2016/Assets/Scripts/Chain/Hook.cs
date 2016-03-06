@@ -180,15 +180,30 @@ namespace Simoncouche.Chain {
         /// <summary>React to attached chunk being grabbed by a player</summary>
         /// <param name="playerGrab">The player who grabbed the chunk</param> 
         private void OnAttachedChunkPlayerGrab(PlayerGrab playerGrab) {
-            // Reroute the chain to the player
-            this.targetJoint.connectedBody = playerGrab.rigidbody;
+            // Reroute the chain to the player only if both hooks exist
+            if (this.chain.bothHooksExist) {
+                this.targetJoint.connectedBody = playerGrab.rigidbody;
+            }
+            // Otherwise, deactivate chain physics while the player is grabbing
+            else {
+                this.chainJoint.enabled = false;
+            }
         }
 
         /// <summary>React to attached chunk being released by a player</summary>
         /// <param name="rb">The rigidbody the player was holding</param> 
         private void OnAttachedChunkPlayerRelease(Rigidbody2D rb) {
-            // Reroute the chain back to the island or chunk
-            this.targetJoint.connectedBody = rb;
+            // Reroute the chain back to the island or chunk only if both hooks exist
+            if (this.chain.bothHooksExist) {
+                this.targetJoint.connectedBody = rb;
+            }
+            // Otherwise, reactivate chain physics when the player releases.
+            // NOTE: This will cause a bug if the player throws the second hook of a chain 
+            // before releasing the island, but this is not something that should be possible 
+            // in the final build, so we don't account for it
+            else {
+                this.chainJoint.enabled = true;
+            }
         }
 	}
 }

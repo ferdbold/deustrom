@@ -366,5 +366,10 @@ namespace Simoncouche.Chain {
             }
         }
 
+        public bool bothHooksExist {
+            get {
+                return (_beginningHook != null && _endingHook != null);
+            }
+        }
     }
 }
