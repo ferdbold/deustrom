@@ -269,7 +269,7 @@ namespace Simoncouche.Islands {
 
         public void ConvertChunkToAnotherColor(IslandUtils.color newColor) {
             _color = newColor;
-            //TODO chnage mesh
+            _randomizeIslandVisual.SetIslandColorVisual(newColor);
         }
 
         #endregion
