@@ -467,48 +467,6 @@ namespace Simoncouche.Islands {
 
         #endregion
 
-        #region Conversion
-
-        /// <summary>
-        /// Test if any chunk as part of the island can be converted
-        /// </summary>
-        /// <param name="island">The island to test</param>
-        public void TestIslandForConversion(Island island) {
-            foreach (IslandChunk chunk in island.chunks) {
-                int sobekChunk = 0;
-                int cthuluChunk = 0;
-                foreach (IslandChunk connection in chunk.connectedChunk) {
-                    if (connection != null) {
-                        if (connection.color == IslandUtils.color.red) sobekChunk++;
-                        else if (connection.color == IslandUtils.color.blue) cthuluChunk++;
-                    }
-                }
-
-                IslandUtils.color newColor = ColorConversion(sobekChunk, cthuluChunk, chunk.color);
-                if (newColor != chunk.color) {
-                    chunk.ConvertChunkToAnotherColor(newColor);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Which color should the conversion return
-        /// </summary>
-        /// <param name="c_sobek">number of chunk from sobek around this one</param>
-        /// <param name="c_cthulu">number of chunk from cthulu around this one</param>
-        /// <param name="current">the current color of the island</param>
-        /// <returns>The new color for the island</returns>
-        private IslandUtils.color ColorConversion(int c_sobek, int c_cthulu, IslandUtils.color current) {
-            if (current == IslandUtils.color.blue) c_sobek++;
-            else if (current == IslandUtils.color.red) c_sobek++;
-
-            if (c_sobek < c_cthulu) return IslandUtils.color.blue;
-            else if (c_sobek > c_cthulu) return IslandUtils.color.red;
-            else return current;
-        }
-
-        #endregion
-
         #region Utils
 
         /// <summary>
