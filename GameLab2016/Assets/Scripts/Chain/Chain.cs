@@ -13,9 +13,9 @@ namespace Simoncouche.Chain {
         /// <summary>Self-reference to the chain prefab for factory purposes</summary>
         private static GameObject _chainPrefab;
 
-		[Tooltip("The length of a single chain section")]
-		[SerializeField]
-		private float _chainSectionLength = 1;
+        [Tooltip("The length of a single chain section")]
+        [SerializeField]
+        private float _chainSectionLength = 1;
 
         [Tooltip("Time until an attached (both hooks are attached to an island chain expires)")]
         [SerializeField]
@@ -25,10 +25,10 @@ namespace Simoncouche.Chain {
         private Hook _beginningHook;
         
         /// <summary>The second hook thrown by the player</summary>
-		private Hook _endingHook;
+        private Hook _endingHook;
 
-		/// <summary>The chain sections currently generated for visual effect</summary>
-		private List<ChainSection> _chainSections;
+        /// <summary>The chain sections currently generated for visual effect</summary>
+        private List<ChainSection> _chainSections;
 
         /// <summary> This is the maximum distance between two hooks</summary>
         private float _maxDistanceBetweenTwoHooks;
@@ -73,43 +73,42 @@ namespace Simoncouche.Chain {
         private float flickerTimeDivider = 2f;
 
         public HookThrower thrower { get; set; }
-		public float initialForce { get; set; }
-
+        public float initialForce { get; set; }
 
         /// <summary>This is the sound which will be played on destroy of our chain over time</summary>
         private AudioSource _destroySoundSource;
 
-		/// <summary>Spawn a new chain in the scene</summary>
-		/// <param name="thrower">The game object that threw this chain</param>
-		/// <param name="initialForce">The initial force to give to the first hook</param>
-		public static Chain Create(HookThrower thrower, float initialForce) {
-			if (_chainPrefab == null) {
-				_chainPrefab = Resources.Load("Chain/Chain") as GameObject;
-			}
+        /// <summary>Spawn a new chain in the scene</summary>
+        /// <param name="thrower">The game object that threw this chain</param>
+        /// <param name="initialForce">The initial force to give to the first hook</param>
+        public static Chain Create(HookThrower thrower, float initialForce) {
+            if (_chainPrefab == null) {
+                _chainPrefab = Resources.Load("Chain/Chain") as GameObject;
+            }
 
-			Chain chain = ((GameObject)Instantiate(
-				_chainPrefab, 
-				Vector3.zero, 
-				Quaternion.identity
-			)).GetComponent<Chain>();
+            Chain chain = ((GameObject)Instantiate(
+                _chainPrefab, 
+                Vector3.zero, 
+                Quaternion.identity
+            )).GetComponent<Chain>();
 
-			chain.thrower = thrower;
-			chain.initialForce = initialForce;
+            chain.thrower = thrower;
+            chain.initialForce = initialForce;
 
-			return chain;
-		}
+            return chain;
+        }
 
-		public void Awake() {
-			this._chainSections = new List<ChainSection>();
+        public void Awake() {
+            this._chainSections = new List<ChainSection>();
             this._destroySoundSource = this.GetComponentInChildren<AudioSource>();
             
-		}
+        }
 
-		public void Start() {
+        public void Start() {
             this._endingHookIsSet = false;
-			CreateBeginningHook();
+            CreateBeginningHook();
             this._maxDistanceBetweenTwoHooks = _beginningHook.chainJoint.distance;
-		}
+        }
 
         public void Update() {
             if (!_isPlayingSoundOnDestroy) {
@@ -118,16 +117,16 @@ namespace Simoncouche.Chain {
                 AttachedHookToIslandsUpdate();
             }
         }
-			
+            
         /// <summary>
         /// Sync the number of chain sections with the current 
         /// distance between the two edges of the chain
         /// </summary>
-		private void RecalculateChainSections() {
+        private void RecalculateChainSections() {
             Vector3 chainBeginning = _beginningHook.transform.position;
             Vector3 chainEnding = (_endingHook != null)
-				? _endingHook.transform.position
-				: this.thrower.transform.position;
+                ? _endingHook.transform.position
+                : this.thrower.transform.position;
 
             int neededSections = (int)(Vector3.Distance(chainBeginning, chainEnding) / _chainSectionLength);
 
@@ -146,14 +145,14 @@ namespace Simoncouche.Chain {
                 _chainSections.RemoveAt(_chainSections.Count - 1);
             }
         }
-			
+            
         /// <summary>Create and configure the beginning hook</summary>
-		public void CreateBeginningHook() {
-			_beginningHook = Hook.Create(this, true, this.thrower.isPlayerOne);
+        public void CreateBeginningHook() {
+            _beginningHook = Hook.Create(this, true, this.thrower.isPlayerOne);
 
             // Position where the player threw the hook
             throwerThrowPosition = this.thrower.transform.position;
-		}
+        }
 
         /// <summary>Create and configure the ending hook</summary>
         public void CreateEndingHook() {
@@ -360,10 +359,10 @@ namespace Simoncouche.Chain {
                     _beginningHook.chainJoint.distance = 
                         Vector2.Distance(_beginningHook.chainJoint.connectedBody.transform.position, _beginningHook.transform.position);
                 }
+
                 float tempDistance = _beginningHook.chainJoint.distance;
                 tempDistance = Mathf.Clamp(tempDistance - retractDistance, 0f,_beginningHook.chainJoint.distance);
                 _beginningHook.chainJoint.distance = tempDistance;
-                
             }
         }
 
