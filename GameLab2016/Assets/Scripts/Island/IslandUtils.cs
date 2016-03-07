@@ -3,18 +3,21 @@
 using System.Collections;
 
 namespace Simoncouche.Islands {
-    /// <summary>
-    /// Useful function and enums for Islands
-    /// </summary>
-    public class IslandUtils {
-        /// <summary>
-        /// Possible color of Islands
-        /// </summary>
-        public enum color {
-            red,
-            blue,
-            green
-        }
+	/// <summary>
+	/// Useful function and enums for Islands
+	/// </summary>
+	public class IslandUtils {
+		/// <summary>
+		/// Possible color of Islands
+		/// </summary>
+		public enum color {
+            /// <summary>Sobek </summary>
+			red,
+            /// <summary>Cthulu</summary>
+			blue,
+            /// <summary>Neutral</summary>
+			green
+		}
 
         /// <summary>
         /// Creates a string from the Island information of a Island
