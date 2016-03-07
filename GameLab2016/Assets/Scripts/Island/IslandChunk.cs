@@ -182,7 +182,7 @@ namespace Simoncouche.Islands {
             List<IslandChunk> connected = new List<IslandChunk>();
             foreach (IslandAnchorPoints anchor in anchors) {
                 IslandChunk chunk = anchor.GetConnectedIsland();
-                if (chunk != null && chunk != this) {
+                if (chunk != null && chunk != this && !connected.Contains(chunk)) {
                     connected.Add(chunk);
                 }
             }

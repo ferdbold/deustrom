@@ -437,6 +437,7 @@ namespace Simoncouche.Islands {
                 int cthuluChunk = 0;
                 foreach (IslandChunk connection in chunk.connectedChunk) {
                     if (connection != null) {
+                        Debug.Log(connection.color);
                         if (connection.color == IslandUtils.color.red) sobekChunk++;
                         else if (connection.color == IslandUtils.color.blue) cthuluChunk++;
                     }
@@ -457,8 +458,9 @@ namespace Simoncouche.Islands {
         /// <param name="current">the current color of the island</param>
         /// <returns>The new color for the island</returns>
         private IslandUtils.color ColorConversion(int c_sobek, int c_cthulu, IslandUtils.color current) {
-            if (current == IslandUtils.color.blue) c_sobek++;
+            if (current == IslandUtils.color.blue) c_cthulu++;
             else if (current == IslandUtils.color.red) c_sobek++;
+            Debug.Log("Sboek: " + c_sobek + " |Cthulu: " + c_cthulu + " |Old Color: " + current);
 
             if (c_sobek < c_cthulu) return IslandUtils.color.blue;
             else if (c_sobek > c_cthulu) return IslandUtils.color.red;
