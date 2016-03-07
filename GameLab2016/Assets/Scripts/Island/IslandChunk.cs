@@ -189,6 +189,17 @@ namespace Simoncouche.Islands {
             connectedChunk = connected;
         }
 
+        /// <summary>
+        /// Make a second check of the connection to make sure they are correct
+        /// </summary>
+        public void CheckLinkConnection() {
+            foreach (IslandChunk chunk in connectedChunk) {
+                if (!chunk.connectedChunk.Contains(this)) {
+                    chunk.connectedChunk.Add(this);
+                }
+            }
+        }
+
         /// <summary> Spawn Every Anchor points around the island </summary>
         void SpawnAnchorPoints () {
             anchors = new List<IslandAnchorPoints>();

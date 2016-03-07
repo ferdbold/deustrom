@@ -95,6 +95,9 @@ namespace Simoncouche.Islands {
             foreach (IslandChunk chunk in chunks) {
                 chunk.CheckConnection();
             }
+            foreach (IslandChunk chunk in chunks) {
+                chunk.CheckLinkConnection();
+            }
         }
 
         /// <summary>
