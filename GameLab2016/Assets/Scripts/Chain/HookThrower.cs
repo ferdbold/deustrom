@@ -128,7 +128,7 @@ namespace Simoncouche.Chain {
             }
 
             //Return if the player is currently grabbing an island
-            if (_playerGrab.isIslandGrabbed) {
+            if (_playerGrab.grabbedBody!=null) {
                 return;
             }
 
