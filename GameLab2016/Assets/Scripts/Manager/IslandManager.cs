@@ -228,6 +228,8 @@ namespace Simoncouche.Islands {
         /// <param name="island">The target island to check</param>
         public void CheckIslandBroken(Island island) {
             if (island == null || island.chunks.Count <= 0) {
+                _island.Remove(island);
+                Destroy(island.gameObject); //Must destroy the island if there is no more chunks attached to the island
                 return;
             }
 

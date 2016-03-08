@@ -60,6 +60,10 @@ namespace Simoncouche.Chain {
         public PlayerAudio playerAudio { get; private set; }
         public AudioSource audioSource { get; private set; }
 
+        // In order to know if we can throw a hook
+        private PlayerGrab _playerGrab;
+        public bool isHookAttachedToPlayer { get; private set; }
+
         public bool isPlayerOne { get; private set; }
 
         // PROPERTIES
@@ -72,6 +76,7 @@ namespace Simoncouche.Chain {
             this.playerController = GetComponent<PlayerController>();
             this.playerAudio = GetComponent<PlayerAudio>();
             this.audioSource = GetComponent<AudioSource>();
+            _playerGrab = GetComponent<PlayerGrab>();
 
             this.chainLinker = transform.Find("ChainLinker").GetComponent<Rigidbody2D>();
         }
@@ -122,6 +127,11 @@ namespace Simoncouche.Chain {
                 return;
             }
 
+            //Return if the player is currently grabbing an island
+            if (_playerGrab.isIslandGrabbed) {
+                return;
+            }
+
             switch (_currentState) {
             // If we press fire when we don't have any hook,
             // we create a hook and switch the currentState to OneHook
@@ -139,7 +149,6 @@ namespace Simoncouche.Chain {
 
             // If we press fire when we have 1 hook, 
             // we create a hook and switch the currentState to NoHook
-            // TODO: MODIFIER POUR LIER LES 2 CHAINES
             case State.OneHook: 
                 _chains[_chains.Count - 1].CreateEndingHook();
                 _currentState = State.Waiting;
@@ -238,7 +247,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void BeginningHookHit() {
             _currentState = State.OneHook;
-            //if (_doesHookReplacePresentHookOnIsland) HookAlreadyOnIslandCheck();
+            this.isHookAttachedToPlayer = true;
         }
 
         /// <summary>
@@ -246,7 +255,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void EndingHookHit() {
             _currentState = State.NoHook;
-            //if (_doesHookReplacePresentHookOnIsland) HookAlreadyOnIslandCheck();
+            this.isHookAttachedToPlayer = false;
         }
 
         /// <summary>

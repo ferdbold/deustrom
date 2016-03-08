@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Simoncouche.Islands;
+using Simoncouche.Chain;
 
 namespace Simoncouche.Controller {
     
@@ -38,6 +39,8 @@ namespace Simoncouche.Controller {
         /// <summary> Has maxed charge been reached </summary>
         private bool _maxChargeReached = false;
 
+        public bool isIslandGrabbed { get; private set; }
+
 
 
         //Components
@@ -53,6 +56,8 @@ namespace Simoncouche.Controller {
         private PlayerAudio _playerAudio;
         /// <summary> Reference to the gravityBody of the player</summary>
         private GravityBody _playerGravityBody;
+        /// <summary> Reference to the hookThrower of the player</summary>
+        private HookThrower _hookThrower;
         /// <summary> List of all particle systems used for charge animation </summary>
         private List<ParticleSystem> _chargeParticles;
         private List<ParticleSystem> _chargeParticlesMax;
@@ -69,6 +74,7 @@ namespace Simoncouche.Controller {
             _playerController = GetComponent<PlayerController>();
             _playerAudio = GetComponent<PlayerAudio>();
             _playerGravityBody = GetComponent<GravityBody>();
+            _hookThrower = GetComponent<HookThrower>();
             _chargeParticles = new List<ParticleSystem>(transform.Find("P_ChargeParticles").GetComponentsInChildren<ParticleSystem>());
             _chargeParticlesMax = new List<ParticleSystem>(transform.Find("P_MaxChargeParticles").GetComponentsInChildren<ParticleSystem>());
             grabbedBody = null;
@@ -146,9 +152,10 @@ namespace Simoncouche.Controller {
                 if (playerTargetAngle <= MAX_GRAB_ANGLE) {  
                     //Make sure we are trying to grab an IslandChunk
                     IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
-                    if (targetChunk != null) { 
+                    if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) { 
                         //Initiate Grab
                         Grab(targetBody, targetChunk);
+                        isIslandGrabbed = true; //On ne possède plus le body
                     }
                 }
             }
@@ -277,6 +284,7 @@ namespace Simoncouche.Controller {
                 //Sounds
                 _playerAudio.PlaySound(PlayerSounds.PlayerPush);
 
+                isIslandGrabbed = false; //On ne possède plus le body
 
             } else {
                 Debug.LogWarning("Attempted to throw when grabbedBody is null.");             
@@ -335,6 +343,7 @@ namespace Simoncouche.Controller {
                 _playerController.HandleGrabStopAnimation();
 
 
+                isIslandGrabbed = false; //On ne possède plus le body
             } else {
                 Debug.LogWarning("Grabbed body is null and trying to release !");
             }
