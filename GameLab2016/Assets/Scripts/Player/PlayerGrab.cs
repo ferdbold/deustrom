@@ -39,6 +39,8 @@ namespace Simoncouche.Controller {
         /// <summary> Has maxed charge been reached </summary>
         private bool _maxChargeReached = false;
 
+        public bool isIslandGrabbed { get; private set; }
+
 
         //Components
         /// <summary> Currently Grabbed GravityBody</summary>
@@ -152,6 +154,7 @@ namespace Simoncouche.Controller {
                     if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) { 
                         //Initiate Grab
                         Grab(targetBody, targetChunk);
+                        isIslandGrabbed = true; //On ne possède plus le body
                     }
                 }
             }
