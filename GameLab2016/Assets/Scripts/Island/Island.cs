@@ -76,7 +76,7 @@ namespace Simoncouche.Islands {
         public void ConnectIslandToIsland(Vector3 targetPos, Vector3 targetRot, Island targetIsland, float time = 0.5f) {
             foreach (IslandChunk chunk in chunks) {
                 foreach (IslandChunk targetChunk in targetIsland.chunks) {
-                    Physics2D.IgnoreCollision(chunk.GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
+                    if (targetChunk != null) Physics2D.IgnoreCollision(chunk.GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
                 }
             }
             

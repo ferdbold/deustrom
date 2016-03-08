@@ -237,7 +237,7 @@ namespace Simoncouche.Islands {
             List<IslandChunk> chunkIsland = new List<IslandChunk>();
             chunkIsland = CheckIslandBroken_Helper(island.chunks[0], chunkIsland);
             List<IslandChunk> chunkChecked = chunkIsland;
-
+            //Debug.Log(chunkIsland.Count);
             //is broken
             while (chunkChecked.Count != island.chunks.Count) {
                 //Find list of Chunk that should be island
@@ -249,6 +249,7 @@ namespace Simoncouche.Islands {
                     }
                 }
 
+                //Debug.Log(chunkIsland.Count);
                 chunkChecked.AddRange(chunkIsland);
 
                 //Remove Chunk
