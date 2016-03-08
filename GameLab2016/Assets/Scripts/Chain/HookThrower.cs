@@ -327,5 +327,14 @@ namespace Simoncouche.Chain {
                 #endregion
             }
         }
+
+        public void RemoveChainOnPlayerMaelstromEnter() {
+            if (_chains.Count > 0) {
+                if (_chains[_chains.Count - 1] != null && _currentState == State.OneHook) {
+                    _chains[_chains.Count - 1].DestroyChain(true);
+                    isHookAttachedToPlayer = false;
+                }
+            }
+        }
     }
 }
