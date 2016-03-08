@@ -39,9 +39,6 @@ namespace Simoncouche.Controller {
         /// <summary> Has maxed charge been reached </summary>
         private bool _maxChargeReached = false;
 
-        public bool isIslandGrabbed { get; private set; }
-
-
 
         //Components
         /// <summary> Currently Grabbed GravityBody</summary>
@@ -155,7 +152,6 @@ namespace Simoncouche.Controller {
                     if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) { 
                         //Initiate Grab
                         Grab(targetBody, targetChunk);
-                        isIslandGrabbed = true; //On ne possède plus le body
                     }
                 }
             }
@@ -283,9 +279,6 @@ namespace Simoncouche.Controller {
                 _playerController.HandlePushAnimation();
                 //Sounds
                 _playerAudio.PlaySound(PlayerSounds.PlayerPush);
-
-                isIslandGrabbed = false; //On ne possède plus le body
-
             } else {
                 Debug.LogWarning("Attempted to throw when grabbedBody is null.");             
             }
@@ -341,9 +334,6 @@ namespace Simoncouche.Controller {
 
                 //Animation
                 _playerController.HandleGrabStopAnimation();
-
-
-                isIslandGrabbed = false; //On ne possède plus le body
             } else {
                 Debug.LogWarning("Grabbed body is null and trying to release !");
             }
