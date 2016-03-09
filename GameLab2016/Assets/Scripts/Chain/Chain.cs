@@ -364,16 +364,17 @@ namespace Simoncouche.Chain {
                 _beginningHook.chainJoint.distance = tempDistance;
 
                 //We first check with a single chunk if it collides with the player
-                if (islandChunkBeginningHook.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
-                    return true;
-                } else if (islandChunkBeginningHook.parentIsland != null) {//We Then check with all the chunks of the Island if it collides with the player
-                    if (islandChunkBeginningHook.parentIsland.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
+                if (islandChunkBeginningHook != null) {
+                    if (islandChunkBeginningHook.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
                         return true;
+                    } else if (islandChunkBeginningHook.parentIsland != null) {//We Then check with all the chunks of the Island if it collides with the player
+                        if (islandChunkBeginningHook.parentIsland.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
+                            return true;
+                        }
+                        foreach (Islands.IslandChunk chunk in islandChunkBeginningHook.parentIsland.chunks) {
+                            if (chunk.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) return true;
+                        }
                     }
-                    foreach (Islands.IslandChunk chunk in islandChunkBeginningHook.parentIsland.chunks) {
-                        if (chunk.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) return true;
-                    }
-                    
                 }
             }
             return false;

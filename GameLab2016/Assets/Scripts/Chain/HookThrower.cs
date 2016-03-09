@@ -66,7 +66,7 @@ namespace Simoncouche.Chain {
 
         // PROPERTIES
         private bool _triggerIsHeld = false;
-        private bool _retractButtonIsHeld = false;
+        private bool _isRetracting = false;
 
         public void Awake() {
             this.rigidbody = GetComponent<Rigidbody2D>();
@@ -90,10 +90,11 @@ namespace Simoncouche.Chain {
                 this.RetractChainsEngaged
             );
 
+            /* DEPRECATED: USED WHEN RETRACTS WAS WHILE BUTTON PRESSED
             GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Button.p1_retractHooksButtonUp : InputManager.Button.p2_retractHooksButtonUp,
                 this.RetractChainsReleased
-            );
+            );*/
 
             GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Button.p1_cutLinkWithChainButton : InputManager.Button.p2_cutLinkWithChainButton,
@@ -185,16 +186,16 @@ namespace Simoncouche.Chain {
         /// This retracts the chains using by starting a coroutine
         /// </summary>
         private void RetractChainsEngaged() {
-            if (!_retractButtonIsHeld) { //If just stop pressing
-                _retractButtonIsHeld = true;
+            if (!_isRetracting) { //If just stop pressing
+                _isRetracting = true;
                 StartCoroutine(RetractChains(_timeBetweenChainLengthRetraction));
             }
         }
         /// <summary>
+        /// DEPRECATED
         /// This put a stop to the retraction of our chains by stoping the coroutine
         /// </summary>
         private void RetractChainsReleased() {
-            _retractButtonIsHeld = false;
             StopCoroutine("RetractChains");
             if(_chains.Count>0) _chains[_chains.Count - 1].RetractChainReleaseBehaviour();
         }
@@ -232,6 +233,7 @@ namespace Simoncouche.Chain {
                 if (mustPlaySound) playerAudio.PlaySound(PlayerSounds.PlayerRetractChains);
                 yield return new WaitForSeconds(time);
             }
+            _isRetracting = false;
         }
 
         /// <summary>
