@@ -160,6 +160,7 @@ namespace Simoncouche.Controller {
             if(!InRespawnState) {
                 StartRespawnState();
                 StartCoroutine(Respawn_Spin(deathPosition));
+                _hookThrower.RemoveChainOnPlayerMaelstromEnter();
             }
         }
 

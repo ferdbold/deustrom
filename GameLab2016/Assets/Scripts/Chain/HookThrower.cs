@@ -20,6 +20,10 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private float _initialForceAmount = 10f;
 
+        [Tooltip("Minimum time in seconds between each throw action")]
+        [SerializeField]
+        private float _throwCooldown = 1.0f;
+
         [Header("Hook retraction properties:")]
         [Tooltip("The retracted distance in each tick of the retraction")]
         [SerializeField]
@@ -29,14 +33,9 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private float _timeBetweenChainLengthRetraction = 0.5f;
 
-        [Tooltip("Minimum time in seconds between each throw action")]
-        [SerializeField]
-        private float _throwCooldown = 1.0f;
-
         [Tooltip("Check this to replace hook already present on an island by new hook")]
         [SerializeField]
         private bool _doesHookReplacePresentHookOnIsland= false;
-
 
         /// <summary>
         /// The minimum distance needed between the thrower and a chain's 
@@ -58,10 +57,9 @@ namespace Simoncouche.Chain {
         public AimController aimController { get; private set; }
         public PlayerController playerController { get; private set; }
         public PlayerAudio playerAudio { get; private set; }
-        public AudioSource audioSource { get; private set; }
 
         // In order to know if we can throw a hook
-        private PlayerGrab _playerGrab;
+        public PlayerGrab playerGrab { get; private set; }
         public bool isHookAttachedToPlayer { get; private set; }
 
         public bool isPlayerOne { get; private set; }
@@ -75,8 +73,7 @@ namespace Simoncouche.Chain {
             this.aimController = GetComponent<AimController>();
             this.playerController = GetComponent<PlayerController>();
             this.playerAudio = GetComponent<PlayerAudio>();
-            this.audioSource = GetComponent<AudioSource>();
-            _playerGrab = GetComponent<PlayerGrab>();
+            playerGrab = GetComponent<PlayerGrab>();
 
             this.chainLinker = transform.Find("ChainLinker").GetComponent<Rigidbody2D>();
         }
@@ -123,12 +120,12 @@ namespace Simoncouche.Chain {
 
             // Exit early if currently in cooldown
             if (_throwCooldownRemaining > 0) {
-                this.audioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.hookThrowCooldownFail);
+                this.playerAudio.PlaySound(PlayerSounds.PlayerCooldown);
                 return;
             }
 
             //Return if the player is currently grabbing an island
-            if (_playerGrab.grabbedBody!=null) {
+            if (playerGrab.grabbedBody!=null) {
                 return;
             }
 
@@ -208,19 +205,31 @@ namespace Simoncouche.Chain {
         private void CutChainLinkWithThrower() {
             if (_chains.Count > 0) {
                 _chains[_chains.Count - 1].CutLinkBeginningHook();
+                this.isHookAttachedToPlayer = false;
             }
         }
 
+        /// <summary>
+        /// Retracts all the chains of the player and checks if the connected hook to the player is destroyed (cause too clause),
+        /// we attach the island to the player then cut the player link to the hook
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         IEnumerator RetractChains(float time) {
-            while (_retractButtonIsHeld) {
-                if (_chains.Count > 0) {
-                    playerAudio.PlaySound(PlayerSounds.PlayerRetractChains);
-                    foreach (Chain chain in _chains) {
-                        chain.RetractChain(_distanceRetractionValue);
+            while (_chains.Count>0) {
+                bool mustPlaySound = false;
+                for(int i=_chains.Count-1; i >=0;i--){
+                    if (_chains[i]._beginningHookIsSet){ mustPlaySound = true; //Parce qu'on ne rétracte pas les chaînes qui viennent tout juste d'être lancé
+                        bool attachedHookToPlayerMustBeDestroyed =_chains[i].RetractChain(_distanceRetractionValue);
+                        if (attachedHookToPlayerMustBeDestroyed) {
+                            this.isHookAttachedToPlayer = false;
+                            _chains[i].AttachBeginningHookTargetToPlayer();
+                            _chains[i].CutLinkBeginningHook();
+                        }
                     }
                 }
+                if (mustPlaySound) playerAudio.PlaySound(PlayerSounds.PlayerRetractChains);
                 yield return new WaitForSeconds(time);
-
             }
         }
 
@@ -328,11 +337,14 @@ namespace Simoncouche.Chain {
             }
         }
 
+        /// <summary>
+        /// Removes the chain if the player enters the maelstrom
+        /// </summary>
         public void RemoveChainOnPlayerMaelstromEnter() {
             if (_chains.Count > 0) {
                 if (_chains[_chains.Count - 1] != null && _currentState == State.OneHook) {
                     _chains[_chains.Count - 1].DestroyChain(true);
-                    isHookAttachedToPlayer = false;
+                    this.isHookAttachedToPlayer = false;
                 }
             }
         }
