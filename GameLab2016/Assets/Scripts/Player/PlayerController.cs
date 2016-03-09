@@ -160,7 +160,6 @@ namespace Simoncouche.Controller {
             if(!InRespawnState) {
                 StartRespawnState();
                 StartCoroutine(Respawn_Spin(deathPosition));
-                _hookThrower.RemoveChainOnPlayerMaelstromEnter();
             }
         }
 
@@ -194,7 +193,7 @@ namespace Simoncouche.Controller {
             for(float i =0f; i < 1f; i += Time.deltaTime / RESPAWN_SPIN_TIME) {
                 Vector2 lerpV2 = Vector2.Lerp(sP, (Vector2)tP, i);
                 transform.position = new Vector3(lerpV2.x, lerpV2.y, transform.position.z);
-                transform.Rotate(new Vector3(0, 0, RESPAWN_SPIN_RATE / Time.deltaTime));
+                transform.Rotate(new Vector3(0, 0, RESPAWN_SPIN_RATE * Time.deltaTime));
                 _positionZOnBackground._zOffset = Mathf.Lerp(sZ, tZ, i);
                 yield return null;
             }
@@ -208,7 +207,7 @@ namespace Simoncouche.Controller {
             for (float i = 0f; i < 1f; i += Time.deltaTime / RESPAWN_UNDERWATER_TIME) {
                 Vector2 lerpV2 = Vector2.Lerp(startPosition, targetPosition, i);
                 transform.position = new Vector3(lerpV2.x, lerpV2.y, transform.position.z);
-                transform.Rotate(new Vector3(0, 0, RESPAWN_SPIN_RATE / Time.deltaTime));
+                transform.Rotate(new Vector3(0, 0, RESPAWN_SPIN_RATE * Time.deltaTime));
                 yield return null;
             }
             StopRespawnState();
