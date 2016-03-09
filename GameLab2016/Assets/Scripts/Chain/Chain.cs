@@ -221,7 +221,7 @@ namespace Simoncouche.Chain {
                     //Then we destroy the chain
                 else if (!_beginningHook.attachedToTarget &&
                     Vector2.Distance(_beginningHook.transform.position, throwerThrowPosition) > _maxDistanceBetweenTwoHooks / 2) {
-                    DestroyBeginningHook();
+                    DestroyBeginningHook(false);
                 }
             }
 
@@ -251,11 +251,11 @@ namespace Simoncouche.Chain {
         /// <summary>
         /// Destroy the chain when we miss the first throw
         /// </summary>
-        private void DestroyBeginningHook() {
+        private void DestroyBeginningHook(bool mustPlaySound) {
             //Tells the owner he missed the beginning hook
             this.thrower.BeginningHookMissed();
 
-            this.DestroyChain(false);
+            this.DestroyChain(mustPlaySound);
         }
 
         /// <summary>
@@ -349,13 +349,12 @@ namespace Simoncouche.Chain {
             }
         }
 
-        /// <summary>
-        /// Retracts the chain modifying chainJoint.distance
-        /// </summary>
-        /// <param name="retractDistance">The distance to retract per tick of this function</param>
-        public void RetractChain(float retractDistance) {
-            if (_beginningHook.chainJoint!=null) {
-                if (_beginningHookIsSet && !_endingHookIsSet) {
+        ///<summary>Retracts the chain modifying chainJoint.distance</param>
+        ///<param name="retractDistance">The distance to retract per tick of this function</param>
+        /// <returns>If the island connected to the player was destroyed</returns>
+        public bool RetractChain(float retractDistance) {
+            if (_beginningHook.chainJoint != null) {
+                if (!_endingHookIsSet) {
                     _beginningHook.chainJoint.distance = 
                         Vector2.Distance(_beginningHook.chainJoint.connectedBody.transform.position, _beginningHook.transform.position);
                 }
@@ -363,7 +362,21 @@ namespace Simoncouche.Chain {
                 float tempDistance = _beginningHook.chainJoint.distance;
                 tempDistance = Mathf.Clamp(tempDistance - retractDistance, 0f,_beginningHook.chainJoint.distance);
                 _beginningHook.chainJoint.distance = tempDistance;
+
+                //We first check with a single chunk if it collides with the player
+                if (islandChunkBeginningHook.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
+                    return true;
+                } else if (islandChunkBeginningHook.parentIsland != null) {//We Then check with all the chunks of the Island if it collides with the player
+                    if (islandChunkBeginningHook.parentIsland.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
+                        return true;
+                    }
+                    foreach (Islands.IslandChunk chunk in islandChunkBeginningHook.parentIsland.chunks) {
+                        if (chunk.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) return true;
+                    }
+                    
+                }
             }
+            return false;
         }
 
         /// <summary>
@@ -379,9 +392,9 @@ namespace Simoncouche.Chain {
         /// Cut the link of the beginning hook if and only if the ending hook is null
         /// </summary>
         public void CutLinkBeginningHook() {
+            this.PlayDestroySound();
             if (_endingHook == null) {
-                PlayDestroySound();
-                this.DestroyBeginningHook();
+                DestroyBeginningHook(true);
             }
         }
 
@@ -400,6 +413,13 @@ namespace Simoncouche.Chain {
             bool sameAnchorPoint = ((anchorPoint == _beginningHook.currentAnchorPoint && anchorPoint.GetIslandChunk()==_beginningHook.currentAnchorPoint.GetIslandChunk())
                 || (anchorPoint == _endingHook.currentAnchorPoint && anchorPoint.GetIslandChunk() == _endingHook.currentAnchorPoint.GetIslandChunk()));
             return sameAnchorPoint;
+        }
+
+        /// <summary>
+        /// Attach beginning hook's target to the player grab
+        /// </summary>
+        public void AttachBeginningHookTargetToPlayer() {
+            thrower.playerGrab.AttemptGrabOnHookRetraction(islandChunkBeginningHook.gameObject.GetComponent<GravityBody>()); //MAKES THE PLAYER GRAB THE ISLAND
         }
     }
 }
