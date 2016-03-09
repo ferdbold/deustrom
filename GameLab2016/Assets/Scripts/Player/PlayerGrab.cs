@@ -154,8 +154,22 @@ namespace Simoncouche.Controller {
                     if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) { 
                         //Initiate Grab
                         Grab(targetBody, targetChunk);
-                        isIslandGrabbed = true; //On ne possède plus le body
+                        this.isIslandGrabbed = true; //On ne possède plus le body
                     }
+                }
+            }
+        }
+
+        /// <summary> Attemps to grab gravity body if one is not already grabbed BUT DOESNT CHECK THE ANGLE</summary>
+        /// <param name="targetBody">target gravity body to grab</param>
+        public void AttemptGrabOnHookRetraction(GravityBody targetBody) {
+            if (grabbedBody == null && _inGrabCooldown == false) {
+                //Make sure we are trying to grab an IslandChunk
+                IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
+                if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) {
+                    //Initiate Grab
+                    Grab(targetBody, targetChunk);
+                    this.isIslandGrabbed = true; //On ne possède plus le body
                 }
             }
         }

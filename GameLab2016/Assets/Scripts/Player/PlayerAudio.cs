@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Simoncouche.Controller {
 
-    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond, PlayerDeath, PlayerRetractChains};
+    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond, PlayerDeath, PlayerRetractChains, PlayerCooldown};
 
     [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(PlayerController))]
@@ -106,6 +106,9 @@ namespace Simoncouche.Controller {
                     break;
                 case PlayerSounds.PlayerRetractChains:
                     _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerRetractChains);
+                    break;
+                case PlayerSounds.PlayerCooldown:
+                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.hookThrowCooldownFail);
                     break;
                 default:
                     Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");
