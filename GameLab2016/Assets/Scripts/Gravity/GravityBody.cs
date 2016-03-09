@@ -115,6 +115,10 @@ public class GravityBody : GravityObject {
         _DestroyModeFX.SetActive(false);
     }
 
+    public void RemoveInDestroyMode() {
+        inDestroyMode = false;
+    }
+
     #endregion
 
     #region Activation and Destruction

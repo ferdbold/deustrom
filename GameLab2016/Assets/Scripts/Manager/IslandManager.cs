@@ -22,6 +22,9 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Particle spawned when island assemble")]
         private GameObject[] AssembleParticlePrefab;
 
+        [SerializeField] [Tooltip("Particle spawned when island gets destroyed by collision with high speed impacting object")]
+        private GameObject DestroyParticle;
+
         [SerializeField]
         [Tooltip("The time it takes for 2 chunks to do their merging anim")]
         private float _chunkMergeTime = 1f;
@@ -228,8 +231,7 @@ namespace Simoncouche.Islands {
         /// <param name="island">The target island to check</param>
         public void CheckIslandBroken(Island island) {
             if (island == null || island.chunks.Count <= 0) {
-                _island.Remove(island);
-                Destroy(island.gameObject); //Must destroy the island if there is no more chunks attached to the island
+                DestroyIsland(island);
                 return;
             }
 
@@ -283,7 +285,7 @@ namespace Simoncouche.Islands {
             islandChecked.Add(current);
 
             foreach (IslandChunk connection in current.connectedChunk) {
-                if (islandChecked.Count == current.parentIsland.chunks.Count) break;
+                if (current != null && islandChecked.Count == current.parentIsland.chunks.Count) break;
 
                 if (connection != null && !islandChecked.Contains(connection)) {
                     CheckIslandBroken_Helper(connection, islandChecked);
@@ -313,6 +315,9 @@ namespace Simoncouche.Islands {
             if (chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
                 return;
             }
+
+            //Spawn Particle and play sound
+            Instantiate(DestroyParticle, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
 
             Island islandLink = chunk.parentIsland;
 
@@ -348,7 +353,8 @@ namespace Simoncouche.Islands {
 
             /*DEBUG Destruction TODO replace with separation*/
             foreach (IslandChunk c in islandRemoved) {
-                Destroy(c.gameObject);
+                c._parentIsland.RemoveChunkToIsland(c);
+                DestroyChunk(c);
             }
 
             //Check if the island is broken in pieces

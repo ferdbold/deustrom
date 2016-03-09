@@ -28,6 +28,8 @@ public class AudioManager : MonoBehaviour {
     private ChainSound _chainSound;
     public ChainSound chainSound { get { return _chainSound; } }
 
+    private AudioSource source;
+
     //TODO replace certain sound with list and create function to random through list
     //The get value of attribute will then return a random clip
 }
@@ -93,8 +95,8 @@ public class IslandSound {
     public AudioClip mergeSound { get { return _merge; } }
 
     [SerializeField] [Tooltip("Sound played when 2 island merge togeter")]
-    private AudioClip _disassemble;
-    public AudioClip disassembleSound { get { return _disassemble; } }
+    private AudioClip _destruction;
+    public AudioClip destructionSound { get { return _destruction; } }
 }
 
 [System.Serializable]

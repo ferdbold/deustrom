@@ -72,6 +72,8 @@ namespace Simoncouche.Islands {
 
         /// <summary> audio source of the chunk </summary>
         private AudioSource _audioSource;
+        public AudioSource audioSource { get { return _audioSource; } }
+
         /// <summary> island visual randomizer </summary>
         private RandomizeIslandVisual _randomizeIslandVisual;
         #endregion
@@ -243,9 +245,11 @@ namespace Simoncouche.Islands {
                     return;
                 }
 
-                //Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
-                GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
-                _audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.mergeSound);
+                if (!chunk.gravityBody.inDestroyMode && !gravityBody.inDestroyMode) {
+                    //Debug.Log("Collision between " + transform.name + " and " + other.name + ". They Assemble.");
+                    GameManager.islandManager.HandleChunkCollision(this, anchor, chunk, otherAnchor);
+                    _audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.mergeSound);
+                }
             }
         }
 
@@ -253,12 +257,23 @@ namespace Simoncouche.Islands {
             Collider2D other = col.collider;
             IslandChunk chunk = other.GetComponent<IslandChunk>();
 
-            //Collide with chunk of other color
-            if (chunk != null && chunk.color != _color) {
-
-                //Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
-                _audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.collisionSound);
+            if (chunk != null && chunk.parentIsland != null) {
+                Debug.Log(chunk.parentIsland.gravityBody.inDestroyMode);
             }
+
+            if (chunk != null && chunk.parentIsland != null && chunk.parentIsland.gravityBody.inDestroyMode) {
+                chunk.parentIsland.gravityBody.Velocity = 5 * Vector3.Normalize(transform.localPosition - chunk.transform.localPosition);
+                chunk.parentIsland.gravityBody.RemoveInDestroyMode();
+                TakeDamage(1);
+            } else if (chunk != null && chunk.gravityBody.inDestroyMode) {
+                chunk.gravityBody.Velocity = 5 * Vector3.Normalize(transform.localPosition - chunk.transform.localPosition);
+                chunk.gravityBody.RemoveInDestroyMode();
+                TakeDamage(1);
+            }
+
+            //Collide with chunk of other color
+                //Debug.Log("Collision between " + transform.name + " and " + col.collider.name + ". They Collide.");
+                //_audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.collisionSound);
         }
 
         /// <summary>
@@ -268,7 +283,6 @@ namespace Simoncouche.Islands {
         public void TakeDamage(int damage) {
             if (damage > 0) {
                 GameManager.islandManager.TakeDamageHandler(this, damage);
-                _audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.disassembleSound);
             } else {
                 Debug.LogWarning("The damage sent to the island chunk should be higher than 0");
             }
