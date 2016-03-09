@@ -223,10 +223,9 @@ namespace Simoncouche.Chain {
                     if (_chains[i]._beginningHookIsSet){ mustPlaySound = true; //Parce qu'on ne rétracte pas les chaînes qui viennent tout juste d'être lancé
                         bool attachedHookToPlayerMustBeDestroyed =_chains[i].RetractChain(_distanceRetractionValue);
                         if (attachedHookToPlayerMustBeDestroyed) {
-                            this.isHookAttachedToPlayer = false;
+                            this.OnCutLinkWithPlayer();
                             _chains[i].AttachBeginningHookTargetToPlayer();
                             _chains[i].CutLinkBeginningHook();
-                            _currentState = State.NoHook;
                         }
                     }
                 }
@@ -240,7 +239,7 @@ namespace Simoncouche.Chain {
         /// Function called by a chain when the first throw missed
         /// Here we remove the current chain from the list and set back the state to NoHook
         /// </summary>
-        public void BeginningHookMissed() {
+        public void OnBeginningHookMissed() {
             _currentState = State.NoHook;
             playerController.HandleSecondHookAnimation();
         }
@@ -249,7 +248,7 @@ namespace Simoncouche.Chain {
         /// Function called by a chain when the first throw missed
         /// In case we miss our second throw, we set back our state to OneHook
         /// </summary>
-        public void EndingHookMissed() {
+        public void OnEndingHookMissed() {
             _currentState = State.OneHook;
             playerController.HandleSecondHookAnimation();
         }
@@ -257,7 +256,7 @@ namespace Simoncouche.Chain {
         /// <summary>
         /// Function called to update the state of our hookthrower when the beginning hook hit something
         /// </summary>
-        public void BeginningHookHit() {
+        public void OnBeginningHookHit() {
             _currentState = State.OneHook;
             this.isHookAttachedToPlayer = true;
         }
@@ -265,7 +264,12 @@ namespace Simoncouche.Chain {
         /// <summary>
         /// Function called to update the state of our hookthrower when the ending hook hit something
         /// </summary>
-        public void EndingHookHit() {
+        public void OnEndingHookHit() {
+            _currentState = State.NoHook;
+            this.isHookAttachedToPlayer = false;
+        }
+
+        private void OnCutLinkWithPlayer() {
             _currentState = State.NoHook;
             this.isHookAttachedToPlayer = false;
         }
@@ -276,7 +280,7 @@ namespace Simoncouche.Chain {
         /// <param name="chain"></param>
         public void RemoveChainFromChains(Chain chain) {
             if (!chain._endingHookIsSet) { //IF SO, it means that the chain being destroyed is the one attached to the player
-                _currentState = State.NoHook; //MUST SWITCH STATE: we can't throw the second hook now !
+                this.OnCutLinkWithPlayer();
                 playerController.HandleSecondHookAnimation();
             }
             _chains.Remove(chain);
@@ -346,9 +350,8 @@ namespace Simoncouche.Chain {
         public void RemoveChainOnPlayerMaelstromEnter() {
             if (_chains.Count > 0) {
                 if (_chains[_chains.Count - 1] != null && _currentState == State.OneHook) {
-                    _currentState = State.NoHook;
                     _chains[_chains.Count - 1].DestroyChain(true);
-                    this.isHookAttachedToPlayer = false;
+                    this.OnCutLinkWithPlayer();
                 }
             }
         }
