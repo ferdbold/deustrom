@@ -225,6 +225,7 @@ namespace Simoncouche.Chain {
                             this.isHookAttachedToPlayer = false;
                             _chains[i].AttachBeginningHookTargetToPlayer();
                             _chains[i].CutLinkBeginningHook();
+                            _currentState = State.NoHook;
                         }
                     }
                 }
@@ -343,6 +344,7 @@ namespace Simoncouche.Chain {
         public void RemoveChainOnPlayerMaelstromEnter() {
             if (_chains.Count > 0) {
                 if (_chains[_chains.Count - 1] != null && _currentState == State.OneHook) {
+                    _currentState = State.NoHook;
                     _chains[_chains.Count - 1].DestroyChain(true);
                     this.isHookAttachedToPlayer = false;
                 }
