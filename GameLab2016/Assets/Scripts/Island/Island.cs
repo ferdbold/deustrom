@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 using System.Collections.Generic;
 using DG.Tweening;
 using System.Collections;
+using Simoncouche.Controller;
 
 namespace Simoncouche.Islands {
     /// <summary>
@@ -161,6 +161,9 @@ namespace Simoncouche.Islands {
         /// <param name="triggerChunk"> Chunk that triggered the maelstrom enter</param>
         public void OnMaelstromEnter(IslandChunk triggerChunk) {
             //Handle Score or island destruction
+            foreach (IslandChunk chunk in chunks) {
+                PlayerGrab.UngrabBody(chunk.gravityBody);
+            }
             RemoveChunkToIsland(triggerChunk);
             GameManager.islandManager.DestroyChunk(triggerChunk);
             GameManager.islandManager.CheckIslandBroken(this);

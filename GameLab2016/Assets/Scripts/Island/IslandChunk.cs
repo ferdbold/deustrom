@@ -257,10 +257,6 @@ namespace Simoncouche.Islands {
             Collider2D other = col.collider;
             IslandChunk chunk = other.GetComponent<IslandChunk>();
 
-            if (chunk != null && chunk.parentIsland != null) {
-                Debug.Log(chunk.parentIsland.gravityBody.inDestroyMode);
-            }
-
             if (chunk != null && chunk.parentIsland != null && chunk.parentIsland.gravityBody.inDestroyMode) {
                 chunk.parentIsland.gravityBody.Velocity = 5 * Vector3.Normalize(transform.localPosition - chunk.transform.localPosition);
                 chunk.parentIsland.gravityBody.RemoveInDestroyMode();
