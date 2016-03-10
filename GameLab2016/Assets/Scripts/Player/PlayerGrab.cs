@@ -118,8 +118,13 @@ namespace Simoncouche.Controller {
                 this.CheckPlayerInputs
             );
 
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_cutLinkWithChainButton : InputManager.Button.p2_cutLinkWithChainButton,
+                this.Release
+            );
+
             //For Keyboard use
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Button.p1_pushButton : InputManager.Button.p2_pushButton,
                 this.Throw
@@ -418,6 +423,7 @@ namespace Simoncouche.Controller {
         #endregion
 
         #region Static Utils
+
         /// <summary> Make other player release the target chunk if they're holding it.</summary>
         /// <param name="targetChunk">Chunk to release</param>
         private static void MakeOtherPlayerRelease(IslandChunk targetChunk) {
