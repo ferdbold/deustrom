@@ -66,7 +66,7 @@ namespace Simoncouche.Islands {
         /// </param>
         public void AddChunkToIsland(IslandChunk chunk) {
             if (!chunks.Contains(chunk) && chunk!=null) {
-                _islandColliders.AddCollision(chunk);
+                //_islandColliders.AddCollision(chunk);
                 chunk.parentIsland = this;
                 chunk.transform.SetParent(transform);
                 chunks.Add(chunk);
@@ -110,7 +110,7 @@ namespace Simoncouche.Islands {
         public void RemoveChunkToIsland(IslandChunk chunk) {
             //TODO : Implement this function
             if (chunks.Contains(chunk)) {
-                _islandColliders.RemoveCollision(chunk);
+                //_islandColliders.RemoveCollision(chunk);
                 chunks.Remove(chunk);
             }
 
@@ -161,7 +161,7 @@ namespace Simoncouche.Islands {
             transform.position += medianPosition;
 
             Debug.Log("test");
-            _islandColliders.UpdateCollision();
+            //_islandColliders.UpdateCollision();
         }
         
         /// <summary>
