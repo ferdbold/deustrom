@@ -2,6 +2,10 @@
 using Simoncouche.Islands;
 using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(InputManager))]
+[RequireComponent(typeof(IslandManager))]
+[RequireComponent(typeof(AudioManager))]
+[RequireComponent(typeof(UIManager))]
 public class GameManager : MonoBehaviour {
 
     public static GameManager Instance { get; private set; }
@@ -10,16 +14,19 @@ public class GameManager : MonoBehaviour {
     public static InputManager inputManager { get; private set; }
     public static IslandManager islandManager { get; private set; }
     public static AudioManager audioManager { get; private set; }
+    public static UIManager uiManager { get; private set; }
 
     void Awake() {
         if (Instance == null) {
             Instance = this;
-            inputManager = GetComponent<InputManager>();
-            islandManager = GetComponent<IslandManager>();
-            audioManager = GetComponent<AudioManager>();
+
+            GameManager.inputManager = GetComponent<InputManager>();
+            GameManager.islandManager = GetComponent<IslandManager>();
+            GameManager.audioManager = GetComponent<AudioManager>();
+            GameManager.uiManager = GetComponent<UIManager>();
+
             DontDestroyOnLoad(gameObject);
-        }
-        else {
+        } else {
             Destroy(gameObject);
         }
     }
@@ -31,6 +38,9 @@ public class GameManager : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Application.Quit();
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha0)) {
+            Time.timeScale = 0f;
         }
         if (Input.GetKeyDown(KeyCode.Alpha1)) {          
             Time.timeScale = 1f;
