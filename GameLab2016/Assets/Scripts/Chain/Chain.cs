@@ -208,7 +208,7 @@ namespace Simoncouche.Chain {
             if (!this._beginningHookIsSet) {
                 if (this._beginningHook.attachedToTarget) {
                     //Tells to the thrower he hit the hook
-                    this.thrower.BeginningHookHit();
+                    this.thrower.OnBeginningHookHit();
 
                     //Apply the maximum distance of the first hook (maxDistanceBetweenTwoHooks divided by 2)
                     this._beginningHook.chainJoint.distance = this._maxDistanceBetweenTwoHooks/2;
@@ -228,7 +228,7 @@ namespace Simoncouche.Chain {
             if (_endingHook != null && !_endingHookIsSet) {
                 if (_endingHook.attachedToTarget) {
                     ///Tells to the thrower he hit the hook
-                    this.thrower.EndingHookHit();
+                    this.thrower.OnEndingHookHit();
 
                     // Reroute the beginning hook from the player to the ending hook
                     this._beginningHook.chainJoint.connectedBody = _endingHook.rigidbody;
@@ -253,7 +253,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void DestroyBeginningHook(bool mustPlaySound) {
             //Tells the owner he missed the beginning hook
-            this.thrower.BeginningHookMissed();
+            this.thrower.OnBeginningHookMissed();
 
             this.DestroyChain(mustPlaySound);
         }
@@ -267,7 +267,7 @@ namespace Simoncouche.Chain {
             Destroy(_endingHook.gameObject);
 
             //Tells the thrower he missed the ending hook throw
-            this.thrower.EndingHookMissed();
+            this.thrower.OnEndingHookMissed();
 
             //Must reset the connected rigidbody!
             this._beginningHook.chainJoint.connectedBody = this.thrower.rigidbody;
@@ -364,16 +364,17 @@ namespace Simoncouche.Chain {
                 _beginningHook.chainJoint.distance = tempDistance;
 
                 //We first check with a single chunk if it collides with the player
-                if (islandChunkBeginningHook.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
-                    return true;
-                } else if (islandChunkBeginningHook.parentIsland != null) {//We Then check with all the chunks of the Island if it collides with the player
-                    if (islandChunkBeginningHook.parentIsland.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
+                if (islandChunkBeginningHook != null) {
+                    if (islandChunkBeginningHook.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
                         return true;
+                    } else if (islandChunkBeginningHook.parentIsland != null) {//We Then check with all the chunks of the Island if it collides with the player
+                        if (islandChunkBeginningHook.parentIsland.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
+                            return true;
+                        }
+                        foreach (Islands.IslandChunk chunk in islandChunkBeginningHook.parentIsland.chunks) {
+                            if (chunk.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) return true;
+                        }
                     }
-                    foreach (Islands.IslandChunk chunk in islandChunkBeginningHook.parentIsland.chunks) {
-                        if (chunk.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) return true;
-                    }
-                    
                 }
             }
             return false;
@@ -392,9 +393,11 @@ namespace Simoncouche.Chain {
         /// Cut the link of the beginning hook if and only if the ending hook is null
         /// </summary>
         public void CutLinkBeginningHook() {
-            this.PlayDestroySound();
-            if (_endingHook == null) {
-                DestroyBeginningHook(true);
+            if (_beginningHook != null) {
+                if (_beginningHook.chainJoint.connectedBody == thrower.rigidbody) {
+                    this.PlayDestroySound();
+                    DestroyChain(true);
+                }
             }
         }
 
