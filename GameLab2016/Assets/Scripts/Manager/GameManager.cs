@@ -32,6 +32,9 @@ public class GameManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Application.Quit();
         }
+        if (Input.GetKeyDown(KeyCode.Alpha0)) {
+            Time.timeScale = 0f;
+        }
         if (Input.GetKeyDown(KeyCode.Alpha1)) {          
             Time.timeScale = 1f;
         }
