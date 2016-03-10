@@ -90,6 +90,11 @@ namespace Simoncouche.Chain {
                 this.RetractChainsEngaged
             );
 
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Axis.p1_leftTrigger : InputManager.Axis.p2_leftTrigger,
+                this.RetractLeftTrigger
+            );
+
             /* DEPRECATED: USED WHEN RETRACTS WAS WHILE BUTTON PRESSED
             GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Button.p1_retractHooksButtonUp : InputManager.Button.p2_retractHooksButtonUp,
@@ -179,6 +184,17 @@ namespace Simoncouche.Chain {
                 //animation
                 aimController.ToggleAimIndicator(true);
                 playerController.HandleAimStartAnimation();
+            }
+        }
+
+        /// <summary>
+        /// For Debug Purpose to for input with left trigger
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        private void RetractLeftTrigger(params float[] a) {
+            if (a[0] > 0) {
+                RetractChainsEngaged();
             }
         }
 
