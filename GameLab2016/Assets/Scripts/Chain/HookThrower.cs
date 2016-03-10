@@ -81,7 +81,7 @@ namespace Simoncouche.Chain {
         public void SetupInput(bool isPlayerOne) {
             this.isPlayerOne = isPlayerOne;
             GameManager.inputManager.AddEvent(
-                isPlayerOne ? InputManager.Axis.p1_leftTrigger : InputManager.Axis.p2_leftTrigger, 
+                isPlayerOne ? InputManager.Axis.p1_rightTrigger : InputManager.Axis.p2_rightTrigger, 
                 this.CheckPlayerInputs
             );
 
