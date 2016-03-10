@@ -29,6 +29,7 @@ namespace Simoncouche.Islands {
 
         //Island's Components
         private CircleCollider2D _collider;
+        private IslandColliders _islandColliders;
         public GravityBody gravityBody { get; private set; }
         public new Rigidbody2D rigidbody { get; private set;}
 
@@ -37,6 +38,7 @@ namespace Simoncouche.Islands {
             _collider = GetComponent<CircleCollider2D>();
             gravityBody = GetComponent<GravityBody>();
             rigidbody = GetComponent<Rigidbody2D>();
+            _islandColliders = GetComponentInChildren<IslandColliders>();
 
             this.GrabbedByPlayer = new PlayerGrabEvent();
             this.ReleasedByPlayer = new Rigidbody2DEvent();
@@ -64,6 +66,7 @@ namespace Simoncouche.Islands {
         /// </param>
         public void AddChunkToIsland(IslandChunk chunk) {
             if (!chunks.Contains(chunk) && chunk!=null) {
+                _islandColliders.AddCollision(chunk);
                 chunk.parentIsland = this;
                 chunk.transform.SetParent(transform);
                 chunks.Add(chunk);
@@ -82,11 +85,11 @@ namespace Simoncouche.Islands {
             
             transform.DOLocalRotate(targetRot, time);
             transform.DOLocalMove(targetPos, time);
-            StartCoroutine(Delay_CenterIslandRoot(time + 0.1f, targetIsland));
+            //StartCoroutine(Delay_CenterIslandRoot(time + 0.1f, targetIsland));
         }
 
         /// <summary> Calls Center Island root function on a delay t in seconds </summary>
-        private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland) { yield return new WaitForSeconds(t); targetIsland.CenterIslandRoot(); }
+        //private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland) { yield return new WaitForSeconds(t); targetIsland.CenterIslandRoot(); }
 
         /// <summary>
         /// Recreate island connection for every chunk in island
@@ -106,10 +109,13 @@ namespace Simoncouche.Islands {
         /// <param name="chunk">Reference of the chunk to remove</param>
         public void RemoveChunkToIsland(IslandChunk chunk) {
             //TODO : Implement this function
-            if(chunks.Contains(chunk)) chunks.Remove(chunk);
+            if (chunks.Contains(chunk)) {
+                _islandColliders.RemoveCollision(chunk);
+                chunks.Remove(chunk);
+            }
 
             //Recenter island middle
-            CenterIslandRoot();
+            //CenterIslandRoot();
         }
 
         /// <summary>
@@ -153,6 +159,9 @@ namespace Simoncouche.Islands {
                 chunks[i].transform.localPosition -= medianPosition;
             }
             transform.position += medianPosition;
+
+            Debug.Log("test");
+            _islandColliders.UpdateCollision();
         }
         
         /// <summary>
@@ -161,9 +170,9 @@ namespace Simoncouche.Islands {
         /// <param name="triggerChunk"> Chunk that triggered the maelstrom enter</param>
         public void OnMaelstromEnter(IslandChunk triggerChunk) {
             //Handle Score or island destruction
-            foreach (IslandChunk chunk in chunks) {
+            /*foreach (IslandChunk chunk in chunks) {
                 PlayerGrab.UngrabBody(chunk.gravityBody);
-            }
+            }*/
             RemoveChunkToIsland(triggerChunk);
             GameManager.islandManager.DestroyChunk(triggerChunk);
             GameManager.islandManager.CheckIslandBroken(this);
