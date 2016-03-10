@@ -250,7 +250,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void OnEndingHookMissed() {
             _currentState = State.OneHook;
-            playerController.HandleSecondHookAnimation();
+            playerController.HandleFirstHookAnimation();
         }
 
         /// <summary>
