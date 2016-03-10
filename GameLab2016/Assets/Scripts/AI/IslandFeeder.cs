@@ -22,7 +22,9 @@ public class IslandFeeder : MonoBehaviour {
     [SerializeField] [Tooltip("Prefab of normal island")]
     private GameObject _islandPrefab;
     [SerializeField] [Tooltip("DO NOT CHANGE. Prefab of island collider.")]
-    private GameObject _islandTemporaryCollider;
+    private GameObject _islandTemporaryColliderPrefab;
+    [SerializeField] [Tooltip("Folder where the created island will go as children")]
+    private Transform _islandParentTransform;
     [SerializeField] [Tooltip("Generate to left or right")]
     private bool GENERATE_LEFT = true;
     [SerializeField] [Tooltip("Number of island in each column")]
@@ -115,7 +117,7 @@ public class IslandFeeder : MonoBehaviour {
         generatedChunk.transform.parent = _islandContainer.transform; //Set parent
         //Create temporary collider until island is spawned
         Collider2D generatedCollider;
-        GameObject tempCollider = (GameObject) GameObject.Instantiate(_islandTemporaryCollider, generatedChunk.transform.position, Quaternion.identity);
+        GameObject tempCollider = (GameObject) GameObject.Instantiate(_islandTemporaryColliderPrefab, generatedChunk.transform.position, Quaternion.identity);
         tempCollider.transform.parent = generatedChunk.transform; //set as parent to get relative scale
         tempCollider.transform.localScale = Vector3.one;
         tempCollider.transform.parent = _islandContainer.transform; //Remove parenting
@@ -182,6 +184,8 @@ public class IslandFeeder : MonoBehaviour {
     /// <param name="chunk">chunk to release </param>
     private void ReleaseIsland(ChunkWithCollider chunkWithCollider) {
         Destroy(chunkWithCollider.collider.gameObject); //remove temporary collider
+
+        chunkWithCollider.chunk.transform.parent = _islandParentTransform;
         ToggleCollisionLayer(chunkWithCollider.chunk.gameObject, true); //Toggle island collisions back on
         chunkWithCollider.chunk.gravityBody.Velocity += new Vector2(_releaseForce * (GENERATE_LEFT ? 1 : -1), 0);
     }
@@ -192,7 +196,7 @@ public class IslandFeeder : MonoBehaviour {
     /// <summary> Update the spawn paramaters in a timed loop</summary>
     private IEnumerator UpdateSpawnParameters() {
         while (true) {
-            //Update PARAMETERS
+            //TODO Update PARAMETERS
 
             yield return new WaitForSeconds(1f);
         }
