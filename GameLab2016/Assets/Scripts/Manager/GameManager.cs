@@ -10,6 +10,12 @@ public class GameManager : MonoBehaviour {
 
     public static GameManager Instance { get; private set; }
 
+    [Header("Scoring")]
+    [SerializeField]
+    [Tooltip("The number of points needed to fill the bar")]
+    private int _pointsGoal = 10;
+    public int pointsGoal { get { return _pointsGoal; } }
+
     // Link to every manager
     public static InputManager inputManager { get; private set; }
     public static IslandManager islandManager { get; private set; }

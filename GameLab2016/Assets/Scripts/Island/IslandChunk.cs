@@ -170,7 +170,7 @@ namespace Simoncouche.Islands {
         /// <summary> Calls Center Island root function on a delay t in seconds </summary>
         private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland, IslandChunk targetChunk) {
             yield return new WaitForSeconds(t);
-            targetIsland.CenterIslandRoot();
+            //targetIsland.CenterIslandRoot();
         }
 
         #endregion
