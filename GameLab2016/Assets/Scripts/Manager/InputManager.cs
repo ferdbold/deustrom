@@ -159,8 +159,8 @@ public class InputManager : MonoBehaviour {
         List<ButtonTuple> buttons = new List<ButtonTuple>() {
             new ButtonTuple("P1 Push", p1_pushButton, Input.GetButtonDown("P1_Push")),
             new ButtonTuple("P2 Push", p2_pushButton, Input.GetButtonDown("P2_Push")),
-            new ButtonTuple("P1 Fire Hook", p1_fireHookButton, Input.GetButtonDown("P1_FireHook")),
-            new ButtonTuple("P2 Fire Hook", p2_fireHookButton, Input.GetButtonDown("P2_FireHook")),
+            //new ButtonTuple("P1 Fire Hook", p1_fireHookButton, Input.GetButtonDown("P1_FireHook")),
+            //new ButtonTuple("P2 Fire Hook", p2_fireHookButton, Input.GetButtonDown("P2_FireHook")),
             new ButtonTuple("Start", _startButton, Input.GetButtonDown("Start")),
             new ButtonTuple("P1 Retract Hooks Down", p1_retractHooksButtonDown, Input.GetButtonDown("P1_Retract_Hooks")),
             new ButtonTuple("P2 Retract Hooks Down", p2_retractHooksButtonDown,Input.GetButtonDown("P2_Retract_Hooks")),

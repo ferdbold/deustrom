@@ -170,7 +170,7 @@ namespace Simoncouche.Islands {
         /// <summary> Calls Center Island root function on a delay t in seconds </summary>
         private IEnumerator Delay_CenterIslandRoot(float t, Island targetIsland, IslandChunk targetChunk) {
             yield return new WaitForSeconds(t);
-            targetIsland.CenterIslandRoot();
+            //targetIsland.CenterIslandRoot();
         }
 
         #endregion
@@ -256,10 +256,6 @@ namespace Simoncouche.Islands {
         void OnCollisionEnter2D(Collision2D col) {
             Collider2D other = col.collider;
             IslandChunk chunk = other.GetComponent<IslandChunk>();
-
-            if (chunk != null && chunk.parentIsland != null) {
-                Debug.Log(chunk.parentIsland.gravityBody.inDestroyMode);
-            }
 
             if (chunk != null && chunk.parentIsland != null && chunk.parentIsland.gravityBody.inDestroyMode) {
                 chunk.parentIsland.gravityBody.Velocity = 5 * Vector3.Normalize(transform.localPosition - chunk.transform.localPosition);

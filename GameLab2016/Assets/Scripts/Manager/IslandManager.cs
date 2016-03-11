@@ -341,7 +341,7 @@ namespace Simoncouche.Islands {
                         island.AddChunkToIsland(islandRemoved[i]);
                     }
                 }
-                island.CenterIslandRoot();
+                //island.CenterIslandRoot();
             }
 
             //Remove connection (only need to remove the connection from one side, one chunk removes the connection from both)
