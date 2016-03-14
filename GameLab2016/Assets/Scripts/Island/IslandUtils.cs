@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-//using UnityEditor;
 using System.Collections;
 
 namespace Simoncouche.Islands {
@@ -46,20 +45,6 @@ namespace Simoncouche.Islands {
         public static bool CheckIfOnSameIsland(IslandChunk a, IslandChunk b) {
             return a.parentIsland != null && b.parentIsland != null && a.parentIsland == b.parentIsland;
         }
-        /* testing
-        #region Testing
 
-        [MenuItem("Window/Test Damage")]
-        private static void TestDamage() {
-            foreach (Island island in GameObject.FindObjectsOfType(typeof(Island))) {
-                if (island.chunks.Count > 6) {
-                    island.chunks[3].TakeDamage(2);
-                    break;
-                }
-            }
-        }
-
-        #endregion
-        */
-        }
+    }
 }
