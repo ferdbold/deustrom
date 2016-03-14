@@ -132,10 +132,8 @@ public class GameManager : MonoBehaviour {
                 break;
         }
 
-        AsyncOperation loading =  SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
-        loading.allowSceneActivation = false;
-        CutsceneManager cutsceneLoaded = GameObject.FindObjectOfType<CutsceneManager>(); //TODO wait for loading scene
-        StartCoroutine(WaitForSceneToLoad(cutsceneLoaded, loading, scene));
+        
+        StartCoroutine(WaitForSceneToLoad(sceneToLoad, scene));
     }
 
     /// <summary>
@@ -144,7 +142,21 @@ public class GameManager : MonoBehaviour {
     /// <param name="loading">the async operation of the scene being loaded</param>
     /// <param name="scene">the scene being loaded</param>
     /// <returns></returns>
-    private IEnumerator WaitForSceneToLoad(CutsceneManager cutscene, AsyncOperation loading, Scene scene) {
+    private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene) {
+		AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+		loading.allowSceneActivation = false;
+
+		CutsceneManager cutscene = null;
+		int debugCount = 0;
+		while (cutscene == null) {
+			cutscene = GameObject.FindObjectOfType<CutsceneManager>();
+			yield return new WaitForSeconds(0.1f);
+			if (++debugCount > 500) {
+				Debug.LogError("Cutscene not loaded or no cutscene object in scene");
+				break;
+			}
+		}
+
         while (!loading.isDone && !cutscene.isDone) { yield return new WaitForEndOfFrame(); }
         SceneManager.UnloadScene(SCENE_CUTSCENE);
         loading.allowSceneActivation = true;
