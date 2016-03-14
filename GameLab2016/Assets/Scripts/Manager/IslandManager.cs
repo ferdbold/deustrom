@@ -182,13 +182,6 @@ namespace Simoncouche.Islands {
             AddChunkToExistingIsland(island.GetComponent<Island>(), a);
             AddChunkToExistingIsland(island.GetComponent<Island>(), b);
 
-            /*
-            island.GetComponent<Island>().AddChunkToIsland(a, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-            PlayerGrab.UngrabBody(a.gravityBody);
-            island.GetComponent<Island>().AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-            PlayerGrab.UngrabBody(b.gravityBody);
-            */
-
             _island.Add(island.GetComponent<Island>());
 
             return island.GetComponent<Island>();
@@ -337,7 +330,7 @@ namespace Simoncouche.Islands {
             if (islandRemoved.Count > 1)  { //Multiple Chunk
                 Island island = CreateIsland(islandRemoved[0], islandRemoved[1]);
                 if (islandRemoved.Count >= 3) {
-                    for (int i = 2; i < islandRemoved.Count; i++) {
+                    for (int i = 2; i < islandRemoved.Count; ++i) {
                         island.AddChunkToIsland(islandRemoved[i]);
                     }
                 }
@@ -351,7 +344,7 @@ namespace Simoncouche.Islands {
                 } 
             }
 
-            /*DEBUG Destruction TODO replace with separation*/
+            //DEBUG Destruction TODO replace with separation
             foreach (IslandChunk c in islandRemoved) {
                 c._parentIsland.RemoveChunkToIsland(c);
                 DestroyChunk(c);
@@ -359,6 +352,7 @@ namespace Simoncouche.Islands {
 
             //Check if the island is broken in pieces
             CheckIslandBroken(islandLink);
+
 
             //Find the chunk to give velocity to
             /*
@@ -388,7 +382,7 @@ namespace Simoncouche.Islands {
             }
             foreach (Island i in islandAccelerated) {
                 i.gravityBody.Velocity = CalculateVelocityAfterHit((Vector2)i.transform.localPosition - removedCenter, damage, i.chunks.Count);
-            }/**/
+            }*/
         }
 
         /// <summary>
