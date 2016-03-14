@@ -28,7 +28,7 @@ public class CutsceneManager : MonoBehaviour {
 
     [Header("Component")]
     [SerializeField]
-    private Image FadeRect;
+    private RawImage FadeRect;
 
     private void Awake() {
         isDone = false;
@@ -55,6 +55,7 @@ public class CutsceneManager : MonoBehaviour {
                 break;
         }
 
+		FadeRect.material.mainTexture = movie;
         movie.Play();
         StartCoroutine(WaitVideoEndToFade(movie));
     }
