@@ -25,9 +25,6 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("DO NOT CHANGE. Prefab of island collider.")]
         private GameObject _islandTemporaryColliderPrefab;
 
-        [SerializeField] [Tooltip("Folder where the created island will go as children")]
-        private Transform _islandParentTransform;
-
         [SerializeField] [Tooltip("Generate to left or right")]
         private bool GENERATE_LEFT = true;
 
@@ -78,26 +75,34 @@ namespace Simoncouche.Islands {
         private float _pScoreDiff = 0f; //Score diff between players in %. If positive, Sobek > Cthlhu.
         private int _pIslandDiff = 0; //Number of island difference.  If positive, Sobek > Cthlhu.
         private int _pSobekIsland = 0; //current Number of island of sobek
-        private int _pCthlhuIsland = 0; //current Number of island of cthulhu
+        private int _pCthulhuIsland = 0; //current Number of island of cthulhu
         //Instantiated objects refs
         private List<List<ChunkWithCollider>> _islandRows;
         private GameObject _islandContainer;
+        //Objects refs
+        private IslandManager _islandManager;
+        private Transform _islandParentTransform;
         //Layers
         private int _defaultLayer = 0;
         private int _noColLayer = 13;
         //Other Values
         private float _releaseForce = 15f; //force applied when island is released after shake
         private float _timeSinceLastSpawn = 0f; //current time since last island spawn
+        [SerializeField]
         private float _modifiedSpawnRate = 5f; //current spawn rate
+        
 
         void Awake() {
-            _islandRows = new List<List<ChunkWithCollider>>();
-            _islandContainer = new GameObject();
+            _islandRows = new List<List<ChunkWithCollider>>(); //Create data obj
+            _islandContainer = new GameObject(); //Create GameObject Container
             _islandContainer.transform.parent = transform;
             _islandContainer.transform.localPosition = Vector3.zero;
+ 
+            _islandManager = FindObjectOfType<IslandManager>().GetComponent<IslandManager>(); //Get Island Manager
         }
 
         void Start() {
+            _islandParentTransform = _islandManager.GetIslandSubFolder(); //Get ISland Subfolder from manager
             for (int i = 0; i <= MIN_COLUMN; ++i) {
                 GenerateColumn();
             }
@@ -113,8 +118,11 @@ namespace Simoncouche.Islands {
             //TODO : Modify spawn rate based on all parameters
             _modifiedSpawnRate = SPAWN_RATE;
             if (SPAWN_CHANGE_MULTIPLICATIVE) {
-                _modifiedSpawnRate *= 100f + (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE);
-                _modifiedSpawnRate *= 100f + (_pIslandDiff * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS);
+                _modifiedSpawnRate *= (100f + (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE)) / 100f;
+                _modifiedSpawnRate *= (100f + (_pIslandDiff * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS)) / 100f;
+            } else {
+                _modifiedSpawnRate += (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE);
+                _modifiedSpawnRate += (_pIslandDiff * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS);
             }
 
 
@@ -222,9 +230,11 @@ namespace Simoncouche.Islands {
         private void ReleaseIsland(ChunkWithCollider chunkWithCollider) {
             Destroy(chunkWithCollider.collider.gameObject); //remove temporary collider
 
-            chunkWithCollider.chunk.transform.parent = _islandParentTransform;
+            _islandManager.CreatedIslandChunk(chunkWithCollider.chunk); //Add chunk to chunk list
+            chunkWithCollider.chunk.transform.parent = _islandParentTransform; //Set parent
             ToggleCollisionLayer(chunkWithCollider.chunk.gameObject, true); //Toggle island collisions back on
-            chunkWithCollider.chunk.gravityBody.Velocity += new Vector2(_releaseForce * (GENERATE_LEFT ? 1 : -1), 0);
+            chunkWithCollider.chunk.gravityBody.Velocity += new Vector2(_releaseForce * (GENERATE_LEFT ? 1 : -1), 0); //Add velocity
+
         }
 
 
@@ -233,12 +243,23 @@ namespace Simoncouche.Islands {
         /// <summary> Update the spawn paramaters in a timed loop</summary>
         private IEnumerator UpdateSpawnParameters() {
             while (true) {
-                //TODO Update PARAMETERS WITH IS_SOBEK VALUE
-                _pScoreDiff = 0f;           
-                _pIslandDiff = 0; 
+                _pScoreDiff = 0f;
+                _pIslandDiff = 0;
                 _pSobekIsland = 0;
-                _pCthlhuIsland = 0; 
-                yield return new WaitForSeconds(1f);
+                _pCthulhuIsland = 0;
+                List<IslandChunk> _CurChunks = _islandManager.GetIslandChunks();
+
+                //TODO Update PARAMETERS WITH IS_SOBEK VALUE
+                //TODO SCORE WHEN READY
+                //_pScoreDiff = GameManager.Instance.ScoreSobek - GameManager.Instance.ScoreCthulhu
+
+                foreach (IslandChunk ic in _CurChunks) {
+                    if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
+                    if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;                  
+                }
+                _pIslandDiff = _pSobekIsland - _pCthulhuIsland;
+
+                yield return new WaitForSeconds(0.5f);
             }
         }
     }
