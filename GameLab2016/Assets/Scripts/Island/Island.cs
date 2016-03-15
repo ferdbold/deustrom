@@ -68,7 +68,7 @@ namespace Simoncouche.Islands {
             if (!chunks.Contains(chunk) && chunk!=null) {
                 //_islandColliders.AddCollision(chunk);
                 chunk.parentIsland = this;
-                chunk.transform.SetParent(transform);
+                chunk.transform.SetParent(transform, true);
                 chunks.Add(chunk);
                 ChangeGravityBodyWhenMerging(chunk);
 
@@ -82,7 +82,6 @@ namespace Simoncouche.Islands {
                     if (chunk != null && targetChunk != null) Physics2D.IgnoreCollision(chunk.GetComponent<Collider2D>(), targetChunk.GetComponent<Collider2D>(), true);
                 }
             }
-            
             transform.DOLocalRotate(targetRot, time);
             transform.DOLocalMove(targetPos, time);
             //StartCoroutine(Delay_CenterIslandRoot(time + 0.1f, targetIsland));
