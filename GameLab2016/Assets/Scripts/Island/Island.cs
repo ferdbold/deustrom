@@ -148,14 +148,14 @@ namespace Simoncouche.Islands {
 
             //Calculate median position of the island's chunks
             Vector3 medianPosition = Vector3.zero;
-            for(int i = 0; i < chunks.Count; ++i ) {
+            for(int i = 0; i < chunks.Count; i++ ) {
                 medianPosition += chunks[i].transform.localPosition;
             }
             medianPosition /= chunks.Count;
             //Debug.Log("median position " + medianPosition);
 
             //Modifiy Island chunks and island positions
-            for (int i = 0; i < chunks.Count; ++i) {
+            for (int i = 0; i < chunks.Count; i++) {
                 chunks[i].transform.localPosition -= medianPosition;
             }
             transform.position += medianPosition;
@@ -170,6 +170,9 @@ namespace Simoncouche.Islands {
         /// <param name="triggerChunk"> Chunk that triggered the maelstrom enter</param>
         public void OnMaelstromEnter(IslandChunk triggerChunk) {
             //Handle Score or island destruction
+            /*foreach (IslandChunk chunk in chunks) {
+                PlayerGrab.UngrabBody(chunk.gravityBody);
+            }*/
             RemoveChunkToIsland(triggerChunk);
             GameManager.islandManager.DestroyChunk(triggerChunk);
             GameManager.islandManager.CheckIslandBroken(this);
