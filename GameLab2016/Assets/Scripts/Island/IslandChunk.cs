@@ -62,7 +62,7 @@ namespace Simoncouche.Islands {
         #region Component Ref
         public List<IslandAnchorPoints> anchors { get; private set; }
 
-        public List<IslandChunk> connectedChunk;
+        public List<IslandChunk> connectedChunk;/* { get; private set; }*/
 
         /// <summary> Gravity Body associated with this island chunk </summary>
         public GravityBody gravityBody {get; private set;}
@@ -143,6 +143,8 @@ namespace Simoncouche.Islands {
         public void ConnectChunk(Vector3 targetPos, Vector3 targetRot, IslandChunk targetChunk, Island targetIsland, float time = 0.5f) {
             parentIsland.ChangeCollisionInIsland(this, false);
             //Debug.Log(targetPos);
+            /*transform.localPosition = targetPos;
+            transform.localRotation = Quaternion.Euler(targetRot);*/
             transform.DOLocalRotate(targetRot, time);
             transform.DOLocalMove(targetPos, time);
             //StartCoroutine(Delay_CenterIslandRoot(0f, targetIsland, targetChunk));
