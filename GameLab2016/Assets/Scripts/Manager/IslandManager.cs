@@ -38,6 +38,7 @@ namespace Simoncouche.Islands {
         void Awake() {
             GameObject playerGO = GameObject.FindWithTag("Player");
 
+
             try {
                 _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
             }
@@ -49,10 +50,9 @@ namespace Simoncouche.Islands {
         void Start() {
             //Add starting chunks to the chunk list
             IslandChunk[] chunks = GameObject.FindObjectsOfType<IslandChunk>();
-            foreach(IslandChunk chunk in chunks) {
+            foreach (IslandChunk chunk in chunks) {
                 CreatedIslandChunk(chunk);
             }
-            
         }
 
         /// <summary> Called when an island is created. Add it's reference to the island chunk list  </summary>
