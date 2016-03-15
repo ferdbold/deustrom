@@ -85,40 +85,43 @@ namespace Simoncouche.Islands {
                 if (IslandUtils.CheckIfOnSameIsland(a_IslandLink, b_IslandLink)) return;
 
                 //Is A Island bigger than B Island
-                bool isA = a_IslandLink.chunks.Count <= b_IslandLink.chunks.Count;
+                bool mergeA = a_IslandLink.chunks.Count <= b_IslandLink.chunks.Count;
+                Island islandToMerge = mergeA ? a_IslandLink : b_IslandLink;
+                Island targetIsland = mergeA ? b_IslandLink : a_IslandLink;
+                IslandChunk chunkToMerge = mergeA ? a : b;
+                IslandChunk targetChunk = mergeA ? b : a;
+                IslandAnchorPoints anchorToMerge = mergeA ? a_anchor : b_anchor;
+                IslandAnchorPoints targetAnchor = mergeA ? b_anchor : a_anchor;
 
-                List<IslandChunk> chunks = isA ? b_IslandLink.chunks : a_IslandLink.chunks;
-                foreach (IslandChunk chunk in chunks) {
-                    if (isA) AddChunkToExistingIsland(a_IslandLink, chunk);
-                    else AddChunkToExistingIsland(a_IslandLink, chunk);
+                //Make operation for first island chunk for others to be relative to this
+                AddChunkToExistingIsland(targetIsland, chunkToMerge);
+                islandToMerge.chunks.Remove(chunkToMerge);
+                Vector3 targetPos = FindTargetLocalPosition(targetChunk, targetAnchor);
+                Vector3 targetRot = FindTargetRotForAnchor(anchorToMerge, targetAnchor);
+                chunkToMerge.ConnectChunk(targetPos, targetRot, null, null, _chunkMergeTime); //change b
+                OnJoinChunk(targetAnchor, targetChunk.color);
 
-                    /*
-                    a_IslandLink.AddChunkToIsland(chunk, GetMergingPoint((isA ? b : a).transform.position, 
-                                                                         (isA ? a : b).transform.position), 
-                                                                         (isA ? a : b).transform.rotation.eulerAngles);
-                    PlayerGrab.UngrabBody(chunk.gravityBody);
-                    */
-                    
+                //Merge every chunk
+                foreach (IslandChunk chunk in islandToMerge.chunks) {
+                    AddChunkToExistingIsland(targetIsland, chunk);
+                    chunk.ConnectChunk(
+                        FindTargetLocalPositionBasedOnPosRot(
+                            chunkToMerge.transform.localPosition,
+                            chunkToMerge.transform.localRotation.eulerAngles,
+                            targetPos,
+                            targetRot,
+                            chunk
+                        ),
+                        targetRot, //TODO relative rot
+                        null, //depracated
+                        null, //depracated
+                        _chunkMergeTime
+                    );
                 }
 
-                //Call the to island to be connected (The many ternary operator are for the possible value if one or the other island are assembled (hi hi)
-                (isA ? b_IslandLink : a_IslandLink).ConnectIslandToIsland(
-                    FindTargetLocalPosition(
-                        isA ? b : a,
-                        isA ? b_anchor : a_anchor,
-                        isA ? b_IslandLink : a_IslandLink
-                    ),
-                    FindTargetRotForAnchor(
-                        isA ? b_anchor : a_anchor,
-                        isA ? a_anchor : b_anchor   
-                    ),
-                    isA ? a_IslandLink : b_IslandLink,
-                    _chunkMergeTime
-                );
-
-                OnJoinChunk(b_anchor, b.color);
-                StartCoroutine(TimerIslandRemove(_chunkMergeTime, isA ? b_IslandLink : a_IslandLink));
-                (isA ? b_IslandLink : a_IslandLink).RecreateIslandChunkConnection();
+                //Finish merge
+                targetIsland.RecreateIslandChunkConnection();
+                RemoveIsland(islandToMerge);
             } 
 
             //If only a is contained in a Island
@@ -165,14 +168,6 @@ namespace Simoncouche.Islands {
             PlayerGrab.UngrabBody(chunk.gravityBody);
             PlayerGrab.RemoveCollisionIfGrabbed(islandLink, chunk);
         }
-
-        /// <summary>
-        /// Timer before the island is remove and merged
-        /// </summary>
-        /// <param name="time">timer time</param>
-        /// <param name="island">island to be removed</param>
-        /// <returns></returns>
-        private IEnumerator TimerIslandRemove(float time, Island island) { yield return new WaitForSeconds(time); RemoveIsland(island); }
 
         /// <summary>
         /// Check if the chunk is contained in a Island
@@ -543,7 +538,8 @@ namespace Simoncouche.Islands {
         /// <param name="b">Island that point a merges to</param>
         /// <returns>euler angle</returns>
         private Vector3 FindTargetRotForAnchor(IslandAnchorPoints a, IslandAnchorPoints b) {
-            return new Vector3(0, 0, a.angle - b.angle - b.GetIslandChunk().transform.localRotation.eulerAngles.z + 180);
+            return new Vector3(0, 0, a.angle + b.angle + b.GetIslandChunk().transform.localRotation.eulerAngles.z 
+                + a.GetIslandChunk().transform.localRotation.eulerAngles.z);
         }
 
         /// <summary>
@@ -564,20 +560,25 @@ namespace Simoncouche.Islands {
         }
 
         /// <summary>
-        /// Find the target local position
+        /// Used when an island hits another, to get target pos relative to hit chunk
         /// </summary>
-        /// <param name="a">The anchor of the island to merge</param>
-        /// <param name="b_chunk">Island to be merge to</param>
-        /// <returns></returns>
-        private Vector3 FindTargetLocalPosition(IslandChunk b_chunk, IslandAnchorPoints b_anchor, Island b_island) {
-            float distance = Vector3.Distance(Vector3.zero, b_anchor.position);
-            float angle = b_anchor.angle + b_chunk.transform.localRotation.eulerAngles.z;
-            Vector3 anchorProjection = new Vector3(
-                distance * Mathf.Cos(angle * Mathf.PI / 180f),
-                distance * Mathf.Sin(angle * Mathf.PI / 180f),
+        /// <param name="originalPos">the original pos of the first chunk</param>
+        /// <param name="originalRot">the original rot of the first chunk</param>
+        /// <param name="targetPos">the target pos of the first chunk</param>
+        /// <param name="targetRot">the target rot of the first chunk</param
+        /// <param name="currentChunk">The chunk that has is position being calculated</param>
+        /// <returns>the target pos relative to first chunk</returns>
+        private Vector3 FindTargetLocalPositionBasedOnPosRot(Vector3 originalPos, Vector3 originalRot, Vector3 targetPos, Vector3 targetRot, IslandChunk currentChunk) {
+            float changeInRot = targetRot.z - originalRot.z;
+            float distance = Vector3.Distance(originalPos, currentChunk.transform.localPosition);
+
+            Vector3 chunkRotProjection = new Vector3(
+                distance * Mathf.Cos(changeInRot * Mathf.PI / 180f),
+                distance * Mathf.Sin(changeInRot * Mathf.PI / 180f),
                 0
-            ); //The projection of the anchor on the current angle of the chunk
-            return (Vector2)b_island.transform.localPosition + (Vector2)b_chunk.transform.localPosition + 2f * (Vector2)anchorProjection;
+            );
+
+            return chunkRotProjection;
         }
 
         /// <summary>
