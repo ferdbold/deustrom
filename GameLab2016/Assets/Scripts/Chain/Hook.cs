@@ -19,7 +19,9 @@ namespace Simoncouche.Chain {
         private float ATTACHED_MASS = 10f;
 
         /// <summary>Self-reference to the hook prefab for factory purposes</summary>
-        private static GameObject _hookPrefab;
+        private static GameObject _hookPrefabSobek;
+        /// <summary>Self-reference to the hook prefab for factory purposes</summary>
+        private static GameObject _hookPrefabCthulu;
 
         /// <summary>The chain this hook is part of</summary>
         public Chain chain { get; private set; }
@@ -61,13 +63,17 @@ namespace Simoncouche.Chain {
         /// <param name="chain">The parent chain</param>
         /// <param name="isBeginningHook">Is this hook the beginning hook of a chain</param>
         public static Hook Create(Chain chain, bool isBeginningHook, bool isPlayerOne) {
-            if (_hookPrefab == null) {
-                if (isPlayerOne) _hookPrefab = Resources.Load("Chain/Hook") as GameObject;
-                else _hookPrefab = Resources.Load("Chain/Hook") as GameObject;
+
+            if (isPlayerOne) {
+                if (_hookPrefabSobek == null) {
+                    _hookPrefabSobek = Resources.Load("Chain/HookSobek") as GameObject;
+                }
+            } else if (_hookPrefabCthulu == null) {
+                _hookPrefabCthulu = Resources.Load("Chain/HookCthulhu") as GameObject;
             }
 
             Hook hook = ((GameObject)Instantiate(
-                _hookPrefab, 
+                isPlayerOne?_hookPrefabSobek:_hookPrefabCthulu, 
                 chain.thrower.transform.position, 
                 Quaternion.Euler(0, 0, chain.thrower.aimController.aimOrientation)
             )).GetComponent<Hook>();
