@@ -76,13 +76,13 @@ public class LevelManager : MonoBehaviour {
     public void AddScore(Player player, int scoreAdded, Vector3 originPos) {
         if (player == Player.sobek) {
             sobekScore += scoreAdded;
-            if (sobekScore > scoreNeededToWin) {
+            if (sobekScore >= scoreNeededToWin) {
                 sobekScore = scoreNeededToWin;
                 OnMatchEnd(Player.sobek);
             }
         } else {
             cthuluScore += scoreAdded;
-            if (cthuluScore > scoreNeededToWin) {
+            if (cthuluScore >= scoreNeededToWin) {
                 cthuluScore = scoreNeededToWin;
                 OnMatchEnd(Player.cthulu);
             }
