@@ -45,6 +45,8 @@ public class LevelManager : MonoBehaviour {
     private void OnLevelWasLoaded(int index) {
         SetupPlayers();
         ui = GameObject.FindObjectOfType<UIManager>();
+        sobekScore = 0;
+        cthuluScore = 0;
     }
 
     /// <summary> Setup ref to players </summary>
@@ -110,7 +112,7 @@ public class LevelManager : MonoBehaviour {
                 return;
             }
         }
-        GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel);
+        GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, dontClose: true);
     }
 
     /// <summary>
