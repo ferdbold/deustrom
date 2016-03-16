@@ -148,10 +148,10 @@ public class GameManager : MonoBehaviour {
     /// <param name="scene">the scene being loaded</param>
     /// <returns></returns>
     private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene) {
-        SceneManager.LoadScene(SCENE_CUTSCENE);
+        SceneManager.LoadSceneAsync(SCENE_CUTSCENE);
         AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
         loading.allowSceneActivation = false;
-        
+
         CutsceneManager cutscene = null;
         int debugCount = 0;
         while (cutscene == null) {
@@ -162,17 +162,22 @@ public class GameManager : MonoBehaviour {
                 break;
             }
         }
+        Debug.LogWarning(loading.allowSceneActivation);
+        Debug.LogWarning(loading.progress);
 
         cutscene.PlayCutscene(CutsceneManager.Cutscene.Cthulu_Win);
 
         while (!loading.isDone || !cutscene.isDone) {
+            Debug.LogWarning(loading.allowSceneActivation);
+            Debug.LogWarning(loading.progress);
             yield return new WaitForEndOfFrame();
             if (cutscene.isDone) {
                 loading.allowSceneActivation = true;
             }
         }
-        SceneManager.UnloadScene(SCENE_CUTSCENE);
         Scene_OnOpen(scene);
+        yield return new WaitForSeconds(cutscene.TimeToFade);
+        SceneManager.UnloadScene(SCENE_CUTSCENE);
     }
 
     /// <summary>

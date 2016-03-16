@@ -12,6 +12,7 @@ public class CutsceneManager : MonoBehaviour {
     [Header("Parameter")]
     [SerializeField] [Tooltip("Fading time when the cutscene ends")]
     private float timeToFade = 1f;
+    public float TimeToFade { get { return timeToFade; } }
 
     [SerializeField] [Tooltip("The time before the image loading completes")]
     private float imageTimeStaying = 1f;
@@ -75,20 +76,22 @@ public class CutsceneManager : MonoBehaviour {
             yield return new WaitForEndOfFrame();
         }
 
+        isDone = true;
+
         //Fade UI
         FadeRect.DOFade(0, timeToFade);
         yield return new WaitForSeconds(timeToFade);
 
-        isDone = true;
+        
     }
 
     IEnumerator WaitForImageEnd() {
         yield return new WaitForSeconds(imageTimeStaying);
 
+        isDone = true;
+
         //Fade UI
         FadeRect.DOFade(0, timeToFade);
         yield return new WaitForSeconds(timeToFade);
-
-        isDone = true;
     }
 }
