@@ -2,7 +2,7 @@
 using System.Collections;
 using Simoncouche.Controller;
 
-public class LevelManager : MonoBehaviour {
+public class LevelManager {
 
     #region Players
     /// <summary>  Sobek (player one) </summary>

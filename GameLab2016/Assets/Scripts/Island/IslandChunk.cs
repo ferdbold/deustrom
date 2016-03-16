@@ -96,6 +96,7 @@ namespace Simoncouche.Islands {
 
         void Start() {
             _randomizeIslandVisual.SetIslandColorVisual(color);
+            StartCoroutine(DebugPoint());
         }
 
 
@@ -337,5 +338,14 @@ namespace Simoncouche.Islands {
         }
 
         #endregion
+
+        IEnumerator DebugPoint () {
+            while (true) {
+                yield return new WaitForSeconds(1);
+                if (GameManager.levelManager != null && (gravityBody.Velocity != Vector2.zero || (parentIsland != null && parentIsland.gravityBody.Velocity != Vector2.zero))) {
+                    GameManager.levelManager.AddScore(color == IslandUtils.color.red ? LevelManager.Player.sobek : LevelManager.Player.cthulu, 1, transform.position);
+                }
+            }
+        }
     }
 }
