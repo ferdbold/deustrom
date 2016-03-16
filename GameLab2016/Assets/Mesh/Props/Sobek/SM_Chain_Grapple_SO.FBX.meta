@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: a456914c2703d8a449a329dddf0d872d
-timeCreated: 1454874546
+guid: 7c203fb95371346f188838fa775a7d7d
+timeCreated: 1458055799
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
@@ -9,8 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: Line003
-    4300002: SM_NileTree
+    4300000: Object005
   materials:
     importMaterials: 1
     materialName: 0

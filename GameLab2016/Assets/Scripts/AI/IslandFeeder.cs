@@ -25,9 +25,6 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("DO NOT CHANGE. Prefab of island collider.")]
         private GameObject _islandTemporaryColliderPrefab;
 
-        [SerializeField] [Tooltip("Folder where the created island will go as children")]
-        private Transform _islandParentTransform;
-
         [SerializeField] [Tooltip("Generate to left or right")]
         private bool GENERATE_LEFT = true;
 
@@ -35,7 +32,7 @@ namespace Simoncouche.Islands {
         private bool IS_SOBEK = true;
 
         [SerializeField] [Tooltip("Number of island in each column")]
-        private int COLUMN_HEIGHT = 5;
+        private List<Transform> SpawnAnchors;
 
         [SerializeField] [Tooltip("minimum amount of visible columns")]
         private int MIN_COLUMN = 5;
@@ -51,6 +48,9 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Default Spawn Time. An island will spawn every SPAWN_RATE seconds")]
         private float SPAWN_RATE = 5f;
 
+        [SerializeField] [Tooltip("Default Target Amount of island.If under this amt of islands, spawn will aceclerate")]
+        private int AMT_ISLAND_MEDIAN = 5;
+
         [SerializeField] [Tooltip("Spawn rate change in % per percentage of score difference between players.")]
         private float SPAWN_CHANGE_PER_SCORE_DIFFERENCE = 2f;
 
@@ -60,8 +60,8 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Spawn rate change in % for each island difference between median.")]
         private float SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN = 10f;
         
-        [SerializeField] [Tooltip("If true, Spawn change will act in a multiplicative manner. If false, will simply add % together.")]
-        private bool SPAWN_CHANGE_MULTIPLICATIVE = true;
+        [Tooltip("If true, Spawn change will act in a multiplicative manner. If false, will simply add % together.")]
+        private bool SPAWN_CHANGE_MULTIPLICATIVE = false;
 
 
         [Header("Visual")]
@@ -75,29 +75,38 @@ namespace Simoncouche.Islands {
         private float _currentX = 0f;
         private float _currentY = 0f;
         //Spawn Parameters 
-        private float _pScoreDiff = 0f; //Score diff between players in %. If positive, Sobek > Cthlhu.
-        private int _pIslandDiff = 0; //Number of island difference.  If positive, Sobek > Cthlhu.
+        private float _pScoreDiff = 0f; //Score diff between players in %. If positive, Spawn Faster.
+        private int _pIslandDiffPlayers = 0; //Number of island difference between players.  If positive, Spawn Faster.
+        private int _pIslandDiffMedian = 0; //Number of island difference between median.  If positive, Spawn Faster.
         private int _pSobekIsland = 0; //current Number of island of sobek
-        private int _pCthlhuIsland = 0; //current Number of island of cthulhu
+        private int _pCthulhuIsland = 0; //current Number of island of cthulhu
         //Instantiated objects refs
         private List<List<ChunkWithCollider>> _islandRows;
         private GameObject _islandContainer;
+        //Objects refs
+        private IslandManager _islandManager;
+        private Transform _islandParentTransform;
         //Layers
         private int _defaultLayer = 0;
         private int _noColLayer = 13;
         //Other Values
         private float _releaseForce = 15f; //force applied when island is released after shake
         private float _timeSinceLastSpawn = 0f; //current time since last island spawn
-        private float _modifiedSpawnRate = 5f; //current spawn rate
+        [SerializeField] private float _modifiedSpawnRate = 5f; //current spawn rate
+
+        
 
         void Awake() {
-            _islandRows = new List<List<ChunkWithCollider>>();
-            _islandContainer = new GameObject();
+            _islandRows = new List<List<ChunkWithCollider>>(); //Create data obj
+            _islandContainer = new GameObject(); //Create GameObject Container
             _islandContainer.transform.parent = transform;
             _islandContainer.transform.localPosition = Vector3.zero;
+ 
+            _islandManager = FindObjectOfType<IslandManager>().GetComponent<IslandManager>(); //Get Island Manager
         }
 
         void Start() {
+            _islandParentTransform = _islandManager.GetIslandSubFolder(); //Get ISland Subfolder from manager
             for (int i = 0; i <= MIN_COLUMN; ++i) {
                 GenerateColumn();
             }
@@ -109,15 +118,8 @@ namespace Simoncouche.Islands {
         }
 
         void ManageSpawn() {
+            //Update Spawn Timer
             _timeSinceLastSpawn += Time.deltaTime;
-            //TODO : Modify spawn rate based on all parameters
-            _modifiedSpawnRate = SPAWN_RATE;
-            if (SPAWN_CHANGE_MULTIPLICATIVE) {
-                _modifiedSpawnRate *= 100f + (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE);
-                _modifiedSpawnRate *= 100f + (_pIslandDiff * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS);
-            }
-
-
             if (_timeSinceLastSpawn > _modifiedSpawnRate) {
                 _timeSinceLastSpawn = 0f;
                 StartReleaseProcessOnRandomIsland();
@@ -134,8 +136,8 @@ namespace Simoncouche.Islands {
             _currentX = _currentColumn * ISLAND_SIZE_X * sideMultiplier;
 
             List<ChunkWithCollider> column = new List<ChunkWithCollider>();
-            for (int i = 0; i < COLUMN_HEIGHT; i++) {
-                column.Add(GenerateIsland());
+            for (int i = 0; i < SpawnAnchors.Count; i++) {
+                column.Add(GenerateIsland(SpawnAnchors[i].localPosition + new Vector3(_currentX,0,0)));
                 _currentY += ISLAND_SIZE_Y;
             }
             _islandRows.Add(column);
@@ -143,10 +145,10 @@ namespace Simoncouche.Islands {
         }
 
         /// <summary> Generate an island and place it in given Island list</summary>
-        private ChunkWithCollider GenerateIsland() {
+        private ChunkWithCollider GenerateIsland(Vector3 position) {
             //Instantiate island
             IslandChunk generatedChunk = (GameObject.Instantiate(_islandPrefab,
-                                                                   _islandContainer.transform.position + new Vector3(_currentX, _currentY, 0),
+                                                                   _islandContainer.transform.position + position,
                                                                    Quaternion.identity)
                                             as GameObject).GetComponent<IslandChunk>();
             generatedChunk.gravityBody.Velocity = Vector2.zero; //Remove velocity
@@ -202,9 +204,10 @@ namespace Simoncouche.Islands {
         IEnumerator ActivateIsland(ChunkWithCollider chunkWithCollider) {
             float t = 0;
             Tweener shakeTweener = chunkWithCollider.chunk.transform.DOShakePosition(SHAKE_TIME_EXTREMUMS.y, .30f, 14, 45, false);
+            _islandManager.CreatedIslandChunk(chunkWithCollider.chunk); //Add chunk to chunk list
+
             while (t <= SHAKE_TIME_EXTREMUMS.y) {
                 t += Time.deltaTime; //Timer
-
                 //Release Condition
                 if (t > SHAKE_TIME_EXTREMUMS.x) {
                     //TODO : CHECK PLAYER POS
@@ -222,23 +225,62 @@ namespace Simoncouche.Islands {
         private void ReleaseIsland(ChunkWithCollider chunkWithCollider) {
             Destroy(chunkWithCollider.collider.gameObject); //remove temporary collider
 
-            chunkWithCollider.chunk.transform.parent = _islandParentTransform;
+            chunkWithCollider.chunk.transform.parent = _islandParentTransform; //Set parent
             ToggleCollisionLayer(chunkWithCollider.chunk.gameObject, true); //Toggle island collisions back on
-            chunkWithCollider.chunk.gravityBody.Velocity += new Vector2(_releaseForce * (GENERATE_LEFT ? 1 : -1), 0);
+            chunkWithCollider.chunk.gravityBody.Velocity += new Vector2(_releaseForce * (GENERATE_LEFT ? 1 : -1), 0); //Add velocity
+
         }
 
 
         #endregion
 
+        private void CalculateSpawnRate() {
+            _modifiedSpawnRate = SPAWN_RATE;
+
+            if (SPAWN_CHANGE_MULTIPLICATIVE) { //Add in a multiplicative manner
+                _modifiedSpawnRate *= (100f + (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE)) / 100f;
+                _modifiedSpawnRate *= (100f + (_pIslandDiffPlayers * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS)) / 100f;
+                if (_pIslandDiffMedian < 0) _modifiedSpawnRate *= (100f + (_pIslandDiffMedian * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN)) / 100f;
+            } else { //Add in a additive manner
+                float additiveSpawnRate = 100f;
+                additiveSpawnRate += (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE);
+                additiveSpawnRate += (_pIslandDiffPlayers * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS);
+                if (_pIslandDiffMedian < 0) additiveSpawnRate += (_pIslandDiffMedian * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN);
+
+                _modifiedSpawnRate *= (additiveSpawnRate / 100f);
+            }
+
+            _modifiedSpawnRate = Mathf.Max(_modifiedSpawnRate, 0.5f);
+        }
+
         /// <summary> Update the spawn paramaters in a timed loop</summary>
         private IEnumerator UpdateSpawnParameters() {
             while (true) {
-                //TODO Update PARAMETERS WITH IS_SOBEK VALUE
-                _pScoreDiff = 0f;           
-                _pIslandDiff = 0; 
+                _pScoreDiff = 0f;
+                _pIslandDiffPlayers = 0;
                 _pSobekIsland = 0;
-                _pCthlhuIsland = 0; 
-                yield return new WaitForSeconds(1f);
+                _pCthulhuIsland = 0;
+                List<IslandChunk> _CurChunks = _islandManager.GetIslandChunks();
+
+                //TODO Update PARAMETERS WITH IS_SOBEK VALUE
+                //TODO SCORE WHEN READY
+                //_pScoreDiff = GameManager.Instance.ScoreSobek - GameManager.Instance.ScoreCthulhu
+
+                foreach (IslandChunk ic in _CurChunks) {
+                    if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
+                    if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;                  
+                }
+                if (IS_SOBEK) {
+                    _pIslandDiffPlayers = _pSobekIsland - _pCthulhuIsland;
+                    _pIslandDiffMedian = _pSobekIsland - AMT_ISLAND_MEDIAN;
+                } else {
+                    _pIslandDiffPlayers = _pCthulhuIsland - _pSobekIsland;
+                    _pIslandDiffMedian = _pCthulhuIsland - AMT_ISLAND_MEDIAN;
+                }
+
+                CalculateSpawnRate();
+
+                yield return new WaitForSeconds(0.5f);
             }
         }
     }

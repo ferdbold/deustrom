@@ -14,6 +14,9 @@ namespace Simoncouche.Islands {
         /// </summary>
         private List<Island> _island = new List<Island>();
 
+        /// <summary> A list of every IslandChunk currently in play</summary>
+        private List<IslandChunk> _islandChunks = new List<IslandChunk>();
+
         [SerializeField] [Tooltip("Island Object Prefab Reference")]
         private GameObject _islandComponent = null;
 
@@ -32,12 +35,9 @@ namespace Simoncouche.Islands {
         /// <summary> the island subfolder in scene </summary>
         private Transform _islandSubFolder;
 
-        private PlayerGrab _playerGrab;
-
         void Awake() {
             GameObject playerGO = GameObject.FindWithTag("Player");
-            if (playerGO != null) _playerGrab = playerGO.GetComponent<PlayerGrab>();
-            if(_playerGrab == null) Debug.LogError("_PlayerGrab cannot be found!");
+
 
             try {
                 _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
@@ -46,6 +46,26 @@ namespace Simoncouche.Islands {
                 Debug.LogWarning("No Island sub folder in scene, you might have forgotten to add the tag to the subfolder. Error Thrown: " + e.Message);
             }
         }
+
+        void Start() {
+            //Add starting chunks to the chunk list
+            IslandChunk[] chunks = GameObject.FindObjectsOfType<IslandChunk>();
+            foreach (IslandChunk chunk in chunks) {
+                CreatedIslandChunk(chunk);
+            }
+        }
+
+        /// <summary> Called when an island is created. Add it's reference to the island chunk list  </summary>
+        /// <param name="ic">created island chunk</param>
+        public void CreatedIslandChunk(IslandChunk chunk) {
+            _islandChunks.Add(chunk);
+        }
+
+        #region Get/Set
+        public List<Island> GetIslands() { return _island; }
+        public List<IslandChunk> GetIslandChunks() { return _islandChunks; }
+        public Transform GetIslandSubFolder() { return _islandSubFolder; }
+        #endregion
 
         #region HandleCollision
 
@@ -214,6 +234,7 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="chunk">chunk to destroy</param>
         public void DestroyChunk(IslandChunk chunk) {
+            _islandChunks.Remove(chunk);
             PlayerGrab.UngrabBody(chunk.gravityBody);
             chunk.gravityBody.DestroyGravityBody();
         }
@@ -582,6 +603,8 @@ namespace Simoncouche.Islands {
         private Vector3 FindMiddlePoint(Vector3 a, Vector3 b) {
             return (a + (b - a) / 2);
         }
+
+       
 
         #endregion
     }
