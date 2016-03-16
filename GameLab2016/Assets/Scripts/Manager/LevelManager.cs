@@ -39,10 +39,10 @@ public class LevelManager {
     public LevelManager(int scoreToWin, int numberOfMatchToWin) {
         scoreNeededToWin = scoreToWin;
         matchToWin = numberOfMatchToWin;
-        OnLevelWasLoaded(0);
+        Setup();
     }
 
-    private void OnLevelWasLoaded(int index) {
+    public void Setup() {
         SetupPlayers();
         ui = GameObject.FindObjectOfType<UIManager>();
         sobekScore = 0;
