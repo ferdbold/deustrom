@@ -36,7 +36,6 @@ namespace Simoncouche.Islands {
         void Update() {
             for (int i = 0; i < _curPlayerTimes.Count; i++) {
                 _curPlayerTimes[i].currentTime += Time.deltaTime;
-                Debug.Log(_curPlayerTimes[i].currentTime);
                 if (_curPlayerTimes[i].currentTime >= timeForDeath) {
                     _curPlayerTimes[i].playerRef.OnMaelstromEnter(transform.position);
                     _curPlayerTimes.RemoveAt(i);
