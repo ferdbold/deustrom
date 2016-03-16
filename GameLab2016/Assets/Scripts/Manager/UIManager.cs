@@ -27,7 +27,7 @@ public class UIManager : MonoBehaviour {
 
     // METHODS
 
-    private void Awake() {
+    public void Setup() {
         this.root = GameObject.Find("UI").GetComponent<Canvas>();
 
         _scoreWidgets = new List<ScoreWidget>();

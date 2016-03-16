@@ -39,6 +39,7 @@ public class LevelManager : MonoBehaviour {
     public LevelManager(int scoreToWin, int numberOfMatchToWin) {
         scoreNeededToWin = scoreToWin;
         matchToWin = numberOfMatchToWin;
+        OnLevelWasLoaded(0);
     }
 
     private void OnLevelWasLoaded(int index) {
@@ -85,6 +86,9 @@ public class LevelManager : MonoBehaviour {
                 cthuluScore = scoreNeededToWin;
                 OnMatchEnd(Player.cthulu);
             }
+        }
+        for (int i = 0; i < scoreAdded; i++) {
+            ui.AddPoint(player == Player.sobek ? 0 : 1, originPos);
         }
     }
 
