@@ -32,7 +32,7 @@ namespace Simoncouche.Islands {
         private bool IS_SOBEK = true;
 
         [SerializeField] [Tooltip("Number of island in each column")]
-        private int COLUMN_HEIGHT = 5;
+        private List<Transform> SpawnAnchors;
 
         [SerializeField] [Tooltip("minimum amount of visible columns")]
         private int MIN_COLUMN = 5;
@@ -136,8 +136,8 @@ namespace Simoncouche.Islands {
             _currentX = _currentColumn * ISLAND_SIZE_X * sideMultiplier;
 
             List<ChunkWithCollider> column = new List<ChunkWithCollider>();
-            for (int i = 0; i < COLUMN_HEIGHT; i++) {
-                column.Add(GenerateIsland());
+            for (int i = 0; i < SpawnAnchors.Count; i++) {
+                column.Add(GenerateIsland(SpawnAnchors[i].localPosition + new Vector3(_currentX,0,0)));
                 _currentY += ISLAND_SIZE_Y;
             }
             _islandRows.Add(column);
@@ -145,10 +145,10 @@ namespace Simoncouche.Islands {
         }
 
         /// <summary> Generate an island and place it in given Island list</summary>
-        private ChunkWithCollider GenerateIsland() {
+        private ChunkWithCollider GenerateIsland(Vector3 position) {
             //Instantiate island
             IslandChunk generatedChunk = (GameObject.Instantiate(_islandPrefab,
-                                                                   _islandContainer.transform.position + new Vector3(_currentX, _currentY, 0),
+                                                                   _islandContainer.transform.position + position,
                                                                    Quaternion.identity)
                                             as GameObject).GetComponent<IslandChunk>();
             generatedChunk.gravityBody.Velocity = Vector2.zero; //Remove velocity
