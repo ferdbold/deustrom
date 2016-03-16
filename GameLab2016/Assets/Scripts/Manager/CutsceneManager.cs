@@ -13,6 +13,9 @@ public class CutsceneManager : MonoBehaviour {
     [SerializeField] [Tooltip("Fading time when the cutscene ends")]
     private float timeToFade = 1f;
 
+    [SerializeField] [Tooltip("The time before the image loading completes")]
+    private float imageTimeStaying = 1f;
+
     [Header("Cutscenes")]
     [SerializeField]
     private MovieTexture Base_Loading_Cutscene;
@@ -21,10 +24,10 @@ public class CutsceneManager : MonoBehaviour {
     private MovieTexture Intro_Cutscene;
 
     [SerializeField]
-    private MovieTexture Sobek_Win_Cutscene;
+    private Texture2D Sobek_Win_Cutscene;
 
     [SerializeField]
-    private MovieTexture Cthulu_Win_Cutscene;
+    private Texture2D Cthulu_Win_Cutscene;
 
     [Header("Component")]
     [SerializeField]
@@ -36,34 +39,51 @@ public class CutsceneManager : MonoBehaviour {
 
     public void PlayCutscene(Cutscene scene) {
         MovieTexture movie = null;
+        Texture2D texture = null;
 
         switch (scene) {
             case Cutscene.Intro:
                 movie = Intro_Cutscene;
+                FadeRect.material.mainTexture = movie;
+                movie.Play();
+                StartCoroutine(WaitVideoEndToFade(movie));
                 break;
 
             case Cutscene.Sobek_Win:
-                movie = Sobek_Win_Cutscene;
+                texture = Sobek_Win_Cutscene;
+                StartCoroutine(WaitForImageEnd());
                 break;
 
             case Cutscene.Cthulu_Win:
-                movie = Cthulu_Win_Cutscene;
+                texture = Cthulu_Win_Cutscene;
+                StartCoroutine(WaitForImageEnd());
                 break;
 
             case Cutscene.Base_Loading:
                 movie = Base_Loading_Cutscene;
+                FadeRect.material.mainTexture = movie;
+                movie.Play();
+                StartCoroutine(WaitVideoEndToFade(movie));
                 break;
         }
 
-		FadeRect.material.mainTexture = movie;
-        movie.Play();
-        StartCoroutine(WaitVideoEndToFade(movie));
+		
     }
 
     IEnumerator WaitVideoEndToFade(MovieTexture movie) {
         while (movie.isPlaying) {
             yield return new WaitForEndOfFrame();
         }
+
+        //Fade UI
+        FadeRect.DOFade(0, timeToFade);
+        yield return new WaitForSeconds(timeToFade);
+
+        isDone = true;
+    }
+
+    IEnumerator WaitForImageEnd() {
+        yield return new WaitForSeconds(imageTimeStaying);
 
         //Fade UI
         FadeRect.DOFade(0, timeToFade);

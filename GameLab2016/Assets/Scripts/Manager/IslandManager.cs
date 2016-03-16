@@ -34,7 +34,7 @@ namespace Simoncouche.Islands {
 
         private PlayerGrab _playerGrab;
 
-        void Awake() {
+        public void Setup() {
             GameObject playerGO = GameObject.FindWithTag("Player");
             if (playerGO != null) _playerGrab = playerGO.GetComponent<PlayerGrab>();
             if(_playerGrab == null) Debug.LogError("_PlayerGrab cannot be found!");

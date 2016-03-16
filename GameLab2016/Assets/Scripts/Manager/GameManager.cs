@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void Update () {
+    void Update() {
         if (Input.GetKeyDown(KeyCode.R)) {
             SwitchScene(currentScene);
             inputManager.ResetInputs();
@@ -78,11 +78,11 @@ public class GameManager : MonoBehaviour {
             Application.Quit();
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Alpha0)) {
             Time.timeScale = 0f;
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {          
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
             Time.timeScale = 1f;
         }
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
@@ -97,8 +97,14 @@ public class GameManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Alpha5)) {
             Time.timeScale = 100f;
         }
-        #endif
-    } 
+        if (Input.GetKeyDown(KeyCode.M)) {
+            levelManager.AddScore(LevelManager.Player.cthulu, 1, Vector3.zero);
+        }
+        if (Input.GetKeyDown(KeyCode.N)) {
+            levelManager.AddScore(LevelManager.Player.sobek, 1, Vector3.zero);
+        }
+#endif
+    }
 
     #region Switch Scene
 
@@ -111,7 +117,6 @@ public class GameManager : MonoBehaviour {
         Scene_OnClose(currentScene);
         _currentScene = scene;
 
-        SceneManager.LoadScene(SCENE_CUTSCENE);
         string sceneToLoad = "";
 
         switch (scene) {
@@ -132,7 +137,7 @@ public class GameManager : MonoBehaviour {
                 break;
         }
 
-        
+
         StartCoroutine(WaitForSceneToLoad(sceneToLoad, scene));
     }
 
@@ -143,23 +148,30 @@ public class GameManager : MonoBehaviour {
     /// <param name="scene">the scene being loaded</param>
     /// <returns></returns>
     private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene) {
-		AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
-		loading.allowSceneActivation = false;
+        SceneManager.LoadScene(SCENE_CUTSCENE);
+        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+        loading.allowSceneActivation = false;
+        
+        CutsceneManager cutscene = null;
+        int debugCount = 0;
+        while (cutscene == null) {
+            cutscene = GameObject.FindObjectOfType<CutsceneManager>();
+            yield return new WaitForSeconds(0.1f);
+            if (++debugCount > 1000) {
+                Debug.LogError("Cutscene not loaded or no cutscene object in scene");
+                break;
+            }
+        }
 
-		CutsceneManager cutscene = null;
-		int debugCount = 0;
-		while (cutscene == null) {
-			cutscene = GameObject.FindObjectOfType<CutsceneManager>();
-			yield return new WaitForSeconds(0.1f);
-			if (++debugCount > 500) {
-				Debug.LogError("Cutscene not loaded or no cutscene object in scene");
-				break;
-			}
-		}
+        cutscene.PlayCutscene(CutsceneManager.Cutscene.Cthulu_Win);
 
-        while (!loading.isDone && !cutscene.isDone) { yield return new WaitForEndOfFrame(); }
+        while (!loading.isDone || !cutscene.isDone) {
+            yield return new WaitForEndOfFrame();
+            if (cutscene.isDone) {
+                loading.allowSceneActivation = true;
+            }
+        }
         SceneManager.UnloadScene(SCENE_CUTSCENE);
-        loading.allowSceneActivation = true;
         Scene_OnOpen(scene);
     }
 
@@ -173,6 +185,8 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case Scene.PlayLevel:
+                islandManager.Setup();
+                uiManager.Setup();
                 levelManager = new LevelManager(_pointsGoal, _matchToWin);
                 break;
 
