@@ -35,7 +35,7 @@ namespace Simoncouche.Islands {
         /// <summary> the island subfolder in scene </summary>
         private Transform _islandSubFolder;
 
-        void Awake() {
+        public void Setup() {
             GameObject playerGO = GameObject.FindWithTag("Player");
 
 

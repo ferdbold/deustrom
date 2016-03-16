@@ -43,7 +43,7 @@ namespace Simoncouche.Controller {
 
         [SerializeField] [Tooltip("Is the current controller for player 1 or player 2")]
         private bool isPlayerOne = true;
-        public bool IsPlayerOne { get { return IsPlayerOne; } }
+        public bool IsPlayerOne { get { return isPlayerOne; } }
 
         #endregion
 
