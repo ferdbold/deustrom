@@ -187,7 +187,9 @@ public class GameManager : MonoBehaviour {
             case Scene.PlayLevel:
                 islandManager.Setup();
                 uiManager.Setup();
-                levelManager = new LevelManager(_pointsGoal, _matchToWin);
+                if (levelManager == null) {
+                    levelManager = new LevelManager(_pointsGoal, _matchToWin);
+                }
                 break;
 
             case Scene.BibleWriting:
