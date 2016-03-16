@@ -114,7 +114,7 @@ public class GameManager : MonoBehaviour {
     /// <param name="scene">Scene to be loaded</param>
     /// <param name="level">if it's a play level, the index of the level</param>
     public void SwitchScene(Scene scene, CutsceneManager.Cutscene cutscene = CutsceneManager.Cutscene.Base_Loading, int level = 0, bool dontClose = false) {
-        if (!dontClose) Scene_OnClose(currentScene);
+        if (!dontClose) Scene_OnClose(_currentScene);
         _currentScene = scene;
 
         string sceneToLoad = "";
@@ -187,9 +187,7 @@ public class GameManager : MonoBehaviour {
             case Scene.PlayLevel:
                 islandManager.Setup();
                 uiManager.Setup();
-                if (levelManager == null) {
-                    levelManager = new LevelManager(_pointsGoal, _matchToWin);
-                }
+                levelManager = new LevelManager(_pointsGoal, _matchToWin);
                 break;
 
             case Scene.BibleWriting:
