@@ -8,9 +8,6 @@ namespace Simoncouche.Bible {
     [RequireComponent(typeof(InputField))]
     public class BibleQuoteWriter : MonoBehaviour {
 
-        /// <summary>File name of our save file</summary>
-        public const string fileName = "/save.bible";
-
         [Tooltip("Minimum number of a quote")]
         [SerializeField]
         private int _minRangeQuoteNumber = 0;
@@ -34,6 +31,7 @@ namespace Simoncouche.Bible {
             //TO DO : SET WHO WON THE GAME HERE
             //sobekWon = 
             _inputField.Select();
+            this.PrintQuote(BibleEntries.GetRandomQuote());
         }
 
         void Update() {
@@ -45,9 +43,9 @@ namespace Simoncouche.Bible {
 
         private void SaveQuote(string quote, bool isSobek) {
             Debug.Log(Application.persistentDataPath);
-            BibleEntries tempEntries = LoadBibleEntries();//Must load the data in order to do an insertion
+            BibleEntries tempEntries = BibleEntries.LoadBibleEntries();//Must load the data in order to do an insertion
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Create(Application.persistentDataPath + fileName);
+            FileStream file = File.Create(Application.persistentDataPath + BibleEntries.fileName);
 
             if (tempEntries == null) { //Must create new bible entries
                 tempEntries = new BibleEntries();
@@ -63,6 +61,10 @@ namespace Simoncouche.Bible {
             file.Close();
         }
 
+        /// <summary>
+        /// Event trigerred by our press enter input in order to save the current text to our file
+        /// </summary>
+        /// <param name="quote"></param>
         private void SubmitQuote(string quote) {
             SaveQuote(quote, sobekWon);
             _inputField.enabled = false;
@@ -70,11 +72,45 @@ namespace Simoncouche.Bible {
         }
 
         /// <summary>
+        /// Function which print every entries in the two bibles
+        /// </summary>
+        private void PrintAllBibleQuotes() {
+            BibleEntries entries = BibleEntries.LoadBibleEntries();
+            foreach (BibleQuote bQuote in entries.quoteListCthulu) {
+                Debug.Log(bQuote.quoteString + " - " + bQuote.godName + " " + bQuote.quoteFirstNo + ":" + bQuote.quoteSecondNo);
+            }
+            foreach (BibleQuote bQuote in entries.quoteListSobek) {
+                Debug.Log(bQuote.quoteString + " - " + bQuote.godName + " " + bQuote.quoteFirstNo + ":" + bQuote.quoteSecondNo);
+            }
+        }
+
+        /// <summary>
+        /// Function which print every entries in the two bibles
+        /// </summary>
+        public void PrintQuote(BibleQuote quote) {
+            if (quote != null) {
+                Debug.Log(quote.quoteString + " - " + quote.godName + " " + quote.quoteFirstNo + ":" + quote.quoteSecondNo);
+            } else {
+                Debug.Log("Il n'existe aucun texte sacré");
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// This class contains all the quotes of the two bibles in two separate lists
+    /// </summary>
+    [System.Serializable]
+    public class BibleEntries {
+        /// <summary>File name of our save file</summary>
+        public const string fileName = "/save.bible";
+
+        /// <summary>
         /// This method is static in order to get every entries in the bibles of the two gods
         /// </summary>
         /// <returns>A BibleEntries object containing two lists of both Cthulu's quotes and Sobek's quotes</returns>
         public static BibleEntries LoadBibleEntries() {
-            if (File.Exists(Application.persistentDataPath + fileName)){
+            if (File.Exists(Application.persistentDataPath + fileName)) {
                 BinaryFormatter bf = new BinaryFormatter();
                 FileStream file = File.Open(Application.persistentDataPath + fileName, FileMode.Open);
                 BibleEntries bibleEntries = (BibleEntries)bf.Deserialize(file);
@@ -86,25 +122,30 @@ namespace Simoncouche.Bible {
         }
 
         /// <summary>
-        /// Function which print every entries in the two bibles
+        /// This method gives a random quote from the two gods
         /// </summary>
-        private void PrintBibleQuotes() {
-            BibleEntries entries = LoadBibleEntries();
-            foreach (BibleQuote bQuote in entries.quoteListCthulu) {
-                Debug.Log(bQuote.quoteString + " - " + bQuote.godName + " " + bQuote.quoteFirstNo + ":" + bQuote.quoteSecondNo);
-            }
-            foreach (BibleQuote bQuote in entries.quoteListSobek) {
-                Debug.Log(bQuote.quoteString + " - " + bQuote.godName + " " + bQuote.quoteFirstNo + ":" + bQuote.quoteSecondNo);
+        /// <returns>A random biblequote from the save system/returns>
+        public static BibleQuote GetRandomQuote() {
+            if (File.Exists(Application.persistentDataPath + fileName)) {
+                BinaryFormatter bf = new BinaryFormatter();
+                FileStream file = File.Open(Application.persistentDataPath + fileName, FileMode.Open);
+                BibleEntries bibleEntries = (BibleEntries)bf.Deserialize(file);
+                List<BibleQuote> quoteList = bibleEntries.quoteListCthulu;
+                quoteList.AddRange(bibleEntries.quoteListSobek);
+                int accessor = 0;
+                if (quoteList.Count < 1) {
+                    file.Close();
+                    return null; //Si on a rien à retourner
+                } else {
+                    accessor = Random.Range(0, quoteList.Count - 1);
+                }
+                file.Close();
+                return quoteList[accessor];
+            } else {
+                return null;
             }
         }
-    }
 
-
-    /// <summary>
-    /// This class contains all the quotes of the two bibles in two separate lists
-    /// </summary>
-    [System.Serializable]
-    public class BibleEntries {
         public List<BibleQuote> quoteListCthulu;
         public List<BibleQuote> quoteListSobek;
         public BibleEntries() {
