@@ -113,8 +113,8 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     /// <param name="scene">Scene to be loaded</param>
     /// <param name="level">if it's a play level, the index of the level</param>
-    public void SwitchScene(Scene scene, CutsceneManager.Cutscene cutscene = CutsceneManager.Cutscene.Base_Loading, int level = 0) {
-        Scene_OnClose(currentScene);
+    public void SwitchScene(Scene scene, CutsceneManager.Cutscene cutscene = CutsceneManager.Cutscene.Base_Loading, int level = 0, bool dontClose = false) {
+        if (!dontClose) Scene_OnClose(currentScene);
         _currentScene = scene;
 
         string sceneToLoad = "";
