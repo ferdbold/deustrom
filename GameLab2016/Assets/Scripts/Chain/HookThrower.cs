@@ -95,6 +95,11 @@ namespace Simoncouche.Chain {
                 this.RetractLeftTrigger
             );
 
+            /* DEPRECATED: USED WHEN RETRACTS WAS WHILE BUTTON PRESSED
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_retractHooksButtonUp : InputManager.Button.p2_retractHooksButtonUp,
+                this.RetractChainsReleased
+            );*/
 
             GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Button.p1_cutLinkWithChainButton : InputManager.Button.p2_cutLinkWithChainButton,
@@ -172,12 +177,12 @@ namespace Simoncouche.Chain {
                 _triggerIsHeld = false;
                 Fire();
                 //animation
-                aimController.ToggleAimIndicator(false);
+                this.aimController.ToggleAimIndicator(false);
                 playerController.HandleAimStopAnimation();
             } else if(!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
                 _triggerIsHeld = true;
                 //animation
-                aimController.ToggleAimIndicator(true);
+                this.aimController.ToggleAimIndicator(true);
                 playerController.HandleAimStartAnimation();
             }
         }
@@ -304,15 +309,17 @@ namespace Simoncouche.Chain {
             if (_chains.Count > 1 && _doesHookReplacePresentHookOnIsland) {
                 bool mustDestroyChain = false;
                 int i = 0;
+
                 while (i < _chains.Count - 1 && !mustDestroyChain) { //Count-1 cause we dont have to check the added hook 
                     if (_chains[i].CheckAnchorPointInHooks(anchorPoint)) {
                         mustDestroyChain = true;
                     }
-                    if (!mustDestroyChain) ++i;
+                    if (!mustDestroyChain) i++;
                 }
-                if(mustDestroyChain) _chains[i].DestroyChain(true);
-                
-                
+
+                if (mustDestroyChain) {
+                    _chains[i].DestroyChain(true);
+                }
             }
         }
 

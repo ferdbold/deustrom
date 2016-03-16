@@ -11,7 +11,9 @@ namespace Simoncouche.Chain {
     public class ChainSection : MonoBehaviour {
 
         /// <summary>Self-reference to the chain section prefab for factory purposes</summary>
-        private static GameObject _chainSectionPrefab;
+        private static GameObject _chainSectionSobek;
+        /// <summary>Self-reference to the chain section prefab for factory purposes</summary>
+        private static GameObject _chainSectionCthulu;
 
         /// <summary>The Hook or ChainSection that precedes this section in the chain</summary>
         public GameObject prev { get; private set; }
@@ -37,13 +39,17 @@ namespace Simoncouche.Chain {
         /// <param name="previous">The previous element in the chain (either Hook or ChainSection)</param>
         /// <param name="previousLinkRotation">The previous link local rotation (for 90° alternance)</param>
         public static ChainSection Create(Vector3 position, Quaternion rotation, Chain chain, GameObject previous,  bool isPlayerOne , Quaternion previousLinkRotation = default(Quaternion)){
-            if (_chainSectionPrefab == null) {
-                if(isPlayerOne) _chainSectionPrefab = Resources.Load("Chain/ChainSectionSobek") as GameObject;
-                else _chainSectionPrefab = Resources.Load("Chain/ChainSectionCthulhu") as GameObject;
+
+            if (isPlayerOne) {
+                if (_chainSectionSobek==null) {
+                    _chainSectionSobek = Resources.Load("Chain/ChainSectionSobek") as GameObject;
+                }
+            } else if(_chainSectionCthulu==null){
+                _chainSectionCthulu = Resources.Load("Chain/ChainSectionCthulhu") as GameObject;
             }
 
             ChainSection chainSection = ((GameObject)Instantiate(
-                _chainSectionPrefab,
+                isPlayerOne?_chainSectionSobek:_chainSectionCthulu,
                 position,
                 rotation
             )).GetComponent<ChainSection>();

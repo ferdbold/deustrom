@@ -47,7 +47,7 @@ public class SoftNormalsToVertexColor : MonoBehaviour {
 		Color[] colors = new Color[n.Length];
 		List<List<int>> groups = new List<List<int>>();
 
-		for( int i = 0; i < v.Length; ++i ) {		// Group verts at the same location
+		for( int i = 0; i < v.Length; i++ ) {		// Group verts at the same location
 			bool added = false;
 			foreach( List<int> group in groups ) {	// Add to exsisting group if possible
 				if( v[group[0]] == v[i] ) {
