@@ -72,7 +72,6 @@ public class GameManager : MonoBehaviour {
     void Update() {
         if (Input.GetKeyDown(KeyCode.R)) {
             SwitchScene(Scene.Menu);
-            inputManager.ResetInputs();
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Application.Quit();
@@ -115,6 +114,7 @@ public class GameManager : MonoBehaviour {
     /// <param name="level">if it's a play level, the index of the level</param>
     public void SwitchScene(Scene scene, CutsceneManager.Cutscene cutscene = CutsceneManager.Cutscene.Base_Loading, int level = 0, bool dontClose = false) {
         if (!dontClose) Scene_OnClose(_currentScene);
+        inputManager.ResetInputs();
         _currentScene = scene;
 
         string sceneToLoad = "";
@@ -171,6 +171,7 @@ public class GameManager : MonoBehaviour {
                 loading.allowSceneActivation = true;
             }
         }
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneToLoad));
         Scene_OnOpen(scene);
         yield return new WaitForSeconds(cutscene.TimeToFade);
         SceneManager.UnloadScene(SCENE_CUTSCENE);
