@@ -34,8 +34,17 @@ public class CutsceneManager : MonoBehaviour {
     [SerializeField]
     private RawImage FadeRect;
 
+    private bool skip = false;
+
     private void Awake() {
         isDone = false;
+    }
+
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick1Button0)) { //TODO change input
+            skip = true;
+            StopCoroutine("WaitForImageEnd");
+        }
     }
 
     public void PlayCutscene(Cutscene scene) {
@@ -52,12 +61,12 @@ public class CutsceneManager : MonoBehaviour {
 
             case Cutscene.Sobek_Win:
                 texture = Sobek_Win_Cutscene;
-                StartCoroutine(WaitForImageEnd());
+                StartCoroutine("WaitForImageEnd");
                 break;
 
             case Cutscene.Cthulu_Win:
                 texture = Cthulu_Win_Cutscene;
-                StartCoroutine(WaitForImageEnd());
+                StartCoroutine("WaitForImageEnd");
                 break;
 
             case Cutscene.Base_Loading:
@@ -74,13 +83,16 @@ public class CutsceneManager : MonoBehaviour {
     IEnumerator WaitVideoEndToFade(MovieTexture movie) {
         while (movie.isPlaying) {
             yield return new WaitForEndOfFrame();
+            if (skip) {
+                movie.Stop();
+                break;
+            }
         }
 
         isDone = true;
 
         //Fade UI
         FadeRect.DOFade(0, timeToFade);
-        yield return new WaitForSeconds(timeToFade);
 
         
     }
@@ -92,6 +104,5 @@ public class CutsceneManager : MonoBehaviour {
 
         //Fade UI
         FadeRect.DOFade(0, timeToFade);
-        yield return new WaitForSeconds(timeToFade);
     }
 }

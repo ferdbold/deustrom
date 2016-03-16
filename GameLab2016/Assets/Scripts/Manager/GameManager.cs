@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.R)) {
-            SwitchScene(currentScene);
+            SwitchScene(Scene.Menu);
             inputManager.ResetInputs();
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -162,14 +162,10 @@ public class GameManager : MonoBehaviour {
                 break;
             }
         }
-        Debug.LogWarning(loading.allowSceneActivation);
-        Debug.LogWarning(loading.progress);
 
         cutscene.PlayCutscene(CutsceneManager.Cutscene.Cthulu_Win);
 
         while (!loading.isDone || !cutscene.isDone) {
-            Debug.LogWarning(loading.allowSceneActivation);
-            Debug.LogWarning(loading.progress);
             yield return new WaitForEndOfFrame();
             if (cutscene.isDone) {
                 loading.allowSceneActivation = true;
@@ -192,7 +188,11 @@ public class GameManager : MonoBehaviour {
             case Scene.PlayLevel:
                 islandManager.Setup();
                 uiManager.Setup();
-                levelManager = new LevelManager(_pointsGoal, _matchToWin);
+                if (levelManager == null) {
+                    levelManager = new LevelManager(_pointsGoal, _matchToWin);
+                } else {
+                    levelManager.Setup();
+                }
                 break;
 
             case Scene.BibleWriting:
