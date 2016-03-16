@@ -15,18 +15,20 @@ namespace Simoncouche.Controller {
         /// <summary> The current aim orientation in vector2 as set by the right analog input </summary>
         public Vector2 aimOrientationVector2 { get; private set; }
 
+        // COMPONENTS
 
         private GameObject _aimIndicator;
 
-        void Awake() {
+        // METHODS
+
+        private void Awake() {
             _aimIndicator = transform.Find("AimIndicator").gameObject;
             ToggleAimIndicator(false);
         }
 
-        void Update() {
+        private void Update() {
             UpdateAim();
         }
-
 
         /// <summary>
         /// Update the aim of the player
@@ -42,7 +44,6 @@ namespace Simoncouche.Controller {
             if (orientation.y < 0) {
                 this.aimOrientation = 360f - this.aimOrientation;
             }
-            
         }
 
         /// <summary> Public method call to toggle indicator on or off from the outside </summary>
@@ -59,8 +60,5 @@ namespace Simoncouche.Controller {
         private void ActivateIndicator() {
             _aimIndicator.SetActive(true);
         }
-
-
     }
-
 }
