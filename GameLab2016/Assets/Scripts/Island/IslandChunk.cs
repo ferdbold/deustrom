@@ -341,7 +341,7 @@ namespace Simoncouche.Islands {
 
         IEnumerator DebugPoint () {
             while (true) {
-                yield return new WaitForSeconds(1);
+                yield return new WaitForSeconds(3);
                 if (GameManager.levelManager != null && (gravityBody.Velocity != Vector2.zero || (parentIsland != null && parentIsland.gravityBody.Velocity != Vector2.zero))) {
                     GameManager.levelManager.AddScore(color == IslandUtils.color.red ? LevelManager.Player.sobek : LevelManager.Player.cthulu, 1, transform.position);
                 }
