@@ -576,7 +576,7 @@ namespace Simoncouche.Islands {
         /// <param name="b_chunk">Island to be merge to</param>
         /// <returns></returns>
         private Vector3 FindTargetLocalPosition(IslandChunk b_chunk, IslandAnchorPoints b_anchor) {
-            float distance = Vector3.Distance(Vector3.zero, b_anchor.position);
+            float distance = Vector3.Distance(b_chunk.transform.position, b_anchor.transform.position);
             float angle = b_anchor.angle + b_chunk.transform.localRotation.eulerAngles.z;
             Vector3 anchorProjection = new Vector3(
                 distance * Mathf.Cos(angle * Mathf.PI / 180f),
