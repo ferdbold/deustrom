@@ -76,23 +76,21 @@ public class LevelManager {
     /// <param name="scoreAdded">The score added to the player score</param>
     /// <param name="originPos">The position of the object that produced the points </param>
     public void AddScore(Player player, int scoreAdded, Vector3 originPos) {
-        if (!GameManager.Instance.disableScoring) {
-            if (player == Player.sobek) {
-                sobekScore += scoreAdded;
-                if (sobekScore >= scoreNeededToWin) {
-                    sobekScore = scoreNeededToWin;
-                    OnMatchEnd(Player.sobek);
-                }
-            } else {
-                cthuluScore += scoreAdded;
-                if (cthuluScore >= scoreNeededToWin) {
-                    cthuluScore = scoreNeededToWin;
-                    OnMatchEnd(Player.cthulu);
-                }
+        if (player == Player.sobek) {
+            sobekScore += scoreAdded;
+            if (sobekScore >= scoreNeededToWin) {
+                sobekScore = scoreNeededToWin;
+                OnMatchEnd(Player.sobek);
             }
-            for (int i = 0; i < scoreAdded; i++) {
-                ui.AddPoint(player == Player.sobek ? 0 : 1, originPos);
+        } else {
+            cthuluScore += scoreAdded;
+            if (cthuluScore >= scoreNeededToWin) {
+                cthuluScore = scoreNeededToWin;
+                OnMatchEnd(Player.cthulu);
             }
+        }
+        for (int i = 0; i < scoreAdded; i++) {
+            ui.AddPoint(player == Player.sobek ? 0 : 1, originPos);
         }
     }
 
@@ -104,18 +102,31 @@ public class LevelManager {
         if (winner == Player.sobek) {
             ++sobekMatchWon;
             if (sobekMatchWon >= matchToWin) {
-                OnGameEnd(Player.sobek);
+                new Simoncouche.Utils.WaitWithCallback(1f, OnMatchEndSobek);
                 return;
             }
         } else {
             ++cthuluMatchWon;
             if (cthuluMatchWon >= matchToWin) {
-                OnGameEnd(Player.cthulu);
+                new Simoncouche.Utils.WaitWithCallback(1f, OnMatchEndCthulu);
                 return;
             }
         }
+
+        sobekScore = -10000;
+        cthuluScore = -10000;
         GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, dontClose: true);
     }
+
+    #region Used for callback
+    private void OnMatchEndCthulu() {
+        OnGameEnd(Player.cthulu);
+    }
+
+    private void OnMatchEndSobek() {
+        OnGameEnd(Player.sobek);
+    }
+    #endregion
 
     /// <summary>
     /// Event called when the Game ends
