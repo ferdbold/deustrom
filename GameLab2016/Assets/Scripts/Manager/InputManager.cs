@@ -23,8 +23,10 @@ public class InputManager : MonoBehaviour {
     private EventAxis p2_rightTrigger;
 
     private EventButton _startButton;
-    private EventButton p1_fireHookButton;
-    private EventButton p2_fireHookButton;
+    private EventButton p1_fireHookButtonDown;
+    private EventButton p2_fireHookButtonDown;
+    private EventButton p1_fireHookButtonUp;
+    private EventButton p2_fireHookButtonUp;
     private EventButton p1_pushButton;
     private EventButton p2_pushButton;
     private EventButton p1_retractHooksButtonDown;
@@ -78,8 +80,10 @@ public class InputManager : MonoBehaviour {
     /// </summary>
     public enum Button { 
         start, 
-        p1_fireHook, 
-        p2_fireHook, 
+        p1_fireHookDown, 
+        p2_fireHookDown, 
+        p1_fireHookUp,
+        p2_fireHookUp,
         p1_pushButton,
         p2_pushButton,
         p1_retractHooksButtonDown,
@@ -97,8 +101,10 @@ public class InputManager : MonoBehaviour {
     public void AddEvent(Button button, EventButton eventFunction) {
         switch (button) {
             case Button.start: _startButton += eventFunction; break;
-            case Button.p1_fireHook: p1_fireHookButton += eventFunction; break;
-            case Button.p2_fireHook: p2_fireHookButton += eventFunction; break;
+            case Button.p1_fireHookDown: p1_fireHookButtonDown += eventFunction; break;
+            case Button.p2_fireHookDown: p2_fireHookButtonDown += eventFunction; break;
+            case Button.p1_fireHookUp: p1_fireHookButtonUp += eventFunction; break;
+            case Button.p2_fireHookUp: p2_fireHookButtonUp += eventFunction; break;
             case Button.p1_pushButton: p1_pushButton += eventFunction; break;
             case Button.p2_pushButton: p2_pushButton += eventFunction; break;
             case Button.p1_retractHooksButtonDown: p1_retractHooksButtonDown += eventFunction; break;
@@ -131,8 +137,10 @@ public class InputManager : MonoBehaviour {
         p2_rightTrigger = null;
 
         _startButton = null;
-        p1_fireHookButton = null;
-        p2_fireHookButton = null;
+        p1_fireHookButtonDown = null;
+        p2_fireHookButtonDown = null;
+        p1_fireHookButtonUp = null;
+        p2_fireHookButtonUp = null;
         p1_pushButton = null;
         p2_pushButton = null;
         p1_retractHooksButtonDown = null;
@@ -159,8 +167,10 @@ public class InputManager : MonoBehaviour {
         List<ButtonTuple> buttons = new List<ButtonTuple>() {
             new ButtonTuple("P1 Push", p1_pushButton, Input.GetButtonDown("P1_Push")),
             new ButtonTuple("P2 Push", p2_pushButton, Input.GetButtonDown("P2_Push")),
-            new ButtonTuple("P1 Fire Hook", p1_fireHookButton, Input.GetButtonDown("P1_FireHook")),
-            new ButtonTuple("P2 Fire Hook", p2_fireHookButton, Input.GetButtonDown("P2_FireHook")),
+            new ButtonTuple("P1 Fire Hook Down", p1_fireHookButtonDown, Input.GetButtonDown("P1_FireHook")),
+            new ButtonTuple("P2 Fire Hook Down", p2_fireHookButtonDown, Input.GetButtonDown("P2_FireHook")),
+            new ButtonTuple("P1 Fire Hook Up", p1_fireHookButtonUp, Input.GetButtonUp("P1_FireHook")),
+            new ButtonTuple("P2 Fire Hook Up", p2_fireHookButtonUp, Input.GetButtonUp("P2_FireHook")),
             new ButtonTuple("Start", _startButton, Input.GetButtonDown("Start")),
             new ButtonTuple("P1 Retract Hooks Down", p1_retractHooksButtonDown, Input.GetButtonDown("P1_Retract_Hooks")),
             new ButtonTuple("P2 Retract Hooks Down", p2_retractHooksButtonDown,Input.GetButtonDown("P2_Retract_Hooks")),
