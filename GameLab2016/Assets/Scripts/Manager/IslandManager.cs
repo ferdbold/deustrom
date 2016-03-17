@@ -36,9 +36,6 @@ namespace Simoncouche.Islands {
         private Transform _islandSubFolder;
 
         public void Setup() {
-            GameObject playerGO = GameObject.FindWithTag("Player");
-
-
             try {
                 _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
             }
@@ -65,6 +62,7 @@ namespace Simoncouche.Islands {
         public List<Island> GetIslands() { return _island; }
         public List<IslandChunk> GetIslandChunks() { return _islandChunks; }
         public Transform GetIslandSubFolder() { return _islandSubFolder; }
+        public float GetMergeTime() { return _chunkMergeTime; }
         #endregion
 
         #region HandleCollision
@@ -165,7 +163,7 @@ namespace Simoncouche.Islands {
         /// <param name="b"></param>
         private void AddChunkToExistingIsland(Island islandLink, IslandChunk chunk) {
             islandLink.AddChunkToIsland(chunk);
-            PlayerGrab.UngrabBody(chunk.gravityBody);
+            PlayerGrab.UngrabBody(chunk.gravityBody,true);
             PlayerGrab.RemoveCollisionIfGrabbed(islandLink, chunk);
         }
 
