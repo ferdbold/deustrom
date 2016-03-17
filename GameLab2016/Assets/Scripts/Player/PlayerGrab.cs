@@ -237,23 +237,27 @@ namespace Simoncouche.Controller {
         /// <param name="transformToMove"> Transform that was grabbed </param>
         /// <param name="delay">delay before starting repositioning. Used in cases where island get merged at the same time</param>
         /// <returns></returns>
-        IEnumerator RepositionGrabbedBody(Transform transformToMove, float delay) {
+        IEnumerator RepositionGrabbedBody(Transform transformToMove, float delay) {            
             yield return new WaitForSeconds(delay);
-            //Get positions
-            float i = 0f;
-            float repositionTime = 1f;
-            Vector2 startPosition = transformToMove.localPosition;
-            Vector2 targetPosition = new Vector2(1.2f, 0);
-            if(grabbedBody.transform != transformToMove) targetPosition -= (Vector2) (transformToMove.localRotation * (grabbedBody.transform.localPosition* transformToMove.localScale.x));
+            if (transformToMove == null) Debug.LogWarning("Attempted to reposition grabbed transform after " + delay + " seconds but it was null.");
+            else if(grabbedBody == null) Debug.LogWarning("Attempted to reposition grabbed transform after " + delay + " seconds but grabbedBody was null.");
+            else {
+                //Get positions
+                float i = 0f;
+                float repositionTime = 1f;
+                Vector2 startPosition = transformToMove.localPosition;
+                Vector2 targetPosition = new Vector2(1.2f, 0);
+                if (grabbedBody.transform != transformToMove) targetPosition -= (Vector2)(transformToMove.localRotation * (grabbedBody.transform.localPosition * transformToMove.localScale.x));
 
-            //Lerp to target position
-            while (i < 1f && grabbedBody != null) { 
-                transformToMove.localPosition = Vector2.Lerp(startPosition, targetPosition, i);
-                yield return null;
-                i += Time.deltaTime / repositionTime;
+                //Lerp to target position
+                while (i < 1f && grabbedBody != null) {
+                    transformToMove.localPosition = Vector2.Lerp(startPosition, targetPosition, i);
+                    yield return null;
+                    i += Time.deltaTime / repositionTime;
+                }
+                //finish movement
+                if (grabbedBody != null) transformToMove.localPosition = targetPosition;
             }
-            //finish movement
-            if(grabbedBody != null) transformToMove.localPosition = targetPosition;
         }
 
         /// <summary> Charges the throw multiplier </summary>

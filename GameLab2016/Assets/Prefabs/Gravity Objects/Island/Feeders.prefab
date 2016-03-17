@@ -318,7 +318,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 199508}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -36, y: -15, z: 0}
+  m_LocalPosition: {x: -35, y: -15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 444766}
@@ -433,7 +433,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 132582}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 36, y: -15, z: 0}
+  m_LocalPosition: {x: 35, y: -15, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 413270}
@@ -995,11 +995,12 @@ MonoBehaviour:
   ISLAND_SIZE_X: 5
   ISLAND_SIZE_Y: 5
   SPAWN_RATE: 10
-  AMT_ISLAND_MIN: 5
-  AMT_ISLAND_MAX: 10
+  AMT_ISLAND_MIN: 3
+  AMT_ISLAND_MAX: 7
   SPAWN_CHANGE_PER_SCORE_DIFFERENCE: 2
   SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS: 8
-  SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN: 12
+  SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN: 10
+  SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX: 40
   SHAKE_TIME_EXTREMUMS: {x: 2.5, y: 10}
   _modifiedSpawnRate: 5
 --- !u!114 &11460940
@@ -1030,11 +1031,12 @@ MonoBehaviour:
   ISLAND_SIZE_X: 5
   ISLAND_SIZE_Y: 5
   SPAWN_RATE: 10
-  AMT_ISLAND_MIN: 5
-  AMT_ISLAND_MAX: 10
+  AMT_ISLAND_MIN: 3
+  AMT_ISLAND_MAX: 7
   SPAWN_CHANGE_PER_SCORE_DIFFERENCE: 2
   SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS: 8
-  SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN: 12
+  SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN: 10
+  SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX: 40
   SHAKE_TIME_EXTREMUMS: {x: 2.5, y: 10}
   _modifiedSpawnRate: 5
 --- !u!1001 &100100000
