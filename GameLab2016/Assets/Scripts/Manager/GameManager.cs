@@ -17,6 +17,11 @@ public class GameManager : MonoBehaviour {
     private int _pointsGoal = 10;
     public int pointsGoal { get { return _pointsGoal; } }
 
+    [SerializeField]
+    [Tooltip("Disable scoring (for debug purposes only")]
+    private bool _disableScoring = true;
+    public bool disableScoring { get { return _disableScoring; } }
+
     [Tooltip("Number of match to win to finish the game")]
     [SerializeField]
     private int _matchToWin = 2;

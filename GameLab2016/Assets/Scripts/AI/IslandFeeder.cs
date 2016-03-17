@@ -48,8 +48,11 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Default Spawn Time. An island will spawn every SPAWN_RATE seconds")]
         private float SPAWN_RATE = 5f;
 
-        [SerializeField] [Tooltip("Default Target Amount of island.If under this amt of islands, spawn will aceclerate")]
-        private int AMT_ISLAND_MEDIAN = 5;
+        [SerializeField] [Tooltip("Default Target Amount of island. If under this amt of islands, spawn will aceclerate")]
+        private int AMT_ISLAND_MIN = 5;
+
+        [SerializeField] [Tooltip("Default Target Amount of island. If over this amt of islands, spawn will reduce")]
+        private int AMT_ISLAND_MAX = 10;
 
         [SerializeField] [Tooltip("Spawn rate change in % per percentage of score difference between players.")]
         private float SPAWN_CHANGE_PER_SCORE_DIFFERENCE = 2f;
@@ -74,10 +77,12 @@ namespace Simoncouche.Islands {
         private int _currentColumn = 0;
         private float _currentX = 0f;
         private float _currentY = 0f;
+        private float _targetContinentX = 0;
         //Spawn Parameters 
         private float _pScoreDiff = 0f; //Score diff between players in %. If positive, Spawn Faster.
         private int _pIslandDiffPlayers = 0; //Number of island difference between players.  If positive, Spawn Faster.
-        private int _pIslandDiffMedian = 0; //Number of island difference between median.  If positive, Spawn Faster.
+        private int _pIslandDiffMin = 0; //Number of island difference between min.  If positive, Spawn Faster.
+        private int _pIslandDiffMax = 0; //Number of island difference between max.  If positive, Spawn Slower.
         private int _pSobekIsland = 0; //current Number of island of sobek
         private int _pCthulhuIsland = 0; //current Number of island of cthulhu
         //Instantiated objects refs
@@ -110,14 +115,16 @@ namespace Simoncouche.Islands {
             for (int i = 0; i <= MIN_COLUMN; ++i) {
                 GenerateColumn();
             }
+            _targetContinentX = 0;
             StartCoroutine(UpdateSpawnParameters());
         }
 
         void Update() {
             ManageSpawn();
+            MoveSpawner();
         }
 
-        void ManageSpawn() {
+        private void ManageSpawn() {
             //Update Spawn Timer
             _timeSinceLastSpawn += Time.deltaTime;
             if (_timeSinceLastSpawn > _modifiedSpawnRate) {
@@ -126,6 +133,12 @@ namespace Simoncouche.Islands {
             }
         }
 
+        private void MoveSpawner() {
+            _islandContainer.transform.localPosition = Vector3.Lerp(_islandContainer.transform.localPosition,
+                                                                    new Vector3(_targetContinentX, 0, 0),
+                                                                    0.15f * Time.deltaTime);
+        }
+        
         #region Generation
 
         /// <summary> Generates a new column and append it to islandRows </summary>
@@ -142,6 +155,7 @@ namespace Simoncouche.Islands {
             }
             _islandRows.Add(column);
             _currentColumn++;
+            _targetContinentX += GENERATE_LEFT ? ISLAND_SIZE_X : -ISLAND_SIZE_X;
         }
 
         /// <summary> Generate an island and place it in given Island list</summary>
@@ -240,12 +254,14 @@ namespace Simoncouche.Islands {
             if (SPAWN_CHANGE_MULTIPLICATIVE) { //Add in a multiplicative manner
                 _modifiedSpawnRate *= (100f + (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE)) / 100f;
                 _modifiedSpawnRate *= (100f + (_pIslandDiffPlayers * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS)) / 100f;
-                if (_pIslandDiffMedian < 0) _modifiedSpawnRate *= (100f + (_pIslandDiffMedian * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN)) / 100f;
+                if (_pIslandDiffMin < 0) _modifiedSpawnRate *= (100f + (_pIslandDiffMin * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN)) / 100f;
+                if (_pIslandDiffMax < 0) _modifiedSpawnRate *= (100f - (_pIslandDiffMax * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN)) / 100f;
             } else { //Add in a additive manner
                 float additiveSpawnRate = 100f;
                 additiveSpawnRate += (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE);
                 additiveSpawnRate += (_pIslandDiffPlayers * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS);
-                if (_pIslandDiffMedian < 0) additiveSpawnRate += (_pIslandDiffMedian * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN);
+                if (_pIslandDiffMin < 0) additiveSpawnRate += (_pIslandDiffMin * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN);
+                if (_pIslandDiffMax < 0) additiveSpawnRate -= (_pIslandDiffMax * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN);
 
                 _modifiedSpawnRate *= (additiveSpawnRate / 100f);
             }
@@ -272,10 +288,12 @@ namespace Simoncouche.Islands {
                 }
                 if (IS_SOBEK) {
                     _pIslandDiffPlayers = _pSobekIsland - _pCthulhuIsland;
-                    _pIslandDiffMedian = _pSobekIsland - AMT_ISLAND_MEDIAN;
+                    _pIslandDiffMin = _pSobekIsland - AMT_ISLAND_MIN;
+                    _pIslandDiffMax = AMT_ISLAND_MAX - _pSobekIsland;
                 } else {
                     _pIslandDiffPlayers = _pCthulhuIsland - _pSobekIsland;
-                    _pIslandDiffMedian = _pCthulhuIsland - AMT_ISLAND_MEDIAN;
+                    _pIslandDiffMin = _pCthulhuIsland - AMT_ISLAND_MIN;
+                    _pIslandDiffMax = AMT_ISLAND_MAX - _pCthulhuIsland;
                 }
 
                 CalculateSpawnRate();
