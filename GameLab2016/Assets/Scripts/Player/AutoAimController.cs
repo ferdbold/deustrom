@@ -126,7 +126,6 @@ namespace Simoncouche.Controller {
 
         private void OnDisable() {
             // Take back the indicator and disable it
-            _indicator.parent = transform;
             _indicator.gameObject.SetActive(false);
 
             StopCoroutine(this.ScanUpdate());
