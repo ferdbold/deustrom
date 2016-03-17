@@ -249,12 +249,11 @@ namespace Simoncouche.Islands {
                 DestroyIsland(island);
                 return;
             }
-            Debug.Log("test");
             island.RecreateIslandChunkConnection();
             List<IslandChunk> chunkIsland = new List<IslandChunk>();
             chunkIsland = CheckIslandBroken_Helper(island.chunks[0], chunkIsland);
             List<IslandChunk> chunkChecked = chunkIsland;
-            //Debug.Log(chunkIsland.Count);
+            
             //is broken
             while (chunkChecked.Count != island.chunks.Count) {
                 //Find list of Chunk that should be island
@@ -272,7 +271,7 @@ namespace Simoncouche.Islands {
                 //Remove Chunk
                 if (chunkIsland.Count == 1) {
                     island.chunks.Remove(chunkIsland[0]);
-                    chunkIsland[0].transform.SetParent(island.transform.parent);
+                    chunkIsland[0].transform.SetParent(island.transform.parent, true);
                 }
 
                 //Create Island
@@ -288,6 +287,11 @@ namespace Simoncouche.Islands {
                 }
             }
             island.RecreateIslandChunkConnection();
+
+            //Make the player lose the connection to island being dismantle
+            foreach (IslandChunk check in chunkChecked) {
+                PlayerGrab.UngrabBody(check.gravityBody);
+            }
         }
 
         /// <summary>
