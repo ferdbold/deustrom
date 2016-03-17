@@ -152,7 +152,8 @@ namespace Simoncouche.Controller {
 
         /// <summary> modifies the player's drag based on the grabbed object </summary>
         private void UpdateGrabDrag() {
-            _playerRigidBody.drag = Mathf.Min(_playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag, 3.5f); //max drag to 3.5
+            _playerRigidBody.drag = Mathf.Min(_playerGrab.GetGrabbedWeight() * GRAB_RATIO_MOVEMENT + _startDrag, 10f); //max drag to 3.5
+            
         }
 
         //Death when entering maelstrom and respawn on map edges
