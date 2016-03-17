@@ -93,7 +93,6 @@ namespace Simoncouche.Islands {
                 IslandAnchorPoints anchorToMerge = mergeA ? a_anchor : b_anchor;
                 IslandAnchorPoints targetAnchor = mergeA ? b_anchor : a_anchor;
 
-                //Make operation for first island chunk for others to be relative to this
                 AddChunkToExistingIsland(targetIsland, chunkToMerge);
                 islandToMerge.chunks.Remove(chunkToMerge);
                 Vector3 targetPos = FindTargetLocalPosition(targetChunk, targetAnchor);
@@ -104,14 +103,16 @@ namespace Simoncouche.Islands {
                 //Merge every chunk
                 foreach (IslandChunk chunk in islandToMerge.chunks) {
                     AddChunkToExistingIsland(targetIsland, chunk);
-                    chunk.ConnectChunk(
-                        FindTargetLocalPositionBasedOnPosRot(
+                    targetPos = FindTargetLocalPositionBasedOnPosRot(
                             chunkToMerge.transform.localPosition,
                             chunkToMerge.transform.localRotation.eulerAngles,
                             targetPos,
                             targetRot,
                             chunk
-                        ),
+                     );
+                    chunkToMerge = chunk;
+                    chunk.ConnectChunk(
+                        targetPos,
                         targetRot, //TODO relative rot
                         null, //depracated
                         null, //depracated
@@ -250,7 +251,7 @@ namespace Simoncouche.Islands {
                 DestroyIsland(island);
                 return;
             }
-
+            Debug.Log("test");
             island.RecreateIslandChunkConnection();
             List<IslandChunk> chunkIsland = new List<IslandChunk>();
             chunkIsland = CheckIslandBroken_Helper(island.chunks[0], chunkIsland);
@@ -538,8 +539,9 @@ namespace Simoncouche.Islands {
         /// <param name="b">Island that point a merges to</param>
         /// <returns>euler angle</returns>
         private Vector3 FindTargetRotForAnchor(IslandAnchorPoints a, IslandAnchorPoints b) {
-            return new Vector3(0, 0, a.angle + b.angle + b.GetIslandChunk().transform.localRotation.eulerAngles.z 
-                + a.GetIslandChunk().transform.localRotation.eulerAngles.z);
+            //Debug.Log(a.angle + " " + a.GetIslandChunk().transform.rotation.eulerAngles.z + " " + b.GetIslandChunk().transform.rotation.eulerAngles.z + " " + b.angle);
+            //Debug.Log((b.angle + b.GetIslandChunk().transform.rotation.eulerAngles.z + 180 - a.angle) % 360);
+            return new Vector3(0, 0, (b.angle + b.GetIslandChunk().transform.rotation.eulerAngles.z + 180 - a.angle) % 360);
         }
 
         /// <summary>
@@ -569,16 +571,18 @@ namespace Simoncouche.Islands {
         /// <param name="currentChunk">The chunk that has is position being calculated</param>
         /// <returns>the target pos relative to first chunk</returns>
         private Vector3 FindTargetLocalPositionBasedOnPosRot(Vector3 originalPos, Vector3 originalRot, Vector3 targetPos, Vector3 targetRot, IslandChunk currentChunk) {
-            float changeInRot = targetRot.z - originalRot.z;
+            float changeInRot = targetRot.z + originalRot.z + 180;
             float distance = Vector3.Distance(originalPos, currentChunk.transform.localPosition);
-
+            
             Vector3 chunkRotProjection = new Vector3(
-                distance * Mathf.Cos(changeInRot * Mathf.PI / 180f),
-                distance * Mathf.Sin(changeInRot * Mathf.PI / 180f),
+                targetPos.x + distance * Mathf.Cos(changeInRot * Mathf.PI / 180f),
+                targetPos.y + distance * Mathf.Sin(changeInRot * Mathf.PI / 180f),
                 0
             );
 
-            return chunkRotProjection;
+            //TODO finish rotation
+            return targetPos + currentChunk.transform.localPosition - originalPos;
+            //return chunkRotProjection;
         }
 
         /// <summary>
