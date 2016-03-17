@@ -56,15 +56,17 @@ public class UIManager : MonoBehaviour {
     /// <param name="player">The player gaining a point. Either 1 or 2.</param>
     /// <param name="sourcePos">The position of the object that generated a point for the player.</param>
     public void AddPoint(int player, Vector3 sourcePos) {
-        Image newScoreOrb = (Image)GameObject.Instantiate(_scoreOrbPrefab);
-        newScoreOrb.transform.SetParent(this.root.transform);
-        newScoreOrb.rectTransform.position = Camera.main.WorldToScreenPoint(sourcePos);
+        if (root != null) {
+            Image newScoreOrb = (Image)GameObject.Instantiate(_scoreOrbPrefab);
+            newScoreOrb.transform.SetParent(this.root.transform);
+            newScoreOrb.rectTransform.position = Camera.main.WorldToScreenPoint(sourcePos);
 
-        // Tween orb to destination
-        float animDuration = _orbAnimDuration + Random.Range(0, _orbAnimDurationVariation) - _orbAnimDurationVariation / 2;
-        newScoreOrb.rectTransform.DOMove(_scoreWidgets[player].GetFillEndPosition(), animDuration)
-            .SetEase(Ease.InOutCubic)
-            .OnComplete(() => this.OnOrbAnimComplete(player, newScoreOrb));
+            // Tween orb to destination
+            float animDuration = _orbAnimDuration + Random.Range(0, _orbAnimDurationVariation) - _orbAnimDurationVariation / 2;
+            newScoreOrb.rectTransform.DOMove(_scoreWidgets[player].GetFillEndPosition(), animDuration)
+                .SetEase(Ease.InOutCubic)
+                .OnComplete(() => this.OnOrbAnimComplete(player, newScoreOrb));
+        }
     }
 
     private void OnOrbAnimComplete(int player, Image orb) {

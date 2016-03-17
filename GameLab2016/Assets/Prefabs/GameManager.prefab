@@ -225,10 +225,11 @@ MonoBehaviour:
   _pointsGoal: 1000
   _disableScoring: 1
   _matchToWin: 2
+  lastWinner: 1
   _currentScene: 0
   SCENE_MENU_NAME: Menu
   SCENE_CUTSCENE: Cutscene
-  SCENE_BIBLE_WRITING: Menu
+  SCENE_BIBLE_WRITING: BibleWriter
   SCENE_NAMES:
   - Main_2
 --- !u!1001 &100100000

@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
     private int _matchToWin = 2;
 
+    public LevelManager.Player lastWinner = LevelManager.Player.cthulu;
+
     #region Managers
     public static InputManager inputManager { get; private set; }
     public static IslandManager islandManager { get; private set; }
@@ -36,7 +38,7 @@ public class GameManager : MonoBehaviour {
 
     #region Level Related
 
-    public enum Scene { Menu, PlayLevel, BibleWriting }
+    public enum Scene { Menu, PlayLevel, BibleWriter, BibleReader }
 
     [Header("Scene Related")]
     [SerializeField] [Tooltip("The current scene")]
@@ -50,7 +52,10 @@ public class GameManager : MonoBehaviour {
     private string SCENE_CUTSCENE = "Cutscene";
 
     [SerializeField]
-    private string SCENE_BIBLE_WRITING = "Bible";
+    private string SCENE_BIBLE_WRITING = "BibleWriter";
+
+    [SerializeField]
+    private string SCENE_BIBLE_READING = "BibleReader";
 
     [SerializeField]
     private string[] SCENE_NAMES;
@@ -76,7 +81,7 @@ public class GameManager : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.R)) {
-            SwitchScene(Scene.Menu);
+            if(_currentScene != Scene.BibleWriter)SwitchScene(Scene.Menu);
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
             Application.Quit();
@@ -102,10 +107,10 @@ public class GameManager : MonoBehaviour {
             Time.timeScale = 100f;
         }
         if (Input.GetKeyDown(KeyCode.M)) {
-            levelManager.AddScore(LevelManager.Player.cthulu, 1, Vector3.zero);
+            if (_currentScene == Scene.PlayLevel && levelManager!=null) levelManager.AddScore(LevelManager.Player.cthulu, 50, Vector3.zero);
         }
         if (Input.GetKeyDown(KeyCode.N)) {
-            levelManager.AddScore(LevelManager.Player.sobek, 1, Vector3.zero);
+            if (_currentScene == Scene.PlayLevel && levelManager != null) levelManager.AddScore(LevelManager.Player.sobek, 50, Vector3.zero);
         }
 #endif
     }
@@ -137,8 +142,12 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
 
-            case Scene.BibleWriting:
+            case Scene.BibleWriter:
                 sceneToLoad = SCENE_BIBLE_WRITING;
+                break;
+
+            case Scene.BibleReader:
+                sceneToLoad = SCENE_BIBLE_READING;
                 break;
         }
 
@@ -201,7 +210,12 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
 
-            case Scene.BibleWriting:
+            case Scene.BibleWriter:
+                GameObject rootUI = GameObject.Find("BibleUIInput");
+                rootUI.GetComponentInChildren<Simoncouche.Bible.BibleQuoteWriter>().BeginWriting(this.lastWinner);
+                break;
+
+            case Scene.BibleReader:
                 break;
         }
     }
@@ -219,7 +233,10 @@ public class GameManager : MonoBehaviour {
                 levelManager = null;
                 break;
 
-            case Scene.BibleWriting:
+            case Scene.BibleWriter:
+                break;
+
+            case Scene.BibleReader:
                 break;
         }
     }

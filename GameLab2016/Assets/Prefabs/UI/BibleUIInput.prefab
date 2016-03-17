@@ -101,6 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _minRangeQuoteNumber: 0
   _maxRangeQuoteNumber: 99
+  _titleInputField: {fileID: 11438280}
 --- !u!114 &11436062
 MonoBehaviour:
   m_ObjectHideFlags: 1
