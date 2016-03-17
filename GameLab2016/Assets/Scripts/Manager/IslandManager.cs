@@ -250,6 +250,7 @@ namespace Simoncouche.Islands {
                 return;
             }
             island.RecreateIslandChunkConnection();
+            List<IslandChunk> originChunkList = island.chunks;
             List<IslandChunk> chunkIsland = new List<IslandChunk>();
             chunkIsland = CheckIslandBroken_Helper(island.chunks[0], chunkIsland);
             List<IslandChunk> chunkChecked = chunkIsland;
@@ -289,9 +290,31 @@ namespace Simoncouche.Islands {
             island.RecreateIslandChunkConnection();
 
             //Make the player lose the connection to island being dismantle
-            foreach (IslandChunk check in chunkChecked) {
-                PlayerGrab.UngrabBody(check.gravityBody);
+            if (!TestIfIslandListSame(island.chunks, originChunkList)) {
+                foreach (IslandChunk check in chunkChecked) {
+                    PlayerGrab.UngrabBody(check.gravityBody);
+                }
             }
+        }
+
+        /// <summary>
+        /// Test if two island chunk list have the same element
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private bool TestIfIslandListSame(List<IslandChunk> a, List<IslandChunk> b) {
+            foreach (IslandChunk chunk in b) {
+                if (!a.Contains(chunk)) {
+                    return false;
+                }
+            }
+            foreach (IslandChunk chunk in a) {
+                if (!b.Contains(chunk)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
