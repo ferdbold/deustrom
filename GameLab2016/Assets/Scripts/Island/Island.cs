@@ -193,5 +193,90 @@ namespace Simoncouche.Islands {
                 }
             }
         }
+
+        //Conversion variables
+        private List<IslandChunk> _convertingChunks = new List<IslandChunk>(); //chunks to be converted if conversion timer ends
+        private int _conversionAmtStatus = 0; //Store diff between chunks of both players. negative = cthulhu wins, 0 = stalemate, positive = sobek wins
+        private int _amtIslandPerConversion = 1; //Amt of island per conversion
+        private float _conversionTime = 5f; //Time for a conversion
+
+        public void UpdateConversionStatus() {
+            //Check which side is winning conversion
+           
+            List<IslandChunk> sobekChunks = new List<IslandChunk>();
+            List<IslandChunk> cthulhuChunks = new List<IslandChunk>();
+            foreach (IslandChunk ic in chunks) {
+                if (ic.color == IslandUtils.color.red) {
+                    sobekChunks.Add(ic);
+                } else if (ic.color == IslandUtils.color.blue) {
+                    cthulhuChunks.Add(ic);
+                }
+            }
+            int diffIslandColors = sobekChunks.Count - cthulhuChunks.Count;
+            if (diffIslandColors == 0) {        //Stalemate
+                StopConversionProcess();                
+            }        
+            else if (diffIslandColors > 0) {    //Sobek wins
+                if (_conversionAmtStatus <= 0) ResetConversionProcess(sobekChunks);
+                else UpdateConvertingChunks(sobekChunks);
+            } 
+            else {                              //Cthulhu wins
+                if (_conversionAmtStatus >= 0) ResetConversionProcess(cthulhuChunks);
+                else UpdateConvertingChunks(cthulhuChunks);
+            }
+
+            //Update Conversions amount status variable
+            _conversionAmtStatus = diffIslandColors;
+
+        }
+
+        /// <summary> Update the currently converting chunks. Used when an chunk is added to an island that is currently converting. </summary>
+        /// <param name="chunks"> list of possible chunks to add. We travel this list from the last element to get the newest ones first</param>
+        private void UpdateConvertingChunks(List<IslandChunk> chunks) {
+            for (int i = _amtIslandPerConversion - 1; i > 0; --i) {
+                if (_convertingChunks.Count >= _amtIslandPerConversion) break; //Return if list is of target size
+                if(!_convertingChunks.Contains(chunks[i])) {
+                    _convertingChunks.Add(chunks[i]); //Add to converting chunk
+                }          
+            }
+        }
+
+        /// <summary> Resets the conversion process on island. </summary>
+        /// <param name="chunks"> list of chunks to select from for conversion</param>
+        /// <param name="amt"> max amount of chunks to select </param>
+        private void ResetConversionProcess(List<IslandChunk> chunks) {
+            StopCoroutine(ConversionProcess());
+            for(int i = 0; i < _amtIslandPerConversion; ++i) {
+                if (chunks.Count == 0) break; //Return if list is empty
+                int rIndex = Random.Range(0, chunks.Count); //Get random index
+                _convertingChunks.Add(chunks[rIndex]); //Add to converting chunk
+                chunks.RemoveAt(rIndex); // Remove from pool
+            }
+            StartCoroutine(ConversionProcess());
+        }
+
+        /// <summary> Stops the conversion process on island</summary>
+        private void StopConversionProcess() {
+            _convertingChunks.Clear(); //Clear the chunk list
+            StopCoroutine(ConversionProcess());
+        }
+
+
+        private IEnumerator ConversionProcess() {
+            yield return new WaitForSeconds(_conversionTime);
+            IslandUtils.color newColor;
+            if (_conversionAmtStatus > 0) newColor = IslandUtils.color.red;
+            else if (_conversionAmtStatus < 0) newColor = IslandUtils.color.blue;
+            else {
+                newColor = IslandUtils.color.green;
+                Debug.LogError("Tried to convert when island was equal !");
+            }
+
+            foreach(IslandChunk ic in _convertingChunks) {
+                ic.ConvertChunkToAnotherColor(newColor);
+            }
+
+        }
+
     }
 }

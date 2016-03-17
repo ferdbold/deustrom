@@ -152,7 +152,8 @@ namespace Simoncouche.Islands {
                 createdIsland.RecreateIslandChunkConnection();
             }
 
-            TestIslandForConversion(a.parentIsland);
+            //TestIslandForConversion(a.parentIsland); //Check each insland individually for conversion
+            SimpleIslandConversion(a.parentIsland); //All chunks in island change to the same color which is the most present
         }
 
         /// <summary>
@@ -498,6 +499,14 @@ namespace Simoncouche.Islands {
                     chunk.ConvertChunkToAnotherColor(newColor);
                 }
             }
+        }
+
+        /// <summary>
+        /// Test if any chunk as part of the island can be converted
+        /// </summary>
+        /// <param name="island">The island to test</param>
+        public void SimpleIslandConversion(Island island) {
+            island.UpdateConversionStatus();
         }
 
         /// <summary>
