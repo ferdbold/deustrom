@@ -74,8 +74,6 @@ namespace Simoncouche.Islands {
 
         void OnTriggerExit2D(Collider2D other) {
             if (((1 << other.gameObject.layer) & GravityLayerMask) != 0 && other.gameObject != gameObject) {
-                GravityBody gravityBodyScript = other.gameObject.GetComponentInChildren<GravityBody>();
-                IslandChunk islandChunk = other.gameObject.GetComponentInChildren<IslandChunk>();
                 PlayerController playerController = other.gameObject.GetComponentInChildren<PlayerController>();
 
                 //Check if playercontroller exists. If so, call Maelstrom Collision Method

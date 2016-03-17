@@ -158,7 +158,7 @@ namespace Simoncouche.Controller {
                     IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
                     if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) { 
                         //Initiate Grab
-                        Grab(targetBody, targetChunk);
+                        Grab(targetBody, targetChunk, 0f);
                         this.isIslandGrabbed = true; //On ne possède plus le body
                     }
                 }
@@ -173,13 +173,13 @@ namespace Simoncouche.Controller {
                 IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
                 if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) {
                     //Initiate Grab
-                    Grab(targetBody, targetChunk);
+                    Grab(targetBody, targetChunk, 0f);
                     this.isIslandGrabbed = true; //On ne possède plus le body
                 }
             }
         }
 
-        private void Grab(GravityBody targetBody, IslandChunk targetChunk) {
+        private void Grab(GravityBody targetBody, IslandChunk targetChunk, float repositionDelay) {
             //Before grabbing, make the other players release this chunk
             MakeOtherPlayerRelease(targetChunk);
             grabbedBody = targetBody;
@@ -196,7 +196,7 @@ namespace Simoncouche.Controller {
                 _playerGravityBody.Weight = grabbedBody.Weight + _playerController._startPlayerWeight;
 
                 //Move object in player's arm 
-                StartCoroutine(RepositionGrabbedBody(targetChunk.transform));
+                StartCoroutine(RepositionGrabbedBody(targetChunk.transform, repositionDelay));
 
                 targetChunk.GrabbedByPlayer.Invoke(this);
 
@@ -214,7 +214,7 @@ namespace Simoncouche.Controller {
                 //Set weight
                 _playerGravityBody.Weight = parentIsland.GetComponent<GravityBody>().Weight + _playerController._startPlayerWeight;
                 //Move object in player's arm 
-                StartCoroutine(RepositionGrabbedBody(parentIsland.transform));
+                StartCoroutine(RepositionGrabbedBody(parentIsland.transform, repositionDelay));
 
                 parentIsland.GrabbedByPlayer.Invoke(this);
             }
@@ -231,8 +231,14 @@ namespace Simoncouche.Controller {
 
         }
 
-
-        IEnumerator RepositionGrabbedBody(Transform transformToMove) {
+        /// <summary>
+        /// Repositions grabbed object in front of player to give grabbinh visual
+        /// </summary>
+        /// <param name="transformToMove"> Transform that was grabbed </param>
+        /// <param name="delay">delay before starting repositioning. Used in cases where island get merged at the same time</param>
+        /// <returns></returns>
+        IEnumerator RepositionGrabbedBody(Transform transformToMove, float delay) {
+            yield return new WaitForSeconds(delay);
             //Get positions
             float i = 0f;
             float repositionTime = 1f;
@@ -443,14 +449,21 @@ namespace Simoncouche.Controller {
             }
         }
 
-        /// <summary> Check if any player is currently grabbinb bodyToMerge. If so, make that player release the object </summary>
+        /// <summary> Check if any player is currently grabbing bodyToMerge. If so, make that player release the object </summary>
         /// <param name="bodyToMerge">Gravity body of the body to merge</param>
         public static void UngrabBody(GravityBody bodyToMerge) {
+            UngrabBody(bodyToMerge, false);
+        }
+
+        /// <summary> Check if any player is currently grabbing bodyToMerge. If so, make that player release the object </summary>
+        /// <param name="bodyToMerge">Gravity body of the body to merge</param>
+        public static void UngrabBody(GravityBody bodyToMerge, bool regrab) {
             foreach (PlayerGrab pg in _allPlayerGrabs) {
                 //Debug.Log("checking if " + pg.name + " is grabbing " + bodyToMerge + "      he's grabbing " + pg.grabbedBody);
-                if (pg.grabbedBody == bodyToMerge ) {
+                if (pg.grabbedBody == bodyToMerge) {
                     //Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " because it was merged.");
                     pg.Release();
+                    if (regrab) pg.Grab(bodyToMerge, bodyToMerge.gameObject.GetComponent<IslandChunk>(), GameManager.islandManager.GetMergeTime());
                 }
             }
         }
