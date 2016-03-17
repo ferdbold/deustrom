@@ -7,7 +7,7 @@ namespace Simoncouche.Chain {
 
     /// <summary>A HookThrower controls a character's aiming and spawns hooks and chains upon user input.</summary>
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(AimController))]
+    [RequireComponent(typeof(AutoAimController))]
     [RequireComponent(typeof(AudioSource))]
     public class HookThrower : MonoBehaviour {
 
@@ -54,7 +54,7 @@ namespace Simoncouche.Chain {
         /// <summary>The kinematic rigidbody to hook the visual chain to during OneHook state</summary>
         public Rigidbody2D chainLinker { get; private set; }        
         public new Rigidbody2D rigidbody { get; private set; }
-        public AimController aimController { get; private set; }
+        public AutoAimController autoAimController { get; private set; }
         public PlayerController playerController { get; private set; }
         public PlayerAudio playerAudio { get; private set; }
 
@@ -70,7 +70,7 @@ namespace Simoncouche.Chain {
 
         public void Awake() {
             this.rigidbody = GetComponent<Rigidbody2D>();
-            this.aimController = GetComponent<AimController>();
+            this.autoAimController = GetComponent<AutoAimController>();
             this.playerController = GetComponent<PlayerController>();
             this.playerAudio = GetComponent<PlayerAudio>();
             playerGrab = GetComponent<PlayerGrab>();
@@ -109,14 +109,28 @@ namespace Simoncouche.Chain {
             //For keyboard use
             #if UNITY_EDITOR
             GameManager.inputManager.AddEvent(
-                isPlayerOne ? InputManager.Button.p1_fireHook : InputManager.Button.p2_fireHook,
-                this.Fire
+                isPlayerOne ? InputManager.Button.p1_fireHookDown : InputManager.Button.p2_fireHookDown,
+                this.OnDebugFireDown
+            );
+
+            GameManager.inputManager.AddEvent(
+                isPlayerOne ? InputManager.Button.p1_fireHookUp : InputManager.Button.p2_fireHookUp,
+                this.OnDebugFireUp
             );
             #endif
         }
 
         private void Update() {
             _throwCooldownRemaining = Mathf.Max(0, _throwCooldownRemaining - Time.deltaTime);
+        }
+
+        private void OnDebugFireDown() {
+            this.autoAimController.enabled = true;
+        }
+
+        private void OnDebugFireUp() {
+            this.autoAimController.enabled = false;
+            this.Fire();
         }
 
         /// <summary>Handle user input to throw a new chain and hook</summary>
@@ -177,12 +191,12 @@ namespace Simoncouche.Chain {
                 _triggerIsHeld = false;
                 Fire();
                 //animation
-                this.aimController.ToggleAimIndicator(false);
+                this.autoAimController.enabled = false;
                 playerController.HandleAimStopAnimation();
             } else if(!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
                 _triggerIsHeld = true;
                 //animation
-                this.aimController.ToggleAimIndicator(true);
+                this.autoAimController.enabled = true;
                 playerController.HandleAimStartAnimation();
             }
         }

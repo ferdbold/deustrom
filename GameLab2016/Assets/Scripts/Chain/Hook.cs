@@ -75,7 +75,7 @@ namespace Simoncouche.Chain {
             Hook hook = ((GameObject)Instantiate(
                 isPlayerOne?_hookPrefabSobek:_hookPrefabCthulu, 
                 chain.thrower.transform.position, 
-                Quaternion.Euler(0, 0, chain.thrower.aimController.aimOrientation)
+                Quaternion.Euler(0, 0, chain.thrower.autoAimController.aimOrientation)
             )).GetComponent<Hook>();
 
             hook.name = (isBeginningHook) ? "BeginningHook" : "EndingHook";

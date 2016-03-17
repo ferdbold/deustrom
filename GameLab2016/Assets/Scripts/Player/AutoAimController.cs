@@ -38,13 +38,13 @@ namespace Simoncouche.Controller {
         private IslandChunk _target;
 
         // COMPONENTS
-        private ParticleSystem _targetParticles;
+        private Transform _indicator;
         private AimController _aimController;
 
         // METHODS
 
         private void Awake() {
-            _targetParticles = transform.Find("AutoAimIndicator").GetComponent<ParticleSystem>();
+            _indicator = transform.Find("AutoAimIndicator");
             _aimController = GetComponent<AimController>();
         }
 
@@ -58,6 +58,8 @@ namespace Simoncouche.Controller {
                 if (_target != oldTarget && _target != null) {
                     SetIndicatorTo(_target.transform);
                 }
+
+                _indicator.Find("Icon").LookAt(Camera.main.transform.position);
                 yield return new WaitForSeconds(SCAN_UPDATE_TICK);
             }
         }
@@ -112,22 +114,30 @@ namespace Simoncouche.Controller {
         /// <summary>Send the indicator to a certain target transform.</summary>
         /// <param name="targetTransform">The target transform</param>
         private void SetIndicatorTo(Transform targetTransform) {
-            _targetParticles.transform.parent = targetTransform;
-            _targetParticles.transform.localPosition = Vector3.zero;
+            _indicator.parent = targetTransform;
+            _indicator.localPosition = Vector3.zero;
         }
 
         private void OnEnable() {
-            _targetParticles.gameObject.SetActive(true);
+            _indicator.gameObject.SetActive(true);
 
             StartCoroutine(this.ScanUpdate());
         }
 
         private void OnDisable() {
             // Take back the indicator and disable it
-            _targetParticles.transform.parent = transform;
-            _targetParticles.gameObject.SetActive(false);
+            _indicator.parent = transform;
+            _indicator.gameObject.SetActive(false);
 
             StopCoroutine(this.ScanUpdate());
+        }
+
+        // PROPERTIES
+
+        public float aimOrientation {
+            get {
+                return _aimController.aimOrientation;
+            }
         }
     }
 }
