@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 namespace Simoncouche.Bible {
     public class BibleQuoteReader : MonoBehaviour {
