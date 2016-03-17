@@ -198,7 +198,7 @@ namespace Simoncouche.Islands {
         private List<IslandChunk> _convertingChunks = new List<IslandChunk>(); //chunks to be converted if conversion timer ends
         private int _conversionAmtStatus = 0; //Store diff between chunks of both players. negative = cthulhu wins, 0 = stalemate, positive = sobek wins
         private int _amtIslandPerConversion = 1; //Amt of island per conversion
-        private float _conversionTime = 5f; //Time for a conversion
+        private bool _isConverting = false;
 
         public void UpdateConversionStatus() {
             //Check which side is winning conversion
@@ -212,33 +212,37 @@ namespace Simoncouche.Islands {
                     cthulhuChunks.Add(ic);
                 }
             }
+
             int diffIslandColors = sobekChunks.Count - cthulhuChunks.Count;
-            if (diffIslandColors == 0) {        //Stalemate
+            if (diffIslandColors == 0 || (cthulhuChunks.Count == 0 || sobekChunks.Count == 0)) {        //Stalemate
                 StopConversionProcess();                
             }        
-            else if (diffIslandColors > 0) {    //Sobek wins
-                if (_conversionAmtStatus <= 0) ResetConversionProcess(sobekChunks);
-                else UpdateConvertingChunks(sobekChunks);
-            } 
-            else {                              //Cthulhu wins
-                if (_conversionAmtStatus >= 0) ResetConversionProcess(cthulhuChunks);
+            else if (diffIslandColors > 0) {                                                            //Sobek wins
+                if (_conversionAmtStatus <= 0) ResetConversionProcess(cthulhuChunks);
                 else UpdateConvertingChunks(cthulhuChunks);
+            } 
+            else {                                                                                      //Cthulhu wins
+                if (_conversionAmtStatus >= 0) ResetConversionProcess(sobekChunks);
+                else UpdateConvertingChunks(sobekChunks);
             }
+            
 
             //Update Conversions amount status variable
             _conversionAmtStatus = diffIslandColors;
+            //Debug.Log("Updated Conversion status. Chunks to convert : " + _convertingChunks.Count + "  status : " + _conversionAmtStatus + "  size ct : " + cthulhuChunks.Count + "  size so : " + sobekChunks.Count);
 
         }
 
         /// <summary> Update the currently converting chunks. Used when an chunk is added to an island that is currently converting. </summary>
         /// <param name="chunks"> list of possible chunks to add. We travel this list from the last element to get the newest ones first</param>
         private void UpdateConvertingChunks(List<IslandChunk> chunks) {
-            for (int i = _amtIslandPerConversion - 1; i > 0; --i) {
+            for (int i = _amtIslandPerConversion - 1; i >= 0; --i) {
                 if (_convertingChunks.Count >= _amtIslandPerConversion) break; //Return if list is of target size
                 if(!_convertingChunks.Contains(chunks[i])) {
                     _convertingChunks.Add(chunks[i]); //Add to converting chunk
                 }          
             }
+            if (_isConverting == false) StartCoroutine(ConversionProcess());
         }
 
         /// <summary> Resets the conversion process on island. </summary>
@@ -259,11 +263,20 @@ namespace Simoncouche.Islands {
         private void StopConversionProcess() {
             _convertingChunks.Clear(); //Clear the chunk list
             StopCoroutine(ConversionProcess());
+            _isConverting = false;
         }
 
 
+
         private IEnumerator ConversionProcess() {
-            yield return new WaitForSeconds(_conversionTime);
+           
+            _isConverting = true;
+            yield return null;
+            for (float i = 0f; i < 1f; i+= Time.deltaTime / GameManager.islandManager.GetConversionTime()) {
+                yield return null;            
+            }
+            _isConverting = false;
+
             IslandUtils.color newColor;
             if (_conversionAmtStatus > 0) newColor = IslandUtils.color.red;
             else if (_conversionAmtStatus < 0) newColor = IslandUtils.color.blue;
@@ -276,6 +289,8 @@ namespace Simoncouche.Islands {
                 ic.ConvertChunkToAnotherColor(newColor);
             }
 
+            _convertingChunks.Clear();
+            UpdateConversionStatus();
         }
 
     }
