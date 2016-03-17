@@ -61,7 +61,10 @@ namespace Simoncouche.Islands {
         private float SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS = 15f;
 
         [SerializeField] [Tooltip("Spawn rate change in % for each island difference between median.")]
-        private float SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN = 10f;
+        private float SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN = 10f;
+
+        [SerializeField] [Tooltip("Spawn rate change in % for each island difference between median.")]
+        private float SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX = 40f;
         
         [Tooltip("If true, Spawn change will act in a multiplicative manner. If false, will simply add % together.")]
         private bool SPAWN_CHANGE_MULTIPLICATIVE = false;
@@ -254,14 +257,14 @@ namespace Simoncouche.Islands {
             if (SPAWN_CHANGE_MULTIPLICATIVE) { //Add in a multiplicative manner
                 _modifiedSpawnRate *= (100f + (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE)) / 100f;
                 _modifiedSpawnRate *= (100f + (_pIslandDiffPlayers * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS)) / 100f;
-                if (_pIslandDiffMin < 0) _modifiedSpawnRate *= (100f + (_pIslandDiffMin * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN)) / 100f;
-                if (_pIslandDiffMax < 0) _modifiedSpawnRate *= (100f - (_pIslandDiffMax * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN)) / 100f;
+                if (_pIslandDiffMin < 0) _modifiedSpawnRate *= (100f + (_pIslandDiffMin * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN)) / 100f;
+                if (_pIslandDiffMax < 0) _modifiedSpawnRate *= (100f - (_pIslandDiffMax * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX)) / 100f;
             } else { //Add in a additive manner
                 float additiveSpawnRate = 100f;
                 additiveSpawnRate += (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE);
                 additiveSpawnRate += (_pIslandDiffPlayers * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS);
-                if (_pIslandDiffMin < 0) additiveSpawnRate += (_pIslandDiffMin * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN);
-                if (_pIslandDiffMax < 0) additiveSpawnRate -= (_pIslandDiffMax * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MEDIAN);
+                if (_pIslandDiffMin < 0) additiveSpawnRate += (_pIslandDiffMin * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN);
+                if (_pIslandDiffMax < 0) additiveSpawnRate -= (_pIslandDiffMax * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX);
 
                 _modifiedSpawnRate *= (additiveSpawnRate / 100f);
             }
