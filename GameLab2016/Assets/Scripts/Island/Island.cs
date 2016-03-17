@@ -174,7 +174,12 @@ namespace Simoncouche.Islands {
             }*/
             RemoveChunkToIsland(triggerChunk);
             GameManager.islandManager.DestroyChunk(triggerChunk);
-            GameManager.islandManager.CheckIslandBroken(this);
+            if (this.chunks.Count <= 0) {
+                GameManager.islandManager.DestroyIsland(this);
+            }
+            else {
+                GameManager.islandManager.CheckIslandBroken(this);
+            }
         }
 
         /// <summary>

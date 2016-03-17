@@ -75,8 +75,8 @@ namespace Simoncouche.Islands {
         /// <param name="b">the second chunk</param>
         /// <param name="b_anchor">the anchor associated to b</param>
         public void HandleChunkCollision(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor) {
-            Island a_IslandLink = ChunkContainedInIsland(a);
-            Island b_IslandLink = ChunkContainedInIsland(b);
+            Island a_IslandLink = a.parentIsland;
+            Island b_IslandLink = b.parentIsland;
             
             //If both are contained in Island
             if (a_IslandLink != null && b_IslandLink != null && a_IslandLink != b_IslandLink) {
@@ -402,8 +402,8 @@ namespace Simoncouche.Islands {
             //Check if the island is broken in pieces
             CheckIslandBroken(islandLink);
 
+            /*//EXPERIMENTAL
             //Find the chunk to give velocity to
-            /*
             List<IslandChunk> chunkAccelerated = new List<IslandChunk>();
             List<Island> islandAccelerated = new List<Island>();
             foreach (IslandChunk c in islandRemoved) {
@@ -532,8 +532,8 @@ namespace Simoncouche.Islands {
             a.ConnectChunk(
                 FindTargetLocalPosition(b, b_anchor),
                 FindTargetRotForAnchor(a_anchor, b_anchor),
-                b,
-                targetIsland,
+                null, //Depracated
+                null, //Depracated
                 _chunkMergeTime
             );
             OnJoinChunk(b_anchor, b.color);
@@ -583,7 +583,7 @@ namespace Simoncouche.Islands {
                 distance * Mathf.Sin(angle * Mathf.PI / 180f),
                 0
             ); //The projection of the anchor on the current angle of the chunk
-            return (Vector2)b_chunk.transform.localPosition + 2f * (Vector2)anchorProjection;
+            return b_chunk.transform.localPosition + 2f * anchorProjection;
         }
 
         /// <summary>
