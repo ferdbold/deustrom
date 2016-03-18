@@ -91,7 +91,7 @@ public class LevelManager {
                 }
             }
             for (int i = 0; i < scoreAdded; i++) {
-                if (ui != null) ui.AddPoint(player == Player.sobek ? 0 : 1, originPos);
+                if (ui != null) ui.AddPoint(player, originPos);
             }
         }
     }
