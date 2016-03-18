@@ -36,7 +36,7 @@ namespace Simoncouche.Chain {
 
         [Tooltip("Check this to replace hook already present on an island by new hook")]
         [SerializeField]
-        private bool _doesHookReplacePresentHookOnIsland= false;
+        private bool _doesHookReplacePresentHookOnIsland = false;
 
         /// <summary>
         /// The minimum distance needed between the thrower and a chain's 
@@ -53,7 +53,7 @@ namespace Simoncouche.Chain {
 
         // COMPONENTS
         /// <summary>The kinematic rigidbody to hook the visual chain to during OneHook state</summary>
-        public Rigidbody2D chainLinker { get; private set; }        
+        public Rigidbody2D chainLinker { get; private set; }
         public new Rigidbody2D rigidbody { get; private set; }
         public AimController aimController { get; private set; }
         public AutoAimController autoAimController { get; private set; }
@@ -84,7 +84,7 @@ namespace Simoncouche.Chain {
         public void SetupInput(bool isPlayerOne) {
             this.isPlayerOne = isPlayerOne;
             GameManager.inputManager.AddEvent(
-                isPlayerOne ? InputManager.Axis.p1_rightTrigger : InputManager.Axis.p2_rightTrigger, 
+                isPlayerOne ? InputManager.Axis.p1_rightTrigger : InputManager.Axis.p2_rightTrigger,
                 this.CheckPlayerInputs
             );
 
@@ -110,7 +110,7 @@ namespace Simoncouche.Chain {
                 );
 
             //For keyboard use
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             GameManager.inputManager.AddEvent(
                 isPlayerOne ? InputManager.Button.p1_fireHookDown : InputManager.Button.p2_fireHookDown,
                 this.OnDebugFireDown
@@ -120,7 +120,7 @@ namespace Simoncouche.Chain {
                 isPlayerOne ? InputManager.Button.p1_fireHookUp : InputManager.Button.p2_fireHookUp,
                 this.OnDebugFireUp
             );
-            #endif
+#endif
         }
 
         private void Update() {
@@ -195,13 +195,13 @@ namespace Simoncouche.Chain {
             if (playerController.InRespawnState == true) return; //Deactivate hook if currently respawning
             bool isCurrentlyHeld = (input[0] == 1);
 
-            if(_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
+            if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
                 _triggerIsHeld = false;
                 Fire();
                 //animation
                 this.autoAimController.enabled = false;
                 playerController.HandleAimStopAnimation();
-            } else if(!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
+            } else if (!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
                 _triggerIsHeld = true;
                 //animation
                 this.autoAimController.enabled = true;
@@ -235,7 +235,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void RetractChainsReleased() {
             StopCoroutine("RetractChains");
-            if(_chains.Count>0) _chains[_chains.Count - 1].RetractChainReleaseBehaviour();
+            if (_chains.Count > 0) _chains[_chains.Count - 1].RetractChainReleaseBehaviour();
         }
 
         /// <summary>
@@ -255,14 +255,15 @@ namespace Simoncouche.Chain {
         /// <param name="time"></param>
         /// <returns></returns>
         IEnumerator RetractChains(float time) {
-            while (_chains.Count>0) {
+            while (_chains.Count > 0) {
                 bool mustPlaySound = false;
-                for(int i=_chains.Count-1; i >=0;i--){
-                    if (_chains[i]._beginningHookIsSet){ mustPlaySound = true; //Parce qu'on ne rétracte pas les chaînes qui viennent tout juste d'être lancé
-                        bool attachedHookToPlayerMustBeDestroyed =_chains[i].RetractChain(_distanceRetractionValue);
-                        if (attachedHookToPlayerMustBeDestroyed) {
+                for (int i = _chains.Count - 1; i >= 0; i--) {
+                    if (_chains[i]._beginningHookIsSet) {
+                        mustPlaySound = true; //Parce qu'on ne rétracte pas les chaînes qui viennent tout juste d'être lancé
+                        GravityBody mustAttachedToBody = _chains[i].RetractChain(_distanceRetractionValue);
+                        if (mustAttachedToBody != null) {
                             this.OnCutLinkWithPlayer();
-                            _chains[i].AttachBeginningHookTargetToPlayer();
+                            this.AttachTouchedChunkToPlayer(mustAttachedToBody);
                             _chains[i].CutLinkBeginningHook();
                         }
                     }
@@ -357,7 +358,23 @@ namespace Simoncouche.Chain {
             }
 
             _triggerIsHeld = false;
-            playerController.HandleAimStopAnimation();  
+            playerController.HandleAimStopAnimation();
         }
+
+        /// <summary>
+        /// Attach beginning hook's target to the player grab
+        /// </summary>
+        private void AttachTouchedChunkToPlayer(GravityBody gBody) {
+            Vector3 vectorPlayerChunk = Vector3.Normalize(gBody.transform.position - this.transform.position);
+            Debug.Log("VectorPlayerChunk" + vectorPlayerChunk);
+            float angle = Vector3.Angle(this.transform.right, vectorPlayerChunk);
+            Debug.Log("Angle variation" + angle);
+            
+            this.rigidbody.transform.Rotate(this.transform.forward, angle, Space.Self);
+            //this.rigidbody.transform.rotation = Quaternion.FromToRotation(transform.forward , vectorPlayerChunk) * this.rigidbody.transform.rotation;
+            this.playerGrab.AttemptGrabOnHookRetraction(gBody); //MAKES THE PLAYER GRAB THE ISLAND
+        }
+
+
     }
 }
