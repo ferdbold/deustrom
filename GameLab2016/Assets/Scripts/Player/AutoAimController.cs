@@ -25,7 +25,7 @@ namespace Simoncouche.Controller {
 
         [Tooltip("The top angle of the cone of detection starting from the player in degrees")]
         [SerializeField]
-        private float _theta = 30;
+        private float _theta = 60;
 
         [Tooltip("The max distance of detection from the player")]
         [SerializeField]
@@ -52,9 +52,9 @@ namespace Simoncouche.Controller {
             _indicator = transform.Find("AutoAimIndicator");
             _aimController = GetComponent<AimController>();
         }
-            
-        private void Update() {
-            _indicator.Find("Icon").LookAt(Camera.main.transform.position);
+
+        private void LateUpdate() {
+            _indicator.FindChild("Icon").LookAt(Camera.main.transform.position);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Simoncouche.Controller {
         /// <returns>The all targets in range.</returns>
         private List<IslandChunk> GetAllTargetsInRange() {
             List<IslandChunk> islandsInRange = new List<IslandChunk>();
-            float chunkDiameter = 5; // TODO: Fetch diameter from some reliable source
+            float chunkDiameter = 3; // TODO: Fetch diameter from some reliable source
             float thetaRad = _theta * Mathf.PI/180;
 
             // Ensure the ray angle is small enough to capture all chunks
@@ -112,9 +112,9 @@ namespace Simoncouche.Controller {
                     Debug.DrawRay(transform.position, stepRayDirection, Color.white, SCAN_UPDATE_TICK);
                 }
 
-                RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, stepRayDirection);
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, stepRayDirection, _distance, 1 << 10);
 
-                foreach (RaycastHit2D hit in hits) {
+                if (hit.collider != null) {
                     IslandChunk hitChunk = hit.transform.GetComponent<IslandChunk>();
 
                     if (hitChunk != null && !islandsInRange.Contains(hitChunk)) {
