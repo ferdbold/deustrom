@@ -38,7 +38,7 @@ namespace Simoncouche.Controller {
         [SerializeField]
         private bool _displayScanRays = false;
 
-        private IslandChunk _target;
+        public IslandChunk target { get; private set; }
 
         private Coroutine _updateCoroutine;
 
@@ -52,24 +52,31 @@ namespace Simoncouche.Controller {
             _indicator = transform.Find("AutoAimIndicator");
             _aimController = GetComponent<AimController>();
         }
+            
+        private void Update() {
+            _indicator.Find("Icon").LookAt(Camera.main.transform.position);
+        }
 
+        /// <summary>
+        /// Main scanning and operation loop.
+        /// </summary>
+        /// <returns>Coroutine</returns>
         private IEnumerator ScanUpdate() {
             while (true) {
-                IslandChunk oldTarget = _target;
+                IslandChunk oldTarget = this.target;
                 List<IslandChunk> targets = GetAllTargetsInRange();
 
                 if (_indicator == null) {
                     RestoreIndicator();
                 }
 
-                _target = ChooseTarget(targets);
-                _indicator.gameObject.SetActive(_target != null);
+                this.target = ChooseTarget(targets);
+                _indicator.gameObject.SetActive(this.target != null);
 
-                if (_target != oldTarget && _target != null) {
-                    SetIndicatorTo(_target.transform);
+                if (this.target != oldTarget && this.target != null) {
+                    SetIndicatorTo(this.target.transform);
                 }
 
-                _indicator.Find("Icon").LookAt(Camera.main.transform.position);
                 yield return new WaitForSeconds(SCAN_UPDATE_TICK);
             }
         }
@@ -80,10 +87,14 @@ namespace Simoncouche.Controller {
         private void RestoreIndicator() {
             Debug.Log("Restoring auto aim indicator");
             _indicator = GameObject.Instantiate(_aimIndicatorPrefab);
-            _indicator.SetParent(transform);
+            _indicator.parent = transform;
             _indicator.gameObject.SetActive(false);
         }
 
+        /// <summary>
+        /// Builds a list of every island chunk in current range of the player.
+        /// </summary>
+        /// <returns>The all targets in range.</returns>
         private List<IslandChunk> GetAllTargetsInRange() {
             List<IslandChunk> islandsInRange = new List<IslandChunk>();
             float chunkDiameter = 5; // TODO: Fetch diameter from some reliable source
@@ -115,6 +126,11 @@ namespace Simoncouche.Controller {
             return islandsInRange;
         }
 
+        /// <summary>
+        /// Choose within a list of potential targets the one closest to the center of the player's detection cone.
+        /// </summary>
+        /// <returns>The target.</returns>
+        /// <param name="targets">Targets.</param>
         private IslandChunk ChooseTarget(List<IslandChunk> targets) {
             float angleToBeat = _theta/2;
             IslandChunk pickedTarget = null;
@@ -154,6 +170,28 @@ namespace Simoncouche.Controller {
         public float aimOrientation {
             get {
                 return _aimController.aimOrientation;
+            }
+        }
+
+        /// <summary>
+        /// Returns the angle in degrees between Vector2.right and the vector leading to the current target. Returns 0 
+        /// if there is no current target.
+        /// </summary>
+        public float targetOrientation {
+            get {
+                float orientation = 0;
+                Vector2 toTarget = this.target.transform.position - transform.position;
+
+                if (this.target != null) {
+                    orientation = Vector2.Angle(Vector2.right, toTarget);
+
+                    // Correct angle in lower quadrants
+                    if (toTarget.y < 0) {
+                        orientation = 360f - orientation;
+                    }
+                }
+
+                return orientation;
             }
         }
     }

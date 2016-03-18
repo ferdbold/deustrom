@@ -144,8 +144,13 @@ namespace Simoncouche.Chain {
                 return;
             }
 
-            //Return if the player is currently grabbing an island
-            if (playerGrab.grabbedBody!=null) {
+            // Exit early if the player is currently grabbing an island
+            if (playerGrab.grabbedBody != null) {
+                return;
+            }
+
+            // Exit early if we have no auto aim target
+            if (this.autoAimController.target == null) {
                 return;
             }
 
@@ -153,6 +158,9 @@ namespace Simoncouche.Chain {
             // If we press fire when we don't have any hook,
             // we create a hook and switch the currentState to OneHook
             case State.NoHook:
+                // Acquire chain target
+                Simoncouche.Islands.IslandAnchorPoints targetAnchor = this.autoAimController.target.GetComponentInChildren<Simoncouche.Islands.IslandAnchorPoints>();
+
                 _chains.Add(Chain.Create(this, _initialForceAmount));
                 _currentState = State.Waiting;
 
