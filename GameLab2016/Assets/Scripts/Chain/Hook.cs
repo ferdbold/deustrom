@@ -172,12 +172,8 @@ namespace Simoncouche.Chain {
 
             this.targetJoint.enabled = true;
 
-            // Attach the joint to either the chunk or its parent island if it has one
-            if (parentIsland == null) {
-                this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
-            } else {
-                this.targetJoint.connectedBody = parentIsland.rigidbody;
-            }          
+            // Attach the target joint to the specified IslandChunk
+            this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
 
             // Add listeners
             anchor.GetIslandChunk().MergeIntoIsland.AddListener(this.OnAttachedChunkMerge);
