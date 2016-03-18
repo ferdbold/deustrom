@@ -44,7 +44,7 @@ namespace Simoncouche.UI {
 
             // Update direct roll position
             _directSlider.value += amount;
-            rollPosition.y = this.GetFillEndPosition().y;
+            rollPosition.x = this.GetFillEndPosition().x;
             _directRoll.rectTransform.position = rollPosition;
 
             // Queue up lerping animation
@@ -56,8 +56,7 @@ namespace Simoncouche.UI {
         /// <summary>Updates the lerping roll position on every update step of the lerping slider animation</summary>
         private void UpdateRollTopPosition() {
             Vector3 rollPosition = _lerpingRoll.rectTransform.position;
-
-            rollPosition.y = _lerpingSlider.fillRect.position.y + (_lerpingSlider.fillRect.rect.height / 2 * GameManager.uiManager.root.scaleFactor);
+            rollPosition.x = _lerpingSlider.fillRect.position.x + (_lerpingSlider.fillRect.rect.width / 2 * GameManager.uiManager.root.scaleFactor * ((transform.localRotation.eulerAngles.z == 0) ? 1 : -1));
             _lerpingRoll.rectTransform.position = rollPosition;
         }
 
@@ -67,7 +66,7 @@ namespace Simoncouche.UI {
         /// <returns>The fill end position.</returns>
         public Vector3 GetFillEndPosition() {
             return new Vector3(
-                _directSlider.fillRect.position.x, 
+                _directSlider.fillRect.position.x + (_directSlider.fillRect.rect.width / 2 * GameManager.uiManager.root.scaleFactor * ((transform.localRotation.eulerAngles.z == 0) ? 1 : -1)), 
                 _directSlider.fillRect.position.y + (_directSlider.fillRect.rect.height / 2 * GameManager.uiManager.root.scaleFactor),
                 0
             );
