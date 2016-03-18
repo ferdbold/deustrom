@@ -30,6 +30,14 @@ public class AudioManager : MonoBehaviour {
 
     private AudioSource source;
 
+    private void Awake() {
+        source = GetComponentInChildren<AudioSource>();
+    }
+
+    public void PlayAudioClip(AudioClip clip) {
+        source.clip = clip;
+        source.Play();
+    }
     //TODO replace certain sound with list and create function to random through list
     //The get value of attribute will then return a random clip
 }

@@ -60,6 +60,13 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
     private string[] SCENE_NAMES;
 
+    [SerializeField]
+    private float timeForTuto = 1f;
+
+    #endregion
+
+    #region Utils Variables
+    public bool isPaused { get; private set; }
     #endregion
 
     void Awake() {
@@ -152,7 +159,7 @@ public class GameManager : MonoBehaviour {
         }
 
 
-        StartCoroutine(WaitForSceneToLoad(sceneToLoad, scene));
+        StartCoroutine(WaitForSceneToLoad(sceneToLoad, scene, cutscene));
     }
 
     /// <summary>
@@ -161,7 +168,7 @@ public class GameManager : MonoBehaviour {
     /// <param name="loading">the async operation of the scene being loaded</param>
     /// <param name="scene">the scene being loaded</param>
     /// <returns></returns>
-    private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene) {
+    private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene, CutsceneManager.Cutscene cutsceneVideo) {
         SceneManager.LoadSceneAsync(SCENE_CUTSCENE);
         AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
         loading.allowSceneActivation = false;
@@ -170,24 +177,24 @@ public class GameManager : MonoBehaviour {
         int debugCount = 0;
         while (cutscene == null) {
             cutscene = GameObject.FindObjectOfType<CutsceneManager>();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForRealSeconds(0.1f);
             if (++debugCount > 1000) {
                 Debug.LogError("Cutscene not loaded or no cutscene object in scene");
                 break;
             }
         }
 
-        cutscene.PlayCutscene(CutsceneManager.Cutscene.Cthulu_Win);
+        cutscene.PlayCutscene(cutsceneVideo);
 
         while (!loading.isDone || !cutscene.isDone) {
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForRealSeconds(0.05f);
             if (cutscene.isDone) {
                 loading.allowSceneActivation = true;
             }
         }
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneToLoad));
         Scene_OnOpen(scene);
-        yield return new WaitForSeconds(cutscene.TimeToFade);
+        yield return new WaitForRealSeconds(cutscene.TimeToFade);
         SceneManager.UnloadScene(SCENE_CUTSCENE);
     }
 
@@ -205,6 +212,7 @@ public class GameManager : MonoBehaviour {
                 uiManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_pointsGoal, _matchToWin);
+                    StartTutorial();
                 } else {
                     levelManager.Setup();
                 }
@@ -239,6 +247,39 @@ public class GameManager : MonoBehaviour {
             case Scene.BibleReader:
                 break;
         }
+    }
+
+    #endregion
+
+    #region Tutorial
+
+    private void StartTutorial() {
+        Pause();
+        TutorialUI tuto = (Instantiate(Resources.Load("Tutorial")) as GameObject).GetComponent<TutorialUI>();
+        tuto.StartTuto();
+    }
+
+    #endregion
+
+    #region Utils
+
+    /// <summary>
+    /// Pause the game
+    /// </summary>
+    public void Pause() {
+        ChangePauseStatus(true);
+    }
+
+    /// <summary>
+    /// UnPause the game
+    /// </summary>
+    public void UnPause() {
+        ChangePauseStatus(false);
+    }
+
+    private void ChangePauseStatus(bool pause) {
+        isPaused = pause;
+        Time.timeScale = isPaused ? 0 : 1;
     }
 
     #endregion

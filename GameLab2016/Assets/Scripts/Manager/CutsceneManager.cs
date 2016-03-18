@@ -32,46 +32,54 @@ public class CutsceneManager : MonoBehaviour {
 
     [Header("Component")]
     [SerializeField]
-    private RawImage FadeRect;
+    private RawImage Video;
+
+    [SerializeField]
+    private Image FadeRect;
 
     private bool skip = false;
 
     private void Awake() {
         isDone = false;
+        FadeRect.color = new Color(FadeRect.color.r, FadeRect.color.g, FadeRect.color.b, 0);
+        Video.gameObject.SetActive(false);
+        FadeUI(true);
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick1Button0)) { //TODO change input
+        if (Input.GetKeyDown(KeyCode.Joystick1Button7) || Input.GetKeyDown(KeyCode.Joystick1Button7) || Input.GetKeyDown(KeyCode.Space)) { //TODO change input
             skip = true;
+            isDone = true;
             StopCoroutine("WaitForImageEnd");
+            FadeUI(false);
         }
     }
 
     public void PlayCutscene(Cutscene scene) {
         MovieTexture movie = null;
-        Texture2D texture = null;
 
         switch (scene) {
             case Cutscene.Intro:
                 movie = Intro_Cutscene;
-                FadeRect.material.mainTexture = movie;
+                Video.material.mainTexture = movie;
                 movie.Play();
+                GameManager.audioManager.PlayAudioClip(movie.audioClip);
                 StartCoroutine(WaitVideoEndToFade(movie));
                 break;
 
             case Cutscene.Sobek_Win:
-                texture = Sobek_Win_Cutscene;
+                Video.material.mainTexture = Sobek_Win_Cutscene;
                 StartCoroutine("WaitForImageEnd");
                 break;
 
             case Cutscene.Cthulu_Win:
-                texture = Cthulu_Win_Cutscene;
+                Video.material.mainTexture = Cthulu_Win_Cutscene;
                 StartCoroutine("WaitForImageEnd");
                 break;
 
             case Cutscene.Base_Loading:
                 movie = Base_Loading_Cutscene;
-                FadeRect.material.mainTexture = movie;
+                Video.material.mainTexture = movie;
                 movie.Play();
                 StartCoroutine(WaitVideoEndToFade(movie));
                 break;
@@ -81,6 +89,9 @@ public class CutsceneManager : MonoBehaviour {
     }
 
     IEnumerator WaitVideoEndToFade(MovieTexture movie) {
+        yield return new WaitForSeconds(timeToFade);
+        Video.gameObject.SetActive(true);
+
         while (movie.isPlaying) {
             yield return new WaitForEndOfFrame();
             if (skip) {
@@ -88,21 +99,26 @@ public class CutsceneManager : MonoBehaviour {
                 break;
             }
         }
-
         isDone = true;
 
-        //Fade UI
-        FadeRect.DOFade(0, timeToFade);
+        FadeUI(false);
 
-        
+
     }
 
     IEnumerator WaitForImageEnd() {
+        yield return new WaitForSeconds(timeToFade);
+        Video.gameObject.SetActive(true);
+
         yield return new WaitForSeconds(imageTimeStaying);
 
         isDone = true;
+        
+        FadeUI(false);
+    }
 
-        //Fade UI
-        FadeRect.DOFade(0, timeToFade);
+    void FadeUI (bool fadeIn) {
+        Video.gameObject.SetActive(false);
+        FadeRect.DOFade(fadeIn ? 1 : 0, timeToFade);
     }
 }

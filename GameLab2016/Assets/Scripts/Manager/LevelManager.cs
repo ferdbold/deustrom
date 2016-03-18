@@ -115,7 +115,7 @@ public class LevelManager {
 
         sobekScore = -10000;
         cthuluScore = -10000;
-        GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, dontClose: true);
+        GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, winner == Player.sobek ? CutsceneManager.Cutscene.Sobek_Win : CutsceneManager.Cutscene.Cthulu_Win, dontClose: true);
     }
 
     #region Used for callback

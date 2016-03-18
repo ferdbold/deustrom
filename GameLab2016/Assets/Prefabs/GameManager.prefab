@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab0b4397cdca29a45acd824ad27408db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pointsGoal: 1000
+  _pointsGoal: 10
   _disableScoring: 1
   _matchToWin: 2
   lastWinner: 1
