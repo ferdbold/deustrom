@@ -98,6 +98,7 @@ namespace Simoncouche.Controller {
 
         void Start() {
             ToggleChargeParticles(false); // toggle off particles
+            ToggleMaxChargeParticles(false); //toggle off max particles
         }
 
         void Update() {
@@ -221,7 +222,7 @@ namespace Simoncouche.Controller {
 
             //Check grab particles 
             if(_triggerIsHeld) {
-                ToggleChargeParticles(true);
+                ToggleMaxChargeParticles(true);
             }
             //Animation
             _playerController.HandleGrabStartAnimation();
@@ -268,7 +269,8 @@ namespace Simoncouche.Controller {
 
             if (!_maxChargeReached && _curChargeMultiplier == CHARGED_MAX_MULTIPLIER) {
                 _maxChargeReached = true;
-                ChargeParticlesMaxReached(); //emit ready particles
+                ToggleMaxChargeParticles(true); //emit ready particles
+                ToggleChargeParticles(false); //stop emitting charge particles
             }
         }
 
@@ -276,14 +278,27 @@ namespace Simoncouche.Controller {
         /// <param name="on"></param>
         private void ToggleChargeParticles(bool on) {
             foreach (ParticleSystem ps in _chargeParticles) {
-                if (on) ps.enableEmission = true;
-                else ps.enableEmission = false;
+                if (on) {
+                    ps.Simulate(0,false,true);
+                    ps.Play();
+                    ps.enableEmission = true;
+                    
+                } else {
+                    ps.enableEmission = false;
+                    
+                }
             }
         }
 
-        private void ChargeParticlesMaxReached() {
+        private void ToggleMaxChargeParticles(bool on) {
             foreach (ParticleSystem ps in _chargeParticlesMax) {
-                ps.Emit(200);
+                if (on) {
+                    ps.Simulate(0, false, true);
+                    ps.Play();
+                    ps.enableEmission = true;
+                } else {
+                    ps.enableEmission = false;
+                }        
             }
            
         }
@@ -384,6 +399,7 @@ namespace Simoncouche.Controller {
             _curChargeMultiplier = 1f;
             _maxChargeReached = false;
             ToggleChargeParticles(false);
+            ToggleMaxChargeParticles(false);
         }
 
         /// <summary> Handles the cooldown of the grab </summary>
@@ -498,6 +514,7 @@ namespace Simoncouche.Controller {
 
             if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
                 ToggleChargeParticles(false);
+                ToggleMaxChargeParticles(false);
                 _triggerIsHeld = false;
                 Throw();
             } else if (!_triggerIsHeld && isCurrentlyHeld && grabbedBody != null) {//If just started pressing

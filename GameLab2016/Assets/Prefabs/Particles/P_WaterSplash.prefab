@@ -25,6 +25,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 434924}
+  - 114: {fileID: 11400214}
   m_Layer: 0
   m_Name: P_WaterSplash
   m_TagString: Untagged
@@ -117,6 +118,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 428160}
   m_RootOrder: 1
+--- !u!114 &11400214
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 141022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81a6d84854ff4c441bdcef281c8fd00e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  time: 2
 --- !u!198 &19865586
 ParticleSystem:
   m_ObjectHideFlags: 1

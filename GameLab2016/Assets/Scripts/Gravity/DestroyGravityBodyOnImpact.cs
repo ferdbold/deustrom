@@ -13,8 +13,8 @@ namespace Simoncouche.Islands {
         [Tooltip("NOT FOR EDIT. Layers of objects to teleport into wormhole")] [SerializeField]
         private LayerMask GravityLayerMask;
 
-
-        //DO SOMETHING WITH THIS
+        private GameObject WaterSplashParticlePrefab;
+        
         public class playerTimeData {
             public PlayerController playerRef;
             public float currentTime;
@@ -31,6 +31,7 @@ namespace Simoncouche.Islands {
         void Awake() {
             _audioSource = GetComponent<AudioSource>();
             _curPlayerTimes = new List<playerTimeData>();
+            WaterSplashParticlePrefab = (GameObject)Resources.Load("Particles/P_WaterSplash");
         }
 
         void Update() {
@@ -40,6 +41,7 @@ namespace Simoncouche.Islands {
                     _curPlayerTimes[i].playerRef.OnMaelstromEnter(transform.position);
                     _curPlayerTimes.RemoveAt(i);
                     i--;
+                    SpawnWaterSplash(transform);
                 }
 
             }
@@ -57,6 +59,7 @@ namespace Simoncouche.Islands {
                 if (islandChunk != null) {
                     islandChunk.OnMaelstromEnter();
                     _audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
+                    SpawnWaterSplash(transform);
                 }
                 //Check if playercontroller exists. If so, call Maelstrom Collision Method
                 else if (playerController != null) {
@@ -67,6 +70,7 @@ namespace Simoncouche.Islands {
                     if (gravityBodyScript.collisionEnabled == true) {
                         gravityBodyScript.DestroyGravityBody();
                         _audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
+                        SpawnWaterSplash(transform);
                     }
                 }
             }
@@ -88,6 +92,16 @@ namespace Simoncouche.Islands {
                 }
 
             }
+        }
+
+        /// <summary>
+        /// Spawns a slash particules on parent location.
+        /// </summary>
+        /// <param name="parent"> parent of the instantiated game object</param>
+        private void SpawnWaterSplash(Transform parent) {
+            GameObject go = (GameObject)Instantiate(WaterSplashParticlePrefab);
+            go.transform.parent = parent;
+            go.transform.localPosition = new Vector3(0, 0, 2.5f);
         }
     }
 }
