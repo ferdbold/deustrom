@@ -76,21 +76,23 @@ public class LevelManager {
     /// <param name="scoreAdded">The score added to the player score</param>
     /// <param name="originPos">The position of the object that produced the points </param>
     public void AddScore(Player player, int scoreAdded, Vector3 originPos) {
-        if (player == Player.sobek) {
-            sobekScore += scoreAdded;
-            if (sobekScore >= scoreNeededToWin) {
-                sobekScore = scoreNeededToWin;
-                OnMatchEnd(Player.sobek);
+        if (!GameManager.Instance.disableScoring) {
+            if (player == Player.sobek) {
+                sobekScore += scoreAdded;
+                if (sobekScore >= scoreNeededToWin) {
+                    sobekScore = scoreNeededToWin;
+                    OnMatchEnd(Player.sobek);
+                }
+            } else {
+                cthuluScore += scoreAdded;
+                if (cthuluScore >= scoreNeededToWin) {
+                    cthuluScore = scoreNeededToWin;
+                    OnMatchEnd(Player.cthulu);
+                }
             }
-        } else {
-            cthuluScore += scoreAdded;
-            if (cthuluScore >= scoreNeededToWin) {
-                cthuluScore = scoreNeededToWin;
-                OnMatchEnd(Player.cthulu);
+            for (int i = 0; i < scoreAdded; i++) {
+                if (ui != null) ui.AddPoint(player == Player.sobek ? 0 : 1, originPos);
             }
-        }
-        for (int i = 0; i < scoreAdded; i++) {
-            if(ui!=null) ui.AddPoint(player == Player.sobek ? 0 : 1, originPos);
         }
     }
 

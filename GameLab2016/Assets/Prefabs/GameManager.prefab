@@ -200,7 +200,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _orbAnimDuration: 1
   _orbAnimDurationVariation: 0.25
-  _scoreOrbPrefab: {fileID: 11420200, guid: 54df75251a7ed41999fea1a3333a4a03, type: 2}
+  _sobekRunePrefab: {fileID: 0}
+  _cthulhuRunePrefab: {fileID: 0}
 --- !u!114 &11483164
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -223,7 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab0b4397cdca29a45acd824ad27408db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pointsGoal: 1000
+  _pointsGoal: 100
   _disableScoring: 1
   _matchToWin: 2
   lastWinner: 1

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
 guid: 05e3144aa47b646eb83b8bde68864a8d
-timeCreated: 1458069461
+timeCreated: 1458251333
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Scroll_Cthulhu_Mask_0
+    21300000: Cthulhu_TopRoll
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -51,28 +51,58 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: Scroll_Cthulhu_Mask_0
+    - name: Cthulhu_TopRoll
       rect:
         serializedVersion: 2
-        x: 20
-        y: 128
-        width: 527
-        height: 190
+        x: 32
+        y: 59
+        width: 340
+        height: 495
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline:
-      - - {x: 151.96376, y: 55.368034}
-        - {x: -136.03624, y: 55.368034}
-        - {x: -151.03624, y: 43.368034}
-        - {x: -151.03624, y: -19.631966}
-        - {x: -149.03624, y: -29.631966}
-        - {x: -113.03624, y: -50.631966}
-        - {x: -32.03624, y: -50.631966}
-        - {x: 9.96376, y: -47.631966}
-        - {x: 100.96376, y: -48.631966}
-        - {x: 144.96376, y: -28.631966}
-        - {x: 151.96376, y: -20.631966}
+      - - {x: 170, y: -204.5}
+        - {x: 150, y: -67.5}
+        - {x: 149, y: 42.5}
+        - {x: 157, y: 119.5}
+        - {x: 170, y: 182.5}
+        - {x: 170, y: 215.5}
+        - {x: 156, y: 233.5}
+        - {x: 145, y: 233.5}
+        - {x: 135, y: 231.5}
+        - {x: 133, y: 229.5}
+        - {x: 138, y: 236.5}
+        - {x: 137, y: 242.5}
+        - {x: 50, y: 242.5}
+        - {x: 25, y: 233.5}
+        - {x: 12, y: 223.5}
+        - {x: 4, y: 202.5}
+        - {x: 10, y: 189.5}
+        - {x: -78, y: 187.5}
+        - {x: -78, y: 177.5}
+        - {x: -61, y: 157.5}
+        - {x: -40, y: 23.5}
+        - {x: -38, y: -58.5}
+        - {x: -68, y: -174.5}
+        - {x: -61, y: -179.5}
+        - {x: -39, y: -183.5}
+        - {x: -6, y: -172.5}
+        - {x: -28, y: -180.5}
+        - {x: -29, y: -183.5}
+        - {x: -28, y: -187.5}
+        - {x: 16, y: -205.5}
+        - {x: 23, y: -235.5}
+        - {x: 57, y: -242.5}
+        - {x: 148, y: -242.5}
+        - {x: 169, y: -234.5}
+        - {x: 170, y: -216.5}
+      - - {x: 102, y: 242.5}
+        - {x: 102, y: 235.5}
+        - {x: 103, y: 234.5}
+        - {x: 105, y: 234.5}
+        - {x: 108, y: 235.5}
+        - {x: 108, y: 242.5}
     outline: []
   spritePackingTag: 
   userData: 
