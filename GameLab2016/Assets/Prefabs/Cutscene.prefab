@@ -119,9 +119,15 @@ MonoBehaviour:
   timeToFade: 1
   imageTimeStaying: 5
   Base_Loading_Cutscene: {fileID: 0}
-  Intro_Cutscene: {fileID: 15200000, guid: c80d86a01da3d0d47bfaa7086691290e, type: 3}
-  Sobek_Win_Cutscene: {fileID: 2800000, guid: ef31d3b3d13ac1745b9e8db687b632d5, type: 3}
-  Cthulu_Win_Cutscene: {fileID: 2800000, guid: a8853372c37e9994db07458868e8e2e0, type: 3}
+  Intro_Cutscene: {fileID: 15200000, guid: 037dbb66aface08498aa24af132a6e48, type: 3}
+  Sobek_WinMatch_Cutscene: {fileID: 2800000, guid: ef31d3b3d13ac1745b9e8db687b632d5,
+    type: 3}
+  Cthulu_WinMatch_Cutscene: {fileID: 2800000, guid: a8853372c37e9994db07458868e8e2e0,
+    type: 3}
+  Sobek_WinGame_Cutscene: {fileID: 2800000, guid: 87f6ed76e5555cb4697d7ccb99485cbe,
+    type: 3}
+  Cthulu_WinGame_Cutscene: {fileID: 2800000, guid: 3e922fb579b80ce4e88dd305068a83c9,
+    type: 3}
   Video: {fileID: 11437630}
   FadeRect: {fileID: 11494576}
 --- !u!114 &11424778

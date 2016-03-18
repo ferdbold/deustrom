@@ -6,10 +6,10 @@ public class LevelManager {
 
     #region Players
     /// <summary>  Sobek (player one) </summary>
-    public GameObject sobekPlayer { get; private set; }
+    public static GameObject sobekPlayer { get; private set; }
 
     /// <summary> Cthulu (player two)</summary>
-    public GameObject cthuluPlayer { get; private set; }
+    public static GameObject cthulhuPlayer { get; private set; }
     #endregion
 
     #region Score
@@ -58,7 +58,7 @@ public class LevelManager {
             if (player.GetComponent<PlayerController>().IsPlayerOne) {
                 sobekPlayer = player;
             } else {
-                cthuluPlayer = player;
+                cthulhuPlayer = player;
             }
         }
     }
@@ -117,7 +117,7 @@ public class LevelManager {
 
         sobekScore = -10000;
         cthuluScore = -10000;
-        GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, winner == Player.sobek ? CutsceneManager.Cutscene.Sobek_Win : CutsceneManager.Cutscene.Cthulu_Win, dontClose: true);
+        GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, winner == Player.sobek ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch, dontClose: true);
     }
 
     #region Used for callback
@@ -138,7 +138,7 @@ public class LevelManager {
         GameManager.Instance.lastWinner = winner;
         GameManager.Instance.SwitchScene(
             GameManager.Scene.BibleWriter,
-            winner == Player.sobek ? CutsceneManager.Cutscene.Sobek_Win : CutsceneManager.Cutscene.Cthulu_Win
+            winner == Player.sobek ? CutsceneManager.Cutscene.Sobek_WinGame : CutsceneManager.Cutscene.Cthulu_WinGame
         );
     }
 

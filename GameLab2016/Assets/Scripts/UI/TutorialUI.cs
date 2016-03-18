@@ -22,12 +22,14 @@ public class TutorialUI : MonoBehaviour {
     }
 
     IEnumerator PlayTuto() {
-        movie.material.mainTexture = video;
-        GameManager.audioManager.PlayAudioClip(video.audioClip);
-        video.Play();
-        while (video.isPlaying) {
-            yield return new WaitForRealSeconds(0.05f);
-        }
+        if (video != null) {
+            movie.material.mainTexture = video;
+            GameManager.audioManager.PlayAudioClip(video.audioClip);
+            video.Play();
+            while (video.isPlaying) {
+                yield return new WaitForRealSeconds(0.05f);
+            }
+        } 
         GameManager.Instance.UnPause();
         Destroy(gameObject);
     }
