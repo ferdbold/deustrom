@@ -200,8 +200,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _orbAnimDuration: 1
   _orbAnimDurationVariation: 0.25
-  _sobekRunePrefab: {fileID: 0}
-  _cthulhuRunePrefab: {fileID: 0}
+  _sobekRunePrefab: {fileID: 11420200, guid: 54df75251a7ed41999fea1a3333a4a03, type: 2}
+  _cthulhuRunePrefab: {fileID: 11420200, guid: d154f54759bf44e4787bf04ceaef686c, type: 2}
 --- !u!114 &11483164
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -235,6 +235,7 @@ MonoBehaviour:
   SCENE_BIBLE_READING: BibleReader
   SCENE_NAMES:
   - Main_2
+  timeForTuto: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
