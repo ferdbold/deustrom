@@ -259,34 +259,34 @@ namespace Simoncouche.Chain {
             Island parentIsland = anchor.GetIslandChunk().parentIsland;
             // Attach the joint to either the chunk or its parent island if it has one
             if (parentIsland == null) {
-                if (GameManager.levelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
-                    if (GameManager.levelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody.GetComponent<IslandChunk>() == anchor.GetIslandChunk()) { //IF SOBEK ATTACHED TO THE CHUNK SECTION
-                        this.targetJoint.connectedBody = GameManager.levelManager.sobekPlayer.GetComponentInChildren<Rigidbody2D>();
+                if (LevelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
+                    if (LevelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody.GetComponent<IslandChunk>() == anchor.GetIslandChunk()) { //IF SOBEK ATTACHED TO THE CHUNK SECTION
+                        this.targetJoint.connectedBody = LevelManager.sobekPlayer.GetComponentInChildren<Rigidbody2D>();
                         islandIsGrabbedEnemy = true;
                     }
-                } else if (GameManager.levelManager.cthuluPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
-                    if (GameManager.levelManager.cthuluPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody.GetComponent<IslandChunk>() == anchor.GetIslandChunk()) { //IF CTHULU ATTACHED TO THE CHUNK SECTION
-                        this.targetJoint.connectedBody = GameManager.levelManager.cthuluPlayer.GetComponentInChildren<Rigidbody2D>();
+                } else if (LevelManager.cthulhuPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
+                    if (LevelManager.cthulhuPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody.GetComponent<IslandChunk>() == anchor.GetIslandChunk()) { //IF CTHULU ATTACHED TO THE CHUNK SECTION
+                        this.targetJoint.connectedBody = LevelManager.cthulhuPlayer.GetComponentInChildren<Rigidbody2D>();
                         islandIsGrabbedEnemy = true;
                     }
                 }
-            } else if (GameManager.levelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
-                if (GameManager.levelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().
+            } else if (LevelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
+                if (LevelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().
                     grabbedBody.gameObject.
                     GetComponentInChildren<IslandChunk>().
                     parentIsland == parentIsland) { //IF SOBEK ATTACHED TO THE ISLAND SECTION
                     if (this == this.chain._beginningHook) {
-                        this.targetJoint.connectedBody = GameManager.levelManager.sobekPlayer.GetComponentInChildren<Rigidbody2D>();
+                        this.targetJoint.connectedBody = LevelManager.sobekPlayer.GetComponentInChildren<Rigidbody2D>();
                         islandIsGrabbedEnemy = true;
                     }
                 }
-            } else if (GameManager.levelManager.cthuluPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
-                if (GameManager.levelManager.cthuluPlayer.GetComponentInChildren<PlayerGrab>().
+            } else if (LevelManager.cthulhuPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
+                if (LevelManager.cthulhuPlayer.GetComponentInChildren<PlayerGrab>().
                     grabbedBody.gameObject.
                     GetComponentInChildren<IslandChunk>()
                     .parentIsland == parentIsland) { //IF CTHULU ATTACHED TO THE ISLAND SECTION
                     if (this == this.chain._beginningHook) {
-                        this.targetJoint.connectedBody = GameManager.levelManager.cthuluPlayer.GetComponentInChildren<Rigidbody2D>();
+                        this.targetJoint.connectedBody = LevelManager.cthulhuPlayer.GetComponentInChildren<Rigidbody2D>();
                         islandIsGrabbedEnemy = true;
                     }
                 }

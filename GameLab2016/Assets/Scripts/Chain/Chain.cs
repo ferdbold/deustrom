@@ -196,14 +196,14 @@ namespace Simoncouche.Chain {
             bool mustDestroyChain = false;
             if (_beginningHookIsSet) {
                 if(_beginningHook.targetJoint.connectedBody == null || 
-                    (_beginningHook.islandIsGrabbedEnemy && (thrower.isPlayerOne?GameManager.levelManager.cthuluPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody== null :
-                    GameManager.levelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
+                    (_beginningHook.islandIsGrabbedEnemy && (thrower.isPlayerOne?LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody== null :
+                    LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
                     mustDestroyChain = true;
                 }else if (_endingHookIsSet) {
                     if(_endingHook.targetJoint.connectedBody == null 
                         || (_endingHook.islandIsGrabbedEnemy && 
-                        (thrower.isPlayerOne ? GameManager.levelManager.cthuluPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
-                        GameManager.levelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
+                        (thrower.isPlayerOne ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
+                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
                         mustDestroyChain = true;
                     }
                 }
