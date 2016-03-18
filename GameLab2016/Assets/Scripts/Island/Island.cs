@@ -10,6 +10,12 @@ namespace Simoncouche.Islands {
     /// </summary>
     public class Island : MonoBehaviour {
 
+        private static GameObject SO_IDLE;
+        private static GameObject SO_POP;
+        private static GameObject CT_IDLE;
+        private static GameObject CT_POP;
+
+
         private int _weight = 1;
         public int weight {
             get { return _weight; }
@@ -33,6 +39,14 @@ namespace Simoncouche.Islands {
         public GravityBody gravityBody { get; private set; }
         public new Rigidbody2D rigidbody { get; private set;}
 
+
+        //Conversion variables
+        private List<IslandChunk> _convertingChunks = new List<IslandChunk>(); //chunks to be converted if conversion timer ends
+        private int _conversionAmtStatus = 0; //Store diff between chunks of both players. negative = cthulhu wins, 0 = stalemate, positive = sobek wins
+        private int _amtIslandPerConversion = 1; //Amt of island per conversion
+        private bool _isConverting = false;
+
+
         private void Awake() {
             chunks = new List<IslandChunk>();
             _collider = GetComponent<CircleCollider2D>();
@@ -42,10 +56,19 @@ namespace Simoncouche.Islands {
 
             this.GrabbedByPlayer = new PlayerGrabEvent();
             this.ReleasedByPlayer = new Rigidbody2DEvent();
+
+            if (SO_IDLE == null || SO_POP == null || CT_IDLE == null || CT_POP == null) GetParticlesGameObject();
         }
         
         private void Start() {
             if (_collider != null) _collider.isTrigger = true;
+        }
+
+        private static void GetParticlesGameObject() {
+            SO_IDLE = (GameObject)Resources.Load("Particles/P_SO_Convert_Idle");
+            SO_POP = (GameObject)Resources.Load("Particles/P_SO_Convert_Pop");
+            CT_IDLE = (GameObject)Resources.Load("Particles/P_CT_Convert_Idle");
+            CT_POP = (GameObject)Resources.Load("Particles/P_CT_Convert_Pop");
         }
 
         /// <summary>
@@ -194,11 +217,7 @@ namespace Simoncouche.Islands {
             }
         }
 
-        //Conversion variables
-        private List<IslandChunk> _convertingChunks = new List<IslandChunk>(); //chunks to be converted if conversion timer ends
-        private int _conversionAmtStatus = 0; //Store diff between chunks of both players. negative = cthulhu wins, 0 = stalemate, positive = sobek wins
-        private int _amtIslandPerConversion = 1; //Amt of island per conversion
-        private bool _isConverting = false;
+        #region conversion
 
         public void UpdateConversionStatus() {
             //Check which side is winning conversion
@@ -278,20 +297,30 @@ namespace Simoncouche.Islands {
             _isConverting = false;
 
             IslandUtils.color newColor;
-            if (_conversionAmtStatus > 0) newColor = IslandUtils.color.red;
-            else if (_conversionAmtStatus < 0) newColor = IslandUtils.color.blue;
-            else {
+            GameObject particlesPrefabPop;
+            if (_conversionAmtStatus > 0) {
+                newColor = IslandUtils.color.red;
+                particlesPrefabPop = SO_POP;
+            } else if (_conversionAmtStatus < 0) {
+                newColor = IslandUtils.color.blue;
+                particlesPrefabPop = CT_POP;
+            } else {
                 newColor = IslandUtils.color.green;
+                particlesPrefabPop = null;
                 Debug.LogError("Tried to convert when island was equal !");
             }
 
             foreach(IslandChunk ic in _convertingChunks) {
                 ic.ConvertChunkToAnotherColor(newColor);
+                GameObject particlesGO = (GameObject) Instantiate(particlesPrefabPop, ic.transform.position, Quaternion.identity);
+                particlesGO.transform.parent = ic.transform;
             }
 
             _convertingChunks.Clear();
             UpdateConversionStatus();
         }
+
+        #endregion
 
     }
 }
