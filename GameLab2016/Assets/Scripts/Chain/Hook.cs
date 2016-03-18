@@ -62,7 +62,8 @@ namespace Simoncouche.Chain {
         /// <summary>Spawn a new hook inside a chain</summary>
         /// <param name="chain">The parent chain</param>
         /// <param name="isBeginningHook">Is this hook the beginning hook of a chain</param>
-        public static Hook Create(Chain chain, bool isBeginningHook, bool isPlayerOne) {
+        /// <param name="orientation">The angle (in degrees) to apply to the hook</param> 
+        public static Hook Create(Chain chain, bool isBeginningHook, bool isPlayerOne, float orientation) {
 
             if (isPlayerOne) {
                 if (_hookPrefabSobek == null) {
@@ -77,7 +78,7 @@ namespace Simoncouche.Chain {
             Hook hook = ((GameObject)Instantiate(
                 isPlayerOne?_hookPrefabSobek:_hookPrefabCthulu,
                 elevatedPosition, 
-                Quaternion.Euler(0, 0, chain.thrower.autoAimController.targetOrientation)
+                Quaternion.Euler(0, 0, orientation)
             )).GetComponent<Hook>();
 
             hook.name = (isBeginningHook) ? "BeginningHook" : "EndingHook";

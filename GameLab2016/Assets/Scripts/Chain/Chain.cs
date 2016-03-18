@@ -74,6 +74,7 @@ namespace Simoncouche.Chain {
 
         public HookThrower thrower { get; set; }
         public float initialForce { get; set; }
+        public float initialOrientation { get; set; }
 
         /// <summary>This is the sound which will be played on destroy of our chain over time</summary>
         private AudioSource _destroySoundSource;
@@ -81,7 +82,8 @@ namespace Simoncouche.Chain {
         /// <summary>Spawn a new chain in the scene</summary>
         /// <param name="thrower">The game object that threw this chain</param>
         /// <param name="initialForce">The initial force to give to the first hook</param>
-        public static Chain Create(HookThrower thrower, float initialForce) {
+        /// <param name="initialOrientation">The angle (in degrees) to apply to the beginning hook</param> 
+        public static Chain Create(HookThrower thrower, float initialForce, float initialOrientation) {
             if (_chainPrefab == null) {
                 _chainPrefab = Resources.Load("Chain/Chain") as GameObject;
             }
@@ -94,6 +96,7 @@ namespace Simoncouche.Chain {
 
             chain.thrower = thrower;
             chain.initialForce = initialForce;
+            chain.initialOrientation = initialOrientation;
 
             return chain;
         }
@@ -148,15 +151,16 @@ namespace Simoncouche.Chain {
             
         /// <summary>Create and configure the beginning hook</summary>
         public void CreateBeginningHook() {
-            _beginningHook = Hook.Create(this, true, this.thrower.isPlayerOne);
+            _beginningHook = Hook.Create(this, true, this.thrower.isPlayerOne, initialOrientation);
 
             // Position where the player threw the hook
             throwerThrowPosition = this.thrower.transform.position;
         }
 
         /// <summary>Create and configure the ending hook</summary>
-        public void CreateEndingHook() {
-            _endingHook = Hook.Create(this, false, this.thrower.isPlayerOne); 
+        /// <param name="orientation">The orientation (in degrees) that the hook will face</param> 
+        public void CreateEndingHook(float orientation) {
+            _endingHook = Hook.Create(this, false, this.thrower.isPlayerOne, orientation); 
 
             // Reroute the visual chain from the player to the ending hook
             _chainSections[_chainSections.Count - 1].joint.connectedBody = _endingHook.rigidbody;

@@ -7,6 +7,7 @@ namespace Simoncouche.Chain {
 
     /// <summary>A HookThrower controls a character's aiming and spawns hooks and chains upon user input.</summary>
     [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(AimController))]
     [RequireComponent(typeof(AutoAimController))]
     [RequireComponent(typeof(AudioSource))]
     public class HookThrower : MonoBehaviour {
@@ -54,6 +55,7 @@ namespace Simoncouche.Chain {
         /// <summary>The kinematic rigidbody to hook the visual chain to during OneHook state</summary>
         public Rigidbody2D chainLinker { get; private set; }        
         public new Rigidbody2D rigidbody { get; private set; }
+        public AimController aimController { get; private set; }
         public AutoAimController autoAimController { get; private set; }
         public PlayerController playerController { get; private set; }
         public PlayerAudio playerAudio { get; private set; }
@@ -70,6 +72,7 @@ namespace Simoncouche.Chain {
 
         public void Awake() {
             this.rigidbody = GetComponent<Rigidbody2D>();
+            this.aimController = GetComponent<AimController>();
             this.autoAimController = GetComponent<AutoAimController>();
             this.playerController = GetComponent<PlayerController>();
             this.playerAudio = GetComponent<PlayerAudio>();
@@ -149,16 +152,16 @@ namespace Simoncouche.Chain {
                 return;
             }
 
-            // Exit early if we have no auto aim target
-            if (this.autoAimController.target == null) {
-                return;
+            float orientation = this.aimController.aimOrientation;
+            if (this.autoAimController.target != null) {
+                orientation = this.autoAimController.targetOrientation;
             }
 
             switch (_currentState) {
             // If we press fire when we don't have any hook,
             // we create a hook and switch the currentState to OneHook
             case State.NoHook:
-                _chains.Add(Chain.Create(this, _initialForceAmount));
+                _chains.Add(Chain.Create(this, _initialForceAmount, orientation));
                 _currentState = State.Waiting;
 
                 // Animation handling
@@ -172,7 +175,7 @@ namespace Simoncouche.Chain {
             // If we press fire when we have 1 hook, 
             // we create a hook and switch the currentState to NoHook
             case State.OneHook: 
-                _chains[_chains.Count - 1].CreateEndingHook();
+                _chains[_chains.Count - 1].CreateEndingHook(orientation);
                 _currentState = State.Waiting;
 
                 // Animation handling
