@@ -22,7 +22,7 @@ TagManager:
   - ParticlesRenderAbove
   - CollisionsOff
   - StaticCollision
-  - 
+  - IslandCollision
   - 
   - 
   - 

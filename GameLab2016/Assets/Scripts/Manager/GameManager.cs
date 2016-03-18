@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour {
             Application.Quit();
         }
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Alpha0)) {
             Time.timeScale = 0f;
         }
@@ -120,7 +120,7 @@ public class GameManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.N)) {
             if (_currentScene == Scene.PlayLevel && levelManager != null) levelManager.AddScore(LevelManager.Player.sobek, 50, Vector3.zero);
         }
-#endif
+        #endif
     }
 
     #region Switch Scene

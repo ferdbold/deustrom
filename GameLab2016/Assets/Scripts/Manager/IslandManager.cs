@@ -102,6 +102,7 @@ namespace Simoncouche.Islands {
                 Vector3 targetPos = FindTargetLocalPosition(targetChunk, targetAnchor);
                 Vector3 targetRot = FindTargetRotForAnchor(anchorToMerge, targetAnchor);
                 chunkToMerge.ConnectChunk(targetPos, targetRot, null, null, _chunkMergeTime); //change b
+                targetIsland.islandColliders.AddCollision(chunkToMerge, targetPos);
                 OnJoinChunk(targetAnchor, targetChunk.color);
 
                 //Merge every chunk
@@ -122,6 +123,7 @@ namespace Simoncouche.Islands {
                         null, //depracated
                         _chunkMergeTime
                     );
+                    targetIsland.islandColliders.AddCollision(chunk, targetPos);
                 }
 
                 //Finish merge
@@ -155,6 +157,7 @@ namespace Simoncouche.Islands {
             else {
                 Island createdIsland = CreateIsland(a, b);
                 JoinTwoChunk(b, b_anchor, a, a_anchor, createdIsland);
+                createdIsland.islandColliders.AddCollision(a, Vector3.zero);
                 createdIsland.RecreateIslandChunkConnection();
             }
 
@@ -278,18 +281,21 @@ namespace Simoncouche.Islands {
 
                 //Remove Chunk
                 if (chunkIsland.Count == 1) {
-                    island.chunks.Remove(chunkIsland[0]);
+                    island.RemoveChunkToIsland(chunkIsland[0]);
                     chunkIsland[0].transform.SetParent(island.transform.parent, true);
                 }
 
                 //Create Island
                 else if (chunkIsland.Count != 0) {
                     foreach (IslandChunk chunk in chunkIsland) {
-                        island.chunks.Remove(chunk);
+                        island.RemoveChunkToIsland(chunk);
                     }
                     Island newIsland = CreateIsland(chunkIsland[0], chunkIsland[1]);
                     for (int i = 2; i < chunkIsland.Count; i++) {
                         AddChunkToExistingIsland(newIsland, chunkIsland[i]);
+                    }
+                    foreach (IslandChunk chunk in newIsland.chunks) {
+                        newIsland.islandColliders.AddCollision(chunk, chunk.transform.localPosition);
                     }
                     newIsland.RecreateIslandChunkConnection();
                 }
@@ -305,26 +311,6 @@ namespace Simoncouche.Islands {
 
             //Update Conversion Status of the island
             island.UpdateConversionStatus();
-        }
-
-        /// <summary>
-        /// Test if two island chunk list have the same element
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        private bool TestIfIslandListSame(List<IslandChunk> a, List<IslandChunk> b) {
-            foreach (IslandChunk chunk in b) {
-                if (!a.Contains(chunk)) {
-                    return false;
-                }
-            }
-            foreach (IslandChunk chunk in a) {
-                if (!b.Contains(chunk)) {
-                    return false;
-                }
-            }
-            return true;
         }
 
         /// <summary>
@@ -547,13 +533,15 @@ namespace Simoncouche.Islands {
         /// <param name="b_anchor">anchor assossiated to b</param>
         private void JoinTwoChunk(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor, Island targetIsland) {
             //Debug.Log(a.transform.localPosition + " " + b.transform.localPosition);
+            Vector3 targetPos = FindTargetLocalPosition(b, b_anchor);
             a.ConnectChunk(
-                FindTargetLocalPosition(b, b_anchor),
+                targetPos,
                 FindTargetRotForAnchor(a_anchor, b_anchor),
                 null, //Depracated
                 null, //Depracated
                 _chunkMergeTime
             );
+            targetIsland.islandColliders.AddCollision(a, targetPos);
             OnJoinChunk(b_anchor, b.color);
         }
 
