@@ -3397,7 +3397,7 @@ MonoBehaviour:
   RESPAWN_UNDERWATER_TIME: 3
   Z_UNDER_WATER: -0.35
   BUMP_FORCE: 1
-  isPlayerOne: 1
+  isPlayerOne: 0
 --- !u!114 &11447832
 MonoBehaviour:
   m_ObjectHideFlags: 1
