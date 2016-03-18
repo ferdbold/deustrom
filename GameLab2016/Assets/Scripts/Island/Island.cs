@@ -42,6 +42,7 @@ namespace Simoncouche.Islands {
 
         //Conversion variables
         private List<IslandChunk> _convertingChunks = new List<IslandChunk>(); //chunks to be converted if conversion timer ends
+        private List<GameObject> _convertingParticles = new List<GameObject>(); //Conversion particles objects
         private int _conversionAmtStatus = 0; //Store diff between chunks of both players. negative = cthulhu wins, 0 = stalemate, positive = sobek wins
         private int _amtIslandPerConversion = 1; //Amt of island per conversion
         private bool _isConverting = false;
@@ -237,12 +238,12 @@ namespace Simoncouche.Islands {
                 StopConversionProcess();                
             }        
             else if (diffIslandColors > 0) {                                                            //Sobek wins
-                if (_conversionAmtStatus <= 0) ResetConversionProcess(cthulhuChunks);
-                else UpdateConvertingChunks(cthulhuChunks);
+                if (_conversionAmtStatus <= 0) ResetConversionProcess(cthulhuChunks, false);
+                else UpdateConvertingChunks(cthulhuChunks, false);
             } 
             else {                                                                                      //Cthulhu wins
-                if (_conversionAmtStatus >= 0) ResetConversionProcess(sobekChunks);
-                else UpdateConvertingChunks(sobekChunks);
+                if (_conversionAmtStatus >= 0) ResetConversionProcess(sobekChunks, true);
+                else UpdateConvertingChunks(sobekChunks, true);
             }
             
 
@@ -254,11 +255,12 @@ namespace Simoncouche.Islands {
 
         /// <summary> Update the currently converting chunks. Used when an chunk is added to an island that is currently converting. </summary>
         /// <param name="chunks"> list of possible chunks to add. We travel this list from the last element to get the newest ones first</param>
-        private void UpdateConvertingChunks(List<IslandChunk> chunks) {
+        private void UpdateConvertingChunks(List<IslandChunk> chunks, bool isSobek) {
             for (int i = _amtIslandPerConversion - 1; i >= 0; --i) {
                 if (_convertingChunks.Count >= _amtIslandPerConversion) break; //Return if list is of target size
                 if(!_convertingChunks.Contains(chunks[i])) {
                     _convertingChunks.Add(chunks[i]); //Add to converting chunk
+                    CreateConversionParticles(chunks[i].transform, isSobek);
                 }          
             }
             if (_isConverting == false) StartCoroutine(ConversionProcess());
@@ -267,25 +269,25 @@ namespace Simoncouche.Islands {
         /// <summary> Resets the conversion process on island. </summary>
         /// <param name="chunks"> list of chunks to select from for conversion</param>
         /// <param name="amt"> max amount of chunks to select </param>
-        private void ResetConversionProcess(List<IslandChunk> chunks) {
+        private void ResetConversionProcess(List<IslandChunk> chunks, bool isSobek) {
             StopCoroutine(ConversionProcess());
             for(int i = 0; i < _amtIslandPerConversion; ++i) {
                 if (chunks.Count == 0) break; //Return if list is empty
                 int rIndex = Random.Range(0, chunks.Count); //Get random index
                 _convertingChunks.Add(chunks[rIndex]); //Add to converting chunk
+                CreateConversionParticles(chunks[rIndex].transform, isSobek);
                 chunks.RemoveAt(rIndex); // Remove from pool
+
             }
             StartCoroutine(ConversionProcess());
         }
 
         /// <summary> Stops the conversion process on island</summary>
         private void StopConversionProcess() {
-            _convertingChunks.Clear(); //Clear the chunk list
+            ResetConvertingLists();
             StopCoroutine(ConversionProcess());
             _isConverting = false;
         }
-
-
 
         private IEnumerator ConversionProcess() {
            
@@ -316,8 +318,28 @@ namespace Simoncouche.Islands {
                 particlesGO.transform.parent = ic.transform;
             }
 
-            _convertingChunks.Clear();
+            ResetConvertingLists();
             UpdateConversionStatus();
+        }
+
+        private void CreateConversionParticles(Transform target, bool isSobek) {
+            GameObject particlesGO;
+            if (isSobek) particlesGO = (GameObject)Instantiate(SO_IDLE, target.position, Quaternion.identity);
+            else particlesGO = (GameObject)Instantiate(CT_IDLE, target.position, Quaternion.identity);
+
+            particlesGO.transform.parent = target;
+            particlesGO.transform.localPosition = new Vector3(0, 0, -1.5f);
+            _convertingParticles.Add(particlesGO);
+        }
+
+        private void ResetConvertingLists() {
+            //Convertion
+            _convertingChunks.Clear();
+            //Particles
+            for (int i = _convertingParticles.Count-1; i >= 0; i--) {
+                Destroy(_convertingParticles[i]);
+            }
+            _convertingParticles.Clear();
         }
 
         #endregion

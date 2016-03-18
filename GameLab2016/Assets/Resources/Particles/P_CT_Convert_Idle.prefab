@@ -10,7 +10,7 @@ GameObject:
   - 4: {fileID: 417428}
   - 198: {fileID: 19898332}
   - 199: {fileID: 19997322}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_CT_Convert_Idle (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ GameObject:
   - 4: {fileID: 469786}
   - 198: {fileID: 19817190}
   - 199: {fileID: 19924386}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_CT_Convert_Idle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42,7 +42,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 411910}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_CT_Convert_Idle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3093,7 +3093,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 160294}

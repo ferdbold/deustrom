@@ -10,7 +10,7 @@ GameObject:
   - 4: {fileID: 445748}
   - 198: {fileID: 19870126}
   - 199: {fileID: 19980072}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_SOLogo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ GameObject:
   - 4: {fileID: 482192}
   - 198: {fileID: 19852044}
   - 199: {fileID: 19997284}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_Puffs_SO
   m_TagString: FxTemporaire
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - 4: {fileID: 478066}
   - 198: {fileID: 19866246}
   - 199: {fileID: 19920774}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_Star (1)
   m_TagString: FxTemporaire
   m_Icon: {fileID: 0}
@@ -60,7 +60,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 481436}
   - 114: {fileID: 11497108}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_SO_Convert_Pop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4576,7 +4576,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 188194}

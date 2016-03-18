@@ -10,7 +10,7 @@ GameObject:
   - 4: {fileID: 462652}
   - 198: {fileID: 19846904}
   - 199: {fileID: 19952038}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_CTLogo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -27,7 +27,7 @@ GameObject:
   - 4: {fileID: 481302}
   - 198: {fileID: 19891348}
   - 199: {fileID: 19946578}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_Puffs_CT
   m_TagString: FxTemporaire
   m_Icon: {fileID: 0}
@@ -43,7 +43,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 445946}
   - 114: {fileID: 11425010}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: P_CT_Convert_Pop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3061,7 +3061,11 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 183560}
