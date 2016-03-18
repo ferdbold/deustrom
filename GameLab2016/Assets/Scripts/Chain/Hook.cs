@@ -59,6 +59,12 @@ namespace Simoncouche.Chain {
 
         public new Rigidbody2D rigidbody { get; private set; }
 
+        public IslandChunk connectedChunk { get; private set; }
+
+        public Island connectedIsland { get; private set; }
+
+        public bool islandIsGrabbedEnemy { get; private set; }
+
         /// <summary>Spawn a new hook inside a chain</summary>
         /// <param name="chain">The parent chain</param>
         /// <param name="isBeginningHook">Is this hook the beginning hook of a chain</param>
@@ -102,6 +108,7 @@ namespace Simoncouche.Chain {
             this.rigidbody = GetComponent<Rigidbody2D>();
 
             this.Attach = new UnityEvent();
+            this.islandIsGrabbedEnemy = false;
         }
 
         public void Start() {
@@ -161,10 +168,10 @@ namespace Simoncouche.Chain {
                     }
                 }
             }
-            
+
 
             Island parentIsland = anchor.GetIslandChunk().parentIsland;
-            
+
             chain.thrower.HookAlreadyOnIslandCheck(anchor);//must check if there is already a hook on this joint.  If so, we replace it with this one.
 
             this.rigidbody.velocity = Vector2.zero;
@@ -172,8 +179,26 @@ namespace Simoncouche.Chain {
 
             this.targetJoint.enabled = true;
 
-            // Attach the target joint to the specified IslandChunk
-            this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
+            bool wasAttachedToIsland=this.CheckOtherPlayerOnNewIsland(anchor);
+
+            // Attach the joint to either the chunk or its parent island if it has one
+            if (parentIsland == null && !wasAttachedToIsland) {
+                    this.connectedChunk = anchor.GetIslandChunk();
+                    this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
+                    if (chain._endingHook != null) chain._beginningHook.chainJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>(); //We can switch the connected body to 
+            } 
+            else if(!wasAttachedToIsland){
+                this.connectedIsland = parentIsland;
+                //this.targetJoint.connectedBody = parentIsland.rigidbody;
+                this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
+                if (this == this.chain._endingHook) {
+                    chain._beginningHook.chainJoint.connectedBody = parentIsland.rigidbody;
+                    Debug.Log("Second hook hit");
+                }
+            }
+
+            //Attach the visual
+            
 
             // Add listeners
             anchor.GetIslandChunk().MergeIntoIsland.AddListener(this.OnAttachedChunkMerge);
@@ -209,19 +234,64 @@ namespace Simoncouche.Chain {
                 else if (iChunk == this.chain.islandChunkEndingHook) endingIslandChunkFound = true;
             }
             if (beginningIslandChunkFound && endingIslandChunkFound) this.chain.DestroyChain(false);
+
         }
 
         /// <summary>React to attached chunk being grabbed by a player</summary>
         /// <param name="playerGrab">The player who grabbed the chunk</param> 
         private void OnAttachedChunkPlayerGrab(PlayerGrab playerGrab) {
             // Reroute the chain to the player only if both hooks exist
-            if (this.chain.bothHooksExist) {
-                this.targetJoint.connectedBody = playerGrab.rigidbody;
+            if (chain._beginningHook != null) {
+                if (this == chain._beginningHook) this.chain._beginningHook.targetJoint.connectedBody = playerGrab.rigidbody;//AJOUT
             }
             // Otherwise, deactivate chain physics while the player is grabbing
             else {
                 this.chainJoint.enabled = false;
             }
+        }
+
+        /// <summary>
+        /// Check if there is already a player grabbing the island and set the target joint on the player if so 
+        /// </summary>
+        /// <param name="anchor">anchor of the attached island</param>
+        /// <returns></returns>
+        private bool CheckOtherPlayerOnNewIsland(IslandAnchorPoints anchor) {
+            Island parentIsland = anchor.GetIslandChunk().parentIsland;
+            // Attach the joint to either the chunk or its parent island if it has one
+            if (parentIsland == null) {
+                if (GameManager.levelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
+                    if (GameManager.levelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody.GetComponent<IslandChunk>() == anchor.GetIslandChunk()) { //IF SOBEK ATTACHED TO THE CHUNK SECTION
+                        this.targetJoint.connectedBody = GameManager.levelManager.sobekPlayer.GetComponentInChildren<Rigidbody2D>();
+                        islandIsGrabbedEnemy = true;
+                    }
+                } else if (GameManager.levelManager.cthuluPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
+                    if (GameManager.levelManager.cthuluPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody.GetComponent<IslandChunk>() == anchor.GetIslandChunk()) { //IF CTHULU ATTACHED TO THE CHUNK SECTION
+                        this.targetJoint.connectedBody = GameManager.levelManager.cthuluPlayer.GetComponentInChildren<Rigidbody2D>();
+                        islandIsGrabbedEnemy = true;
+                    }
+                }
+            } else if (GameManager.levelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
+                if (GameManager.levelManager.sobekPlayer.GetComponentInChildren<PlayerGrab>().
+                    grabbedBody.gameObject.
+                    GetComponentInChildren<IslandChunk>().
+                    parentIsland == parentIsland) { //IF SOBEK ATTACHED TO THE ISLAND SECTION
+                    if (this == this.chain._beginningHook) {
+                        this.targetJoint.connectedBody = GameManager.levelManager.sobekPlayer.GetComponentInChildren<Rigidbody2D>();
+                        islandIsGrabbedEnemy = true;
+                    }
+                }
+            } else if (GameManager.levelManager.cthuluPlayer.GetComponentInChildren<PlayerGrab>().grabbedBody != null) {
+                if (GameManager.levelManager.cthuluPlayer.GetComponentInChildren<PlayerGrab>().
+                    grabbedBody.gameObject.
+                    GetComponentInChildren<IslandChunk>()
+                    .parentIsland == parentIsland) { //IF CTHULU ATTACHED TO THE ISLAND SECTION
+                    if (this == this.chain._beginningHook) {
+                        this.targetJoint.connectedBody = GameManager.levelManager.cthuluPlayer.GetComponentInChildren<Rigidbody2D>();
+                        islandIsGrabbedEnemy = true;
+                    }
+                }
+            }
+            return islandIsGrabbedEnemy;
         }
 
         /// <summary>React to attached chunk being released by a player</summary>

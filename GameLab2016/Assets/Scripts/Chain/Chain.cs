@@ -22,10 +22,10 @@ namespace Simoncouche.Chain {
         private float _timeUntilChainExpires = 10.0f;
 
         /// <summary>The first hook thrown by the player</summary>
-        private Hook _beginningHook;
+        public Hook _beginningHook { get; private set; }
         
         /// <summary>The second hook thrown by the player</summary>
-        private Hook _endingHook;
+        public Hook _endingHook { get; private set; }
 
         /// <summary>The chain sections currently generated for visual effect</summary>
         private List<ChainSection> _chainSections;
@@ -189,15 +189,21 @@ namespace Simoncouche.Chain {
 
         /// <summary>
         /// Check if the connected islands of the hooks are null.  If they are, we destroy the chain.
+        /// ALSO CHECK IF A PLAYER GRABBING OUR HOOKED UP ISLAND DOESNT HAVE IT ANYMORE
         /// TODO: CHANGE THIS TO AN EVENT CALL
         /// </summary>
         private void AttachedHookToIslandsUpdate() {
             bool mustDestroyChain = false;
             if (_beginningHookIsSet) {
-                if(_beginningHook.targetJoint.connectedBody == null) {
+                if(_beginningHook.targetJoint.connectedBody == null || 
+                    (_beginningHook.islandIsGrabbedEnemy && (thrower.isPlayerOne?GameManager.levelManager.cthuluPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody== null :
+                    GameManager.levelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
                     mustDestroyChain = true;
                 }else if (_endingHookIsSet) {
-                    if(_endingHook.targetJoint.connectedBody == null) {
+                    if(_endingHook.targetJoint.connectedBody == null 
+                        || (_endingHook.islandIsGrabbedEnemy && 
+                        (thrower.isPlayerOne ? GameManager.levelManager.cthuluPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
+                        GameManager.levelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
                         mustDestroyChain = true;
                     }
                 }
@@ -233,10 +239,6 @@ namespace Simoncouche.Chain {
                 if (_endingHook.attachedToTarget) {
                     ///Tells to the thrower he hit the hook
                     this.thrower.OnEndingHookHit();
-
-                    // Reroute the beginning hook from the player to the ending hook
-                    this._beginningHook.chainJoint.connectedBody = _endingHook.rigidbody;
-                    //this._beginningHook.chainJoint.distance = _maxDistanceBetweenTwoHooks;
 
                     //Set this bool to true in order to stop the calls of thrower.EndingHookHit
                     _endingHookIsSet = true;
