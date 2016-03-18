@@ -393,10 +393,16 @@ namespace Simoncouche.Controller {
             _inGrabCooldown = false;
         }
 
+        public static void ReactivateCollisionForBothPlayer(Collider2D otherCol) {
+            foreach (PlayerGrab grab in _allPlayerGrabs) {
+                grab.ReactivateCollision(otherCol, 0);
+            }
+        }
+
         /// <summary> Calls the coroutine that resume collisions and add its reference to the coroutine list</summary>
         /// <param name="otherCol">collider to unIgnore</param>
         /// <param name="time">time before unignore</param>
-        private void ReactivateCollision(Collider2D otherCol, float time) {
+        void ReactivateCollision(Collider2D otherCol, float time) {
             Coroutine disableCoroutine = StartCoroutine(ResumeCollision(otherCol, time));
 
             //Add coroutine to a dictionnary until is done in case it needs to be interrupted

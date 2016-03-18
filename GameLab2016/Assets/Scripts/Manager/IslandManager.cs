@@ -297,9 +297,9 @@ namespace Simoncouche.Islands {
             island.RecreateIslandChunkConnection();
 
             //Make the player lose the connection to island being dismantle
-            if (!TestIfIslandListSame(island.chunks, originChunkList)) {
+            if (island.chunks.Count != originChunkList.Count) {
                 foreach (IslandChunk check in chunkChecked) {
-                    PlayerGrab.UngrabBody(check.gravityBody);
+                    PlayerGrab.ReactivateCollisionForBothPlayer(check.GetComponent<CircleCollider2D>());
                 }
             }
         }
