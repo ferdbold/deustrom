@@ -238,12 +238,12 @@ namespace Simoncouche.Islands {
                 StopConversionProcess();                
             }        
             else if (diffIslandColors > 0) {                                                            //Sobek wins
-                if (_conversionAmtStatus <= 0) ResetConversionProcess(cthulhuChunks, false);
-                else UpdateConvertingChunks(cthulhuChunks, false);
+                if (_conversionAmtStatus <= 0) ResetConversionProcess(cthulhuChunks, true);
+                else UpdateConvertingChunks(cthulhuChunks, true);
             } 
             else {                                                                                      //Cthulhu wins
-                if (_conversionAmtStatus >= 0) ResetConversionProcess(sobekChunks, true);
-                else UpdateConvertingChunks(sobekChunks, true);
+                if (_conversionAmtStatus >= 0) ResetConversionProcess(sobekChunks, false);
+                else UpdateConvertingChunks(sobekChunks, false);
             }
             
 
