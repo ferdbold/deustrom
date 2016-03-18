@@ -18,7 +18,10 @@ public class UIManager : MonoBehaviour {
 
     [Header("Prefabs")]
     [SerializeField]
-    private Image _scoreOrbPrefab;
+    private Image _sobekRunePrefab;
+
+    [SerializeField]
+    private Image _cthulhuRunePrefab;
 
     // COMPONENTS
 
@@ -36,7 +39,7 @@ public class UIManager : MonoBehaviour {
     }
 
     // FIXME: This is for test purposes and should be removed in the final build
-    public void Update() {
+    private void Update() {
         if (Input.GetKeyDown(KeyCode.K)) {
             this.AddPoint(0, new Vector3(10, 8));
             this.AddPoint(0, new Vector3(12, 6));
@@ -53,11 +56,14 @@ public class UIManager : MonoBehaviour {
     /// <summary>
     /// Displays visual feedback about a player gaining a point.
     /// </summary>
-    /// <param name="player">The player gaining a point. Either 1 or 2.</param>
+    /// <param name="player">The player gaining a point (either 0 or 1).</param>
     /// <param name="sourcePos">The position of the object that generated a point for the player.</param>
     public void AddPoint(int player, Vector3 sourcePos) {
         if (root != null) {
-            Image newScoreOrb = (Image)GameObject.Instantiate(_scoreOrbPrefab);
+            Image newScoreOrb = (player == 0) ?
+                (Image)GameObject.Instantiate(_sobekRunePrefab) :
+                (Image)GameObject.Instantiate(_cthulhuRunePrefab);
+            
             newScoreOrb.transform.SetParent(this.root.transform);
             newScoreOrb.rectTransform.position = Camera.main.WorldToScreenPoint(sourcePos);
 
@@ -70,7 +76,7 @@ public class UIManager : MonoBehaviour {
     }
 
     private void OnOrbAnimComplete(int player, Image orb) {
-        GameObject.Destroy(orb);
+        GameObject.Destroy(orb.gameObject);
         _scoreWidgets[player].AddPoints(1);
     }
 }

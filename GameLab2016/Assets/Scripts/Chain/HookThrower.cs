@@ -144,8 +144,13 @@ namespace Simoncouche.Chain {
                 return;
             }
 
-            //Return if the player is currently grabbing an island
-            if (playerGrab.grabbedBody!=null) {
+            // Exit early if the player is currently grabbing an island
+            if (playerGrab.grabbedBody != null) {
+                return;
+            }
+
+            // Exit early if we have no auto aim target
+            if (this.autoAimController.target == null) {
                 return;
             }
 
@@ -338,7 +343,7 @@ namespace Simoncouche.Chain {
         }
 
         /// <summary>
-        /// Removes the chain if the player enters the maelstrom
+        /// Removes the chain if the player enters the maelstrom AND also prevents the player from shooting while exiting the maelstrom
         /// </summary>
         public void RemoveChainOnPlayerMaelstromEnter() {
             if (_chains.Count > 0) {
@@ -347,6 +352,9 @@ namespace Simoncouche.Chain {
                     this.OnCutLinkWithPlayer();
                 }
             }
+
+            _triggerIsHeld = false;
+            playerController.HandleAimStopAnimation();  
         }
     }
 }

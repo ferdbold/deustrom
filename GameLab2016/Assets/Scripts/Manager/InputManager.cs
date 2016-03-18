@@ -13,31 +13,33 @@ public class InputManager : MonoBehaviour {
     public delegate void EventButton();
 
     //Possible Event
-    private EventAxis p1_leftAnalog;
-    private EventAxis p1_rightAnalog;
-    private EventAxis p1_leftTrigger;
-    private EventAxis p1_rightTrigger;
-    private EventAxis p2_leftAnalog;
-    private EventAxis p2_rightAnalog;
-    private EventAxis p2_leftTrigger;
-    private EventAxis p2_rightTrigger;
+    private EventAxis 
+        p1_leftAnalog,
+        p1_rightAnalog,
+        p1_leftTrigger,
+        p1_rightTrigger,
+        p2_leftAnalog,
+        p2_rightAnalog,
+        p2_leftTrigger,
+        p2_rightTrigger;
 
-    private EventButton _startButton;
-    private EventButton p1_fireHookButtonDown;
-    private EventButton p2_fireHookButtonDown;
-    private EventButton p1_fireHookButtonUp;
-    private EventButton p2_fireHookButtonUp;
-    private EventButton p1_pushButton;
-    private EventButton p2_pushButton;
-    private EventButton p1_retractHooksButtonDown;
-    private EventButton p2_retractHooksButtonDown;
-    private EventButton p1_retractHooksButtonUp;
-    private EventButton p2_retractHooksButtonUp;
-    private EventButton p1_cutLinkWithChainButton;
-    private EventButton p2_cutLinkWithChainButton;
-
+    private EventButton 
+        _startButton,
+        p1_fireHookButtonDown,
+        p2_fireHookButtonDown,
+        p1_fireHookButtonUp,
+        p2_fireHookButtonUp,
+        p1_pushButton,
+        p2_pushButton,
+        p1_retractHooksButtonDown,
+        p2_retractHooksButtonDown,
+        p1_retractHooksButtonUp,
+        p2_retractHooksButtonUp,
+        p1_cutLinkWithChainButton,
+        p2_cutLinkWithChainButton;
 
     #region Add Event
+
     /// <summary>
     /// The name of every axis
     /// </summary>
@@ -51,6 +53,7 @@ public class InputManager : MonoBehaviour {
         p2_leftTrigger,
         p2_rightTrigger 
     }
+
     /// <summary>
     /// Link a function to an event
     /// </summary>
@@ -93,6 +96,7 @@ public class InputManager : MonoBehaviour {
         p1_cutLinkWithChainButton,
         p2_cutLinkWithChainButton 
     }
+
     /// <summary>
     /// Link a function to an event
     /// </summary>
@@ -164,6 +168,7 @@ public class InputManager : MonoBehaviour {
             new AxisTuple("P2 Left Trigger", p2_leftTrigger, Input.GetAxis("P2_L_Trigger"), 0),                                     //This axis has only 1 direction
             new AxisTuple("P2 Right Trigger", p2_rightTrigger, Input.GetAxis("P2_R_Trigger"), 0)                                    //This axis has only 1 direction
         };
+
         List<ButtonTuple> buttons = new List<ButtonTuple>() {
             new ButtonTuple("P1 Push", p1_pushButton, Input.GetButtonDown("P1_Push")),
             new ButtonTuple("P2 Push", p2_pushButton, Input.GetButtonDown("P2_Push")),
