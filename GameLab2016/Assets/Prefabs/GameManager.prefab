@@ -181,6 +181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _islandComponent: {fileID: 169786, guid: 47005e02bda67e84cb4e1e6001a50748, type: 2}
+  _conversionTime: 5
   AssembleParticlePrefab:
   - {fileID: 185804, guid: c1091c6052fb3564686ea296d92a982c, type: 2}
   - {fileID: 179566, guid: 73e441ad6eee6174ea5006d3eb0a873a, type: 2}
@@ -225,10 +226,12 @@ MonoBehaviour:
   _pointsGoal: 1000
   _disableScoring: 1
   _matchToWin: 2
-  _currentScene: 0
+  lastWinner: 1
+  _currentScene: 1
   SCENE_MENU_NAME: Menu
   SCENE_CUTSCENE: Cutscene
-  SCENE_BIBLE_WRITING: Menu
+  SCENE_BIBLE_WRITING: BibleWriter
+  SCENE_BIBLE_READING: BibleReader
   SCENE_NAMES:
   - Main_2
 --- !u!1001 &100100000

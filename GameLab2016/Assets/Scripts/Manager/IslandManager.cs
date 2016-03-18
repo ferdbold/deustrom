@@ -20,6 +20,11 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Island Object Prefab Reference")]
         private GameObject _islandComponent = null;
 
+        [Header("Conversion")]
+
+        [SerializeField] [Tooltip("The time it takes for two island to make a conversion")]
+        private float _conversionTime = 1f;
+
         [Header("Visuals")]
 
         [SerializeField] [Tooltip("Particle spawned when island assemble")]
@@ -28,8 +33,8 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Particle spawned when island gets destroyed by collision with high speed impacting object")]
         private GameObject DestroyParticle;
 
-        [SerializeField]
-        [Tooltip("The time it takes for 2 chunks to do their merging anim")]
+        
+        [SerializeField] [Tooltip("The time it takes for 2 chunks to do their merging anim")]
         private float _chunkMergeTime = 1f;
 
         /// <summary> the island subfolder in scene </summary>
@@ -63,6 +68,7 @@ namespace Simoncouche.Islands {
         public List<IslandChunk> GetIslandChunks() { return _islandChunks; }
         public Transform GetIslandSubFolder() { return _islandSubFolder; }
         public float GetMergeTime() { return _chunkMergeTime; }
+        public float GetConversionTime() { return _conversionTime; }
         #endregion
 
         #region HandleCollision
@@ -152,7 +158,8 @@ namespace Simoncouche.Islands {
                 createdIsland.RecreateIslandChunkConnection();
             }
 
-            TestIslandForConversion(a.parentIsland);
+            //TestIslandForConversion(a.parentIsland); //Check each insland individually for conversion
+            SimpleIslandConversion(a.parentIsland); //All chunks in island change to the same color which is the most present
         }
 
         /// <summary>
@@ -498,6 +505,14 @@ namespace Simoncouche.Islands {
                     chunk.ConvertChunkToAnotherColor(newColor);
                 }
             }
+        }
+
+        /// <summary>
+        /// Test if any chunk as part of the island can be converted
+        /// </summary>
+        /// <param name="island">The island to test</param>
+        public void SimpleIslandConversion(Island island) {
+            island.UpdateConversionStatus();
         }
 
         /// <summary>

@@ -101,6 +101,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _minRangeQuoteNumber: 0
   _maxRangeQuoteNumber: 99
+  _titleInputField: {fileID: 11438280}
 --- !u!114 &11436062
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -166,7 +167,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Write down your own bible quote
+  m_Text: Write down a verse in Cthulu's bible
 --- !u!114 &11456216
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -226,7 +227,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Press enter to submit your greatest achievement EVER
+  m_Text: Press enter to submit your awesome verse
 --- !u!114 &11481478
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -293,7 +294,7 @@ MonoBehaviour:
   m_LineType: 1
   m_HideMobileInput: 0
   m_CharacterValidation: 0
-  m_CharacterLimit: 144
+  m_CharacterLimit: 140
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls: []

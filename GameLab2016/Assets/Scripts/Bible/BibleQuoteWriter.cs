@@ -19,19 +19,31 @@ namespace Simoncouche.Bible {
         /// <summary>Reference to our input field in the UI</summary>
         private InputField _inputField;
 
+        /// <summary>This is the title of our input field</summary>
+        [Tooltip("This is the title of our input field")]
+        [SerializeField]
+        private Text _titleInputField;
+
         /// <summary>Bool in order to know who won the game</summary>
-        private bool sobekWon = false;
+        private bool _sobekWon = false;
 
         void Awake() {
             _inputField = gameObject.GetComponentInChildren<InputField>();
         }
 
-        // Use this for initialization
-        void Start() {
-            //TO DO : SET WHO WON THE GAME HERE
-            //sobekWon = 
-            _inputField.Select();
-            this.PrintQuote(BibleEntries.GetRandomQuote());
+        /// <summary>
+        /// This function allows the player to write and is called via the GameManager
+        /// </summary>
+        /// <param name="winner"></param>
+        public void BeginWriting(LevelManager.Player winner) {
+            if (winner == LevelManager.Player.sobek) {
+                _sobekWon = true;
+                _titleInputField.text = "Write down a verse in Sobek's bible";
+            } else {
+                _sobekWon = false;
+                _titleInputField.text = "Write down a verse in Cthulu's bible";
+            }
+            
         }
 
         void Update() {
@@ -41,6 +53,11 @@ namespace Simoncouche.Bible {
             }
         }
 
+        /// <summary>
+        /// Open the save file and save a quote in it
+        /// </summary>
+        /// <param name="quote">the quote itself to save</param>
+        /// <param name="isSobek">is sobek the winner ?</param>
         private void SaveQuote(string quote, bool isSobek) {
             Debug.Log(Application.persistentDataPath);
             BibleEntries tempEntries = BibleEntries.LoadBibleEntries();//Must load the data in order to do an insertion
@@ -66,9 +83,10 @@ namespace Simoncouche.Bible {
         /// </summary>
         /// <param name="quote"></param>
         private void SubmitQuote(string quote) {
-            SaveQuote(quote, sobekWon);
+            SaveQuote(quote, _sobekWon);
             _inputField.enabled = false;
             //TODO : NOW TRIGGER ENDING SWITCH GAME STATE
+            GameManager.Instance.SwitchScene(GameManager.Scene.Menu);
         }
 
         /// <summary>

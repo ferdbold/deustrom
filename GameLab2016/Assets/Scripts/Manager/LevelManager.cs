@@ -90,7 +90,7 @@ public class LevelManager {
             }
         }
         for (int i = 0; i < scoreAdded; i++) {
-            ui.AddPoint(player == Player.sobek ? 0 : 1, originPos);
+            if(ui!=null) ui.AddPoint(player == Player.sobek ? 0 : 1, originPos);
         }
     }
 
@@ -133,8 +133,9 @@ public class LevelManager {
     /// </summary>
     /// <param name="winner"></param>
     private void OnGameEnd(Player winner) {
+        GameManager.Instance.lastWinner = winner;
         GameManager.Instance.SwitchScene(
-            GameManager.Scene.BibleWriting,
+            GameManager.Scene.BibleWriter,
             winner == Player.sobek ? CutsceneManager.Cutscene.Sobek_Win : CutsceneManager.Cutscene.Cthulu_Win
         );
     }

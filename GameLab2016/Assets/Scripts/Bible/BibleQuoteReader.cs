@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 namespace Simoncouche.Bible {
     public class BibleQuoteReader : MonoBehaviour {
@@ -14,6 +13,7 @@ namespace Simoncouche.Bible {
         // Use this for initialization
         void Start() {
             _textBible.text = GetQuotesOfGod(_currentGodToCheckIsSobek);
+            _textBible.text += GetQuotesOfGod(!_currentGodToCheckIsSobek);
         }
 
         private string GetQuotesOfGod(bool isSobek) {
