@@ -5496,6 +5496,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _theta: 45
   _distance: 20
+  _aimIndicatorPrefab: {fileID: 498024, guid: bb3fe1548d6744532b1f3b196eb78dc8, type: 2}
   _displayScanRays: 0
 --- !u!114 &11416638
 MonoBehaviour:

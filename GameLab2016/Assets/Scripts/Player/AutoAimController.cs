@@ -31,11 +31,16 @@ namespace Simoncouche.Controller {
         [SerializeField]
         private float _distance = 5;
 
+        [SerializeField]
+        private Transform _aimIndicatorPrefab;
+
         [Header("Debug")]
         [SerializeField]
         private bool _displayScanRays = false;
 
         private IslandChunk _target;
+
+        private Coroutine _updateCoroutine;
 
         // COMPONENTS
         private Transform _indicator;
@@ -53,7 +58,12 @@ namespace Simoncouche.Controller {
                 IslandChunk oldTarget = _target;
                 List<IslandChunk> targets = GetAllTargetsInRange();
 
+                if (_indicator == null) {
+                    RestoreIndicator();
+                }
+
                 _target = ChooseTarget(targets);
+                _indicator.gameObject.SetActive(_target != null);
 
                 if (_target != oldTarget && _target != null) {
                     SetIndicatorTo(_target.transform);
@@ -62,6 +72,16 @@ namespace Simoncouche.Controller {
                 _indicator.Find("Icon").LookAt(Camera.main.transform.position);
                 yield return new WaitForSeconds(SCAN_UPDATE_TICK);
             }
+        }
+
+        /// <summary>
+        /// Recreates the aim indicator in case it has been destroyed by its parent chunk.
+        /// </summary>
+        private void RestoreIndicator() {
+            Debug.Log("Restoring auto aim indicator");
+            _indicator = GameObject.Instantiate(_aimIndicatorPrefab);
+            _indicator.SetParent(transform);
+            _indicator.gameObject.SetActive(false);
         }
 
         private List<IslandChunk> GetAllTargetsInRange() {
@@ -92,19 +112,20 @@ namespace Simoncouche.Controller {
                 }
             }
 
-            if (gameObject.name == "Sobek") Debug.Log(islandsInRange.Count);
             return islandsInRange;
         }
 
         private IslandChunk ChooseTarget(List<IslandChunk> targets) {
-            float distanceToBeat = float.PositiveInfinity;
+            float angleToBeat = _theta/2;
             IslandChunk pickedTarget = null;
 
             foreach (IslandChunk target in targets) {
-                float distance = Vector2.Distance(transform.position, target.transform.position);
-                if (distance < distanceToBeat) {
+                Vector2 toTarget = target.transform.position - transform.position;
+                float targetAngle = Vector2.Angle(transform.right, toTarget);
+
+                if (targetAngle < angleToBeat) {
                     pickedTarget = target;
-                    distanceToBeat = distance;
+                    angleToBeat = targetAngle;
                 }
             }
 
@@ -119,16 +140,13 @@ namespace Simoncouche.Controller {
         }
 
         private void OnEnable() {
-            _indicator.gameObject.SetActive(true);
-
-            StartCoroutine(this.ScanUpdate());
+            _updateCoroutine = StartCoroutine(this.ScanUpdate());
         }
 
         private void OnDisable() {
-            // Take back the indicator and disable it
             _indicator.gameObject.SetActive(false);
 
-            StopCoroutine(this.ScanUpdate());
+            StopCoroutine(_updateCoroutine);
         }
 
         // PROPERTIES
