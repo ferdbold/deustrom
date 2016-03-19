@@ -21,11 +21,17 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private float _timeUntilChainExpires = 10.0f;
 
+        [Tooltip("If we are using the character's hook mesh for our hook")]
+        [SerializeField]
+        private bool _hasCharacterHook = false;
+
         /// <summary>The first hook thrown by the player</summary>
         public Hook _beginningHook { get; private set; }
         
         /// <summary>The second hook thrown by the player</summary>
         public Hook _endingHook { get; private set; }
+        
+        
 
         /// <summary>The chain sections currently generated for visual effect</summary>
         private List<ChainSection> _chainSections;
@@ -151,7 +157,7 @@ namespace Simoncouche.Chain {
             
         /// <summary>Create and configure the beginning hook</summary>
         public void CreateBeginningHook() {
-            _beginningHook = Hook.Create(this, true, this.thrower.isSobek, initialOrientation);
+            _beginningHook = Hook.Create(this, true, this.thrower.isSobek, initialOrientation, _hasCharacterHook);
 
             // Position where the player threw the hook
             throwerThrowPosition = this.thrower.transform.position;
@@ -160,7 +166,7 @@ namespace Simoncouche.Chain {
         /// <summary>Create and configure the ending hook</summary>
         /// <param name="orientation">The orientation (in degrees) that the hook will face</param> 
         public void CreateEndingHook(float orientation) {
-            _endingHook = Hook.Create(this, false, this.thrower.isSobek, orientation); 
+            _endingHook = Hook.Create(this, false, this.thrower.isSobek, orientation, _hasCharacterHook); 
 
             // Reroute the visual chain from the player to the ending hook
             _chainSections[_chainSections.Count - 1].joint.connectedBody = _endingHook.rigidbody;
