@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Simoncouche.Controller {
 
-    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond, PlayerDeath, PlayerRetractChains, PlayerCooldown};
+    public enum PlayerSounds { PlayerBump, PlayerPush, PlayerGrab, PlayerChainFirst, PlayerChainSecond, PlayerDeath, PlayerRetractChains, PlayerCooldown, PlayerRespawn};
 
     [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(PlayerController))]
@@ -46,6 +46,13 @@ namespace Simoncouche.Controller {
 
         private bool _isCoroutineRunning;
         private const float _axisMaxValue = 1.0f;
+        private bool _isSobek;
+
+        private float _swimSoundGap = 0.40f;
+        private float _currentSwimSoundGap = 0f;
+        private float _currentSwimSoundTime = 0f;
+        private Vector2 _swimSoundGapVariation = new Vector2(-0.05f, 0.05f);
+        
         #endregion
 
         void Awake() {
@@ -54,65 +61,105 @@ namespace Simoncouche.Controller {
             //Create and setup second audiosource exactly like swimming audio source
             _actionAudioSource = gameObject.AddComponent<AudioSource>();
             _actionAudioSource.outputAudioMixerGroup = _swimmingAudioSource.outputAudioMixerGroup;
+            _isSobek = gameObject.name == "Sobek" ? true : false;
         }
 
         void Start() {
-            _actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.swimSound;
+            //if (_isSobek) _actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.sobekSpecificSound.swimSound;
+            //else _actionAudioSource.clip = GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.swimSound;
             _volumeSwimming = _swimmingAudioSource.volume;
         }
 
         void Update() {
             //We lerp the current added velocity by the player on the character to get a pitch higher or lower depending on velocity
             //magnitude divided by Time.fixedDeltatime is done cause 
+            //TODO : This lerp doesn't seem to be working as intended : 
             _currentPitchValue = Mathf.Lerp(minPitch, maxPitch, GetMovementValue() / _axisMaxValue);
-
             _swimmingAudioSource.pitch = _currentPitchValue;
 
-            if (Mathf.Abs(playerController.GetLeftAnalogHorizontal()) > 0.0f
-                || Mathf.Abs(playerController.GetLeftAnalogVertical()) > 0.0f) {
-                //We reset the volume to the volume specified in the inspector
-                _swimmingAudioSource.volume = _volumeSwimming;
-                //We stop the coroutine and specify it in a boolean
-                StopCoroutine("TimerUntilSoundStop");
-                _isCoroutineRunning = false;
-
+            //Increase time for next swim sound
+            _currentSwimSoundTime += Time.deltaTime;
+            //check if the player is moving
+            if (Mathf.Abs(playerController.GetLeftAnalogHorizontal()) > 0.0f || Mathf.Abs(playerController.GetLeftAnalogVertical()) > 0.0f) {
                 if (!_swimmingAudioSource.isPlaying) _swimmingAudioSource.Play();
-            } else {
-                FadeAudioSource();
+                //Play Random Swim Sounds           
+                if (_currentSwimSoundTime > _currentSwimSoundGap) {
+                    _currentSwimSoundTime = 0;
+                    _currentSwimSoundGap = _swimSoundGap + Random.Range(_swimSoundGapVariation.x, _swimSoundGapVariation.y);
+                    _swimmingAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.swimSound);
+                }
             }
         }
 
         /// <summary> Plays a sound on the action audio source </summary>
         /// <param name="ac"> audioclip to play </param>
         public void PlaySound(PlayerSounds ac) {
-            switch(ac) {
-                case PlayerSounds.PlayerBump :
-                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.bumpSound);
-                    break;
-                case PlayerSounds.PlayerPush :
-                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.pushSound);
-                    break;
-                case PlayerSounds.PlayerGrab :
-                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.grabSound);
-                    break;
-                case PlayerSounds.PlayerChainFirst:
-                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowFirstSound);
-                    break;
-                case PlayerSounds.PlayerChainSecond:
-                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerChain_ThrowSecondSound);
-                    break;
-                case PlayerSounds.PlayerDeath:
-                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerDeath);
-                    break;
-                case PlayerSounds.PlayerRetractChains:
-                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.playerRetractChains);
-                    break;
-                case PlayerSounds.PlayerCooldown:
-                    _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.hookThrowCooldownFail);
-                    break;
-                default:
-                    Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");
-                    break;
+            if(_isSobek) {
+                switch (ac) {
+                    case PlayerSounds.PlayerBump:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.bumpSound);
+                        break;
+                    case PlayerSounds.PlayerPush:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.pushSound);
+                        break;
+                    case PlayerSounds.PlayerGrab:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.grabSound);
+                        break;
+                    case PlayerSounds.PlayerChainFirst:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.playerChain_ThrowFirstSound);
+                        break;
+                    case PlayerSounds.PlayerChainSecond:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.playerChain_ThrowSecondSound);
+                        break;
+                    case PlayerSounds.PlayerDeath:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.playerDeath);
+                        break;
+                    case PlayerSounds.PlayerRetractChains:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.playerRetractChains);
+                        break;
+                    case PlayerSounds.PlayerCooldown:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.hookThrowCooldownFail);
+                        break;
+                    case PlayerSounds.PlayerRespawn:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.playerRespawn);
+                        break;
+                    default:
+                        Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");
+                        break;
+                }
+            } else {
+                switch (ac) {
+                    case PlayerSounds.PlayerBump:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.bumpSound);
+                        break;
+                    case PlayerSounds.PlayerPush:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.pushSound);
+                        break;
+                    case PlayerSounds.PlayerGrab:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.grabSound);
+                        break;
+                    case PlayerSounds.PlayerChainFirst:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.playerChain_ThrowFirstSound);
+                        break;
+                    case PlayerSounds.PlayerChainSecond:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.playerChain_ThrowSecondSound);
+                        break;
+                    case PlayerSounds.PlayerDeath:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.playerDeath);
+                        break;
+                    case PlayerSounds.PlayerRetractChains:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.playerRetractChains);
+                        break;
+                    case PlayerSounds.PlayerCooldown:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.hookThrowCooldownFail);
+                        break;
+                    case PlayerSounds.PlayerRespawn:
+                        _actionAudioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.playerRespawn);
+                        break;
+                    default:
+                        Debug.LogWarning("Sound " + ac.ToString() + " not yet implemented.");
+                        break;
+                }
             }
         }
 
@@ -127,31 +174,6 @@ namespace Simoncouche.Controller {
             return movementValue;
         }
 
-        /// <summary>
-        /// We fade out the sound being played gradually until the volume is almost at 0.  Then we pause the sound and start a coroutine TimeUntilSoundStop
-        /// which wait a certain amount of time until we stop the sound.  It's in order the sound to get played back from the beginning when the player is 
-        /// doing stop'n goes.
-        /// </summary>
-        private void FadeAudioSource() {
-            _swimmingAudioSource.volume -= Time.deltaTime * volumeFadeOutSpeed;
-            if (_swimmingAudioSource.volume < 0.05f) {
-                _swimmingAudioSource.Pause();
-                if (_isCoroutineRunning) {
-                    TimerUntilSoundStop(timeUntileSoundStops);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Coroutine which wait a certain amount of time and then stopl our playerAudioSource
-        /// </summary>
-        /// <param name="time"></param>
-        /// <returns></returns>
-        private IEnumerator TimerUntilSoundStop(float time) {
-            _isCoroutineRunning = true;
-            yield return new WaitForSeconds(time);
-            _swimmingAudioSource.Stop();
-            _isCoroutineRunning = false;
-        }
+   
     }
 }

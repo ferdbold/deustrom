@@ -241,6 +241,9 @@ namespace Simoncouche.Islands {
             _islandChunks.Remove(chunk);
             PlayerGrab.UngrabBody(chunk.gravityBody);
             chunk.gravityBody.DestroyGravityBody();
+            foreach (GameObject chain in GameObject.FindGameObjectsWithTag("Chain")) {
+                chain.SendMessage("AttachedHookToIslandsUpdate");
+            }
         }
 
         /// <summary> Remove Island from the list and call a destroyChunk for each chunk of the island </summary>

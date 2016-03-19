@@ -69,6 +69,9 @@ namespace Simoncouche.Islands {
                 else if (gravityBodyScript != null) {
                     if (gravityBodyScript.collisionEnabled == true) {
                         gravityBodyScript.DestroyGravityBody();
+                        foreach (GameObject chain in GameObject.FindGameObjectsWithTag("Chain")) {
+                            chain.SendMessage("AttachedHookToIslandsUpdate");
+                        }
                         _audioSource.PlayOneShot(GameManager.audioManager.environmentSpecificSound.maelstromDestructionSound);
                         SpawnWaterSplash(transform);
                     }

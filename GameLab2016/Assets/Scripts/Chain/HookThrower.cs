@@ -46,7 +46,7 @@ namespace Simoncouche.Chain {
         public float spawnChainDistanceThreshold { get { return _spawnChainDistanceThreshold; } }
 
         /// <summary>The list of all the chains thrown by this thrower currently in play</summary>
-        private List<Chain> _chains = new List<Chain>();
+        public List<Chain> chains { get; private set; }
 
         /// <summary>Remaining time before the player can attempt a throw again</summary>
         private float _throwCooldownRemaining;
@@ -80,6 +80,7 @@ namespace Simoncouche.Chain {
             this.playerGrab = GetComponent<PlayerGrab>();
             this.chainLinker = transform.Find("ChainLinker").GetComponent<Rigidbody2D>();
             this.isSobek = this.gameObject.name == "Sobek" ? true : false;
+            this.chains = new List<Chain>();
         }
 
         public void SetupInput(bool isPlayerOne) {
@@ -162,7 +163,7 @@ namespace Simoncouche.Chain {
             // If we press fire when we don't have any hook,
             // we create a hook and switch the currentState to OneHook
             case State.NoHook:
-                _chains.Add(Chain.Create(this, _initialForceAmount, orientation));
+                chains.Add(Chain.Create(this, _initialForceAmount, orientation));
                 _currentState = State.Waiting;
 
                 // Animation handling
@@ -176,7 +177,7 @@ namespace Simoncouche.Chain {
             // If we press fire when we have 1 hook, 
             // we create a hook and switch the currentState to NoHook
             case State.OneHook: 
-                _chains[_chains.Count - 1].CreateEndingHook(orientation);
+                chains[chains.Count - 1].CreateEndingHook(orientation);
                 _currentState = State.Waiting;
 
                 // Animation handling
@@ -236,15 +237,15 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void RetractChainsReleased() {
             StopCoroutine("RetractChains");
-            if (_chains.Count > 0) _chains[_chains.Count - 1].RetractChainReleaseBehaviour();
+            if (chains.Count > 0) chains[chains.Count - 1].RetractChainReleaseBehaviour();
         }
 
         /// <summary>
         /// If the current chain is attached to the player, we cut the link with the player using this function
         /// </summary>
         private void CutChainLinkWithThrower() {
-            if (_chains.Count > 0) {
-                _chains[_chains.Count - 1].CutLinkBeginningHook();
+            if (chains.Count > 0) {
+                chains[chains.Count - 1].CutLinkBeginningHook();
                 this.isHookAttachedToPlayer = false;
             }
         }
@@ -256,16 +257,16 @@ namespace Simoncouche.Chain {
         /// <param name="time"></param>
         /// <returns></returns>
         IEnumerator RetractChains(float time) {
-            while (_chains.Count > 0) {
+            while (chains.Count > 0) {
                 bool mustPlaySound = false;
-                for (int i = _chains.Count - 1; i >= 0; i--) {
-                    if (_chains[i]._beginningHookIsSet) {
+                for (int i = chains.Count - 1; i >= 0; i--) {
+                    if (chains[i]._beginningHookIsSet) {
                         mustPlaySound = true; //Parce qu'on ne rétracte pas les chaînes qui viennent tout juste d'être lancé
-                        GravityBody mustAttachedToBody = _chains[i].RetractChain(_distanceRetractionValue);
+                        GravityBody mustAttachedToBody = chains[i].RetractChain(_distanceRetractionValue);
                         if (mustAttachedToBody != null) {
                             this.OnCutLinkWithPlayer();
                             this.AttachTouchedChunkToPlayer(mustAttachedToBody);
-                            _chains[i].CutLinkBeginningHook();
+                            chains[i].CutLinkBeginningHook();
                         }
                     }
                 }
@@ -323,26 +324,26 @@ namespace Simoncouche.Chain {
                 this.OnCutLinkWithPlayer();
                 playerController.HandleSecondHookAnimation();
             }
-            _chains.Remove(chain);
+            chains.Remove(chain);
         }
 
         /// <summary>
         /// Check if there is already a hook on an island or a chunk.  If so, we destroy the precedent chain which posses the hook in question.
         /// </summary>
         public void HookAlreadyOnIslandCheck(Islands.IslandAnchorPoints anchorPoint) {
-            if (_chains.Count > 1 && _doesHookReplacePresentHookOnIsland) {
+            if (chains.Count > 1 && _doesHookReplacePresentHookOnIsland) {
                 bool mustDestroyChain = false;
                 int i = 0;
 
-                while (i < _chains.Count - 1 && !mustDestroyChain) { //Count-1 cause we dont have to check the added hook 
-                    if (_chains[i].CheckAnchorPointInHooks(anchorPoint)) {
+                while (i < chains.Count - 1 && !mustDestroyChain) { //Count-1 cause we dont have to check the added hook 
+                    if (chains[i].CheckAnchorPointInHooks(anchorPoint)) {
                         mustDestroyChain = true;
                     }
                     if (!mustDestroyChain) i++;
                 }
 
                 if (mustDestroyChain) {
-                    _chains[i].DestroyChain(true);
+                    chains[i].DestroyChain(true);
                 }
             }
         }
@@ -351,9 +352,9 @@ namespace Simoncouche.Chain {
         /// Removes the chain if the player enters the maelstrom AND also prevents the player from shooting while exiting the maelstrom
         /// </summary>
         public void RemoveChainOnPlayerMaelstromEnter() {
-            if (_chains.Count > 0) {
-                if (_chains[_chains.Count - 1] != null && _currentState == State.OneHook) {
-                    _chains[_chains.Count - 1].DestroyChain(true);
+            if (chains.Count > 0) {
+                if (chains[chains.Count - 1] != null && _currentState == State.OneHook) {
+                    chains[chains.Count - 1].DestroyChain(true);
                     this.OnCutLinkWithPlayer();
                 }
             }

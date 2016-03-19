@@ -376,6 +376,7 @@ namespace Simoncouche.Controller {
 
                 //Mark grabbed body as null
                 grabbedBody = null;
+
                 //Set weight
                 _playerGravityBody.Weight =  _playerController._startPlayerWeight;
                 //Start Cooldown
@@ -389,6 +390,9 @@ namespace Simoncouche.Controller {
 
             //Reset charge multiplier
             StartCoroutine(ResetChargeMultiplier());
+            foreach(GameObject chain in GameObject.FindGameObjectsWithTag("Chain")){
+                chain.SendMessage("AttachedHookToIslandsUpdate");
+            }
         }
 
         /// <summary>

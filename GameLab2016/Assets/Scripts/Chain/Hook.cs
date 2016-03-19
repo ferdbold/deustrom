@@ -22,6 +22,8 @@ namespace Simoncouche.Chain {
         private static GameObject _hookPrefabSobek;
         /// <summary>Self-reference to the hook prefab for factory purposes</summary>
         private static GameObject _hookPrefabCthulu;
+        /// <summary>Self-reference to the hook prefab for factory purposes</summary>
+        private static GameObject _baseHookPrefab;
 
         /// <summary>The chain this hook is part of</summary>
         public Chain chain { get; private set; }
@@ -69,21 +71,25 @@ namespace Simoncouche.Chain {
         /// <param name="chain">The parent chain</param>
         /// <param name="isBeginningHook">Is this hook the beginning hook of a chain</param>
         /// <param name="orientation">The angle (in degrees) to apply to the hook</param> 
-        public static Hook Create(Chain chain, bool isBeginningHook, bool isSobek, float orientation) {
-
-            if (isSobek) {
-                if (_hookPrefabSobek == null) {
-                    _hookPrefabSobek = Resources.Load("Chain/HookSobek") as GameObject;
+        public static Hook Create(Chain chain, bool isBeginningHook, bool isSobek, float orientation, bool characterMesh) {
+            Vector3 initialPos;
+            if (characterMesh) {
+                if (isSobek) {
+                    if (_hookPrefabSobek == null) {
+                        _hookPrefabSobek = Resources.Load("Chain/HookSobek") as GameObject;
+                    }
+                } else if (_hookPrefabCthulu == null) {
+                    _hookPrefabCthulu = Resources.Load("Chain/HookCthulhu") as GameObject;
                 }
-            } else if (_hookPrefabCthulu == null) {
-                _hookPrefabCthulu = Resources.Load("Chain/HookCthulhu") as GameObject;
+                initialPos = chain.thrower.transform.position + (isSobek ? new Vector3(0, 0, -1.5f) : new Vector3(0, 0, -1.5f)); //Elevates a tiny bit the elevation in order to see the hook on top of island
+            } else {
+                _baseHookPrefab = Resources.Load("Chain/Hook") as GameObject;
+                initialPos = chain.thrower.transform.position;
             }
 
-            Vector3 elevatedPosition = chain.thrower.transform.position + (isSobek ? new Vector3(0, 0, -1.5f) : new Vector3(0, 0, -1.5f));
-
             Hook hook = ((GameObject)Instantiate(
-                isSobek?_hookPrefabSobek:_hookPrefabCthulu,
-                elevatedPosition, 
+                characterMesh?  isSobek?_hookPrefabSobek:_hookPrefabCthulu  :_baseHookPrefab,
+                initialPos, 
                 Quaternion.Euler(0, 0, orientation)
             )).GetComponent<Hook>();
 
@@ -179,7 +185,7 @@ namespace Simoncouche.Chain {
 
             this.targetJoint.enabled = true;
 
-            bool wasAttachedToIsland=this.CheckOtherPlayerOnNewIsland(anchor);
+            bool wasAttachedToIsland=this.CheckOtherPlayerOnNewIsland(anchor); //Must check if there is already a player attached to the island
 
             // Attach the joint to either the chunk or its parent island if it has one
             if (parentIsland == null && !wasAttachedToIsland) {
@@ -189,8 +195,8 @@ namespace Simoncouche.Chain {
             } 
             else if(!wasAttachedToIsland){
                 this.connectedIsland = parentIsland;
-                //this.targetJoint.connectedBody = parentIsland.rigidbody;
-                this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
+                this.targetJoint.connectedBody = parentIsland.rigidbody;
+                //this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
                 if (this == this.chain._endingHook) {
                     chain._beginningHook.chainJoint.connectedBody = parentIsland.rigidbody;
                     Debug.Log("Second hook hit");
@@ -240,6 +246,7 @@ namespace Simoncouche.Chain {
         /// <summary>React to attached chunk being grabbed by a player</summary>
         /// <param name="playerGrab">The player who grabbed the chunk</param> 
         private void OnAttachedChunkPlayerGrab(PlayerGrab playerGrab) {
+            islandIsGrabbedEnemy = true;
             // Reroute the chain to the player only if both hooks exist
             if (chain._beginningHook != null) {
                 if (this == chain._beginningHook) this.chain._beginningHook.targetJoint.connectedBody = playerGrab.rigidbody;//AJOUT
@@ -297,8 +304,9 @@ namespace Simoncouche.Chain {
         /// <summary>React to attached chunk being released by a player</summary>
         /// <param name="rb">The rigidbody the player was holding</param> 
         private void OnAttachedChunkPlayerRelease(Rigidbody2D rb) {
+            islandIsGrabbedEnemy = false;
             // Reroute the chain back to the island or chunk only if both hooks exist
-            if (this.chain.bothHooksExist) {
+            if (chain._beginningHookIsSet) {
                 this.targetJoint.connectedBody = rb;
             }
             // Otherwise, reactivate chain physics when the player releases.
