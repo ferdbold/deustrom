@@ -100,7 +100,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 188194}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 25.11006, y: -40.61651, z: -237.72072}
+  m_LocalPosition: {x: 22.25, y: 2.71, z: -1.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 478066}
@@ -139,7 +139,7 @@ ParticleSystem:
   serializedVersion: 2
   lengthInSec: 1
   startDelay:
-    scalar: 0.3
+    scalar: 0
     maxCurve:
       serializedVersion: 2
       m_Curve:
@@ -328,7 +328,7 @@ ParticleSystem:
         rgba: 4285958032
       minMaxState: 2
     startSize:
-      scalar: 2.5
+      scalar: 3.5
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -344,7 +344,7 @@ ParticleSystem:
         serializedVersion: 2
         m_Curve:
         - time: 0
-          value: 0.48000002
+          value: 0.5714286
           inSlope: 0
           outSlope: 0
           tangentMode: 0
@@ -500,11 +500,11 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
       minMaxState: 0
-    cnt0: 40
+    cnt0: 60
     cnt1: 30
     cnt2: 30
     cnt3: 30
-    cntmax0: 40
+    cntmax0: 65
     cntmax1: 30
     cntmax2: 30
     cntmax3: 30
@@ -3027,7 +3027,7 @@ ParticleSystem:
   serializedVersion: 2
   lengthInSec: 1.2
   startDelay:
-    scalar: 0.45
+    scalar: 0.1
     maxCurve:
       serializedVersion: 2
       m_Curve:
@@ -3723,14 +3723,14 @@ ParticleSystem:
         serializedVersion: 2
         m_Curve:
         - time: 0
-          value: 1
+          value: -0.0050251484
           inSlope: 0
           outSlope: 0
           tangentMode: 0
         - time: 1
-          value: 0
-          inSlope: -2
-          outSlope: -2
+          value: -0.0050251484
+          inSlope: 0
+          outSlope: 0
           tangentMode: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -3753,14 +3753,19 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 1
     z:
-      scalar: 1
+      scalar: 15
       maxCurve:
         serializedVersion: 2
         m_Curve:
-        - time: 0
-          value: 0
+        - time: 0.4894514
+          value: -1
           inSlope: 0
           outSlope: 0
+          tangentMode: 0
+        - time: 1
+          value: -0.41708544
+          inSlope: -5.4443564
+          outSlope: -5.4443564
           tangentMode: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
