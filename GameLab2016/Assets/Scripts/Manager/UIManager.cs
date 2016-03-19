@@ -90,7 +90,7 @@ public class UIManager : MonoBehaviour {
     }
 
     private void RefreshWins() {
-        Debug.Log(GameManager.levelManager);
+        //Debug.Log(GameManager.levelManager);
 
         _winsWidgets[(int)LevelManager.Player.cthulu].score = GameManager.levelManager.cthuluMatchWon;
         _winsWidgets[(int)LevelManager.Player.sobek].score = GameManager.levelManager.sobekMatchWon;
