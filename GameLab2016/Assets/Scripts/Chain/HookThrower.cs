@@ -65,6 +65,7 @@ namespace Simoncouche.Chain {
         public bool isHookAttachedToPlayer { get; private set; }
 
         public bool isPlayerOne { get; private set; }
+        public bool isSobek { get; private set; }
 
         // PROPERTIES
         private bool _triggerIsHeld = false;
@@ -76,9 +77,9 @@ namespace Simoncouche.Chain {
             this.autoAimController = GetComponent<AutoAimController>();
             this.playerController = GetComponent<PlayerController>();
             this.playerAudio = GetComponent<PlayerAudio>();
-            playerGrab = GetComponent<PlayerGrab>();
-
+            this.playerGrab = GetComponent<PlayerGrab>();
             this.chainLinker = transform.Find("ChainLinker").GetComponent<Rigidbody2D>();
+            this.isSobek = this.gameObject.name == "Sobek" ? true : false;
         }
 
         public void SetupInput(bool isPlayerOne) {

@@ -11,9 +11,8 @@ namespace Simoncouche.Islands {
         /// The collider and chunk and not parented since all collisions of the chunk need to be inactive for it to be properly deactivated.
         /// </summary>
         public struct ChunkWithCollider {
-            public IslandChunk chunk { get; private set; }
-            public Collider2D collider { get; private set; }
-
+            public IslandChunk chunk;
+            public Collider2D collider;
             public ChunkWithCollider(IslandChunk c, Collider2D col) { chunk = c; collider = col; }
         }
 
@@ -101,7 +100,8 @@ namespace Simoncouche.Islands {
         //Other Values
         private float _releaseForce = 15f; //force applied when island is released after shake
         private float _timeSinceLastSpawn = 0f; //current time since last island spawn
-        [SerializeField] private float _modifiedSpawnRate = 5f; //current spawn rate
+        [Header("DEBUG")]
+        [SerializeField][Tooltip("DO NOT TOUCH. Visible for DEBUG purposes only")] private float _modifiedSpawnRate = 5f; //current spawn rate
 
         
 
@@ -282,13 +282,13 @@ namespace Simoncouche.Islands {
             _modifiedSpawnRate = SPAWN_RATE;
 
             if (SPAWN_CHANGE_MULTIPLICATIVE) { //Add in a multiplicative manner
-                _modifiedSpawnRate *= (100f + (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE)) / 100f;
+                if(_pScoreDiff < 0) _modifiedSpawnRate *= (100f + (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE)) / 100f;
                 _modifiedSpawnRate *= (100f + (_pIslandDiffPlayers * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS)) / 100f;
                 if (_pIslandDiffMin < 0) _modifiedSpawnRate *= (100f + (_pIslandDiffMin * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN)) / 100f;
                 if (_pIslandDiffMax < 0) _modifiedSpawnRate *= (100f - (_pIslandDiffMax * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX)) / 100f;
             } else { //Add in a additive manner
                 float additiveSpawnRate = 100f;
-                additiveSpawnRate += (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE);
+                if (_pScoreDiff < 0) additiveSpawnRate += (_pScoreDiff * SPAWN_CHANGE_PER_SCORE_DIFFERENCE);
                 additiveSpawnRate += (_pIslandDiffPlayers * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_PLAYERS);
                 if (_pIslandDiffMin < 0) additiveSpawnRate += (_pIslandDiffMin * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN);
                 if (_pIslandDiffMax < 0) additiveSpawnRate -= (_pIslandDiffMax * SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX);
@@ -308,9 +308,10 @@ namespace Simoncouche.Islands {
                 _pCthulhuIsland = 0;
                 List<IslandChunk> _CurChunks = _islandManager.GetIslandChunks();
 
-                //TODO Update PARAMETERS WITH IS_SOBEK VALUE
-                //TODO SCORE WHEN READY
-                //_pScoreDiff = GameManager.Instance.ScoreSobek - GameManager.Instance.ScoreCthulhu
+                float _pSobekScorePercent = (float)GameManager.levelManager.sobekScore / (float)GameManager.levelManager.scoreNeededToWin * 100f;
+                float _pCthulhuScorePercent = (float)GameManager.levelManager.cthuluScore / (float)GameManager.levelManager.scoreNeededToWin * 100f;
+
+
 
                 foreach (IslandChunk ic in _CurChunks) {
                     if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
@@ -320,10 +321,12 @@ namespace Simoncouche.Islands {
                     _pIslandDiffPlayers = _pSobekIsland - _pCthulhuIsland;
                     _pIslandDiffMin = _pSobekIsland - AMT_ISLAND_MIN;
                     _pIslandDiffMax = AMT_ISLAND_MAX - _pSobekIsland;
+                    _pScoreDiff = _pSobekScorePercent - _pCthulhuScorePercent;
                 } else {
                     _pIslandDiffPlayers = _pCthulhuIsland - _pSobekIsland;
                     _pIslandDiffMin = _pCthulhuIsland - AMT_ISLAND_MIN;
                     _pIslandDiffMax = AMT_ISLAND_MAX - _pCthulhuIsland;
+                    _pScoreDiff = _pCthulhuScorePercent - _pSobekScorePercent;
                 }
 
                 CalculateSpawnRate();
