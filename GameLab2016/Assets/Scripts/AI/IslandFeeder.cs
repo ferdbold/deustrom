@@ -11,9 +11,8 @@ namespace Simoncouche.Islands {
         /// The collider and chunk and not parented since all collisions of the chunk need to be inactive for it to be properly deactivated.
         /// </summary>
         public struct ChunkWithCollider {
-            public IslandChunk chunk { get; private set; }
-            public Collider2D collider { get; private set; }
-
+            public IslandChunk chunk;
+            public Collider2D collider;
             public ChunkWithCollider(IslandChunk c, Collider2D col) { chunk = c; collider = col; }
         }
 

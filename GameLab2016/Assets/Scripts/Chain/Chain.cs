@@ -136,7 +136,7 @@ namespace Simoncouche.Chain {
             // Too few sections : Create more sections until we achieve the right number
             while (_chainSections.Count < neededSections) {
                 if (_chainSections.Count == 0) {
-                    _chainSections.Add(_beginningHook.SpawnChainSection(thrower.isPlayerOne));
+                    _chainSections.Add(_beginningHook.SpawnChainSection(thrower.isSobek));
                 } else {
                     _chainSections.Add(_chainSections[_chainSections.Count - 1].SpawnNewSection());
                 }
@@ -151,7 +151,7 @@ namespace Simoncouche.Chain {
             
         /// <summary>Create and configure the beginning hook</summary>
         public void CreateBeginningHook() {
-            _beginningHook = Hook.Create(this, true, this.thrower.isPlayerOne, initialOrientation);
+            _beginningHook = Hook.Create(this, true, this.thrower.isSobek, initialOrientation);
 
             // Position where the player threw the hook
             throwerThrowPosition = this.thrower.transform.position;
@@ -160,7 +160,7 @@ namespace Simoncouche.Chain {
         /// <summary>Create and configure the ending hook</summary>
         /// <param name="orientation">The orientation (in degrees) that the hook will face</param> 
         public void CreateEndingHook(float orientation) {
-            _endingHook = Hook.Create(this, false, this.thrower.isPlayerOne, orientation); 
+            _endingHook = Hook.Create(this, false, this.thrower.isSobek, orientation); 
 
             // Reroute the visual chain from the player to the ending hook
             _chainSections[_chainSections.Count - 1].joint.connectedBody = _endingHook.rigidbody;
@@ -196,13 +196,14 @@ namespace Simoncouche.Chain {
             bool mustDestroyChain = false;
             if (_beginningHookIsSet) {
                 if(_beginningHook.targetJoint.connectedBody == null || 
-                    (_beginningHook.islandIsGrabbedEnemy && (thrower.isPlayerOne?LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody== null :
+                    (_beginningHook.islandIsGrabbedEnemy && (thrower.isSobek?LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody== null :
                     LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
-                    mustDestroyChain = true;
+                        Debug.Log(LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody);
+                        mustDestroyChain = true;
                 }else if (_endingHookIsSet) {
                     if(_endingHook.targetJoint.connectedBody == null 
                         || (_endingHook.islandIsGrabbedEnemy && 
-                        (thrower.isPlayerOne ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
+                        (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
                         LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
                         mustDestroyChain = true;
                     }
