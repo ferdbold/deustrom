@@ -38,9 +38,9 @@ namespace Simoncouche.Chain {
         /// <param name="chain">The parent chain</param>
         /// <param name="previous">The previous element in the chain (either Hook or ChainSection)</param>
         /// <param name="previousLinkRotation">The previous link local rotation (for 90° alternance)</param>
-        public static ChainSection Create(Vector3 position, Quaternion rotation, Chain chain, GameObject previous,  bool isPlayerOne , Quaternion previousLinkRotation = default(Quaternion)){
+        public static ChainSection Create(Vector3 position, Quaternion rotation, Chain chain, GameObject previous,  bool isSobek , Quaternion previousLinkRotation = default(Quaternion)){
 
-            if (isPlayerOne) {
+            if (isSobek) {
                 if (_chainSectionSobek==null) {
                     _chainSectionSobek = Resources.Load("Chain/ChainSectionSobek") as GameObject;
                 }
@@ -49,7 +49,7 @@ namespace Simoncouche.Chain {
             }
 
             ChainSection chainSection = ((GameObject)Instantiate(
-                isPlayerOne?_chainSectionSobek:_chainSectionCthulu,
+                isSobek?_chainSectionSobek:_chainSectionCthulu,
                 position,
                 rotation
             )).GetComponent<ChainSection>();
@@ -83,7 +83,7 @@ namespace Simoncouche.Chain {
                 this.rigidbody.transform.rotation, 
                 this.chain, 
                 this.gameObject, 
-                chain.thrower.isPlayerOne,
+                chain.thrower.isSobek,
                 this.mesh.localRotation
             );
 

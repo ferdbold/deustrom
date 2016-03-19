@@ -55,7 +55,7 @@ public class LevelManager {
         if (players.Length > 2) Debug.LogWarning("Their is more than 2 player in the scene");
 
         foreach (GameObject player in players) {
-            if (player.GetComponent<PlayerController>().IsPlayerOne) {
+            if (player.name=="Sobek") {
                 sobekPlayer = player;
             } else {
                 cthulhuPlayer = player;

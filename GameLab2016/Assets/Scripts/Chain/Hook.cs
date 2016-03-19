@@ -69,9 +69,9 @@ namespace Simoncouche.Chain {
         /// <param name="chain">The parent chain</param>
         /// <param name="isBeginningHook">Is this hook the beginning hook of a chain</param>
         /// <param name="orientation">The angle (in degrees) to apply to the hook</param> 
-        public static Hook Create(Chain chain, bool isBeginningHook, bool isPlayerOne, float orientation) {
+        public static Hook Create(Chain chain, bool isBeginningHook, bool isSobek, float orientation) {
 
-            if (isPlayerOne) {
+            if (isSobek) {
                 if (_hookPrefabSobek == null) {
                     _hookPrefabSobek = Resources.Load("Chain/HookSobek") as GameObject;
                 }
@@ -79,10 +79,10 @@ namespace Simoncouche.Chain {
                 _hookPrefabCthulu = Resources.Load("Chain/HookCthulhu") as GameObject;
             }
 
-            Vector3 elevatedPosition = chain.thrower.transform.position + (isPlayerOne ? new Vector3(0, 0, -1.5f) : new Vector3(0, 0, -1.5f));
+            Vector3 elevatedPosition = chain.thrower.transform.position + (isSobek ? new Vector3(0, 0, -1.5f) : new Vector3(0, 0, -1.5f));
 
             Hook hook = ((GameObject)Instantiate(
-                isPlayerOne?_hookPrefabSobek:_hookPrefabCthulu,
+                isSobek?_hookPrefabSobek:_hookPrefabCthulu,
                 elevatedPosition, 
                 Quaternion.Euler(0, 0, orientation)
             )).GetComponent<Hook>();
@@ -131,13 +131,13 @@ namespace Simoncouche.Chain {
 
         /// <summary>Spawns the first chain section and attach to it</summary>
         /// <returns>The chain section</returns>
-        public ChainSection SpawnChainSection(bool isPlayerOne) {
+        public ChainSection SpawnChainSection(bool isSobek) {
             ChainSection chainSection = ChainSection.Create(
                 transform.position, 
                 this.rigidbody.transform.rotation, 
                 this.chain, 
                 this.gameObject, 
-                isPlayerOne,
+                isSobek,
                 Quaternion.identity
             );
 
