@@ -147,28 +147,95 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterSound:
-    _swim: {fileID: 8300000, guid: 7d1404ab3fad16e498c09a2c7a3ffae5, type: 3}
-    _bump: {fileID: 8300000, guid: 601d58c5248089446bdbec27c1bf801c, type: 3}
-    _push: {fileID: 8300000, guid: bc562fc7e8590bd40a1d235e6c67ed05, type: 3}
-    _grab: {fileID: 8300000, guid: bc562fc7e8590bd40a1d235e6c67ed05, type: 3}
-    _playerChain_ThrowFirst: {fileID: 8300000, guid: 24157398b1ebef3439f69190a3161712,
-      type: 3}
-    _playerChain_ThrowSecond: {fileID: 8300000, guid: 1f31b3b05e06415489c62651d9d52dcc,
-      type: 3}
-    _playerDeath: {fileID: 8300000, guid: 1928952072d157d459fc73db8521f0fd, type: 3}
-    _playerRetractChains: {fileID: 8300000, guid: 99896105c1a92714b802ff0bfb9f0142,
-      type: 3}
-    _hookThrowCooldownFail: {fileID: 8300000, guid: 16602db8ffd4c47c3bb33d4c1a997544,
-      type: 3}
+    _sobekSound:
+      _swim:
+      - {fileID: 8300000, guid: 808d29afd404b5747aa0d62814a09590, type: 3}
+      - {fileID: 8300000, guid: 25a55c904dfa662418b389c236baa951, type: 3}
+      - {fileID: 8300000, guid: ce1702c3745cf6041a8d1c00b31ec1d5, type: 3}
+      - {fileID: 8300000, guid: 23ab95eeb2b09fe4f96f8fc64a88e198, type: 3}
+      - {fileID: 8300000, guid: a2092ab896f58d64ba0abf4756d3a6ce, type: 3}
+      - {fileID: 8300000, guid: 649f64b1db74fd048bac9a8a692751a4, type: 3}
+      - {fileID: 8300000, guid: ab05d78f92a04894fb3c626f15f214b3, type: 3}
+      - {fileID: 8300000, guid: 6f0d11a47d882a249a045dab9c7f7eb2, type: 3}
+      _bump:
+      - {fileID: 8300000, guid: 95c846b473e5c384fb84563b31ed2077, type: 3}
+      _push:
+      - {fileID: 8300000, guid: 4386daf7165db4842afe11cae10cd6ac, type: 3}
+      _grab:
+      - {fileID: 8300000, guid: 24b37b69675b0dc498040f0bd001889a, type: 3}
+      _playerChain_ThrowFirst:
+      - {fileID: 8300000, guid: 58154e3f78a8a5e468e5f7e70d971152, type: 3}
+      - {fileID: 8300000, guid: 967348cd168fce64aab4d78265166c0f, type: 3}
+      - {fileID: 8300000, guid: 84d5dd958836e0941bbf75c373a68c08, type: 3}
+      - {fileID: 8300000, guid: 6263fe13470b04f46a55d54c0926260c, type: 3}
+      _playerChain_ThrowSecond:
+      - {fileID: 8300000, guid: a389068c7d11a7749aff52af8f685453, type: 3}
+      - {fileID: 8300000, guid: 7c0b4d0c8c3e7444fb0b354c610b57e1, type: 3}
+      - {fileID: 8300000, guid: 21ff49e37cac327429025ad5357cd9c6, type: 3}
+      - {fileID: 8300000, guid: f4370ba956072a941971d9d399b35981, type: 3}
+      - {fileID: 8300000, guid: 9723642d6104f5841a1441efe3e2af2a, type: 3}
+      _playerDeath:
+      - {fileID: 8300000, guid: 3e11eeeeae6751a49b6f9bc10f274302, type: 3}
+      _playerRetractChains:
+      - {fileID: 8300000, guid: 99896105c1a92714b802ff0bfb9f0142, type: 3}
+      _hookThrowCooldownFail:
+      - {fileID: 8300000, guid: 16602db8ffd4c47c3bb33d4c1a997544, type: 3}
+      _playerRespawn:
+      - {fileID: 8300000, guid: 687d525a0f720ee4ebd5a24fb5aeeea1, type: 3}
+    _cthuluSound:
+      _swim:
+      - {fileID: 8300000, guid: 808d29afd404b5747aa0d62814a09590, type: 3}
+      - {fileID: 8300000, guid: 25a55c904dfa662418b389c236baa951, type: 3}
+      - {fileID: 8300000, guid: ce1702c3745cf6041a8d1c00b31ec1d5, type: 3}
+      - {fileID: 8300000, guid: 23ab95eeb2b09fe4f96f8fc64a88e198, type: 3}
+      - {fileID: 8300000, guid: a2092ab896f58d64ba0abf4756d3a6ce, type: 3}
+      - {fileID: 8300000, guid: 649f64b1db74fd048bac9a8a692751a4, type: 3}
+      - {fileID: 8300000, guid: ab05d78f92a04894fb3c626f15f214b3, type: 3}
+      - {fileID: 8300000, guid: 6f0d11a47d882a249a045dab9c7f7eb2, type: 3}
+      _bump:
+      - {fileID: 8300000, guid: ad491eda2edb10846aeab55f2367a2bc, type: 3}
+      _push:
+      - {fileID: 8300000, guid: 4386daf7165db4842afe11cae10cd6ac, type: 3}
+      _grab:
+      - {fileID: 8300000, guid: 24b37b69675b0dc498040f0bd001889a, type: 3}
+      _playerChain_ThrowFirst:
+      - {fileID: 8300000, guid: 58154e3f78a8a5e468e5f7e70d971152, type: 3}
+      - {fileID: 8300000, guid: 967348cd168fce64aab4d78265166c0f, type: 3}
+      - {fileID: 8300000, guid: 84d5dd958836e0941bbf75c373a68c08, type: 3}
+      - {fileID: 8300000, guid: 6263fe13470b04f46a55d54c0926260c, type: 3}
+      _playerChain_ThrowSecond:
+      - {fileID: 8300000, guid: a389068c7d11a7749aff52af8f685453, type: 3}
+      - {fileID: 8300000, guid: 7c0b4d0c8c3e7444fb0b354c610b57e1, type: 3}
+      - {fileID: 8300000, guid: 21ff49e37cac327429025ad5357cd9c6, type: 3}
+      - {fileID: 8300000, guid: f4370ba956072a941971d9d399b35981, type: 3}
+      - {fileID: 8300000, guid: 9723642d6104f5841a1441efe3e2af2a, type: 3}
+      _playerDeath:
+      - {fileID: 8300000, guid: 3e11eeeeae6751a49b6f9bc10f274302, type: 3}
+      _playerRetractChains:
+      - {fileID: 8300000, guid: cc9c226b2f27b184c9cd397a8892fd53, type: 3}
+      _hookThrowCooldownFail:
+      - {fileID: 8300000, guid: 16602db8ffd4c47c3bb33d4c1a997544, type: 3}
+      _playerRespawn:
+      - {fileID: 8300000, guid: 687d525a0f720ee4ebd5a24fb5aeeea1, type: 3}
   _islandSound:
-    _collision: {fileID: 8300000, guid: 0b347266e4cbe3c42937db571416cebf, type: 3}
-    _merge: {fileID: 8300000, guid: 167f6df39a4ba2c45ae9c7e0fcfe3af8, type: 3}
-    _destruction: {fileID: 8300000, guid: 767285c66a13dcf478092ddd75923a8a, type: 3}
+    _collision:
+    - {fileID: 8300000, guid: 6f3b7e321c9fbdf4c9158a22d2583ab9, type: 3}
+    - {fileID: 8300000, guid: e051317b694103c4d9aa8da7dd5876ae, type: 3}
+    - {fileID: 8300000, guid: 97182342adcdfdd49b5e37c2dcdff69a, type: 3}
+    _merge:
+    - {fileID: 8300000, guid: 6f3b7e321c9fbdf4c9158a22d2583ab9, type: 3}
+    - {fileID: 8300000, guid: e051317b694103c4d9aa8da7dd5876ae, type: 3}
+    - {fileID: 8300000, guid: 97182342adcdfdd49b5e37c2dcdff69a, type: 3}
+    _destruction:
+    - {fileID: 8300000, guid: 01dc350ec20fafc488a379128b74dcee, type: 3}
   _environmentSound:
-    _maelstromDestruction: {fileID: 8300000, guid: 707dcca614eb18f40bba2e988a126237,
-      type: 3}
+    _maelstromDestruction:
+    - {fileID: 8300000, guid: 3e11eeeeae6751a49b6f9bc10f274302, type: 3}
+    - {fileID: 8300000, guid: 04ec635783e944b46827421deda55be2, type: 3}
+    - {fileID: 8300000, guid: 406cc4aaa1480eb45b20eeafba8ab153, type: 3}
   _chainSound:
-    _chainDestruction: {fileID: 8300000, guid: 2249f2e354ead7948a4a21ae872e5559, type: 3}
+    _chainDestruction:
+    - {fileID: 8300000, guid: 2249f2e354ead7948a4a21ae872e5559, type: 3}
 --- !u!114 &11442458
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -184,6 +184,8 @@ namespace Simoncouche.Controller {
             _playerRigidBody.velocity = Vector2.zero;
             StartCoroutine(Respawn_Resurface());
 
+            //Audio
+            _playerAudio.PlaySound(PlayerSounds.PlayerRespawn);
             //Animation
             HandleKnockedOutStopAnimation();
         }

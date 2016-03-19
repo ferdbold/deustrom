@@ -19,6 +19,7 @@ AudioMixerController:
     - d9831d4526f4b1347b4d1c8d57d4f054
     - fb3a00d0e811f9a44bf860cd6bd47293
     - 1cfe2378c540428448c0c8659970adfc
+    - 5147c5c0c54417e4ba9f73cc466d8378
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500003}
@@ -33,6 +34,7 @@ AudioMixerGroupController:
   m_Children:
   - {fileID: 24318460}
   - {fileID: 24372724}
+  - {fileID: 24338642}
   m_Volume: 4a1ebdb62eaf5d945b70c4867b13383a
   m_Pitch: cccbcf863fef5f94eb6f4186901e5436
   m_Effects:
@@ -54,6 +56,23 @@ AudioMixerGroupController:
   m_Pitch: 3544066f3513b2448b9645c2efc08f35
   m_Effects:
   - {fileID: 24428076}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!243 &24338642
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Swimming
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 5147c5c0c54417e4ba9f73cc466d8378
+  m_Children: []
+  m_Volume: 2555300213b466c419db4219d0fc4033
+  m_Pitch: 0ee41324b16ad8d49bc24483d7134869
+  m_Effects:
+  - {fileID: 24435116}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -97,6 +116,19 @@ AudioMixerEffectController:
   m_EffectID: 7d276000736b4c6459ab3f13a5d92730
   m_EffectName: Attenuation
   m_MixLevel: 562ff3f3c6d03ca44982af9a4872aece
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
+--- !u!244 &24435116
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_EffectID: 0276aceea2aeeaa44955546a16bc05df
+  m_EffectName: Attenuation
+  m_MixLevel: fef0fde12cd07e64cbe5a5fcc00258ed
   m_Parameters: []
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
