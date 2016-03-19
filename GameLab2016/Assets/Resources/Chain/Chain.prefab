@@ -12,7 +12,7 @@ GameObject:
   - 82: {fileID: 8214848}
   m_Layer: 0
   m_Name: Chain
-  m_TagString: Untagged
+  m_TagString: Chain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,6 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _chainSectionLength: 1
   _timeUntilChainExpires: 10
+  _hasCharacterHook: 0
   islandChunkBeginningHook: {fileID: 0}
   islandChunkEndingHook: {fileID: 0}
   _chainFlickerColor: {r: 1, g: 1, b: 1, a: 0}
@@ -211,6 +212,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: flickerTimeDivider
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_TagString
+      value: Chain
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _hasCharacterHook
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
