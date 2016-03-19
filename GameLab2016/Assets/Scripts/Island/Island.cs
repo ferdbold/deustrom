@@ -36,6 +36,8 @@ namespace Simoncouche.Islands {
         //Island's Components
         private CircleCollider2D _collider;
         private IslandColliders _islandColliders;
+        public IslandColliders islandColliders { get { return _islandColliders; } }
+
         public GravityBody gravityBody { get; private set; }
         public new Rigidbody2D rigidbody { get; private set;}
 
@@ -90,7 +92,6 @@ namespace Simoncouche.Islands {
         /// </param>
         public void AddChunkToIsland(IslandChunk chunk) {
             if (!chunks.Contains(chunk) && chunk!=null) {
-                //_islandColliders.AddCollision(chunk);
                 chunk.parentIsland = this;
                 chunk.transform.SetParent(transform, true);
                 chunks.Add(chunk);
@@ -131,9 +132,8 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="chunk">Reference of the chunk to remove</param>
         public void RemoveChunkToIsland(IslandChunk chunk) {
-            //TODO : Implement this function
             if (chunks.Contains(chunk)) {
-                //_islandColliders.RemoveCollision(chunk);
+                _islandColliders.RemoveCollision(chunk);
                 chunks.Remove(chunk);
             }
 
@@ -182,8 +182,7 @@ namespace Simoncouche.Islands {
                 chunks[i].transform.localPosition -= medianPosition;
             }
             transform.position += medianPosition;
-
-            Debug.Log("test");
+            
             //_islandColliders.UpdateCollision();
         }
         

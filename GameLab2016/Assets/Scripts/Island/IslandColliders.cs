@@ -5,30 +5,57 @@ namespace Simoncouche.Islands {
     public class IslandColliders : MonoBehaviour {
 
         private List<IslandCollider_Data> colliders = new List<IslandCollider_Data>();
+        private Transform originIsland = null;
+        private Transform targetPlayer = null;
+        private Vector3 originLocalPos;
+        
+        void Awake() {
+            originIsland = transform.parent;
+            originLocalPos = transform.localPosition;
+        }
 
-        public void AddCollision(IslandChunk chunk) {
+        /// <summary>
+        /// Move the collision from the island to the grabed player
+        /// </summary>
+        /// <param name="destination"></param>
+        public void MoveCollisionToPlayer(Transform destination) {
+            targetPlayer = destination;
+            transform.SetParent(destination, true);
+            UpdateCollision();
+        }
+
+        /// <summary>
+        /// Move the collision back to the island
+        /// </summary>
+        public void MoveCollisionBackToIsland() {
+            targetPlayer = null;
+            transform.SetParent(originIsland, true);
+            transform.localPosition = originLocalPos;
+            UpdateCollision();
+        }
+
+        public void AddCollision(IslandChunk chunk, Vector3 targetPos) {
             if (FindChunk(chunk) == null) {
                 CircleCollider2D col = chunk.GetComponent<CircleCollider2D>();
 
                 CircleCollider2D thisCol = gameObject.AddComponent<CircleCollider2D>();
                 thisCol.radius = col.radius;
-                thisCol.offset = chunk.transform.localPosition;
-
+                thisCol.offset = targetPos;
+                
                 colliders.Add(new IslandCollider_Data(thisCol, chunk));
+                Physics2D.IgnoreCollision(chunk.GetComponent<CircleCollider2D>(), thisCol);
             }
         }
 
         public void RemoveCollision(IslandChunk chunk) {
             IslandCollider_Data data = FindChunk(chunk);
-            Destroy(data.collider);
             colliders.Remove(data);
+            Destroy(data.collider);
         }
 
-        public void UpdateCollision() {
+        private void UpdateCollision() {
             foreach (IslandCollider_Data data in colliders) {
-                Debug.Log(data.originChunk.transform.localPosition);
                 data.collider.offset = data.originChunk.transform.localPosition;
-                Debug.Log(data.collider.offset);
             }
         }
 

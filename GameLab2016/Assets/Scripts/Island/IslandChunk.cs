@@ -147,7 +147,8 @@ namespace Simoncouche.Islands {
             /*transform.localPosition = targetPos;
             transform.localRotation = Quaternion.Euler(targetRot);*/
             transform.DOLocalRotate(targetRot, time);
-            transform.DOLocalMove(targetPos, time);
+            transform.DOLocalMoveX(targetPos.x, time);
+            transform.DOLocalMoveY(targetPos.y, time);
             //StartCoroutine(Delay_CenterIslandRoot(0f, targetIsland, targetChunk));
         }
 
