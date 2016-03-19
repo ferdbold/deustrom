@@ -116,6 +116,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _chainSectionLength: 1
   _timeUntilChainExpires: 10
+  _hasCharacterHook: 0
   islandChunkBeginningHook: {fileID: 0}
   islandChunkEndingHook: {fileID: 0}
   _chainFlickerColor: {r: 1, g: 1, b: 1, a: 0}
@@ -215,6 +216,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_TagString
       value: Chain
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _hasCharacterHook
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
