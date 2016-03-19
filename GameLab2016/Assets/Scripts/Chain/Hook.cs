@@ -240,6 +240,7 @@ namespace Simoncouche.Chain {
         /// <summary>React to attached chunk being grabbed by a player</summary>
         /// <param name="playerGrab">The player who grabbed the chunk</param> 
         private void OnAttachedChunkPlayerGrab(PlayerGrab playerGrab) {
+            islandIsGrabbedEnemy = true;
             // Reroute the chain to the player only if both hooks exist
             if (chain._beginningHook != null) {
                 if (this == chain._beginningHook) this.chain._beginningHook.targetJoint.connectedBody = playerGrab.rigidbody;//AJOUT
@@ -297,8 +298,9 @@ namespace Simoncouche.Chain {
         /// <summary>React to attached chunk being released by a player</summary>
         /// <param name="rb">The rigidbody the player was holding</param> 
         private void OnAttachedChunkPlayerRelease(Rigidbody2D rb) {
+            islandIsGrabbedEnemy = false;
             // Reroute the chain back to the island or chunk only if both hooks exist
-            if (this.chain.bothHooksExist) {
+            if (chain._beginningHookIsSet) {
                 this.targetJoint.connectedBody = rb;
             }
             // Otherwise, reactivate chain physics when the player releases.
