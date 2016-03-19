@@ -991,7 +991,7 @@ MonoBehaviour:
   - {fileID: 467024}
   - {fileID: 458794}
   - {fileID: 429976}
-  MIN_COLUMN: 5
+  MIN_COLUMN: 2
   ISLAND_SIZE_X: 5
   ISLAND_SIZE_Y: 5
   SPAWN_RATE: 10
@@ -1027,7 +1027,7 @@ MonoBehaviour:
   - {fileID: 472816}
   - {fileID: 445264}
   - {fileID: 429950}
-  MIN_COLUMN: 5
+  MIN_COLUMN: 2
   ISLAND_SIZE_X: 5
   ISLAND_SIZE_Y: 5
   SPAWN_RATE: 10

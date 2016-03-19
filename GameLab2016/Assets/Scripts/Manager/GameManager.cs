@@ -72,6 +72,7 @@ public class GameManager : MonoBehaviour {
     void Awake() {
         if (Instance == null) {
             Instance = this;
+            Application.targetFrameRate = 60; //Set target framerate
 
             GameManager.inputManager = GetComponent<InputManager>();
             GameManager.islandManager = GetComponent<IslandManager>();

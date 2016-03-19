@@ -81,6 +81,7 @@ namespace Simoncouche.Islands {
         private float _currentX = 0f;
         private float _currentY = 0f;
         private float _targetContinentX = 0;
+        private bool _isMoving = false;
         //Spawn Parameters 
         private float _pScoreDiff = 0f; //Score diff between players in %. If positive, Spawn Faster.
         private int _pIslandDiffPlayers = 0; //Number of island difference between players.  If positive, Spawn Faster.
@@ -118,13 +119,15 @@ namespace Simoncouche.Islands {
             for (int i = 0; i <= MIN_COLUMN; ++i) {
                 GenerateColumn();
             }
-            ToggleCollidersOnColumn(0, true);
             _targetContinentX = 0;
             StartCoroutine(UpdateSpawnParameters());
         }
 
         void Update() {
             ManageSpawn();
+        }
+
+        void FixedUpdate() {
             MoveSpawner();
         }
 
@@ -138,9 +141,18 @@ namespace Simoncouche.Islands {
         }
 
         private void MoveSpawner() {
-            _islandContainer.transform.localPosition = Vector3.Lerp(_islandContainer.transform.localPosition,
-                                                                    new Vector3(_targetContinentX, 0, 0),
-                                                                    0.15f * Time.deltaTime);
+            if (_isMoving) {
+                Vector3 tPos = new Vector3(_targetContinentX, 0, 0);
+                Debug.Log(Vector3.Distance(_islandContainer.transform.localPosition, tPos));
+                if (Vector3.Distance(_islandContainer.transform.localPosition, tPos) > 0.15f) {
+                    _islandContainer.transform.localPosition = Vector3.Lerp(_islandContainer.transform.localPosition,
+                                                                            tPos,
+                                                                            0.8f * Time.deltaTime);
+                } else {
+                    _isMoving = false;
+                    _islandContainer.transform.localPosition = tPos;
+                }
+            }
         }
         
         #region Generation
@@ -160,6 +172,7 @@ namespace Simoncouche.Islands {
             _islandRows.Add(column);
             _currentColumn++;
             _targetContinentX += GENERATE_LEFT ? ISLAND_SIZE_X : -ISLAND_SIZE_X;
+            _isMoving = true;
         }
 
         /// <summary> Generate an island and place it in given Island list</summary>
@@ -178,7 +191,6 @@ namespace Simoncouche.Islands {
             tempCollider.transform.parent = generatedChunk.transform; //set as parent to get relative scale
             tempCollider.transform.localScale = Vector3.one;
             tempCollider.transform.parent = _islandContainer.transform; //Remove parenting
-            tempCollider.SetActive(false);
             generatedCollider = tempCollider.GetComponent<Collider2D>();
 
             return (new ChunkWithCollider(generatedChunk, generatedCollider));
@@ -230,7 +242,6 @@ namespace Simoncouche.Islands {
             int randIndex = Random.Range(0, _islandRows[0].Count);
             StartCoroutine(ActivateIsland(_islandRows[0][randIndex]));
             RemoveIslandChunkFromList(_islandRows[0][randIndex], 0);
-            ToggleColliderOnSpecificChunk(1,randIndex,true); //activate collision on next chunk
         }
 
         /// <summary> Activate an island. Island will check player's position to see if it can be released early if they are far. Otherwise wait for the whole duration</summary>
