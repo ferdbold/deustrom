@@ -6,6 +6,7 @@ TagManager:
   tags:
   - IslandSubFolder
   - FxTemporaire
+  - Chain
   layers:
   - Default
   - TransparentFX
