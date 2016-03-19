@@ -23,6 +23,9 @@ public class UIManager : MonoBehaviour {
     [SerializeField]
     private Image _cthulhuRunePrefab;
 
+    private List<Image> sobekRunesPool = new List<Image>();
+    private List<Image> cthulhuRunesPool = new List<Image>();
+
     // COMPONENTS
 
     public Canvas root { get; private set; }
@@ -43,6 +46,12 @@ public class UIManager : MonoBehaviour {
         _winsWidgets.Add(GameObject.Find("UI/Wins/Cthulhu").GetComponent<WinsWidget>());
     
         RefreshWins();
+
+        //Pooling
+        for (int i = 0; i < 15; i++) {
+            InstantiateRune(LevelManager.Player.sobek);
+            InstantiateRune(LevelManager.Player.cthulu);
+        }
     }
 
     // FIXME: This is for test purposes and should be removed in the final build
@@ -67,9 +76,7 @@ public class UIManager : MonoBehaviour {
     /// <param name="sourcePos">The position of the object that generated a point for the player.</param>
     public void AddPoint(LevelManager.Player player, Vector3 sourcePos) {
         if (root != null) {
-            Image newScoreOrb = (player == LevelManager.Player.cthulu) ?
-                (Image)GameObject.Instantiate(_cthulhuRunePrefab) :
-                (Image)GameObject.Instantiate(_sobekRunePrefab);
+            Image newScoreOrb = GetRune(player);
             
             newScoreOrb.transform.SetParent(this.root.transform);
             newScoreOrb.rectTransform.position = Camera.main.WorldToScreenPoint(sourcePos);
@@ -90,7 +97,45 @@ public class UIManager : MonoBehaviour {
     }
 
     private void OnOrbAnimComplete(LevelManager.Player player, Image orb) {
-        GameObject.Destroy(orb.gameObject);
+        ReturnRune(orb, player);
         _scoreWidgets[(int)player].AddPoints(1);
     }
+
+    #region Pooling
+
+    private Image GetRune(LevelManager.Player player) {
+        Image returnImage = null;
+        if (player == LevelManager.Player.sobek) {         
+            if (sobekRunesPool.Count <= 0) InstantiateRune(player);
+            returnImage = sobekRunesPool[0];
+            sobekRunesPool.RemoveAt(0);
+        } else {
+            if (cthulhuRunesPool.Count <= 0) InstantiateRune(player);
+            returnImage = cthulhuRunesPool[0];
+            cthulhuRunesPool.RemoveAt(0);
+        }
+        returnImage.gameObject.SetActive(true);
+        return returnImage;
+    }
+
+    private void ReturnRune(Image rune, LevelManager.Player player) {
+        rune.gameObject.SetActive(false);
+        if (player == LevelManager.Player.sobek) sobekRunesPool.Add(rune);
+        else cthulhuRunesPool.Add(rune);
+    }
+
+    private void InstantiateRune(LevelManager.Player player) {
+        Image instantiatedObj;
+        if (player == LevelManager.Player.sobek) {
+            instantiatedObj = (Image)GameObject.Instantiate(_sobekRunePrefab);
+            instantiatedObj.gameObject.SetActive(false);
+            sobekRunesPool.Add(instantiatedObj);
+        } else {
+            instantiatedObj = (Image)GameObject.Instantiate(_cthulhuRunePrefab);
+            instantiatedObj.gameObject.SetActive(false);
+            cthulhuRunesPool.Add(instantiatedObj);
+        }
+    }
+
+    #endregion
 }

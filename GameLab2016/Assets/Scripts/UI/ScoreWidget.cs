@@ -65,7 +65,7 @@ namespace Simoncouche.UI {
         /// </summary>
         /// <returns>The fill end position.</returns>
         public Vector3 GetFillEndPosition() {
-            Debug.Log("Y: " + _directSlider.fillRect.rect.height / 2 * GameManager.uiManager.root.scaleFactor);
+            //Debug.Log("Y: " + _directSlider.fillRect.rect.height / 2 * GameManager.uiManager.root.scaleFactor);
 
             return new Vector3(
                 _directSlider.fillRect.position.x + (_directSlider.fillRect.rect.width / 2 * GameManager.uiManager.root.scaleFactor * ((transform.localRotation.eulerAngles.z == 0) ? 1 : -1)), 
