@@ -118,6 +118,7 @@ namespace Simoncouche.Islands {
             for (int i = 0; i <= MIN_COLUMN; ++i) {
                 GenerateColumn();
             }
+            ToggleCollidersOnColumn(0, true);
             _targetContinentX = 0;
             StartCoroutine(UpdateSpawnParameters());
         }
@@ -177,6 +178,7 @@ namespace Simoncouche.Islands {
             tempCollider.transform.parent = generatedChunk.transform; //set as parent to get relative scale
             tempCollider.transform.localScale = Vector3.one;
             tempCollider.transform.parent = _islandContainer.transform; //Remove parenting
+            tempCollider.SetActive(false);
             generatedCollider = tempCollider.GetComponent<Collider2D>();
 
             return (new ChunkWithCollider(generatedChunk, generatedCollider));
@@ -205,7 +207,21 @@ namespace Simoncouche.Islands {
             }
         }
 
+
+        private void ToggleCollidersOnColumn(int index, bool active) {
+            foreach (ChunkWithCollider cc in _islandRows[index]) {
+                cc.collider.gameObject.SetActive(active);
+            }
+        }
+
+        private void ToggleColliderOnSpecificChunk(int column, int row, bool active) {
+            _islandRows[column][row].collider.gameObject.SetActive(active);
+        }
+
         #endregion
+
+
+
 
         #region Activating and Releasing Islands
 
@@ -214,6 +230,7 @@ namespace Simoncouche.Islands {
             int randIndex = Random.Range(0, _islandRows[0].Count);
             StartCoroutine(ActivateIsland(_islandRows[0][randIndex]));
             RemoveIslandChunkFromList(_islandRows[0][randIndex], 0);
+            ToggleColliderOnSpecificChunk(1,randIndex,true); //activate collision on next chunk
         }
 
         /// <summary> Activate an island. Island will check player's position to see if it can be released early if they are far. Otherwise wait for the whole duration</summary>
