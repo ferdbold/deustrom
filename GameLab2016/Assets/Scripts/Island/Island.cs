@@ -133,8 +133,14 @@ namespace Simoncouche.Islands {
         /// <param name="chunk">Reference of the chunk to remove</param>
         public void RemoveChunkToIsland(IslandChunk chunk) {
             if (chunks.Contains(chunk)) {
+                foreach (IslandChunk c in chunks) {
+                    if (c != chunk) {
+                        chunk.ChangeCollisionBetweenChunk(c, true);
+                    }
+                }
                 _islandColliders.RemoveCollision(chunk);
                 chunks.Remove(chunk);
+                chunk.transform.SetParent(transform.root);
             }
 
             //Recenter island middle
