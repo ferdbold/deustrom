@@ -117,7 +117,7 @@ namespace Simoncouche.Chain {
             if (!_isPlayingSoundOnDestroy) {
                 RecalculateChainSections();
                 ChainMissAndHitUpdate();
-                AttachedHookToIslandsUpdate();
+                //AttachedHookToIslandsUpdate();
             }
         }
             
@@ -194,20 +194,43 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void AttachedHookToIslandsUpdate() {
             bool mustDestroyChain = false;
-            if (_beginningHookIsSet) {
-                if(_beginningHook.targetJoint.connectedBody == null || 
-                    (_beginningHook.islandIsGrabbedEnemy && (thrower.isSobek?LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody== null :
-                    LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
-                        Debug.Log(LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody);
-                        mustDestroyChain = true;
-                }else if (_endingHookIsSet) {
-                    if(_endingHook.targetJoint.connectedBody == null 
-                        || (_endingHook.islandIsGrabbedEnemy && 
+            if (_beginningHookIsSet && _beginningHook!=null) {
+                if (_beginningHook.targetJoint.connectedBody == null) mustDestroyChain = true;
+
+                else if ( _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
+                    if (_beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed) mustDestroyChain = true;
+                } 
+                if (_beginningHook.islandIsGrabbedEnemy &&
+                      (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
+                      LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) {
+                    mustDestroyChain = true;
+                } 
+                else if (_endingHookIsSet && _endingHook != null) {
+                    if (_endingHook.targetJoint.connectedBody == null) mustDestroyChain = true;
+                    else if ( _endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
+                        if (_endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed) mustDestroyChain = true;
+                    }
+                    if(_endingHook.islandIsGrabbedEnemy &&
                         (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
-                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
-                        mustDestroyChain = true;
+                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) {
+                            mustDestroyChain = true;
                     }
                 }
+
+                /*
+                if ((_beginningHook.targetJoint.connectedBody == null | _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed)
+                    || (_beginningHook.islandIsGrabbedEnemy && 
+                    (thrower.isSobek?LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody.isDestroyed== true :
+                    LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody.isDestroyed == true))) {
+                        mustDestroyChain = true;
+                }else if (_endingHookIsSet) {
+                    if((_endingHook.targetJoint.connectedBody == null | _endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed)
+                        || (_endingHook.islandIsGrabbedEnemy &&
+                        (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody.isDestroyed == true :
+                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody.isDestroyed == true))) {
+                        mustDestroyChain = true;
+                    }
+                }*/
             }
             if (mustDestroyChain) DestroyChain(true);
         }

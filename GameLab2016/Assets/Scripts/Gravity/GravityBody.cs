@@ -30,6 +30,8 @@ public class GravityBody : GravityObject {
     
     public float AdditionnalDrag { get { return _additionnalDrag; } set { _additionnalDrag = Mathf.Clamp(value, 0f, 2f); } }
     public float DefaultDrag { get { return DEFAULT_DRAG;  } private set { DEFAULT_DRAG = value; } }
+
+    public bool isDestroyed = false;
  
 
     //Components
@@ -141,6 +143,7 @@ public class GravityBody : GravityObject {
     public virtual void DestroyGravityBody(){
         //Debug.Log("Destroyed RigidBody " + gameObject.name);
         Destroy(gameObject);
+        isDestroyed = true;
     }
 
     #endregion

@@ -189,8 +189,8 @@ namespace Simoncouche.Chain {
             } 
             else if(!wasAttachedToIsland){
                 this.connectedIsland = parentIsland;
-                //this.targetJoint.connectedBody = parentIsland.rigidbody;
-                this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
+                this.targetJoint.connectedBody = parentIsland.rigidbody;
+                //this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
                 if (this == this.chain._endingHook) {
                     chain._beginningHook.chainJoint.connectedBody = parentIsland.rigidbody;
                     Debug.Log("Second hook hit");
