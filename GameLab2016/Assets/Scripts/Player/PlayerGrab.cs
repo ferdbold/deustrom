@@ -218,6 +218,7 @@ namespace Simoncouche.Controller {
                 StartCoroutine(RepositionGrabbedBody(parentIsland.transform, repositionDelay));
 
                 parentIsland.GrabbedByPlayer.Invoke(this);
+                parentIsland.islandColliders.MoveCollisionToPlayer(transform);
             }
 
             //Check grab particles 
@@ -370,6 +371,7 @@ namespace Simoncouche.Controller {
                     }
 
                     parentIsland.ReleasedByPlayer.Invoke(parentIsland.rigidbody);
+                    parentIsland.islandColliders.MoveCollisionBackToIsland();
                 }
 
                 //Mark grabbed body as null

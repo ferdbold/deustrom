@@ -5,6 +5,34 @@ namespace Simoncouche.Islands {
     public class IslandColliders : MonoBehaviour {
 
         private List<IslandCollider_Data> colliders = new List<IslandCollider_Data>();
+        private Transform originIsland = null;
+        private Transform targetPlayer = null;
+        private Vector3 originLocalPos;
+        
+        void Awake() {
+            originIsland = transform.parent;
+            originLocalPos = transform.localPosition;
+        }
+
+        /// <summary>
+        /// Move the collision from the island to the grabed player
+        /// </summary>
+        /// <param name="destination"></param>
+        public void MoveCollisionToPlayer(Transform destination) {
+            targetPlayer = destination;
+            transform.SetParent(destination, true);
+            UpdateCollision();
+        }
+
+        /// <summary>
+        /// Move the collision back to the island
+        /// </summary>
+        public void MoveCollisionBackToIsland() {
+            targetPlayer = null;
+            transform.SetParent(originIsland, true);
+            transform.localPosition = originLocalPos;
+            UpdateCollision();
+        }
 
         public void AddCollision(IslandChunk chunk, Vector3 targetPos) {
             if (FindChunk(chunk) == null) {
@@ -25,7 +53,7 @@ namespace Simoncouche.Islands {
             Destroy(data.collider);
         }
 
-        public void UpdateCollision() {
+        private void UpdateCollision() {
             foreach (IslandCollider_Data data in colliders) {
                 data.collider.offset = data.originChunk.transform.localPosition;
             }
