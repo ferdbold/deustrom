@@ -143,7 +143,6 @@ namespace Simoncouche.Islands {
         private void MoveSpawner() {
             if (_isMoving) {
                 Vector3 tPos = new Vector3(_targetContinentX, 0, 0);
-                Debug.Log(Vector3.Distance(_islandContainer.transform.localPosition, tPos));
                 if (Vector3.Distance(_islandContainer.transform.localPosition, tPos) > 0.15f) {
                     _islandContainer.transform.localPosition = Vector3.Lerp(_islandContainer.transform.localPosition,
                                                                             tPos,

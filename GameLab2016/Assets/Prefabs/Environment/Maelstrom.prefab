@@ -43,6 +43,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 422834}
   - 61: {fileID: 6100102}
+  - 114: {fileID: 11479210}
   m_Layer: 0
   m_Name: Collider_ScreenEdge (2)
   m_TagString: Untagged
@@ -129,6 +130,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 436000}
   - 61: {fileID: 6109150}
+  - 114: {fileID: 11473610}
   m_Layer: 0
   m_Name: Collider_ScreenEdge (4)
   m_TagString: Untagged
@@ -230,6 +232,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 424652}
   - 61: {fileID: 6176734}
+  - 114: {fileID: 11429050}
   m_Layer: 0
   m_Name: Collider_ScreenEdge (5)
   m_TagString: Untagged
@@ -364,6 +367,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 412162}
   - 61: {fileID: 6119638}
+  - 114: {fileID: 11457046}
   m_Layer: 0
   m_Name: Collider_ScreenEdge
   m_TagString: Untagged
@@ -432,6 +436,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 440952}
   - 61: {fileID: 6134482}
+  - 114: {fileID: 11403790}
   m_Layer: 0
   m_Name: Collider_ScreenEdge (1)
   m_TagString: Untagged
@@ -695,6 +700,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 497694}
   - 61: {fileID: 6106654}
+  - 114: {fileID: 11452788}
   m_Layer: 0
   m_Name: Collider_ScreenEdge (3)
   m_TagString: Untagged
@@ -2125,6 +2131,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &11403790
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 148758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48cb6b2b78d6b464884f4f2a2f6e978e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BLOCK_X: 0
+  BLOCK_Y: 1
+--- !u!114 &11429050
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 126656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48cb6b2b78d6b464884f4f2a2f6e978e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BLOCK_X: 1
+  BLOCK_Y: 0
 --- !u!114 &11441632
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2172,6 +2204,32 @@ MonoBehaviour:
   WEIGTH_IMPORTANCE: 0
   DISTANCE_IMPORTANCE: 1
   FORCE: {x: -10, y: 0}
+--- !u!114 &11452788
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 198228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48cb6b2b78d6b464884f4f2a2f6e978e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BLOCK_X: 1
+  BLOCK_Y: 0
+--- !u!114 &11457046
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 137012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48cb6b2b78d6b464884f4f2a2f6e978e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BLOCK_X: 0
+  BLOCK_Y: 1
 --- !u!114 &11464012
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2203,6 +2261,19 @@ MonoBehaviour:
   GravityLayerMask:
     serializedVersion: 2
     m_Bits: 1024
+--- !u!114 &11473610
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 114148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48cb6b2b78d6b464884f4f2a2f6e978e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BLOCK_X: 1
+  BLOCK_Y: 0
 --- !u!114 &11475066
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2253,6 +2324,19 @@ MonoBehaviour:
   SIDE_FORCE: 12
   MAX_DISTANCE_PLAYER: 25
   _dragMaximums: {x: 0, y: 1.8}
+--- !u!114 &11479210
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 101850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48cb6b2b78d6b464884f4f2a2f6e978e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BLOCK_X: 1
+  BLOCK_Y: 0
 --- !u!198 &19800348
 ParticleSystem:
   m_ObjectHideFlags: 1
