@@ -22,10 +22,10 @@ namespace Simoncouche.Chain {
         private float _timeUntilChainExpires = 10.0f;
 
         /// <summary>The first hook thrown by the player</summary>
-        private Hook _beginningHook;
+        public Hook _beginningHook { get; private set; }
         
         /// <summary>The second hook thrown by the player</summary>
-        private Hook _endingHook;
+        public Hook _endingHook { get; private set; }
 
         /// <summary>The chain sections currently generated for visual effect</summary>
         private List<ChainSection> _chainSections;
@@ -189,15 +189,21 @@ namespace Simoncouche.Chain {
 
         /// <summary>
         /// Check if the connected islands of the hooks are null.  If they are, we destroy the chain.
+        /// ALSO CHECK IF A PLAYER GRABBING OUR HOOKED UP ISLAND DOESNT HAVE IT ANYMORE
         /// TODO: CHANGE THIS TO AN EVENT CALL
         /// </summary>
         private void AttachedHookToIslandsUpdate() {
             bool mustDestroyChain = false;
             if (_beginningHookIsSet) {
-                if(_beginningHook.targetJoint.connectedBody == null) {
+                if(_beginningHook.targetJoint.connectedBody == null || 
+                    (_beginningHook.islandIsGrabbedEnemy && (thrower.isPlayerOne?LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody== null :
+                    LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
                     mustDestroyChain = true;
                 }else if (_endingHookIsSet) {
-                    if(_endingHook.targetJoint.connectedBody == null) {
+                    if(_endingHook.targetJoint.connectedBody == null 
+                        || (_endingHook.islandIsGrabbedEnemy && 
+                        (thrower.isPlayerOne ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
+                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))) {
                         mustDestroyChain = true;
                     }
                 }
@@ -233,10 +239,6 @@ namespace Simoncouche.Chain {
                 if (_endingHook.attachedToTarget) {
                     ///Tells to the thrower he hit the hook
                     this.thrower.OnEndingHookHit();
-
-                    // Reroute the beginning hook from the player to the ending hook
-                    this._beginningHook.chainJoint.connectedBody = _endingHook.rigidbody;
-                    //this._beginningHook.chainJoint.distance = _maxDistanceBetweenTwoHooks;
 
                     //Set this bool to true in order to stop the calls of thrower.EndingHookHit
                     _endingHookIsSet = true;
@@ -356,7 +358,7 @@ namespace Simoncouche.Chain {
         ///<summary>Retracts the chain modifying chainJoint.distance</param>
         ///<param name="retractDistance">The distance to retract per tick of this function</param>
         /// <returns>If the island connected to the player was destroyed</returns>
-        public bool RetractChain(float retractDistance) {
+        public GravityBody RetractChain(float retractDistance) {
             if (_beginningHook.chainJoint != null) {
                 if (!_endingHookIsSet) {
                     _beginningHook.chainJoint.distance = 
@@ -370,18 +372,18 @@ namespace Simoncouche.Chain {
                 //We first check with a single chunk if it collides with the player
                 if (islandChunkBeginningHook != null) {
                     if (islandChunkBeginningHook.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
-                        return true;
+                        return islandChunkBeginningHook.gravityBody;
                     } else if (islandChunkBeginningHook.parentIsland != null) {//We Then check with all the chunks of the Island if it collides with the player
-                        if (islandChunkBeginningHook.parentIsland.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
-                            return true;
-                        }
                         foreach (Islands.IslandChunk chunk in islandChunkBeginningHook.parentIsland.chunks) {
-                            if (chunk.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) return true;
+                            if (chunk.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) return chunk.gravityBody;
+                        }
+                        if (islandChunkBeginningHook.parentIsland.gravityBody.rigidbody.GetComponent<Collider2D>().IsTouching(thrower.rigidbody.GetComponent<Collider2D>())) {
+                            return islandChunkBeginningHook.parentIsland.gravityBody;
                         }
                     }
                 }
             }
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -420,13 +422,6 @@ namespace Simoncouche.Chain {
             bool sameAnchorPoint = ((anchorPoint == _beginningHook.currentAnchorPoint && anchorPoint.GetIslandChunk()==_beginningHook.currentAnchorPoint.GetIslandChunk())
                 || (anchorPoint == _endingHook.currentAnchorPoint && anchorPoint.GetIslandChunk() == _endingHook.currentAnchorPoint.GetIslandChunk()));
             return sameAnchorPoint;
-        }
-
-        /// <summary>
-        /// Attach beginning hook's target to the player grab
-        /// </summary>
-        public void AttachBeginningHookTargetToPlayer() {
-            thrower.playerGrab.AttemptGrabOnHookRetraction(islandChunkBeginningHook.gameObject.GetComponent<GravityBody>()); //MAKES THE PLAYER GRAB THE ISLAND
         }
     }
 }

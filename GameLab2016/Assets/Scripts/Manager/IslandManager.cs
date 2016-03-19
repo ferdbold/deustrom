@@ -302,6 +302,9 @@ namespace Simoncouche.Islands {
                     PlayerGrab.ReactivateCollisionForBothPlayer(check.GetComponent<CircleCollider2D>());
                 }
             }
+
+            //Update Conversion Status of the island
+            island.UpdateConversionStatus();
         }
 
         /// <summary>

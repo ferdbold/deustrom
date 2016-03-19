@@ -7,7 +7,7 @@ public class CutsceneManager : MonoBehaviour {
 
     public bool isDone { get; private set; }
 
-    public enum Cutscene { Base_Loading, Intro, Sobek_Win, Cthulu_Win }
+    public enum Cutscene { Base_Loading, Intro, Sobek_WinMatch, Cthulu_WinMatch, Sobek_WinGame, Cthulu_WinGame }
 
     [Header("Parameter")]
     [SerializeField] [Tooltip("Fading time when the cutscene ends")]
@@ -25,10 +25,16 @@ public class CutsceneManager : MonoBehaviour {
     private MovieTexture Intro_Cutscene;
 
     [SerializeField]
-    private Texture2D Sobek_Win_Cutscene;
+    private Texture2D Sobek_WinMatch_Cutscene;
 
     [SerializeField]
-    private Texture2D Cthulu_Win_Cutscene;
+    private Texture2D Cthulu_WinMatch_Cutscene;
+
+    [SerializeField]
+    private Texture2D Sobek_WinGame_Cutscene;
+
+    [SerializeField]
+    private Texture2D Cthulu_WinGame_Cutscene;
 
     [Header("Component")]
     [SerializeField]
@@ -41,7 +47,7 @@ public class CutsceneManager : MonoBehaviour {
 
     private void Awake() {
         isDone = false;
-        FadeRect.color = new Color(FadeRect.color.r, FadeRect.color.g, FadeRect.color.b, 0);
+        FadeRect.DOFade(0, 0);
         Video.gameObject.SetActive(false);
         FadeUI(true);
     }
@@ -67,21 +73,35 @@ public class CutsceneManager : MonoBehaviour {
                 StartCoroutine(WaitVideoEndToFade(movie));
                 break;
 
-            case Cutscene.Sobek_Win:
-                Video.material.mainTexture = Sobek_Win_Cutscene;
+            case Cutscene.Sobek_WinMatch:
+                Video.material.mainTexture = Sobek_WinMatch_Cutscene;
                 StartCoroutine("WaitForImageEnd");
                 break;
 
-            case Cutscene.Cthulu_Win:
-                Video.material.mainTexture = Cthulu_Win_Cutscene;
+            case Cutscene.Cthulu_WinMatch:
+                Video.material.mainTexture = Cthulu_WinMatch_Cutscene;
+                StartCoroutine("WaitForImageEnd");
+                break;
+
+            case Cutscene.Sobek_WinGame:
+                Video.material.mainTexture = Sobek_WinGame_Cutscene;
+                StartCoroutine("WaitForImageEnd");
+                break;
+
+            case Cutscene.Cthulu_WinGame:
+                Video.material.mainTexture = Cthulu_WinGame_Cutscene;
                 StartCoroutine("WaitForImageEnd");
                 break;
 
             case Cutscene.Base_Loading:
-                movie = Base_Loading_Cutscene;
-                Video.material.mainTexture = movie;
-                movie.Play();
-                StartCoroutine(WaitVideoEndToFade(movie));
+                if (Base_Loading_Cutscene != null) {
+                    Video.material.mainTexture = Base_Loading_Cutscene;
+                    movie.Play();
+                    StartCoroutine(WaitVideoEndToFade(movie));
+                } else {
+                    Debug.LogWarning("No cutscene for loading screen");
+                    StartCoroutine("WaitForImageEnd");
+                }
                 break;
         }
 

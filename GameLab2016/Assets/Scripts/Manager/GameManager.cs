@@ -209,13 +209,13 @@ public class GameManager : MonoBehaviour {
 
             case Scene.PlayLevel:
                 islandManager.Setup();
-                uiManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_pointsGoal, _matchToWin);
                     StartTutorial();
                 } else {
                     levelManager.Setup();
                 }
+                uiManager.Setup();
                 break;
 
             case Scene.BibleWriter:

@@ -235,15 +235,15 @@ namespace Simoncouche.Islands {
 
             int diffIslandColors = sobekChunks.Count - cthulhuChunks.Count;
             if (diffIslandColors == 0 || (cthulhuChunks.Count == 0 || sobekChunks.Count == 0)) {        //Stalemate
-                StopConversionProcess();                
+                StopConversionProcess();    
             }        
             else if (diffIslandColors > 0) {                                                            //Sobek wins
-                if (_conversionAmtStatus <= 0) ResetConversionProcess(cthulhuChunks, false);
-                else UpdateConvertingChunks(cthulhuChunks, false);
+                if (_conversionAmtStatus <= 0) ResetConversionProcess(cthulhuChunks, true);
+                else UpdateConvertingChunks(cthulhuChunks, true);
             } 
             else {                                                                                      //Cthulhu wins
-                if (_conversionAmtStatus >= 0) ResetConversionProcess(sobekChunks, true);
-                else UpdateConvertingChunks(sobekChunks, true);
+                if (_conversionAmtStatus >= 0) ResetConversionProcess(sobekChunks, false);
+                else UpdateConvertingChunks(sobekChunks, false);
             }
             
 
@@ -263,14 +263,14 @@ namespace Simoncouche.Islands {
                     CreateConversionParticles(chunks[i].transform, isSobek);
                 }          
             }
-            if (_isConverting == false) StartCoroutine(ConversionProcess());
+            if (_isConverting == false) StartCoroutine("ConversionProcess");
         }
 
         /// <summary> Resets the conversion process on island. </summary>
         /// <param name="chunks"> list of chunks to select from for conversion</param>
         /// <param name="amt"> max amount of chunks to select </param>
         private void ResetConversionProcess(List<IslandChunk> chunks, bool isSobek) {
-            StopCoroutine(ConversionProcess());
+            StopCoroutine("ConversionProcess");
             for(int i = 0; i < _amtIslandPerConversion; ++i) {
                 if (chunks.Count == 0) break; //Return if list is empty
                 int rIndex = Random.Range(0, chunks.Count); //Get random index
@@ -279,13 +279,13 @@ namespace Simoncouche.Islands {
                 chunks.RemoveAt(rIndex); // Remove from pool
 
             }
-            StartCoroutine(ConversionProcess());
+            StartCoroutine("ConversionProcess");
         }
 
         /// <summary> Stops the conversion process on island</summary>
         private void StopConversionProcess() {
             ResetConvertingLists();
-            StopCoroutine(ConversionProcess());
+            StopCoroutine("ConversionProcess");
             _isConverting = false;
         }
 
