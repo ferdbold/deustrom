@@ -61,8 +61,6 @@ namespace Simoncouche.Chain {
 
         public new Rigidbody2D rigidbody { get; private set; }
 
-        public IslandChunk connectedChunk { get; private set; }
-
         public Island connectedIsland { get; private set; }
 
         public bool islandIsGrabbedEnemy { get; private set; }
@@ -186,8 +184,6 @@ namespace Simoncouche.Chain {
             this.targetJoint.enabled = true;
 
             bool wasAttachedToIsland=this.CheckOtherPlayerOnNewIsland(anchor); //Must check if there is already a player attached to the island
-
-            this.connectedChunk = anchor.GetIslandChunk();
 
             // Attach the joint to either the chunk or its parent island if it has one
             if (parentIsland == null && !wasAttachedToIsland) {
