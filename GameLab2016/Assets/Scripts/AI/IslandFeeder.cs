@@ -44,6 +44,9 @@ namespace Simoncouche.Islands {
 
         [Header("Spawn Properties")]
 
+        //Gravity body layer
+        private int gravityBodyLayer = 10;
+
         [SerializeField] [Tooltip("Default Spawn Time. An island will spawn every SPAWN_RATE seconds")]
         private float SPAWN_RATE = 5f;
 
@@ -272,6 +275,7 @@ namespace Simoncouche.Islands {
             chunkWithCollider.chunk.transform.parent = _islandParentTransform; //Set parent
             ToggleCollisionLayer(chunkWithCollider.chunk.gameObject, true); //Toggle island collisions back on
             chunkWithCollider.chunk.gravityBody.Velocity += new Vector2(_releaseForce * (GENERATE_LEFT ? 1 : -1), 0); //Add velocity
+            chunkWithCollider.chunk.gameObject.layer = gravityBodyLayer;
 
         }
 

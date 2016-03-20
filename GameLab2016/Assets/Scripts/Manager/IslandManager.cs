@@ -257,17 +257,32 @@ namespace Simoncouche.Islands {
         /// Check if an island was broken by the destruction/disassembling of one of his chunk
         /// </summary>
         /// <param name="island">The target island to check</param>
-        public void CheckIslandBroken(Island island) {
+        public List<Transform> CheckIslandBroken(Island island) {
             if (island == null || island.chunks.Count <= 0) {
                 DestroyIsland(island);
-                return;
+                return null;
             }
+
+            List<Transform> everyPiece = new List<Transform>();
+            everyPiece.Add(island.transform);
+
             island.RecreateIslandChunkConnection();
             List<IslandChunk> originChunkList = island.chunks;
             List<IslandChunk> chunkIsland = new List<IslandChunk>();
             chunkIsland = CheckIslandBroken_Helper(island.chunks[0], chunkIsland);
             List<IslandChunk> chunkChecked = chunkIsland;
             
+            //Reestablish collision to chunk not in main cluster 
+            if (chunkChecked.Count != island.chunks.Count) {
+                foreach (IslandChunk chunk in island.chunks) {
+                    foreach (IslandChunk target in island.chunks) {
+                        if (!(chunkChecked.Contains(target) && chunkChecked.Contains(chunk))) {
+                            chunk.ChangeCollisionBetweenChunk(target, true);
+                        }
+                    }
+                }
+            }
+
             //is broken
             while (chunkChecked.Count != island.chunks.Count) {
                 //Find list of Chunk that should be island
@@ -286,6 +301,7 @@ namespace Simoncouche.Islands {
                 if (chunkIsland.Count == 1) {
                     island.RemoveChunkToIsland(chunkIsland[0]);
                     chunkIsland[0].transform.SetParent(island.transform.parent, true);
+                    everyPiece.Add(chunkIsland[0].transform);
                 }
 
                 //Create Island
@@ -301,6 +317,7 @@ namespace Simoncouche.Islands {
                         newIsland.islandColliders.AddCollision(chunk, chunk.transform.localPosition);
                     }
                     newIsland.RecreateIslandChunkConnection();
+                    everyPiece.Add(island.transform);
                 }
             }
             island.RecreateIslandChunkConnection();
@@ -314,6 +331,7 @@ namespace Simoncouche.Islands {
 
             //Update Conversion Status of the island
             island.UpdateConversionStatus();
+            return everyPiece;
         }
 
         /// <summary>
@@ -374,6 +392,11 @@ namespace Simoncouche.Islands {
                 islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
             }
 
+            //Remove chunk from island
+            foreach (IslandChunk c in islandRemoved) {
+                islandLink.RemoveChunkToIsland(c);
+            }
+
             //Divide Island
             if (islandRemoved.Count > 1)  { //Multiple Chunk
                 Island island = CreateIsland(islandRemoved[0], islandRemoved[1]);
@@ -382,7 +405,6 @@ namespace Simoncouche.Islands {
                         island.AddChunkToIsland(islandRemoved[i]);
                     }
                 }
-                //island.CenterIslandRoot();
             }
 
             //Remove connection (only need to remove the connection from one side, one chunk removes the connection from both)
@@ -392,44 +414,24 @@ namespace Simoncouche.Islands {
                 } 
             }
 
-            /*DEBUG Destruction TODO replace with separation*/
-            foreach (IslandChunk c in islandRemoved) {
-                c._parentIsland.RemoveChunkToIsland(c);
-                DestroyChunk(c);
+            //Give Velocity
+            if (chunk.parentIsland != null) {
+                chunk.parentIsland.gravityBody.Velocity = Vector3.zero;
+            } else {
+                chunk.gravityBody.Velocity = Vector3.zero;
             }
 
-            //Check if the island is broken in pieces
-            CheckIslandBroken(islandLink);
+            StartCoroutine(CompleteTakeDamage(islandLink));
+        }
 
-            /*//EXPERIMENTAL
-            //Find the chunk to give velocity to
-            List<IslandChunk> chunkAccelerated = new List<IslandChunk>();
-            List<Island> islandAccelerated = new List<Island>();
-            foreach (IslandChunk c in islandRemoved) {
-                Collider2D[] others = Physics2D.OverlapCircleAll(c.transform.position, 2f);
-
-                foreach (Collider2D other in others) {
-                    IslandChunk chk = other.GetComponent<IslandChunk>();
-
-                    if (chk != null && !islandRemoved.Contains(chk)) {
-                        if (chk.parentIsland != null && !islandAccelerated.Contains(chk.parentIsland)) {
-                            islandAccelerated.Add(chk.parentIsland);
-                        } else if (!chunkAccelerated.Contains(chk)) {
-                            chunkAccelerated.Add(chk);
-                        }
-                    }
-                }
+        private IEnumerator CompleteTakeDamage(Island island) {
+            int count = 100;
+            //Wait for a number of frame
+            while (count > 0) {
+                --count;
+                CheckIslandBroken(island);
+                yield return new WaitForEndOfFrame();
             }
-            
-            //Give velocity to chunks around the destroyed ones
-            Vector2 removedCenter = islandRemoved.Count > 1 ? islandRemoved[0].parentIsland.transform.localPosition : islandRemoved[0].transform.position;
-
-            foreach (IslandChunk c in chunkAccelerated) {
-                c.gravityBody.Velocity = CalculateVelocityAfterHit((Vector2)c.transform.localPosition - removedCenter, damage, 1);
-            }
-            foreach (Island i in islandAccelerated) {
-                i.gravityBody.Velocity = CalculateVelocityAfterHit((Vector2)i.transform.localPosition - removedCenter, damage, i.chunks.Count);
-            }/**/
         }
 
         /// <summary>
