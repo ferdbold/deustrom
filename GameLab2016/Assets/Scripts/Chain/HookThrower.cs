@@ -353,7 +353,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void RemoveChainOnPlayerMaelstromEnter() {
             if (chains.Count > 0) {
-                if (chains[chains.Count - 1] != null && _currentState == State.OneHook) {
+                if (chains[chains.Count - 1] != null & (chains[chains.Count - 1]._beginningHook!=null && !chains[chains.Count - 1]._endingHookIsSet)) {
                     chains[chains.Count - 1].DestroyChain(true);
                     this.OnCutLinkWithPlayer();
                 }
