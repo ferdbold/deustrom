@@ -119,7 +119,7 @@ MonoBehaviour:
   timeToFade: 1
   imageTimeStaying: 5
   Base_Loading_Cutscene: {fileID: 0}
-  Intro_Cutscene: {fileID: 15200000, guid: 037dbb66aface08498aa24af132a6e48, type: 3}
+  Intro_Cutscene: {fileID: 15200000, guid: c80d86a01da3d0d47bfaa7086691290e, type: 3}
   Sobek_WinMatch_Cutscene: {fileID: 2800000, guid: ef31d3b3d13ac1745b9e8db687b632d5,
     type: 3}
   Cthulu_WinMatch_Cutscene: {fileID: 2800000, guid: a8853372c37e9994db07458868e8e2e0,
@@ -490,6 +490,11 @@ Prefab:
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Intro_Cutscene
+      value: 
+      objectReference: {fileID: 15200000, guid: c80d86a01da3d0d47bfaa7086691290e,
+        type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 147470}

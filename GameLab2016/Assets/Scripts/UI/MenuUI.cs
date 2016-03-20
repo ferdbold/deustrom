@@ -1,7 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.UI;
 
 public class MenuUI : MonoBehaviour {
+
+    [SerializeField]
+    private Button firstActiveButton;
+
+    private void Awake() {
+        firstActiveButton.Select();
+    }
 
 	public void PlayButton() {
         GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, CutsceneManager.Cutscene.Intro);
