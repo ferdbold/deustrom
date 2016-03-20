@@ -42,19 +42,25 @@ namespace Simoncouche.Controller {
 
         private Coroutine _updateCoroutine;
 
+        private Color _indicatorColor;
+
         // COMPONENTS
         private Transform _indicator;
+        private SpriteRenderer _indicatorIcon;
         private AimController _aimController;
 
         // METHODS
 
         private void Awake() {
             _indicator = transform.Find("AutoAimIndicator");
+            _indicatorIcon = _indicator.FindChild("Icon").GetComponent<SpriteRenderer>();
+            _indicatorColor = _indicatorIcon.color;
+
             _aimController = GetComponent<AimController>();
         }
 
         private void LateUpdate() {
-            _indicator.FindChild("Icon").LookAt(Camera.main.transform.position);
+            _indicatorIcon.transform.LookAt(Camera.main.transform.position);
         }
 
         /// <summary>
@@ -89,6 +95,9 @@ namespace Simoncouche.Controller {
             _indicator = GameObject.Instantiate(_aimIndicatorPrefab);
             _indicator.parent = transform;
             _indicator.gameObject.SetActive(false);
+
+            _indicatorIcon = _indicator.FindChild("Icon").GetComponent<SpriteRenderer>();
+            _indicatorIcon.color = _indicatorColor;
         }
 
         /// <summary>

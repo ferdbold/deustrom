@@ -205,7 +205,6 @@ namespace Simoncouche.Chain {
 
                 else if ( _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
                     GravityBody gravityBody = _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>();
-                    Debug.Log(gravityBody.isDestroyed);
                     if (_beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed) mustDestroyChain = true;
                 } 
                 if (_beginningHook.islandIsGrabbedEnemy &&
