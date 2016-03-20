@@ -74,8 +74,7 @@ Shader "Custom/NewSurfaceShader" {
                 float4 _node_3795_var = tex2D(_node_3795,TRANSFORM_TEX(node_3401, _node_3795));
                 float3 node_4976 = (1.0 - _node_3795_var.rgb);
                 float3 node_2391 = (node_4976+node_4976);
-                float3 node_4197 = (node_2391+node_2391);
-                float3 emissive = (lerp( _node_3795_var.rgb, node_4197, _Invert_Diff )*(i.uv0.g+float4(0.408737,0.6217187,0.7720588,0))).rgb;
+                float3 emissive = (lerp( _node_3795_var.rgb, (node_2391+node_2391), _Invert_Diff )*(i.uv0.g+float4(0.408737,0.6217187,0.7720588,0))).rgb;
                 float3 finalColor = emissive;
                 float node_773 = i.uv0.g;
                 float node_172 = (node_773*(1.0 - node_773));

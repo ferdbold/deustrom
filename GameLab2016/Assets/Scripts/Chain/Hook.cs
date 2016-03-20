@@ -124,8 +124,6 @@ namespace Simoncouche.Chain {
             if (!attachedToTarget) {
                 IslandAnchorPoints anchorPoint = coll.gameObject.GetComponent<IslandAnchorPoints>();
 
-                
-
                 if (anchorPoint != null) {
                     this.currentAnchorPoint = anchorPoint;
                     this.AttachToIsland(anchorPoint);
@@ -172,36 +170,33 @@ namespace Simoncouche.Chain {
                     }
                 }
             }
-
-
+                
             Island parentIsland = anchor.GetIslandChunk().parentIsland;
 
-            chain.thrower.HookAlreadyOnIslandCheck(anchor);//must check if there is already a hook on this joint.  If so, we replace it with this one.
+            // Must check if there is already a hook on this joint.
+            // If so, we replace it with this one.
+            chain.thrower.HookAlreadyOnIslandCheck(anchor);
 
             this.rigidbody.velocity = Vector2.zero;
             this.rigidbody.mass = this.ATTACHED_MASS;
 
             this.targetJoint.enabled = true;
 
-            bool wasAttachedToIsland=this.CheckOtherPlayerOnNewIsland(anchor); //Must check if there is already a player attached to the island
+            // Must check if there is already a player attached to the island
+            bool wasAttachedToIsland = this.CheckOtherPlayerOnNewIsland(anchor);
 
             // Attach the joint to either the chunk or its parent island if it has one
             if (parentIsland == null && !wasAttachedToIsland) {
                     this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
                     if (chain._endingHook != null) chain._beginningHook.chainJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>(); //We can switch the connected body to 
             } 
-            else if(!wasAttachedToIsland){
+            else if(!wasAttachedToIsland) {
                 this.connectedIsland = parentIsland;
                 this.targetJoint.connectedBody = parentIsland.rigidbody;
-                //this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
                 if (this == this.chain._endingHook) {
                     chain._beginningHook.chainJoint.connectedBody = parentIsland.rigidbody;
-                    Debug.Log("Second hook hit");
                 }
             }
-
-            //Attach the visual
-            
 
             // Add listeners
             anchor.GetIslandChunk().MergeIntoIsland.AddListener(this.OnAttachedChunkMerge);
@@ -210,7 +205,7 @@ namespace Simoncouche.Chain {
 
             this.Attach.Invoke();
 
-            //The hook is now attached to a target
+            // The hook is now attached to a target
             attachedToTarget = true;
         }
 

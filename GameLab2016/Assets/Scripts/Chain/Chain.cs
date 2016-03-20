@@ -204,28 +204,28 @@ namespace Simoncouche.Chain {
                 //IF the Island or the Chunk doesnt exist anymore then we destroy the chain
                 else if ( _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
                     if (_beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed 
-                        || _beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed) mustDestroyChain = true;
+                        || _beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed) 
+                        mustDestroyChain = true;
                 }
                 //IF the island attached to our beginning hook and grabbed by the enemy doesnt exist anymore then we destroy the chain
                 if (_beginningHook.islandIsGrabbedEnemy && 
                       (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
-                      LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) {
+                      LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) 
                     mustDestroyChain = true;
-                } 
                 else if (_endingHookIsSet && _endingHook != null) {
                     //IF the connectedBody of our ending hook doesnt exist anymore then we destroy the chain
                     if (_endingHook.targetJoint.connectedBody == null) mustDestroyChain = true;
                     //IF the Island or the Chunk connected to our ending hook doesnt exist anymore then we destroy the chain
                     else if ( _endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
                         if (_endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed 
-                            || _beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed) mustDestroyChain = true;
+                            || _beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed)
+                            mustDestroyChain = true;
                     }
                     //IF the island attached to our ending hook and grabbed by the enemy doesnt exist anymore then we destroy the chain
                     if(_endingHook.islandIsGrabbedEnemy &&
                         (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
-                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) {
-                            mustDestroyChain = true;
-                    }
+                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) 
+                        mustDestroyChain = true;
                 }
             }
             if (mustDestroyChain) DestroyChain(true);

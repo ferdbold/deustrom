@@ -30,7 +30,7 @@ Material:
       data:
         first:
           name: _Depth
-        second: 0.2
+        second: 1.5
       data:
         first:
           name: _Opacity
@@ -42,7 +42,7 @@ Material:
       data:
         first:
           name: _BulgeScale
-        second: -0.03
+        second: -0.08
       data:
         first:
           name: _Waves
@@ -66,7 +66,7 @@ Material:
       data:
         first:
           name: _Shadow_Depth
-        second: 0.4
+        second: 0.33
       data:
         first:
           name: _Wave_Speed
