@@ -370,10 +370,9 @@ namespace Simoncouche.Chain {
             Vector3 vectorPlayerChunk = Vector3.Normalize(gBody.transform.position - this.transform.position);
             Debug.Log("VectorPlayerChunk" + vectorPlayerChunk);
             float angle = Vector3.Angle(this.transform.right, vectorPlayerChunk);
-            Debug.Log("Angle variation" + angle);
             
+            //Must apply a rotation towards the island in order to prevent the player from going on the other side of the island when grabbing
             this.rigidbody.transform.Rotate(this.transform.forward, angle, Space.Self);
-            //this.rigidbody.transform.rotation = Quaternion.FromToRotation(transform.forward , vectorPlayerChunk) * this.rigidbody.transform.rotation;
             this.playerGrab.AttemptGrabOnHookRetraction(gBody); //MAKES THE PLAYER GRAB THE ISLAND
         }
 
