@@ -12,7 +12,7 @@ public class IslandDamagingObject : MonoBehaviour {
         IslandChunk chunk = other.gameObject.GetComponent<IslandChunk>();
         Debug.Log(other.gameObject.name);
         if (chunk != null) {
-            chunk.TakeDamage(_damage);
+            chunk.TakeDamage(_damage, Vector3.zero);
             Destroy(gameObject);
         }
     }

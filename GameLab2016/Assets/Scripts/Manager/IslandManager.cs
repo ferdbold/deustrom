@@ -305,7 +305,6 @@ namespace Simoncouche.Islands {
                 //Remove Chunk
                 if (chunkIsland.Count == 1) {
                     island.RemoveChunkToIsland(chunkIsland[0]);
-                    chunkIsland[0].transform.SetParent(island.transform.parent, true);
                     everyPiece.Add(chunkIsland[0].transform);
                 }
 
@@ -369,7 +368,7 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="chunk">The chunk affected by this</param>
         /// <param name="damage">The number of chunk affected</param>
-        public void TakeDamageHandler(IslandChunk chunk, int damage) {
+        public void TakeDamageHandler(IslandChunk chunk, int damage, Vector3 velocityGiven) {
             //If no damage
             if (damage < 1) {
                 return;
@@ -396,7 +395,6 @@ namespace Simoncouche.Islands {
             if (damage > 1) {
                 islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
             }
-
             //Remove chunk from island
             foreach (IslandChunk c in islandRemoved) {
                 islandLink.RemoveChunkToIsland(c);
@@ -421,16 +419,16 @@ namespace Simoncouche.Islands {
 
             //Give Velocity
             if (chunk.parentIsland != null) {
-                chunk.parentIsland.gravityBody.Velocity = Vector3.zero;
+                chunk.parentIsland.gravityBody.Velocity = velocityGiven;
             } else {
-                chunk.gravityBody.Velocity = Vector3.zero;
+                chunk.gravityBody.Velocity = velocityGiven;
             }
 
             StartCoroutine(CompleteTakeDamage(islandLink));
         }
 
         private IEnumerator CompleteTakeDamage(Island island) {
-            int count = 100;
+            int count = 20;
             //Wait for a number of frame
             while (count > 0) {
                 --count;

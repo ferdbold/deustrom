@@ -42,6 +42,8 @@ namespace Simoncouche.Islands {
 
         [SerializeField] [Tooltip("The radius of the anchor trigger zone")]
         private float _anchorPointRadius = 0.2f;
+
+        private bool isDamageable = true;
         #endregion
 
         #region Events
@@ -261,12 +263,12 @@ namespace Simoncouche.Islands {
 
             if (chunk != null && chunk.parentIsland != null && chunk.parentIsland.gravityBody.inDestroyMode) {
                 chunk.parentIsland.gravityBody.Velocity = 5 * Vector3.Normalize(transform.localPosition - chunk.transform.localPosition);
-                chunk.parentIsland.gravityBody.RemoveInDestroyMode();
-                TakeDamage(1);
+                //chunk.parentIsland.gravityBody.RemoveInDestroyMode();
+                TakeDamage(1, chunk.parentIsland.gravityBody.Velocity);
             } else if (chunk != null && chunk.gravityBody.inDestroyMode) {
                 chunk.gravityBody.Velocity = 5 * Vector3.Normalize(transform.localPosition - chunk.transform.localPosition);
-                chunk.gravityBody.RemoveInDestroyMode();
-                TakeDamage(1);
+                //chunk.gravityBody.RemoveInDestroyMode();
+                TakeDamage(1, chunk.gravityBody.Velocity);
             }
 
             //Collide with chunk of other color
@@ -278,12 +280,19 @@ namespace Simoncouche.Islands {
         /// The damage taken by the island connected to this chunk. A chunk not part of an island does not take damage
         /// </summary>
         /// <param name="damage">The number of chunk affected by the division</param>
-        public void TakeDamage(int damage) {
-            if (damage > 0) {
-                GameManager.islandManager.TakeDamageHandler(this, damage);
+        public void TakeDamage(int damage, Vector3 givenVelocity) {
+            if (damage > 0 && isDamageable) {
+                GameManager.islandManager.TakeDamageHandler(this, damage, givenVelocity);
+                isDamageable = false;
+                StartCoroutine(TakeDamageCooldown());
             } else {
                 Debug.LogWarning("The damage sent to the island chunk should be higher than 0");
             }
+        }
+
+        IEnumerator TakeDamageCooldown() {
+            yield return new WaitForEndOfFrame();
+            isDamageable = true;
         }
 
         /// <summary>
