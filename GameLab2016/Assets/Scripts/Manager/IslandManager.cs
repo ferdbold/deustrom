@@ -222,11 +222,11 @@ namespace Simoncouche.Islands {
         /// Removes the Island from the list then destroy it
         /// </summary>
         /// <param name="Island">The Island that need to be removed</param>
-        private void RemoveIsland(Island Island) {
+        private void RemoveIsland(Island island) {
 
-            _island.Remove(Island);
-            if (Island != null) {
-                Destroy(Island.gameObject);
+            _island.Remove(island);
+            if (island != null) {
+                Destroy(island.gameObject);
             }
         }
 
@@ -241,16 +241,21 @@ namespace Simoncouche.Islands {
             _islandChunks.Remove(chunk);
             PlayerGrab.UngrabBody(chunk.gravityBody);
             chunk.gravityBody.DestroyGravityBody();
-            foreach (GameObject chain in GameObject.FindGameObjectsWithTag("Chain")) {
+            foreach (GameObject chain in GameObject.FindGameObjectsWithTag("Chain")) { //MUST SEND A MESSAGE TO CHAINS IN ORDER TO CHECK IF A HOOK IS ATTACHED TO A DESTROYED ISLAND
                 chain.SendMessage("AttachedHookToIslandsUpdate");
             }
+
         }
 
         /// <summary> Remove Island from the list and call a destroyChunk for each chunk of the island </summary>
         /// <param name="island">island to destroy</param>
         public void DestroyIsland(Island island) {
             foreach (IslandChunk chunk in island.chunks) DestroyChunk(chunk);
+            island.gravityBody.isDestroyed = true; //MUST SET THAT TO TRUE !!
             RemoveIsland(island);
+            foreach (GameObject chain in GameObject.FindGameObjectsWithTag("Chain")) { //MUST SEND A MESSAGE TO CHAINS IN ORDER TO CHECK IF A HOOK IS ATTACHED TO A DESTROYED ISLAND
+                chain.SendMessage("AttachedHookToIslandsUpdate");
+            }
         }
 
         /// <summary>

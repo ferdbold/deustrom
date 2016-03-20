@@ -187,9 +187,10 @@ namespace Simoncouche.Chain {
 
             bool wasAttachedToIsland=this.CheckOtherPlayerOnNewIsland(anchor); //Must check if there is already a player attached to the island
 
+            this.connectedChunk = anchor.GetIslandChunk();
+
             // Attach the joint to either the chunk or its parent island if it has one
             if (parentIsland == null && !wasAttachedToIsland) {
-                    this.connectedChunk = anchor.GetIslandChunk();
                     this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
                     if (chain._endingHook != null) chain._beginningHook.chainJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>(); //We can switch the connected body to 
             } 

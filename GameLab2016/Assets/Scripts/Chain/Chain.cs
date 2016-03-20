@@ -204,6 +204,8 @@ namespace Simoncouche.Chain {
                 if (_beginningHook.targetJoint.connectedBody == null) mustDestroyChain = true;
 
                 else if ( _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
+                    GravityBody gravityBody = _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>();
+                    Debug.Log(gravityBody.isDestroyed);
                     if (_beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed) mustDestroyChain = true;
                 } 
                 if (_beginningHook.islandIsGrabbedEnemy &&
@@ -222,21 +224,6 @@ namespace Simoncouche.Chain {
                             mustDestroyChain = true;
                     }
                 }
-
-                /*
-                if ((_beginningHook.targetJoint.connectedBody == null | _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed)
-                    || (_beginningHook.islandIsGrabbedEnemy && 
-                    (thrower.isSobek?LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody.isDestroyed== true :
-                    LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody.isDestroyed == true))) {
-                        mustDestroyChain = true;
-                }else if (_endingHookIsSet) {
-                    if((_endingHook.targetJoint.connectedBody == null | _endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed)
-                        || (_endingHook.islandIsGrabbedEnemy &&
-                        (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody.isDestroyed == true :
-                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody.isDestroyed == true))) {
-                        mustDestroyChain = true;
-                    }
-                }*/
             }
             if (mustDestroyChain) DestroyChain(true);
         }
