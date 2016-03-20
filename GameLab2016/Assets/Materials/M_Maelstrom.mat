@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: M_Maelstrom
   m_Shader: {fileID: 4800000, guid: 7d69e3eb8c67dbd4889733649ab69c03, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _INVERT_MASK_ON _USE_MASK_ON
   m_LightmapFlags: 5
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -51,7 +51,7 @@ Material:
       data:
         first:
           name: _White_Power
-        second: 0.5
+        second: 0.02
       data:
         first:
           name: _node_5314
@@ -91,7 +91,7 @@ Material:
       data:
         first:
           name: _Use_Mask
-        second: 0
+        second: 1
       data:
         first:
           name: _White_Power_copy
@@ -103,7 +103,7 @@ Material:
       data:
         first:
           name: _Black_Power
-        second: 0
+        second: -1.85
       data:
         first:
           name: _Invert_Diff
