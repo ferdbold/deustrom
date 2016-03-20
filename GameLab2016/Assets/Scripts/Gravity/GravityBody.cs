@@ -142,8 +142,8 @@ public class GravityBody : GravityObject {
     /// </summary>
     public virtual void DestroyGravityBody(){
         //Debug.Log("Destroyed RigidBody " + gameObject.name);
-        Destroy(gameObject);
         isDestroyed = true;
+        Destroy(gameObject);
     }
 
     #endregion
