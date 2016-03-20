@@ -250,6 +250,13 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Quit the game
+    /// </summary>
+    public void QuitGame() {
+        Application.Quit();
+    }
+
     #endregion
 
     #region Tutorial

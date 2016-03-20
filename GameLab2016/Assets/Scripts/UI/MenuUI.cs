@@ -10,4 +10,8 @@ public class MenuUI : MonoBehaviour {
     public void BiblesButton() {
         GameManager.Instance.SwitchScene(GameManager.Scene.BibleReader);
     }
+
+    public void QuitGame() {
+        GameManager.Instance.QuitGame();
+    }
 }
