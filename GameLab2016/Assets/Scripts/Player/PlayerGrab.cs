@@ -278,29 +278,28 @@ namespace Simoncouche.Controller {
         /// <param name="on"></param>
         private void ToggleChargeParticles(bool on) {
             foreach (ParticleSystem ps in _chargeParticles) {
+                ParticleSystem.EmissionModule em = ps.emission;
+
                 if (on) {
                     ps.Simulate(0,false,true);
                     ps.Play();
-                    ps.enableEmission = true;
-                    
-                } else {
-                    ps.enableEmission = false;
-                    
                 }
+
+                em.enabled = on;
             }
         }
 
         private void ToggleMaxChargeParticles(bool on) {
             foreach (ParticleSystem ps in _chargeParticlesMax) {
+                ParticleSystem.EmissionModule em = ps.emission;
+
                 if (on) {
                     ps.Simulate(0, false, true);
                     ps.Play();
-                    ps.enableEmission = true;
-                } else {
-                    ps.enableEmission = false;
-                }        
+                }
+
+                em.enabled = on;
             }
-           
         }
 
         /// <summary> Throw gravity body in direction of player's aim controller</summary>
