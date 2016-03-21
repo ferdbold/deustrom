@@ -253,7 +253,6 @@ namespace Simoncouche.Controller {
 
                 //Lerp to target position
                 while (i < 1f && grabbedBody != null) {
-                    transformToMove.localPosition = Vector2.Lerp(startPosition, targetPosition, i);
                     yield return null;
                     i += Time.deltaTime / repositionTime;
                 }
