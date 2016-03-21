@@ -78,6 +78,8 @@ namespace Simoncouche.Islands {
 
         /// <summary> island visual randomizer </summary>
         private RandomizeIslandVisual _randomizeIslandVisual;
+
+        public bool isMergeable { get; private set; }
         #endregion
         
         void Awake() {
@@ -90,6 +92,7 @@ namespace Simoncouche.Islands {
 
             connectedChunk = new List<IslandChunk>();
             SpawnAnchorPoints();
+            isMergeable = true;
 
             this.MergeIntoIsland = new IslandEvent();
             this.GrabbedByPlayer = new PlayerGrabEvent();
@@ -99,6 +102,10 @@ namespace Simoncouche.Islands {
         void Start() {
             if (color != IslandUtils.color.green) _randomizeIslandVisual.SetIslandColorVisual(color);
             StartCoroutine(DebugPoint());
+        }
+
+        void Update() {
+            isMergeable = !(gravityBody.inDestroyMode || (parentIsland != null && parentIsland.gravityBody.inDestroyMode));
         }
 
 
@@ -192,7 +199,14 @@ namespace Simoncouche.Islands {
                     connected.Add(chunk);
                 }
             }
-            connectedChunk = connected;
+
+            connectedChunk.Clear();
+            //Make sure every chunk detecte4d are part of the island
+            foreach (IslandChunk chunk in connected) {
+                if (parentIsland.chunks.Contains(chunk)) {
+                    connectedChunk.Add(chunk);
+                }
+            }
         }
 
         /// <summary>
@@ -245,7 +259,7 @@ namespace Simoncouche.Islands {
 
             if (otherAnchor != null && otherAnchor.transform.parent.gameObject != gameObject) {
 
-                if (IslandUtils.CheckIfOnSameIsland(chunk, this)) {
+                if (IslandUtils.CheckIfOnSameIsland(chunk, this) || !isMergeable) {
                     return;
                 }
 
@@ -255,6 +269,20 @@ namespace Simoncouche.Islands {
                     _audioSource.PlayOneShot(GameManager.audioManager.islandSpecificSound.mergeSound);
                 }
             }
+        }
+
+        public void ChangeMergeability(bool mergable) {
+            isMergeable = mergable;
+        }
+
+        public void ResetMergeability(float time) {
+            StartCoroutine(ResetMergeabilityCoroutine(time));
+        }
+
+        IEnumerator ResetMergeabilityCoroutine(float time) {
+            isMergeable = false;
+            yield return new WaitForSeconds(time);
+            isMergeable = true;
         }
 
         void OnCollisionEnter2D(Collision2D col) {

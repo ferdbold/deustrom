@@ -51,6 +51,9 @@ namespace Simoncouche.Islands {
             IslandCollider_Data data = FindChunk(chunk);
             colliders.Remove(data);
             Destroy(data.collider);
+            if (colliders.Count <= 0) {
+                Destroy(gameObject);
+            }
         }
 
         private void UpdateCollision() {
