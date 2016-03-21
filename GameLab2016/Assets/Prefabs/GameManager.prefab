@@ -266,7 +266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33dd852e61f8c46678e336cac887f0b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _orbAnimDuration: 1
+  _orbAnimDuration: 1.5
   _orbAnimDurationVariation: 0.25
   _sobekRunePrefab: {fileID: 11420200, guid: 54df75251a7ed41999fea1a3333a4a03, type: 2}
   _cthulhuRunePrefab: {fileID: 11420200, guid: d154f54759bf44e4787bf04ceaef686c, type: 2}
@@ -319,6 +319,10 @@ Prefab:
       propertyPath: _chainSound._chainDestruction
       value: 
       objectReference: {fileID: 8300000, guid: 2a9f41d9ee9a50648b9bee80da656089, type: 3}
+    - target: {fileID: 0}
+      propertyPath: _orbAnimDuration
+      value: 1.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 186930}
