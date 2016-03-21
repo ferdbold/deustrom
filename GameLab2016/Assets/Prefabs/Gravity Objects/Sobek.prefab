@@ -3411,7 +3411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attractionLevel: 10
   radius: 1
-  DEFAULT_DRAG: 50
+  DEFAULT_DRAG: 150
   START_VELOCITY: {x: 0, y: 2}
   isDestroyed: 0
   _activated: 1
@@ -11162,7 +11162,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: DEFAULT_DRAG
-      value: 50
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Z_UNDER_WATER

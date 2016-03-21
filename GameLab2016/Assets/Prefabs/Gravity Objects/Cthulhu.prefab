@@ -5555,7 +5555,7 @@ MonoBehaviour:
   CHARGED_MAX_MULTIPLIER: 2.25
   CHARGE_TIME: 1
   MAX_GRAB_ANGLE: 75
-  GRAB_COOLDOWN: 1
+  GRAB_COOLDOWN: 0.5
 --- !u!114 &11422846
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5636,7 +5636,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attractionLevel: 10
   radius: 1
-  DEFAULT_DRAG: 50
+  DEFAULT_DRAG: 150
   START_VELOCITY: {x: 0, y: 2}
   isDestroyed: 0
   _activated: 1
@@ -13421,7 +13421,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: GRAB_COOLDOWN
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: playerAcceleration
@@ -13429,7 +13429,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: DEFAULT_DRAG
-      value: 50
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: maximumVelocity
