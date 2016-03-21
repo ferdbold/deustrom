@@ -30,10 +30,12 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Particle spawned when island assemble")]
         private GameObject[] AssembleParticlePrefab;
 
-        [SerializeField] [Tooltip("Particle spawned when island gets destroyed by collision with high speed impacting object")]
-        private GameObject DestroyParticle;
+        [SerializeField] [Tooltip("Particle spawned when Sobek island gets destroyed by collision with high speed impacting object")]
+        private GameObject DestroyParticle_SO;
+        [SerializeField] [Tooltip("Particle spawned when Cthlhu island gets destroyed by collision with high speed impacting object")]
+        private GameObject DestroyParticle_CT;
 
-        
+
         [SerializeField] [Tooltip("The time it takes for 2 chunks to do their merging anim")]
         private float _chunkMergeTime = 1f;
 
@@ -400,7 +402,8 @@ namespace Simoncouche.Islands {
             }
 
             //Spawn Particle and play sound
-            Instantiate(DestroyParticle, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+            if(chunk.color == IslandUtils.color.red) Instantiate(DestroyParticle_SO, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+            if (chunk.color == IslandUtils.color.blue) Instantiate(DestroyParticle_CT, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
 
             Island islandLink = chunk.parentIsland;
 
