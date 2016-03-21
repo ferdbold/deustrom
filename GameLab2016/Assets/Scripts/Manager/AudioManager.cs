@@ -98,6 +98,10 @@ public class SobekSpecificSound : SoundClass {
     [SerializeField]
     private List<AudioClip> _playerRespawn;
     public AudioClip playerRespawn { get { return GetRandom(_playerRespawn); } }
+
+    [SerializeField]
+    private List<AudioClip> _conversion;
+    public AudioClip Conversion { get { return GetRandom(_conversion); } }
 }
 
 [System.Serializable]
@@ -143,6 +147,10 @@ public class CthuluSpecificSound : SoundClass {
     [SerializeField]
     private List<AudioClip> _playerRespawn;
     public AudioClip playerRespawn { get { return GetRandom(_playerRespawn); } }
+
+    [SerializeField]
+    private List<AudioClip> _conversion;
+    public AudioClip Conversion { get { return GetRandom(_conversion); } }
 }
 
 [System.Serializable]

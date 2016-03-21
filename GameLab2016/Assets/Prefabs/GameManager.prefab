@@ -182,6 +182,8 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 16602db8ffd4c47c3bb33d4c1a997544, type: 3}
       _playerRespawn:
       - {fileID: 8300000, guid: 687d525a0f720ee4ebd5a24fb5aeeea1, type: 3}
+      _conversion:
+      - {fileID: 8300000, guid: 8a3c3ec672c1d884e8eedbf4f9fbfadc, type: 3}
     _cthuluSound:
       _swim:
       - {fileID: 8300000, guid: 808d29afd404b5747aa0d62814a09590, type: 3}
@@ -217,6 +219,8 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 16602db8ffd4c47c3bb33d4c1a997544, type: 3}
       _playerRespawn:
       - {fileID: 8300000, guid: 687d525a0f720ee4ebd5a24fb5aeeea1, type: 3}
+      _conversion:
+      - {fileID: 8300000, guid: 8a3c3ec672c1d884e8eedbf4f9fbfadc, type: 3}
   _islandSound:
     _collision:
     - {fileID: 8300000, guid: 6f3b7e321c9fbdf4c9158a22d2583ab9, type: 3}
@@ -253,7 +257,7 @@ MonoBehaviour:
   - {fileID: 185804, guid: c1091c6052fb3564686ea296d92a982c, type: 2}
   - {fileID: 179566, guid: 73e441ad6eee6174ea5006d3eb0a873a, type: 2}
   - {fileID: 198552, guid: 2538333aedd5beb42afbe69011b79399, type: 2}
-  DestroyParticle: {fileID: 111502, guid: 65e6fa5d9193f254a8da813c02251049, type: 2}
+  DestroyParticle: {fileID: 185804, guid: c1091c6052fb3564686ea296d92a982c, type: 2}
   _chunkMergeTime: 1
 --- !u!114 &11472564
 MonoBehaviour:
