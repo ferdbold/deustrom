@@ -346,7 +346,7 @@ namespace Simoncouche.Islands {
             _color = newColor;
             _randomizeIslandVisual.SetIslandColorVisual(newColor);
             //Play Sound
-            if (newColor == IslandUtils.color.red) audioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.Conversion);
+            if (newColor == IslandUtils.color.red) audioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.conversion);
             else audioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.Conversion);
         }
 

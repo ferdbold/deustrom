@@ -92,6 +92,9 @@ namespace Simoncouche.Controller {
         /// <summary> Start Player weight </summary>
         public float _startPlayerWeight { get; private set; }
 
+        private float _TimeSinceLastBump = 10f;
+        private float _TimeSinceLastBumpNeededForChant = 1.25f;
+
         #endregion
 
         /// <summary> Getting multiple needed components (Rigidbody, ...)  </summary>
@@ -143,6 +146,10 @@ namespace Simoncouche.Controller {
             _playerGrab.SetupInput(isPlayerOne);
         }
 
+        void Update() {
+            _TimeSinceLastBump += Time.deltaTime;
+        }
+
         /// <summary> FixedUpdate pour le character avec rigidbody (sujet à changements)  </summary>
         void FixedUpdate() {
             if (InRespawnState) return; //dont do logic if player is in respawn
@@ -173,6 +180,7 @@ namespace Simoncouche.Controller {
 
             //Audio
             _playerAudio.PlaySound(PlayerSounds.PlayerDeath);
+            if (_TimeSinceLastBump <= _TimeSinceLastBumpNeededForChant) _playerAudio.PlaySound(PlayerSounds.OtherPlayerChant);
             //Animation
             HandleKnockedOutStartAnimation();
         }
@@ -455,6 +463,7 @@ namespace Simoncouche.Controller {
             _playerRigidBody.velocity += bumpForce;
             StartPlayerBumpCooldown();
             HandleHitAnimation();
+            _TimeSinceLastBump = 0f; // reset time since last bump
             //Release object
             _playerGrab.Release();
             //Play Audio

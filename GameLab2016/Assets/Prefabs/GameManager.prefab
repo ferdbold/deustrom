@@ -440,6 +440,10 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 687d525a0f720ee4ebd5a24fb5aeeea1, type: 3}
       _conversion:
       - {fileID: 8300000, guid: 8a3c3ec672c1d884e8eedbf4f9fbfadc, type: 3}
+      _fastChant:
+      - {fileID: 8300000, guid: c9f82067bad72bc4c85b484beee43baa, type: 3}
+      _slowChant:
+      - {fileID: 8300000, guid: 4acb228b137fc674dac159feee4c9c0b, type: 3}
     _cthuluSound:
       _swim:
       - {fileID: 8300000, guid: 808d29afd404b5747aa0d62814a09590, type: 3}
@@ -477,6 +481,10 @@ MonoBehaviour:
       - {fileID: 8300000, guid: 687d525a0f720ee4ebd5a24fb5aeeea1, type: 3}
       _conversion:
       - {fileID: 8300000, guid: 8a3c3ec672c1d884e8eedbf4f9fbfadc, type: 3}
+      _fastChant:
+      - {fileID: 8300000, guid: f71ac2f337c0fcc4db03e5728527bf76, type: 3}
+      _slowChant:
+      - {fileID: 8300000, guid: 2afb74fc73f578c48808a44e82149e62, type: 3}
   _islandSound:
     _collision:
     - {fileID: 8300000, guid: 6f3b7e321c9fbdf4c9158a22d2583ab9, type: 3}

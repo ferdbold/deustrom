@@ -171,7 +171,6 @@ namespace Simoncouche.Islands {
             gravityBody.Velocity = (gravityBody.Velocity * weight + chunk.gravityBody.Velocity * chunk.weight) / (weight + chunk.weight);
             weight = weight + chunk.weight;
 
-            _collider.radius += 0.25f; //TODO : Get Collider Position and Radius based on island chunks. This is only placeholder !
             gravityBody.Weight += chunk.gravityBody.Weight;
 
             //deactivate the gravitybody of the chunk
