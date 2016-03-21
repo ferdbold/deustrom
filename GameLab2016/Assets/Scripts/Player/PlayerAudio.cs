@@ -86,7 +86,6 @@ namespace Simoncouche.Controller {
             //_swimmingAudioSource.pitch = _currentPitchValue;
             _swimmingAudioSource.pitch = Mathf.Lerp(minPitch, maxPitch, playerController.GetRatioOfMaxSpeed());
             _swimmingAudioSource.volume = Mathf.Lerp(minVolume, maxVolume, playerController.GetRatioOfMaxSpeed());
-            Debug.Log("step : " + playerController.GetRatioOfMaxSpeed()  + "  pitch : " + _swimmingAudioSource.pitch +  " volume : " + _swimmingAudioSource.volume);
 
 
             //Increase time for next swim sound
