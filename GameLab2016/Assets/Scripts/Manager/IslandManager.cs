@@ -30,10 +30,12 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Particle spawned when island assemble")]
         private GameObject[] AssembleParticlePrefab;
 
-        [SerializeField] [Tooltip("Particle spawned when island gets destroyed by collision with high speed impacting object")]
-        private GameObject DestroyParticle;
+        [SerializeField] [Tooltip("Particle spawned when Sobek island gets destroyed by collision with high speed impacting object")]
+        private GameObject DestroyParticle_SO;
+        [SerializeField] [Tooltip("Particle spawned when Cthlhu island gets destroyed by collision with high speed impacting object")]
+        private GameObject DestroyParticle_CT;
 
-        
+
         [SerializeField] [Tooltip("The time it takes for 2 chunks to do their merging anim")]
         private float _chunkMergeTime = 1f;
 
@@ -291,6 +293,12 @@ namespace Simoncouche.Islands {
                 return null;
             }
 
+            //Make the player ungrab and then regrab only in 0.1seconds. 
+            foreach (IslandChunk check in island.chunks) {
+                PlayerGrab.UngrabBody(check.gravityBody, true, 0.1f);
+                Debug.Log(check.name);
+            }
+
             List<Transform> everyPiece = new List<Transform>();
             everyPiece.Add(island.transform);
 
@@ -316,6 +324,7 @@ namespace Simoncouche.Islands {
                 //Find list of Chunk that should be island
                 chunkIsland.Clear();
                 foreach (IslandChunk chunk in island.chunks) {
+
                     if (!chunkChecked.Contains(chunk)) {
                         chunkIsland = CheckIslandBroken_Helper(chunk, chunkIsland);
                         break;
@@ -349,15 +358,10 @@ namespace Simoncouche.Islands {
             }
             island.RecreateIslandChunkConnection();
 
-            //Make the player lose the connection to island being dismantle
-            if (island.chunks.Count != originChunkList.Count) {
-                foreach (IslandChunk check in chunkChecked) {
-                    PlayerGrab.ReactivateCollisionForBothPlayer(check.GetComponent<CircleCollider2D>());
-                }
-            }
 
             //Update Conversion Status of the island
             island.UpdateConversionStatus();
+
             return everyPiece;
         }
 
@@ -407,7 +411,8 @@ namespace Simoncouche.Islands {
             }
 
             //Spawn Particle and play sound
-            Instantiate(DestroyParticle, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+            if(chunk.color == IslandUtils.color.red) Instantiate(DestroyParticle_SO, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+            if (chunk.color == IslandUtils.color.blue) Instantiate(DestroyParticle_CT, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
 
             Island islandLink = chunk.parentIsland;
 

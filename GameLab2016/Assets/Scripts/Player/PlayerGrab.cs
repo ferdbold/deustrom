@@ -414,9 +414,10 @@ namespace Simoncouche.Controller {
             _inGrabCooldown = false;
         }
 
-        public static void ReactivateCollisionForBothPlayer(Collider2D otherCol) {
+        public static void ReactivateCollisionForBothPlayer(Collider2D otherCol, IslandChunk chunk) {
             foreach (PlayerGrab grab in _allPlayerGrabs) {
-                grab.ReactivateCollision(otherCol, 0);
+                if(grab.grabbedBody != chunk.gravityBody && chunk.parentIsland != null && grab.grabbedBody != chunk.parentIsland.gravityBody)
+                    grab.ReactivateCollision(otherCol, 0);
             }
         }
 
@@ -424,10 +425,12 @@ namespace Simoncouche.Controller {
         /// <param name="otherCol">collider to unIgnore</param>
         /// <param name="time">time before unignore</param>
         void ReactivateCollision(Collider2D otherCol, float time) {
+       
             Coroutine disableCoroutine = StartCoroutine(ResumeCollision(otherCol, time));
 
             //Add coroutine to a dictionnary until is done in case it needs to be interrupted
             string colID = otherCol.GetInstanceID().ToString();
+            if (collisionCoroutines.ContainsKey(colID)) collisionCoroutines.Remove(colID);
             collisionCoroutines.Add(colID, disableCoroutine);
         }
 
@@ -488,6 +491,7 @@ namespace Simoncouche.Controller {
 
         /// <summary> Check if any player is currently grabbing bodyToMerge. If so, make that player release the object </summary>
         /// <param name="bodyToMerge">Gravity body of the body to merge</param>
+        /// <param name="regrab">Regrab body after drop or not</param>
         public static void UngrabBody(GravityBody bodyToMerge, bool regrab) {
             foreach (PlayerGrab pg in _allPlayerGrabs) {
                 //Debug.Log("checking if " + pg.name + " is grabbing " + bodyToMerge + "      he's grabbing " + pg.grabbedBody);
@@ -498,6 +502,36 @@ namespace Simoncouche.Controller {
                 }
             }
         }
+
+        /// <summary> Check if any player is currently grabbing bodyToMerge. If so, make that player release the object </summary>
+        /// <param name="bodyToMerge">Gravity body of the body to merge</param>
+        /// <param name="regrab">Regrab body after drop or not</param>
+        /// <param name="regrabDelay">Delay before regrabbing</param>
+        public static void UngrabBody(GravityBody bodyToMerge, bool regrab, float regrabDelay) {
+            foreach (PlayerGrab pg in _allPlayerGrabs) {
+                //Debug.Log("checking if " + pg.name + " is grabbing " + bodyToMerge + "      he's grabbing " + pg.grabbedBody);
+                if (pg.grabbedBody == bodyToMerge) {
+                    //Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " because it was merged.");
+                    pg.Release();
+                    if (regrab) pg.StartRegrabCoroutine(bodyToMerge, regrabDelay);
+                }
+            }
+        }
+
+        /// <summary> Starts a coroutine that regrab a gravity body adter a delay </summary>
+        /// <param name="bodyToMerge">body to grab</param>
+        /// <param name="delay">delay before grab</param>
+        private void StartRegrabCoroutine(GravityBody bodyToGrab, float delay) {
+            StartCoroutine(RegrabCoroutine(bodyToGrab, delay));
+        }
+        /// <summary> Coroutine that regrab after a delay</summary>
+        private IEnumerator RegrabCoroutine( GravityBody bodyToGrab, float delay) {
+            yield return new WaitForSeconds(delay);
+            if (bodyToGrab != null) {
+                Grab(bodyToGrab, bodyToGrab.gameObject.GetComponent<IslandChunk>(), GameManager.islandManager.GetMergeTime());
+            } else Debug.LogWarning("Attempted to regrab an body which has been destroyed. No grab occured.");
+        }
+
 
         /// <summary> Check if anyplayer is grabbing island, if so make him ignore chunk </summary>
         /// <param name="island"></param>
