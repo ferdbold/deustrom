@@ -142,9 +142,6 @@ namespace Simoncouche.Islands {
                 } else {
                     AddChunkToExistingIsland(a_IslandLink, b);
 
-                    //a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-                    //PlayerGrab.UngrabBody(b.gravityBody);
-
                     JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
                     a_IslandLink.RecreateIslandChunkConnection();
                 }
@@ -160,9 +157,6 @@ namespace Simoncouche.Islands {
                    ParticleGO.transform.parent = anchor.transform;
                } else {
                    AddChunkToExistingIsland(b_IslandLink, a);
-
-                   //b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
-                   //PlayerGrab.UngrabBody(a.gravityBody);
 
                    JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
                    b_IslandLink.RecreateIslandChunkConnection();
