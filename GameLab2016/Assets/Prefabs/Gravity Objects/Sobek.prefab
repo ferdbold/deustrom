@@ -3393,9 +3393,9 @@ MonoBehaviour:
   GRAB_RATIO_ROTATION: 0.65
   GRAB_RATIO_MOVEMENT: 0.45
   RESPAWN_SPIN_TIME: 2
-  RESPAWN_SPIN_RATE: 1080
+  RESPAWN_SPIN_RATE: 1425
   RESPAWN_UNDERWATER_TIME: 3
-  Z_UNDER_WATER: -0.35
+  Z_UNDER_WATER: 0.5
   BUMP_FORCE: 1
   isPlayerOne: 0
 --- !u!114 &11447832
@@ -3413,6 +3413,7 @@ MonoBehaviour:
   radius: 1
   DEFAULT_DRAG: 50
   START_VELOCITY: {x: 0, y: 2}
+  isDestroyed: 0
   _activated: 1
   currentGravObjects: []
 --- !u!114 &11474506
@@ -11162,6 +11163,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: DEFAULT_DRAG
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Z_UNDER_WATER
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: RESPAWN_SPIN_RATE
+      value: 1425
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
