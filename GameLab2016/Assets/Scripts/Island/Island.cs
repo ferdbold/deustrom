@@ -67,6 +67,10 @@ namespace Simoncouche.Islands {
             if (_collider != null) _collider.isTrigger = true;
         }
 
+        private void OnDestroy() {
+            ResetConvertingLists(); //Clear list and particles on destroy
+        }
+
         private static void GetParticlesGameObject() {
             SO_IDLE = (GameObject)Resources.Load("Particles/P_SO_Convert_Idle");
             SO_POP = (GameObject)Resources.Load("Particles/P_SO_Convert_Pop");

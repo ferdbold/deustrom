@@ -23,6 +23,14 @@ namespace Simoncouche.Controller {
         [Tooltip("minimum pitch of our sound when he goes slow")]
         [SerializeField]
         private float minPitch = 1.0f;
+
+        [Tooltip("maximum volume of our sound when he goes fast")]
+        [SerializeField]
+        private float maxVolume = 1.0f;
+
+        [Tooltip("minimum volume of our sound when he goes slow")]
+        [SerializeField]
+        private float minVolume = 0.6f;
         /// <summary>
         /// Fade out speed multipler which is used to decreased the volume multiplied with Time.deltaTime
         /// </summary>
@@ -48,7 +56,7 @@ namespace Simoncouche.Controller {
         private const float _axisMaxValue = 1.0f;
         private bool _isSobek;
 
-        private float _swimSoundGap = 0.40f;
+        private float _swimSoundGap = 0.50f;
         private float _currentSwimSoundGap = 0f;
         private float _currentSwimSoundTime = 0f;
         private Vector2 _swimSoundGapVariation = new Vector2(-0.05f, 0.05f);
@@ -74,11 +82,14 @@ namespace Simoncouche.Controller {
             //We lerp the current added velocity by the player on the character to get a pitch higher or lower depending on velocity
             //magnitude divided by Time.fixedDeltatime is done cause 
             //TODO : This lerp doesn't seem to be working as intended : 
-            _currentPitchValue = Mathf.Lerp(minPitch, maxPitch, GetMovementValue() / _axisMaxValue);
-            _swimmingAudioSource.pitch = _currentPitchValue;
+            //_currentPitchValue = Mathf.Lerp(minPitch, maxPitch, GetMovementValue() / _axisMaxValue);
+            //_swimmingAudioSource.pitch = _currentPitchValue;
+            _swimmingAudioSource.pitch = Mathf.Lerp(minPitch, maxPitch, playerController.GetRatioOfMaxSpeed());
+            _swimmingAudioSource.volume = Mathf.Lerp(minVolume, maxVolume, playerController.GetRatioOfMaxSpeed());
+
 
             //Increase time for next swim sound
-            _currentSwimSoundTime += Time.deltaTime;
+            _currentSwimSoundTime += Time.deltaTime + (Time.deltaTime * playerController.GetRatioOfMaxSpeed());
             //check if the player is moving
             if (Mathf.Abs(playerController.GetLeftAnalogHorizontal()) > 0.0f || Mathf.Abs(playerController.GetLeftAnalogVertical()) > 0.0f) {
                 if (!_swimmingAudioSource.isPlaying) _swimmingAudioSource.Play();
