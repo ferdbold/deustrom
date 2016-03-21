@@ -140,24 +140,25 @@ namespace Simoncouche.Islands {
                 foreach (IslandChunk c in chunks) {
                     if (c != chunk) {
                         chunk.ChangeCollisionBetweenChunk(c, true);
+                        c.RemoveConnectedChunk(chunk);
                     }
                 }
 
                 _islandColliders.RemoveCollision(chunk);
                 chunks.Remove(chunk);
                 chunk.transform.SetParent(GameObject.FindWithTag("IslandSubFolder").transform);
+                chunk.parentIsland = null;
 
                 //Change gravity body
                 gravityBody.Weight -= chunk.gravityBody.Weight;
                 chunk.gravityBody.ActivateGravityBody();
 
+                chunk.ResetMergeability(0.5f);
+
                 if (chunks.Count <= 0) {
                     Destroy(gameObject);
                 }
             }
-
-            //Recenter island middle
-            //CenterIslandRoot();
         }
 
         /// <summary>

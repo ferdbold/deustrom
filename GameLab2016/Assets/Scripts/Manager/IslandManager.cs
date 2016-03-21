@@ -83,6 +83,11 @@ namespace Simoncouche.Islands {
         public void HandleChunkCollision(IslandChunk a, IslandAnchorPoints a_anchor, IslandChunk b, IslandAnchorPoints b_anchor) {
             Island a_IslandLink = a.parentIsland;
             Island b_IslandLink = b.parentIsland;
+
+            //If one of the island is not mergeable
+            if (!a.isMergeable || !b.isMergeable) {
+                return;
+            }
             
             //If both are contained in Island
             if (a_IslandLink != null && b_IslandLink != null && a_IslandLink != b_IslandLink) {
@@ -366,7 +371,7 @@ namespace Simoncouche.Islands {
             islandChecked.Add(current);
 
             foreach (IslandChunk connection in current.connectedChunk) {
-                if (current != null && islandChecked.Count == current.parentIsland.chunks.Count) break;
+                if (current.parentIsland != null && islandChecked.Count == current.parentIsland.chunks.Count) break;
 
                 if (connection != null && !islandChecked.Contains(connection)) {
                     CheckIslandBroken_Helper(connection, islandChecked);
@@ -391,10 +396,14 @@ namespace Simoncouche.Islands {
             if (damage < 1) {
                 return;
             }
-
             //If the chunk has no connection
-            if (chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
+            if (chunk.parentIsland == null || chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
                 return;
+            }
+
+            //Make every part not mergeable for a time
+            foreach (IslandChunk c in chunk.parentIsland.chunks) {
+                c.ResetMergeability(0.5f);
             }
 
             //Spawn Particle and play sound
@@ -413,6 +422,7 @@ namespace Simoncouche.Islands {
             if (damage > 1) {
                 islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
             }
+
             //Remove chunk from island
             foreach (IslandChunk c in islandRemoved) {
                 islandLink.RemoveChunkToIsland(c);
@@ -428,31 +438,16 @@ namespace Simoncouche.Islands {
                 }
             }
 
+            //TODO replace
+            islandLink.gravityBody.Velocity = velocityGiven;
+
             //Remove connection (only need to remove the connection from one side, one chunk removes the connection from both)
             foreach (IslandChunk c in islandLink.chunks) {
                 if (!islandRemoved.Contains(c)) {
                     c.RemoveConnectedChunk(islandRemoved);
                 } 
             }
-
-            //Give Velocity
-            if (chunk.parentIsland != null) {
-                chunk.parentIsland.gravityBody.Velocity = velocityGiven;
-            } else {
-                chunk.gravityBody.Velocity = velocityGiven;
-            }
-
-            StartCoroutine(CompleteTakeDamage(islandLink));
-        }
-
-        private IEnumerator CompleteTakeDamage(Island island) {
-            int count = 20;
-            //Wait for a number of frame
-            while (count > 0) {
-                --count;
-                CheckIslandBroken(island);
-                yield return new WaitForEndOfFrame();
-            }
+            CheckIslandBroken(islandLink);
         }
 
         /// <summary>
