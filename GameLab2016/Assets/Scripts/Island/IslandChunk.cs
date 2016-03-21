@@ -97,7 +97,7 @@ namespace Simoncouche.Islands {
         }
 
         void Start() {
-            _randomizeIslandVisual.SetIslandColorVisual(color);
+            if (color != IslandUtils.color.green) _randomizeIslandVisual.SetIslandColorVisual(color);
             StartCoroutine(DebugPoint());
         }
 

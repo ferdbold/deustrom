@@ -252,6 +252,7 @@ MonoBehaviour:
   AssembleParticlePrefab:
   - {fileID: 185804, guid: c1091c6052fb3564686ea296d92a982c, type: 2}
   - {fileID: 179566, guid: 73e441ad6eee6174ea5006d3eb0a873a, type: 2}
+  - {fileID: 198552, guid: 2538333aedd5beb42afbe69011b79399, type: 2}
   DestroyParticle: {fileID: 111502, guid: 65e6fa5d9193f254a8da813c02251049, type: 2}
   _chunkMergeTime: 1
 --- !u!114 &11472564

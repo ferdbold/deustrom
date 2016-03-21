@@ -600,6 +600,30 @@ Prefab:
       propertyPath: m_Constraints
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VARIATION_SCALE_MIN.x
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VARIATION_SCALE_MIN.y
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VARIATION_SCALE_MIN.z
+      value: 0.975
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VARIATION_SCALE_MAX.x
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VARIATION_SCALE_MAX.y
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: VARIATION_SCALE_MAX.z
+      value: 1.025
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 185502}

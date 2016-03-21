@@ -133,36 +133,60 @@ namespace Simoncouche.Islands {
 
             //If only a is contained in a Island
             else if (a_IslandLink != null) {
-                AddChunkToExistingIsland(a_IslandLink,b);
-               
-                //a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
-                //PlayerGrab.UngrabBody(b.gravityBody);
-               
-                JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
-                a_IslandLink.RecreateIslandChunkConnection();
+                if (a.color == IslandUtils.color.green || b.color == IslandUtils.color.green) {
+                    Transform anchor;
+                    if (a.color == IslandUtils.color.green) anchor = a.transform;
+                    else anchor = b.transform;
+                    GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+                    ParticleGO.transform.parent = anchor.transform;
+                } else {
+                    AddChunkToExistingIsland(a_IslandLink, b);
+
+                    //a_IslandLink.AddChunkToIsland(b, GetMergingPoint(b.transform.position, a.transform.position), a.transform.rotation.eulerAngles);
+                    //PlayerGrab.UngrabBody(b.gravityBody);
+
+                    JoinTwoChunk(b, b_anchor, a, a_anchor, a_IslandLink);
+                    a_IslandLink.RecreateIslandChunkConnection();
+                }
            } 
 
            //If only b is contained in a Island
            else if (b_IslandLink != null) {
-                AddChunkToExistingIsland(b_IslandLink, a);
-                
-                //b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
-                //PlayerGrab.UngrabBody(a.gravityBody);
-                
-                JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
-                b_IslandLink.RecreateIslandChunkConnection();
+               if (a.color == IslandUtils.color.green || b.color == IslandUtils.color.green) {
+                   Transform anchor;
+                   if (a.color == IslandUtils.color.green) anchor = a.transform;
+                   else anchor = b.transform;
+                   GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+                   ParticleGO.transform.parent = anchor.transform;
+               } else {
+                   AddChunkToExistingIsland(b_IslandLink, a);
+
+                   //b_IslandLink.AddChunkToIsland(a, GetMergingPoint(a.transform.position, b.transform.position), b.transform.rotation.eulerAngles);
+                   //PlayerGrab.UngrabBody(a.gravityBody);
+
+                   JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
+                   b_IslandLink.RecreateIslandChunkConnection();
+               }
             } 
 
             //If a & b are not contained in a Island
             else {
-                Island createdIsland = CreateIsland(a, b);
-                JoinTwoChunk(b, b_anchor, a, a_anchor, createdIsland);
-                createdIsland.islandColliders.AddCollision(a, Vector3.zero);
-                createdIsland.RecreateIslandChunkConnection();
+                if (a.color == IslandUtils.color.green || b.color == IslandUtils.color.green) {
+                    Transform anchor;
+                    if (a.color == IslandUtils.color.green) anchor = a.transform;
+                    else anchor = b.transform;
+                    GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+                    ParticleGO.transform.parent = anchor.transform;
+                } else {
+                    Island createdIsland = CreateIsland(a, b);
+                    JoinTwoChunk(b, b_anchor, a, a_anchor, createdIsland);
+                    createdIsland.islandColliders.AddCollision(a, Vector3.zero);
+                    createdIsland.RecreateIslandChunkConnection();
+                }
             }
 
-            //TestIslandForConversion(a.parentIsland); //Check each insland individually for conversion
-            SimpleIslandConversion(a.parentIsland); //All chunks in island change to the same color which is the most present
+            //All chunks in island change to the same color which is the most present
+            if (!(a.color == IslandUtils.color.green || b.color == IslandUtils.color.green)) SimpleIslandConversion(a.parentIsland);
         }
 
         /// <summary>
@@ -563,7 +587,8 @@ namespace Simoncouche.Islands {
             switch (color) {
                 case Islands.IslandUtils.color.red: type = 0; break;
                 case Islands.IslandUtils.color.blue: type = 1; break;
-                default: Debug.Log("Island color is not not blue or red ! "); break;
+                case Islands.IslandUtils.color.green: type = 2; break;
+                default: Debug.Log("Island color is not not blue, red or green! "); break;
             }
 
             //Instantiate Particles FX
