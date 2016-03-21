@@ -286,6 +286,12 @@ namespace Simoncouche.Islands {
                 return null;
             }
 
+            //Make the player ungrab and then regrab only in 0.1seconds. 
+            foreach (IslandChunk check in island.chunks) {
+                PlayerGrab.UngrabBody(check.gravityBody, true, 0.1f);
+                Debug.Log(check.name);
+            }
+
             List<Transform> everyPiece = new List<Transform>();
             everyPiece.Add(island.transform);
 
@@ -311,6 +317,7 @@ namespace Simoncouche.Islands {
                 //Find list of Chunk that should be island
                 chunkIsland.Clear();
                 foreach (IslandChunk chunk in island.chunks) {
+
                     if (!chunkChecked.Contains(chunk)) {
                         chunkIsland = CheckIslandBroken_Helper(chunk, chunkIsland);
                         break;
@@ -344,15 +351,10 @@ namespace Simoncouche.Islands {
             }
             island.RecreateIslandChunkConnection();
 
-            //Make the player lose the connection to island being dismantle
-            if (island.chunks.Count != originChunkList.Count) {
-                foreach (IslandChunk check in chunkChecked) {
-                    PlayerGrab.ReactivateCollisionForBothPlayer(check.GetComponent<CircleCollider2D>());
-                }
-            }
 
             //Update Conversion Status of the island
             island.UpdateConversionStatus();
+
             return everyPiece;
         }
 
