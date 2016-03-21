@@ -5567,8 +5567,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ceccd48804aa44488dc66ed690c65f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPitch: 1.1
-  minPitch: 0.9
+  maxPitch: 1.2
+  minPitch: 0.8
+  maxVolume: 0.8
+  minVolume: 0.4
   volumeFadeOutSpeed: 0.5
 --- !u!114 &11439162
 MonoBehaviour:

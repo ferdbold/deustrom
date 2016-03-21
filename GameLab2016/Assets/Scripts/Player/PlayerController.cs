@@ -312,6 +312,12 @@ namespace Simoncouche.Controller {
             }
         }
 
+        /// <summary>  Returns the ratio of the maximum speed the player currently travels at </summary>
+        /// <returns> Ratio of currentSpeed / MaxSpeed between 0 and 1 </returns>
+        public float GetRatioOfMaxSpeed() {
+            return (_playerRigidBody.velocity.magnitude / maximumVelocity);
+        }
+
         #endregion
 
         //Methods called by various scripts to configure the variable of the player's animator
