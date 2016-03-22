@@ -204,11 +204,13 @@ namespace Simoncouche.Chain {
                 Fire();
                 //animation
                 this.autoAimController.enabled = false;
+                this.aimController.ToggleAimIndicator(false);
                 playerController.HandleAimStopAnimation();
             } else if (!_triggerIsHeld && isCurrentlyHeld) {//If just started pressing
                 _triggerIsHeld = true;
                 //animation
                 this.autoAimController.enabled = true;
+                this.aimController.ToggleAimIndicator(true);
                 playerController.HandleAimStartAnimation();
             }
         }
