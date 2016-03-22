@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 namespace Simoncouche.Controller {
 
@@ -9,6 +10,10 @@ namespace Simoncouche.Controller {
     /// Objects using the aim system need a reference to this.
     /// </summary>
     public class AimController : MonoBehaviour {
+
+        [SerializeField]
+        [Tooltip("Duration for the bounce-in animation")]
+        private float _animDuration = 0.2f;
 
         /// <summary> The current aim orientation as set by the right analog input </summary>
         public float aimOrientation { get; private set; }
@@ -52,13 +57,21 @@ namespace Simoncouche.Controller {
             if (active) ActivateIndicator();
             else DeactivateIndicator();
         }
-        /// <summary> Deactivate Indicator </summary>
-        private void DeactivateIndicator() {
-            _aimIndicator.SetActive(false);
-        }
-        /// <summary> Activate Indicator </summary>
+
+        /// <summary>Activate indicator</summary>
         private void ActivateIndicator() {
+            _aimIndicator.transform.localScale = Vector3.zero;
             _aimIndicator.SetActive(true);
+            _aimIndicator.transform.DOScale(Vector3.one, _animDuration).SetEase(Ease.OutBounce);
+        }
+
+        /// <summary>Deactivate indicator</summary>
+        private void DeactivateIndicator() {
+            _aimIndicator.transform.DOScale(Vector3.zero, _animDuration)
+                .SetEase(Ease.InBounce)
+                .OnComplete(() => {
+                    _aimIndicator.SetActive(false);
+                });
         }
     }
 }

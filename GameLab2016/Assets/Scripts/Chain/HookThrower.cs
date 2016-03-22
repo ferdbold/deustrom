@@ -131,10 +131,12 @@ namespace Simoncouche.Chain {
 
         private void OnDebugFireDown() {
             this.autoAimController.enabled = true;
+            this.aimController.ToggleAimIndicator(true);
         }
 
         private void OnDebugFireUp() {
             this.autoAimController.enabled = false;
+            this.aimController.ToggleAimIndicator(false);
             this.Fire();
         }
 
