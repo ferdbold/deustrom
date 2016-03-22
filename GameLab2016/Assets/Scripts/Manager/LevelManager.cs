@@ -31,7 +31,6 @@ public class LevelManager {
     /// <summary>Cthulu number of match won </summary>
     public int cthuluMatchWon { get; private set; }
 
-    private UIManager ui;
     #endregion
 
     #region Setup
@@ -44,7 +43,6 @@ public class LevelManager {
 
     public void Setup() {
         SetupPlayers();
-        ui = GameObject.FindObjectOfType<UIManager>();
         sobekScore = 0;
         cthuluScore = 0;
     }
@@ -91,7 +89,7 @@ public class LevelManager {
                 }
             }
             for (int i = 0; i < scoreAdded; i++) {
-                if (ui != null) ui.AddPoint(player, originPos);
+                if (GameManager.uiManager != null) GameManager.uiManager.AddPoint(player, originPos);
             }
         }
     }
@@ -143,4 +141,11 @@ public class LevelManager {
     }
 
     #endregion
+
+    /// <summary>Get the current round number, 0-indexed</summary>
+    public int currentRound {
+        get {
+            return this.sobekMatchWon + this.cthuluMatchWon;
+        }
+    }
 }

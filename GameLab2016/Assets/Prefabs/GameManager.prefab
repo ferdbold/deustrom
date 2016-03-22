@@ -539,6 +539,12 @@ MonoBehaviour:
   _orbAnimDurationVariation: 0.25
   _sobekRunePrefab: {fileID: 11420200, guid: 54df75251a7ed41999fea1a3333a4a03, type: 2}
   _cthulhuRunePrefab: {fileID: 11420200, guid: d154f54759bf44e4787bf04ceaef686c, type: 2}
+  _roundSeals:
+  - {fileID: 21300000, guid: 0b1530a80184f41429ebde44e5455cb2, type: 3}
+  - {fileID: 21300000, guid: 8da96b09264d946e398addd0966583ce, type: 3}
+  - {fileID: 21300000, guid: c74ddd431027b4450bf400a5b4cc85cb, type: 3}
+  _sealSobek: {fileID: 21300000, guid: 7b07e9123012d4c4f947c5789f2a2626, type: 3}
+  _sealCthulhu: {fileID: 21300000, guid: c17e9977f077a4b83906bf0b50f89081, type: 3}
 --- !u!114 &11483164
 MonoBehaviour:
   m_ObjectHideFlags: 1
