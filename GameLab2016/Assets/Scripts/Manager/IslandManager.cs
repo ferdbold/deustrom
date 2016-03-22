@@ -17,6 +17,9 @@ namespace Simoncouche.Islands {
         /// <summary> A list of every IslandChunk currently in play</summary>
         private List<IslandChunk> _islandChunks = new List<IslandChunk>();
 
+        /// <summary> A list of every IslandChunk not currently in play but currently ready to be released from feeder (shaking) </summary>
+        private List<IslandChunk> _pendingIslandChunks = new List<IslandChunk>();
+
         [SerializeField] [Tooltip("Island Object Prefab Reference")]
         private GameObject _islandComponent = null;
 
@@ -64,10 +67,15 @@ namespace Simoncouche.Islands {
         public void CreatedIslandChunk(IslandChunk chunk) {
             _islandChunks.Add(chunk);
         }
+        
 
         #region Get/Set
         public List<Island> GetIslands() { return _island; }
         public List<IslandChunk> GetIslandChunks() { return _islandChunks; }
+        public List<IslandChunk> GetPendingIslandChunks() { return _pendingIslandChunks;  }
+        public void AddPendingIslandChunk(IslandChunk ic) { _pendingIslandChunks.Add(ic); }
+        public void RemovePendingIslandChunk(IslandChunk ic) { _pendingIslandChunks.Remove(ic); }
+        public int GetAmountPendingIslandChunk() { return _pendingIslandChunks.Count; }
         public Transform GetIslandSubFolder() { return _islandSubFolder; }
         public float GetMergeTime() { return _chunkMergeTime; }
         public float GetConversionTime() { return _conversionTime; }

@@ -91,6 +91,7 @@ namespace Simoncouche.Islands {
         private int _pIslandDiffMax = 0; //Number of island difference between max.  If positive, Spawn Slower.
         private int _pSobekIsland = 0; //current Number of island of sobek
         private int _pCthulhuIsland = 0; //current Number of island of cthulhu
+        private int _pVolcanoIsland = 0; //current Number of volcano islands
         //Instantiated objects refs
         private List<List<ChunkWithCollider>> _islandRows;
         private GameObject _islandContainer;
@@ -103,8 +104,16 @@ namespace Simoncouche.Islands {
         //Other Values
         private float _releaseForce = 15f; //force applied when island is released after shake
         private float _timeSinceLastSpawn = 0f; //current time since last island spawn
+        //Tutorial Spawning
+        private enum TutorialState { NoIsland, OneIsland, ThreeIsland, VolcanoPhase};
+        private bool _inTutorial = false;
+        private TutorialState _state = TutorialState.NoIsland;
+        private int _tutoTargetIsland = 0;
+        private float _tutoTimeInPhase = 0f;
+
         [Header("DEBUG")]
-        [SerializeField][Tooltip("DO NOT TOUCH. Visible for DEBUG purposes only")] private float _modifiedSpawnRate = 5f; //current spawn rate
+        [SerializeField][Tooltip("DO NOT TOUCH. Visible for DEBUG purposes only")]
+        private float _modifiedSpawnRate = 5f; //current spawn rate
 
         
 
@@ -127,13 +136,18 @@ namespace Simoncouche.Islands {
         }
 
         void Update() {
-            ManageSpawn();
+            if (_inTutorial) {
+                ManageTutorial();
+            } else {
+                ManageSpawn();
+            }
         }
 
         void FixedUpdate() {
             MoveSpawner();
         }
 
+        /// <summary> Called on tick if not in tutorial. Controls island spawn. </summary>
         private void ManageSpawn() {
             //Update Spawn Timer
             _timeSinceLastSpawn += Time.deltaTime;
@@ -143,6 +157,60 @@ namespace Simoncouche.Islands {
             }
         }
 
+        #region Tutorial
+        /// <summary> Manages spawner while in tutorial</summary>
+        private void ManageTutorial() {
+            _tutoTimeInPhase += Time.deltaTime;
+            int curAmtIsland = IS_SOBEK ? _pSobekIsland : _pCthulhuIsland;
+            if (curAmtIsland < _tutoTargetIsland) {
+                StartReleaseProcessOnRandomIsland();
+                CalculateSpawnRate();
+            }
+
+            switch (_state) {
+                case(TutorialState.NoIsland) :
+                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.OneIsland);
+                    break;
+                case (TutorialState.OneIsland):
+                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.ThreeIsland);
+                    break;
+                case (TutorialState.ThreeIsland):
+                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.VolcanoPhase);
+                    break;
+                case (TutorialState.VolcanoPhase):
+                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.OneIsland);
+                    if (_pVolcanoIsland < 1) { //Spawn volcano if there is none
+                        StartReleaseProcessOnVolcano();
+                        CalculateSpawnRate();
+                    }
+                    break;
+            }
+        }
+
+        /// <summary> Manages spawner while in tutorial</summary>
+        private void ChangeState(TutorialState newState) {
+            _tutoTimeInPhase = 0f;
+            _state = newState;
+            switch (newState) {
+                case (TutorialState.NoIsland):
+                    _tutoTargetIsland = 0;                  
+                    break;
+                case (TutorialState.OneIsland):
+                    _tutoTargetIsland = 1;
+                    break;
+                case (TutorialState.ThreeIsland):
+                    _tutoTargetIsland = 3;
+                    break;
+                case (TutorialState.VolcanoPhase):
+                    _tutoTargetIsland = 4;
+                    break;
+            }
+        }
+
+
+        #endregion
+
+        /// <summary> Moves the spawner to its target destination </summary>
         private void MoveSpawner() {
             if (_isMoving) {
                 Vector3 tPos = new Vector3(_targetContinentX, 0, 0);
@@ -235,15 +303,39 @@ namespace Simoncouche.Islands {
         #endregion
 
 
-
-
         #region Activating and Releasing Islands
 
         /// <summary> Select an random island in column and start release process on it </summary>
         private void StartReleaseProcessOnRandomIsland() {
             int randIndex = Random.Range(0, _islandRows[0].Count);
-            StartCoroutine(ActivateIsland(_islandRows[0][randIndex]));
-            RemoveIslandChunkFromList(_islandRows[0][randIndex], 0);
+            StartReleaseProcessOnTargetIsland(_islandRows[0][randIndex]);
+        }
+
+        /// <summary> Select an random island in column and start release process on it </summary>
+        /// <param name="cwc">Chunk with collider to release</param>
+        private void StartReleaseProcessOnTargetIsland(ChunkWithCollider cwc) {
+            StartCoroutine(ActivateIsland(cwc));
+            _islandManager.AddPendingIslandChunk(cwc.chunk); //Remove chunk from pending chunk list
+            RemoveIslandChunkFromList(cwc, 0);
+        }
+
+        /// <summary> Select a random island in column and trasnform it into a volcano and start release process </summary>
+        private void StartReleaseProcessOnVolcano(){
+            int randIndex = Random.Range(0, _islandRows[0].Count);
+            ChunkWithCollider selectedChunk = _islandRows[0][randIndex];
+            RemoveIslandChunkFromList(selectedChunk, 0);
+            StartCoroutine(TransformIntoVolcano(selectedChunk));
+            
+        }
+
+        /// <summary> Coroutine that transform a basic island into a volcano then start it's spawn process</summary>
+        /// <param name="cwc"> Chunk with collider to transform </param> 
+        private IEnumerator TransformIntoVolcano(ChunkWithCollider cwc) {
+            float volcanoAnimTime = 3f;
+            for (float i = 0f; i < 1f; i += Time.deltaTime / volcanoAnimTime) {
+                yield return null;
+            }
+            StartReleaseProcessOnTargetIsland(cwc);
         }
 
         /// <summary> Activate an island. Island will check player's position to see if it can be released early if they are far. Otherwise wait for the whole duration</summary>
@@ -263,6 +355,7 @@ namespace Simoncouche.Islands {
                 }
                 yield return null;
             }
+
             shakeTweener.Complete();
             ReleaseIsland(chunkWithCollider);
         }
@@ -271,6 +364,7 @@ namespace Simoncouche.Islands {
         /// <param name="chunk">chunk to release </param>
         private void ReleaseIsland(ChunkWithCollider chunkWithCollider) {
             Destroy(chunkWithCollider.collider.gameObject); //remove temporary collider
+            _islandManager.RemovePendingIslandChunk(chunkWithCollider.chunk); //Remove chunk from pending chunk list
             _islandManager.CreatedIslandChunk(chunkWithCollider.chunk); //Add chunk to chunk list
 
             chunkWithCollider.chunk.transform.parent = _islandParentTransform; //Set parent
@@ -315,15 +409,22 @@ namespace Simoncouche.Islands {
                 _pSobekIsland = 0;
                 _pCthulhuIsland = 0;
                 List<IslandChunk> _CurChunks = _islandManager.GetIslandChunks();
+                List<IslandChunk> _CurPendingChunks = _islandManager.GetPendingIslandChunks();
+
 
                 float _pSobekScorePercent = (float)GameManager.levelManager.sobekScore / (float)GameManager.levelManager.scoreNeededToWin * 100f;
                 float _pCthulhuScorePercent = (float)GameManager.levelManager.cthuluScore / (float)GameManager.levelManager.scoreNeededToWin * 100f;
 
 
-
                 foreach (IslandChunk ic in _CurChunks) {
                     if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
-                    if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;                  
+                    if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
+                    if (ic.color == IslandUtils.color.green) ++_pVolcanoIsland;
+                }
+                foreach (IslandChunk ic in _CurPendingChunks) {
+                    if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
+                    if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
+                    if (ic.color == IslandUtils.color.green) ++_pVolcanoIsland;
                 }
                 if (IS_SOBEK) {
                     _pIslandDiffPlayers = _pSobekIsland - _pCthulhuIsland;
