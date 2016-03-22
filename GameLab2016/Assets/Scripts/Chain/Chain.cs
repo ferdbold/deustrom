@@ -26,10 +26,10 @@ namespace Simoncouche.Chain {
         private bool _hasCharacterHook = false;
 
         /// <summary>The first hook thrown by the player</summary>
-        public Hook _beginningHook { get; private set; }
+        public Hook beginningHook { get; private set; }
         
         /// <summary>The second hook thrown by the player</summary>
-        public Hook _endingHook { get; private set; }
+        public Hook endingHook { get; private set; }
         
         
 
@@ -116,7 +116,7 @@ namespace Simoncouche.Chain {
         public void Start() {
             this._endingHookIsSet = false;
             CreateBeginningHook();
-            this._maxDistanceBetweenTwoHooks = _beginningHook.chainJoint.distance;
+            this._maxDistanceBetweenTwoHooks = beginningHook.chainJoint.distance;
         }
 
         public void Update() {
@@ -132,9 +132,9 @@ namespace Simoncouche.Chain {
         /// distance between the two edges of the chain
         /// </summary>
         private void RecalculateChainSections() {
-            Vector3 chainBeginning = _beginningHook.transform.position;
-            Vector3 chainEnding = (_endingHook != null)
-                ? _endingHook.transform.position
+            Vector3 chainBeginning = beginningHook.transform.position;
+            Vector3 chainEnding = (endingHook != null)
+                ? endingHook.transform.position
                 : this.thrower.transform.position;
 
             int neededSections = (int)(Vector3.Distance(chainBeginning, chainEnding) / _chainSectionLength);
@@ -142,7 +142,7 @@ namespace Simoncouche.Chain {
             // Too few sections : Create more sections until we achieve the right number
             while (_chainSections.Count < neededSections) {
                 if (_chainSections.Count == 0) {
-                    _chainSections.Add(_beginningHook.SpawnChainSection(thrower.isSobek));
+                    _chainSections.Add(beginningHook.SpawnChainSection(thrower.isSobek));
                 } else {
                     _chainSections.Add(_chainSections[_chainSections.Count - 1].SpawnNewSection());
                 }
@@ -157,7 +157,7 @@ namespace Simoncouche.Chain {
             
         /// <summary>Create and configure the beginning hook</summary>
         public void CreateBeginningHook() {
-            _beginningHook = Hook.Create(this, true, this.thrower.isSobek, initialOrientation, _hasCharacterHook);
+            beginningHook = Hook.Create(this, true, this.thrower.isSobek, initialOrientation, _hasCharacterHook);
 
             // Position where the player threw the hook
             throwerThrowPosition = this.thrower.transform.position;
@@ -166,13 +166,13 @@ namespace Simoncouche.Chain {
         /// <summary>Create and configure the ending hook</summary>
         /// <param name="orientation">The orientation (in degrees) that the hook will face</param> 
         public void CreateEndingHook(float orientation) {
-            _endingHook = Hook.Create(this, false, this.thrower.isSobek, orientation, _hasCharacterHook); 
+            endingHook = Hook.Create(this, false, this.thrower.isSobek, orientation, _hasCharacterHook); 
 
             // Reroute the visual chain from the player to the ending hook
-            _chainSections[_chainSections.Count - 1].joint.connectedBody = _endingHook.rigidbody;
+            _chainSections[_chainSections.Count - 1].joint.connectedBody = endingHook.rigidbody;
 
             // Set up listeners
-            _endingHook.Attach.AddListener(this.OnEndingHookAttach);
+            endingHook.Attach.AddListener(this.OnEndingHookAttach);
 
             // Position where the player threw the hook
             throwerThrowPosition = this.thrower.transform.position;
@@ -182,15 +182,15 @@ namespace Simoncouche.Chain {
         private void OnEndingHookAttach() {
             // Clamp max distance to current distance between the two hooks
             this.SetMaxChainDistance(Vector3.Distance(
-                _beginningHook.transform.position,
-                _endingHook.transform.position
+                beginningHook.transform.position,
+                endingHook.transform.position
             ));
         }
 
         /// <summary>Sets the max distance that the chain can have.</summary>
         /// <param name="distance">Distance.</param>
         private void SetMaxChainDistance(float distance) {
-            _beginningHook.chainJoint.distance = distance;
+            beginningHook.chainJoint.distance = distance;
         }
 
         /// <summary>
@@ -198,31 +198,31 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void AttachedHookToIslandsUpdate() {
             bool mustDestroyChain = false;
-            if (_beginningHookIsSet && _beginningHook!=null) {
+            if (_beginningHookIsSet && beginningHook!=null) {
                 //IF the connectedBody doesnt exist anymore then we destroy the chain
-                if (_beginningHook.targetJoint.connectedBody == null) mustDestroyChain = true;
+                if (beginningHook.targetJoint.connectedBody == null) mustDestroyChain = true;
                 //IF the Island or the Chunk doesnt exist anymore then we destroy the chain
-                else if ( _beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
-                    if (_beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed 
-                        || _beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed) 
+                else if ( beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
+                    if (beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed 
+                        || beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed) 
                         mustDestroyChain = true;
                 }
                 //IF the island attached to our beginning hook and grabbed by the enemy doesnt exist anymore then we destroy the chain
-                if (_beginningHook.islandIsGrabbedEnemy && 
+                if (beginningHook.islandIsGrabbedEnemy && 
                       (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
                       LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) 
                     mustDestroyChain = true;
-                else if (_endingHookIsSet && _endingHook != null) {
+                else if (_endingHookIsSet && endingHook != null) {
                     //IF the connectedBody of our ending hook doesnt exist anymore then we destroy the chain
-                    if (_endingHook.targetJoint.connectedBody == null) mustDestroyChain = true;
+                    if (endingHook.targetJoint.connectedBody == null) mustDestroyChain = true;
                     //IF the Island or the Chunk connected to our ending hook doesnt exist anymore then we destroy the chain
-                    else if ( _endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
-                        if (_endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed 
-                            || _beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed)
+                    else if ( endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
+                        if (endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed 
+                            || beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed)
                             mustDestroyChain = true;
                     }
                     //IF the island attached to our ending hook and grabbed by the enemy doesnt exist anymore then we destroy the chain
-                    if(_endingHook.islandIsGrabbedEnemy &&
+                    if(endingHook.islandIsGrabbedEnemy &&
                         (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
                         LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) 
                         mustDestroyChain = true;
@@ -236,12 +236,12 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void ChainMissAndHitUpdate() {
             if (!this._beginningHookIsSet) {
-                if (this._beginningHook.attachedToTarget) {
+                if (this.beginningHook.attachedToTarget) {
                     //Tells to the thrower he hit the hook
                     this.thrower.OnBeginningHookHit();
 
                     //Apply the maximum distance of the first hook (maxDistanceBetweenTwoHooks divided by 2)
-                    this._beginningHook.chainJoint.distance = this._maxDistanceBetweenTwoHooks/2;
+                    this.beginningHook.chainJoint.distance = this._maxDistanceBetweenTwoHooks/2;
 
                     //Set this bool to true in order to stop the calls of thrower.BeginningHookHit
                     this._beginningHookIsSet = true;
@@ -249,14 +249,14 @@ namespace Simoncouche.Chain {
 
                 //If the hook returns AND if it isn't attached (cause it can attach to an island when it's returning!) AND the distance between the hook and player is lower then a certain amount
                     //Then we destroy the chain
-                else if (!_beginningHook.attachedToTarget &&
-                    Vector2.Distance(_beginningHook.transform.position, throwerThrowPosition) > _maxDistanceBetweenTwoHooks / 2) {
+                else if (!beginningHook.attachedToTarget &&
+                    Vector2.Distance(beginningHook.transform.position, throwerThrowPosition) > _maxDistanceBetweenTwoHooks / 2) {
                     DestroyBeginningHook(false);
                 }
             }
 
-            if (_endingHook != null && !_endingHookIsSet) {
-                if (_endingHook.attachedToTarget) {
+            if (endingHook != null && !_endingHookIsSet) {
+                if (endingHook.attachedToTarget) {
                     ///Tells to the thrower he hit the hook
                     this.thrower.OnEndingHookHit();
 
@@ -267,8 +267,8 @@ namespace Simoncouche.Chain {
                 }
 
                 //Check if the ending hook is further than 
-                else if (!_endingHook.attachedToTarget &&
-                    Vector2.Distance(_endingHook.transform.position, throwerThrowPosition) > _maxDistanceBetweenTwoHooks / 2) {
+                else if (!endingHook.attachedToTarget &&
+                    Vector2.Distance(endingHook.transform.position, throwerThrowPosition) > _maxDistanceBetweenTwoHooks / 2) {
                     DestroyEndingHook();
                 }
             }
@@ -290,13 +290,13 @@ namespace Simoncouche.Chain {
         private void DestroyEndingHook() {
             _chainSections[_chainSections.Count - 1].AttachVisualJointTo(this.thrower.rigidbody);
             
-            Destroy(_endingHook.gameObject);
+            Destroy(endingHook.gameObject);
 
             //Tells the thrower he missed the ending hook throw
             this.thrower.OnEndingHookMissed();
 
             //Must reset the connected rigidbody!
-            this._beginningHook.chainJoint.connectedBody = this.thrower.rigidbody;
+            this.beginningHook.chainJoint.connectedBody = this.thrower.rigidbody;
         }
 
         /// <summary>
@@ -309,9 +309,9 @@ namespace Simoncouche.Chain {
 
             if (playDestroySound) this.PlayDestroySound();
 
-            Destroy(_beginningHook.gameObject);
+            Destroy(beginningHook.gameObject);
 
-            if(_endingHook!=null) Destroy(_endingHook.gameObject);
+            if(endingHook!=null) Destroy(endingHook.gameObject);
 
             this.thrower.RemoveChainFromChains(this);
 
@@ -379,15 +379,15 @@ namespace Simoncouche.Chain {
         ///<param name="retractDistance">The distance to retract per tick of this function</param>
         /// <returns>If the island connected to the player was destroyed</returns>
         public GravityBody RetractChain(float retractDistance) {
-            if (_beginningHook.chainJoint != null) {
+            if (beginningHook.chainJoint != null) {
                 if (!_endingHookIsSet) {
-                    _beginningHook.chainJoint.distance = 
-                        Vector2.Distance(_beginningHook.chainJoint.connectedBody.transform.position, _beginningHook.transform.position);
+                    beginningHook.chainJoint.distance = 
+                        Vector2.Distance(beginningHook.chainJoint.connectedBody.transform.position, beginningHook.transform.position);
                 }
 
-                float tempDistance = _beginningHook.chainJoint.distance;
-                tempDistance = Mathf.Clamp(tempDistance - retractDistance, 0f,_beginningHook.chainJoint.distance);
-                _beginningHook.chainJoint.distance = tempDistance;
+                float tempDistance = beginningHook.chainJoint.distance;
+                tempDistance = Mathf.Clamp(tempDistance - retractDistance, 0f,beginningHook.chainJoint.distance);
+                beginningHook.chainJoint.distance = tempDistance;
 
                 //We first check with a single chunk if it collides with the player
                 if (islandChunkBeginningHook != null) {
@@ -411,7 +411,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void RetractChainReleaseBehaviour() {
             if (_beginningHookIsSet && !_endingHookIsSet) {
-                _beginningHook.chainJoint.distance = _maxDistanceBetweenTwoHooks/2; //Cause only 1 chain is set
+                beginningHook.chainJoint.distance = _maxDistanceBetweenTwoHooks/2; //Cause only 1 chain is set
             }
         }
 
@@ -419,8 +419,8 @@ namespace Simoncouche.Chain {
         /// Cut the link of the beginning hook if and only if the ending hook is null
         /// </summary>
         public void CutLinkBeginningHook() {
-            if (_beginningHook != null) {
-                if (_beginningHook.chainJoint.connectedBody == thrower.rigidbody) {
+            if (beginningHook != null) {
+                if (beginningHook.chainJoint.connectedBody == thrower.rigidbody) {
                     this.PlayDestroySound();
                     DestroyChain(true);
                 }
@@ -429,7 +429,7 @@ namespace Simoncouche.Chain {
 
         public bool bothHooksExist {
             get {
-                return (_beginningHook != null && _endingHook != null);
+                return (beginningHook != null && endingHook != null);
             }
         }
 
@@ -439,9 +439,48 @@ namespace Simoncouche.Chain {
         /// <param name="anchorPoint">the anchor point of a new hook</param>
         /// <returns>boolean that specifies if the passed anchorPoint corresponds to the connected anchor Point of one of our two hooks</returns>
         public bool CheckAnchorPointInHooks(Islands.IslandAnchorPoints anchorPoint){
-            bool sameAnchorPoint = ((anchorPoint == _beginningHook.currentAnchorPoint && anchorPoint.GetIslandChunk()==_beginningHook.currentAnchorPoint.GetIslandChunk())
-                || (anchorPoint == _endingHook.currentAnchorPoint && anchorPoint.GetIslandChunk() == _endingHook.currentAnchorPoint.GetIslandChunk()));
+            bool sameAnchorPoint = ((anchorPoint == beginningHook.currentAnchorPoint && anchorPoint.GetIslandChunk()==beginningHook.currentAnchorPoint.GetIslandChunk())
+                || (anchorPoint == endingHook.currentAnchorPoint && anchorPoint.GetIslandChunk() == endingHook.currentAnchorPoint.GetIslandChunk()));
             return sameAnchorPoint;
+        }
+
+
+        /// <summary>
+        /// This function add additional forces to our retract in order to speed it up
+        /// IMPORTANT: WE FREEZE THE POSITION OF ONE OF THE ISLAND IN ORDER TO RETRACT QUICKLY THEN WE SET IT BACK ON IN the OnMergeIsland event in Hook.cs
+        /// </summary>
+        /// <param name="addedForceMultiplier">This function simply multiply the resultant direction vetor by this force multipler</param>
+        public void AddForceToRetractedIslands(float addedForceMultiplier) {
+            //Case one HOOK attached to player
+            if (!this._endingHookIsSet) {
+                this.beginningHook.targetJoint.connectedBody.AddForce(
+                    (this.thrower.rigidbody.transform.position - this.beginningHook.targetJoint.connectedBody.transform.position) * addedForceMultiplier, ForceMode2D.Impulse);
+            } else {
+                //Check the mass and apply a force to the island with the lowest mass
+                if (this.endingHook.targetJoint.connectedBody.mass > this.beginningHook.targetJoint.connectedBody.mass
+                    || this.endingHook.currentAnchorPoint.GetIslandChunk().parentIsland != null ? LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == this.endingHook.currentAnchorPoint.GetIslandChunk().parentIsland.gravityBody != null : false
+                    || LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == this.endingHook.currentAnchorPoint.GetIslandChunk().gravityBody != null
+                    || this.endingHook.currentAnchorPoint.GetIslandChunk().parentIsland != null ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == this.endingHook.currentAnchorPoint.GetIslandChunk().parentIsland.gravityBody != null : false
+                    || LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == this.endingHook.currentAnchorPoint.GetIslandChunk().gravityBody != null) { 
+                    if (this.beginningHook.targetJoint.connectedBody.constraints == RigidbodyConstraints2D.FreezePosition){
+                        this.beginningHook.targetJoint.connectedBody.constraints = RigidbodyConstraints2D.None;
+                    }
+                    if(this.endingHook.targetJoint.connectedBody!=LevelManager.cthulhuPlayer.GetComponent<Rigidbody2D>() || this.endingHook.targetJoint.connectedBody!=LevelManager.sobekPlayer.GetComponent<Rigidbody2D>())
+                        this.endingHook.targetJoint.connectedBody.constraints = RigidbodyConstraints2D.FreezePosition;
+                    this.beginningHook.targetJoint.connectedBody.AddForce(
+                        (this.endingHook.targetJoint.connectedBody.transform.position - this.beginningHook.targetJoint.connectedBody.transform.position) * addedForceMultiplier, ForceMode2D.Impulse);
+                //Same thing as above but with added force from the endingHook to the beginningHook
+                } else {
+                    if (this.endingHook.targetJoint.connectedBody.constraints == RigidbodyConstraints2D.FreezePosition) {
+                        this.endingHook.targetJoint.connectedBody.constraints = RigidbodyConstraints2D.None;
+                    }
+                    if (this.beginningHook.targetJoint.connectedBody != LevelManager.cthulhuPlayer.GetComponent<Rigidbody2D>() || this.beginningHook.targetJoint.connectedBody != LevelManager.sobekPlayer.GetComponent<Rigidbody2D>())
+                    this.beginningHook.targetJoint.connectedBody.constraints = RigidbodyConstraints2D.FreezePosition;
+                    this.endingHook.targetJoint.connectedBody.AddForce(
+                        (this.beginningHook.targetJoint.connectedBody.transform.position - this.endingHook.targetJoint.connectedBody.transform.position) * addedForceMultiplier, ForceMode2D.Impulse);
+
+                }
+            }
         }
     }
 }

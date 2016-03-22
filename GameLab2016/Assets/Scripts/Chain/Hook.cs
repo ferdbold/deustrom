@@ -188,13 +188,13 @@ namespace Simoncouche.Chain {
             // Attach the joint to either the chunk or its parent island if it has one
             if (parentIsland == null && !wasAttachedToIsland) {
                     this.targetJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>();
-                    if (chain._endingHook != null) chain._beginningHook.chainJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>(); //We can switch the connected body to 
+                    if (chain.endingHook != null) chain.beginningHook.chainJoint.connectedBody = anchor.GetIslandChunk().GetComponent<Rigidbody2D>(); //We can switch the connected body to 
             } 
             else if(!wasAttachedToIsland) {
                 this.connectedIsland = parentIsland;
                 this.targetJoint.connectedBody = parentIsland.rigidbody;
-                if (this == this.chain._endingHook) {
-                    chain._beginningHook.chainJoint.connectedBody = parentIsland.rigidbody;
+                if (this == this.chain.endingHook) {
+                    chain.beginningHook.chainJoint.connectedBody = parentIsland.rigidbody;
                 }
             }
 
@@ -223,6 +223,7 @@ namespace Simoncouche.Chain {
         private void OnAttachedChunkMerge(Island newIsland) {
             // Attach the joints to its parent island
             this.targetJoint.connectedBody = newIsland.rigidbody;
+            newIsland.rigidbody.constraints = RigidbodyConstraints2D.None; //Must set the rigidbody constraints of the chains back to NONE (cause in hookthrower we set 
 
             // If the two hooks are united to the same Island, we destroy the hook
             bool endingIslandChunkFound = false;
@@ -240,8 +241,8 @@ namespace Simoncouche.Chain {
         private void OnAttachedChunkPlayerGrab(PlayerGrab playerGrab) {
             islandIsGrabbedEnemy = true;
             // Reroute the chain to the player only if both hooks exist
-            if (chain._beginningHook != null) {
-                if (this == chain._beginningHook) this.chain._beginningHook.targetJoint.connectedBody = playerGrab.rigidbody;//AJOUT
+            if (chain.beginningHook != null) {
+                if (this == chain.beginningHook) this.chain.beginningHook.targetJoint.connectedBody = playerGrab.rigidbody;//AJOUT
             }
             // Otherwise, deactivate chain physics while the player is grabbing
             else {
@@ -274,7 +275,7 @@ namespace Simoncouche.Chain {
                     grabbedBody.gameObject.
                     GetComponentInChildren<IslandChunk>().
                     parentIsland == parentIsland) { //IF SOBEK ATTACHED TO THE ISLAND SECTION
-                    if (this == this.chain._beginningHook) {
+                    if (this == this.chain.beginningHook) {
                         this.targetJoint.connectedBody = LevelManager.sobekPlayer.GetComponentInChildren<Rigidbody2D>();
                         islandIsGrabbedEnemy = true;
                     }
@@ -284,7 +285,7 @@ namespace Simoncouche.Chain {
                     grabbedBody.gameObject.
                     GetComponentInChildren<IslandChunk>()
                     .parentIsland == parentIsland) { //IF CTHULU ATTACHED TO THE ISLAND SECTION
-                    if (this == this.chain._beginningHook) {
+                    if (this == this.chain.beginningHook) {
                         this.targetJoint.connectedBody = LevelManager.cthulhuPlayer.GetComponentInChildren<Rigidbody2D>();
                         islandIsGrabbedEnemy = true;
                     }

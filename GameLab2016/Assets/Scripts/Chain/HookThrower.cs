@@ -30,6 +30,11 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private float _distanceRetractionValue = 1.0f;
 
+        [Header("Hook retraction properties:")]
+        [Tooltip("The retracted distance in each tick of the retraction")]
+        [SerializeField]
+        private float _addedForceToRetractChains = 5.0f;
+
         [Tooltip("The time between each tick of retraction of the chains")]
         [SerializeField]
         private float _timeBetweenChainLengthRetraction = 0.5f;
@@ -264,6 +269,7 @@ namespace Simoncouche.Chain {
                 for (int i = chains.Count - 1; i >= 0; i--) {
                     if (chains[i]._beginningHookIsSet) {
                         mustPlaySound = true; //Parce qu'on ne rétracte pas les chaînes qui viennent tout juste d'être lancé
+                        chains[i].AddForceToRetractedIslands(_addedForceToRetractChains);
                         GravityBody mustAttachedToBody = chains[i].RetractChain(_distanceRetractionValue);
                         if (mustAttachedToBody != null) {
                             this.OnCutLinkWithPlayer();
@@ -355,7 +361,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void RemoveChainOnPlayerMaelstromEnter() {
             if (chains.Count > 0) {
-                if (chains[chains.Count - 1] != null & (chains[chains.Count - 1]._beginningHook!=null && !chains[chains.Count - 1]._endingHookIsSet)) {
+                if (chains[chains.Count - 1] != null & (chains[chains.Count - 1].beginningHook!=null && !chains[chains.Count - 1]._endingHookIsSet)) {
                     chains[chains.Count - 1].DestroyChain(true);
                     this.OnCutLinkWithPlayer();
                 }
