@@ -189,9 +189,10 @@ namespace Simoncouche.Controller {
         public float targetOrientation {
             get {
                 float orientation = 0;
-                Vector2 toTarget = this.target.transform.position - transform.position;
 
                 if (this.target != null) {
+                    Vector2 toTarget = this.target.transform.position - transform.position;
+
                     orientation = Vector2.Angle(Vector2.right, toTarget);
 
                     // Correct angle in lower quadrants

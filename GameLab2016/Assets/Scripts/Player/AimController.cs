@@ -22,17 +22,24 @@ namespace Simoncouche.Controller {
 
         // COMPONENTS
 
+        private AutoAimController _autoAimController;
         private GameObject _aimIndicator;
 
         // METHODS
 
         private void Awake() {
+            _autoAimController = GetComponent<AutoAimController>();
             _aimIndicator = transform.Find("AimIndicator").gameObject;
+
             ToggleAimIndicator(false);
         }
 
         private void Update() {
             UpdateAim();
+
+            if (_autoAimController) {
+                SnapToAutoAimTarget();
+            }
         }
 
         /// <summary>
@@ -48,6 +55,15 @@ namespace Simoncouche.Controller {
             //Correct angle if in lower quadrants
             if (orientation.y < 0) {
                 this.aimOrientation = 360f - this.aimOrientation;
+            }
+        }
+
+        private void SnapToAutoAimTarget() {
+            float targetOrientation = _autoAimController.targetOrientation;
+            if (targetOrientation != 0) {
+                _aimIndicator.transform.rotation = Quaternion.Euler(0, 0, targetOrientation);
+            } else {
+                _aimIndicator.transform.localRotation = Quaternion.identity;
             }
         }
 
