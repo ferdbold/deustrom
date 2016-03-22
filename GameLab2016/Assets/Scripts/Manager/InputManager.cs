@@ -165,8 +165,8 @@ public class InputManager : MonoBehaviour {
             return _isDisabled;
         }
         set {
-            Debug.LogWarning("Input have been disabled");
             _isDisabled = value;
+            if (_isDisabled) Debug.LogWarning("Input have been disabled");
         }
     }
 

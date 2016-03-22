@@ -17,6 +17,9 @@ namespace Simoncouche.Islands {
         /// <summary> A list of every IslandChunk currently in play</summary>
         private List<IslandChunk> _islandChunks = new List<IslandChunk>();
 
+        /// <summary> A list of every IslandChunk not currently in play but currently ready to be released from feeder (shaking) </summary>
+        private List<IslandChunk> _pendingIslandChunks = new List<IslandChunk>();
+
         [SerializeField] [Tooltip("Island Object Prefab Reference")]
         private GameObject _islandComponent = null;
 
@@ -64,10 +67,15 @@ namespace Simoncouche.Islands {
         public void CreatedIslandChunk(IslandChunk chunk) {
             _islandChunks.Add(chunk);
         }
+        
 
         #region Get/Set
         public List<Island> GetIslands() { return _island; }
         public List<IslandChunk> GetIslandChunks() { return _islandChunks; }
+        public List<IslandChunk> GetPendingIslandChunks() { return _pendingIslandChunks;  }
+        public void AddPendingIslandChunk(IslandChunk ic) { _pendingIslandChunks.Add(ic); }
+        public void RemovePendingIslandChunk(IslandChunk ic) { _pendingIslandChunks.Remove(ic); }
+        public int GetAmountPendingIslandChunk() { return _pendingIslandChunks.Count; }
         public Transform GetIslandSubFolder() { return _islandSubFolder; }
         public float GetMergeTime() { return _chunkMergeTime; }
         public float GetConversionTime() { return _conversionTime; }
@@ -405,7 +413,7 @@ namespace Simoncouche.Islands {
 			}
 			//Make every part not mergeable for a time
 			foreach (IslandChunk c in chunk.parentIsland.chunks) {
-				c.ResetMergeability(0.5f);
+				//c.ResetMergeability(5f);
 			}
 
 			//Spawn Particle and play sound
@@ -448,10 +456,10 @@ namespace Simoncouche.Islands {
 						island.AddChunkToIsland(islandRemoved[i]);
 					}
 				}
-				island.gravityBody.Velocity = DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks));
+				island.gravityBody.Velocity = 100 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks))).normalized;
 
 			} else {
-				islandRemoved[0].gravityBody.Velocity = DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position);
+				islandRemoved[0].gravityBody.Velocity = 100 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
 			}
 
 			//Divide island and Set velocity for every pieces
@@ -459,9 +467,9 @@ namespace Simoncouche.Islands {
 			foreach (GravityBody piece in pieces) {
 				Island islandRef = piece.GetComponent<Island>();
 				if (islandRef != null) {
-					piece.Velocity = DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks));
+					piece.Velocity = 20 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks))).normalized;
 				} else {
-					piece.Velocity = DamageResultingVelocity(medianIslandPos, piece.transform.position);
+					piece.Velocity = 20 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, piece.transform.position)).normalized;
 				}
 			}
 		}
@@ -476,8 +484,7 @@ namespace Simoncouche.Islands {
 			Debug.DrawLine(new Vector3(center.x, center.y, -10), new Vector3(target.x, target.y, -10), Color.red, 2f);
 			Vector3 direction = target - center;
 			direction.Normalize();
-			Vector3 velocity = direction * 6 * Vector3.Distance(center, target);
-			Debug.Log(velocity);
+			Vector3 velocity = direction;
 			return velocity;
 		}
 
