@@ -496,6 +496,8 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 97182342adcdfdd49b5e37c2dcdff69a, type: 3}
     _destruction:
     - {fileID: 8300000, guid: 01dc350ec20fafc488a379128b74dcee, type: 3}
+    _feederRelease:
+    - {fileID: 8300000, guid: bf110c7982907594db88211c539a4b57, type: 3}
   _environmentSound:
     _maelstromDestruction:
     - {fileID: 8300000, guid: 3e11eeeeae6751a49b6f9bc10f274302, type: 3}
