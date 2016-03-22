@@ -405,7 +405,7 @@ namespace Simoncouche.Islands {
 			}
 			//Make every part not mergeable for a time
 			foreach (IslandChunk c in chunk.parentIsland.chunks) {
-				c.ResetMergeability(0.5f);
+				//c.ResetMergeability(5f);
 			}
 
 			//Spawn Particle and play sound
@@ -448,10 +448,10 @@ namespace Simoncouche.Islands {
 						island.AddChunkToIsland(islandRemoved[i]);
 					}
 				}
-				island.gravityBody.Velocity = DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks));
+				island.gravityBody.Velocity = 100 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks))).normalized;
 
 			} else {
-				islandRemoved[0].gravityBody.Velocity = DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position);
+				islandRemoved[0].gravityBody.Velocity = 100 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
 			}
 
 			//Divide island and Set velocity for every pieces
@@ -459,9 +459,9 @@ namespace Simoncouche.Islands {
 			foreach (GravityBody piece in pieces) {
 				Island islandRef = piece.GetComponent<Island>();
 				if (islandRef != null) {
-					piece.Velocity = DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks));
+					piece.Velocity = 20 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks))).normalized;
 				} else {
-					piece.Velocity = DamageResultingVelocity(medianIslandPos, piece.transform.position);
+					piece.Velocity = 20 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, piece.transform.position)).normalized;
 				}
 			}
 		}
@@ -476,8 +476,7 @@ namespace Simoncouche.Islands {
 			Debug.DrawLine(new Vector3(center.x, center.y, -10), new Vector3(target.x, target.y, -10), Color.red, 2f);
 			Vector3 direction = target - center;
 			direction.Normalize();
-			Vector3 velocity = direction * 6 * Vector3.Distance(center, target);
-			Debug.Log(velocity);
+			Vector3 velocity = direction;
 			return velocity;
 		}
 
