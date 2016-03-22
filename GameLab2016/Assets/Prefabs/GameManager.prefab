@@ -567,7 +567,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab0b4397cdca29a45acd824ad27408db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pointsGoal: 3000
+  _pointsGoal: 300
   _disableScoring: 0
   _matchToWin: 2
   lastWinner: 1
@@ -597,6 +597,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: _orbAnimDuration
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: _pointsGoal
+      value: 300
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
