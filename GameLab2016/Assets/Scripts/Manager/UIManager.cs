@@ -31,6 +31,7 @@ public class UIManager : MonoBehaviour {
     public Canvas root { get; private set; }
     private List<ScoreWidget> _scoreWidgets;
     private List<WinsWidget> _winsWidgets;
+    private List<IslandCountWidget> _islandCountWidgets;
 
     // METHODS
 
@@ -44,6 +45,10 @@ public class UIManager : MonoBehaviour {
         _winsWidgets = new List<WinsWidget>();
         _winsWidgets.Add(GameObject.Find("UI/Wins/Sobek").GetComponent<WinsWidget>());
         _winsWidgets.Add(GameObject.Find("UI/Wins/Cthulhu").GetComponent<WinsWidget>());
+
+        _islandCountWidgets = new List<IslandCountWidget>();
+        _islandCountWidgets.Add(GameObject.Find("UI/Islands/Sobek").GetComponent<IslandCountWidget>());
+        _islandCountWidgets.Add(GameObject.Find("UI/Islands/Cthulhu").GetComponent<IslandCountWidget>());
     
         RefreshWins();
 
@@ -54,18 +59,9 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    // FIXME: This is for test purposes and should be removed in the final build
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.K)) {
-            this.AddPoint(LevelManager.Player.cthulu, new Vector3(10, 8));
-            this.AddPoint(LevelManager.Player.cthulu, new Vector3(12, 6));
-            this.AddPoint(LevelManager.Player.cthulu, new Vector3(14, 1));
-        }
-
-        if (Input.GetKeyDown(KeyCode.L)) {
-            this.AddPoint(LevelManager.Player.sobek, new Vector3(7, 5));
-            this.AddPoint(LevelManager.Player.sobek, new Vector3(5, 10));
-            this.AddPoint(LevelManager.Player.sobek, new Vector3(2, 7));
+        foreach (LevelManager.Player player in System.Enum.GetValues(typeof(LevelManager.Player))) {
+            _islandCountWidgets[(int)player].value = GameManager.islandManager.GetPlayerIslandCount(player);
         }
     }
 
@@ -90,8 +86,6 @@ public class UIManager : MonoBehaviour {
     }
 
     private void RefreshWins() {
-        //Debug.Log(GameManager.levelManager);
-
         _winsWidgets[(int)LevelManager.Player.cthulu].score = GameManager.levelManager.cthuluMatchWon;
         _winsWidgets[(int)LevelManager.Player.sobek].score = GameManager.levelManager.sobekMatchWon;
     }
@@ -105,6 +99,7 @@ public class UIManager : MonoBehaviour {
 
     private Image GetRune(LevelManager.Player player) {
         Image returnImage = null;
+
         if (player == LevelManager.Player.sobek) {         
             if (sobekRunesPool.Count <= 0) InstantiateRune(player);
             returnImage = sobekRunesPool[0];
@@ -114,6 +109,7 @@ public class UIManager : MonoBehaviour {
             returnImage = cthulhuRunesPool[0];
             cthulhuRunesPool.RemoveAt(0);
         }
+
         returnImage.gameObject.SetActive(true);
         return returnImage;
     }
@@ -126,6 +122,7 @@ public class UIManager : MonoBehaviour {
 
     private void InstantiateRune(LevelManager.Player player) {
         Image instantiatedObj;
+
         if (player == LevelManager.Player.sobek) {
             instantiatedObj = (Image)GameObject.Instantiate(_sobekRunePrefab);
             instantiatedObj.gameObject.SetActive(false);

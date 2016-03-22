@@ -706,8 +706,19 @@ namespace Simoncouche.Islands {
             return (a + (b - a) / 2);
         }
 
-       
-
         #endregion
+
+        public int GetPlayerIslandCount(LevelManager.Player player) {
+            int count = 0;
+
+            foreach (IslandChunk chunk in _islandChunks) {
+                if ((player == LevelManager.Player.sobek && chunk.color == IslandUtils.color.red) ||
+                    (player == LevelManager.Player.cthulu && chunk.color == IslandUtils.color.blue)) {
+                    count++;
+                }
+            }
+
+            return count;
+        }
     }
 }

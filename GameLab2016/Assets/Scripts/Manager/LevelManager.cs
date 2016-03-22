@@ -13,22 +13,22 @@ public class LevelManager {
     #endregion
 
     #region Score
-    /// <summary> Sobek (player one)</summary>
+    /// <summary>Sobek (player one)</summary>
     public int sobekScore { get; private set; }
 
-    /// <summary> Cthulu (player two)</summary>
+    /// <summary>Cthulu (player two)</summary>
     public int cthuluScore { get; private set; }
 
-    /// <summary> Score need to win </summary>
+    /// <summary>Score need to win </summary>
     public int scoreNeededToWin { get; private set; }
 
-    /// <summary> Number of match to win a game </summary>
+    /// <summary>Number of match to win a game </summary>
     public int matchToWin { get; private set; }
 
-    /// <summary> Sobek number of match won </summary>
+    /// <summary>Sobek number of match won </summary>
     public int sobekMatchWon { get; private set; }
 
-    /// <summary> Cthulu number of match won </summary>
+    /// <summary>Cthulu number of match won </summary>
     public int cthuluMatchWon { get; private set; }
 
     private UIManager ui;
