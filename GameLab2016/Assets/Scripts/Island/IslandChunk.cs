@@ -319,7 +319,7 @@ namespace Simoncouche.Islands {
         }
 
         IEnumerator TakeDamageCooldown() {
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(0.2f);
             isDamageable = true;
         }
 

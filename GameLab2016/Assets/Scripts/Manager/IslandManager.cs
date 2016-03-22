@@ -287,7 +287,7 @@ namespace Simoncouche.Islands {
         /// Check if an island was broken by the destruction/disassembling of one of his chunk
         /// </summary>
         /// <param name="island">The target island to check</param>
-        public List<Transform> CheckIslandBroken(Island island) {
+        public List<GravityBody> CheckIslandBroken(Island island) {
             if (island == null || island.chunks.Count <= 0) {
                 DestroyIsland(island);
                 return null;
@@ -296,11 +296,10 @@ namespace Simoncouche.Islands {
             //Make the player ungrab and then regrab only in 0.1seconds. 
             foreach (IslandChunk check in island.chunks) {
                 PlayerGrab.UngrabBody(check.gravityBody, true, 0.1f);
-                Debug.Log(check.name);
             }
 
-            List<Transform> everyPiece = new List<Transform>();
-            everyPiece.Add(island.transform);
+            List<GravityBody> everyPiece = new List<GravityBody>();
+            everyPiece.Add(island.gravityBody);
 
             island.RecreateIslandChunkConnection();
             List<IslandChunk> originChunkList = island.chunks;
@@ -337,7 +336,7 @@ namespace Simoncouche.Islands {
                 //Remove Chunk
                 if (chunkIsland.Count == 1) {
                     island.RemoveChunkToIsland(chunkIsland[0]);
-                    everyPiece.Add(chunkIsland[0].transform);
+                    everyPiece.Add(chunkIsland[0].gravityBody);
                 }
 
                 //Create Island
@@ -353,7 +352,7 @@ namespace Simoncouche.Islands {
                         newIsland.islandColliders.AddCollision(chunk, chunk.transform.localPosition);
                     }
                     newIsland.RecreateIslandChunkConnection();
-                    everyPiece.Add(island.transform);
+                    everyPiece.Add(island.gravityBody);
                 }
             }
             island.RecreateIslandChunkConnection();
@@ -395,65 +394,105 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="chunk">The chunk affected by this</param>
         /// <param name="damage">The number of chunk affected</param>
-        public void TakeDamageHandler(IslandChunk chunk, int damage, Vector3 velocityGiven) {
-            //If no damage
-            if (damage < 1) {
-                return;
-            }
-            //If the chunk has no connection
-            if (chunk.parentIsland == null || chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
-                return;
-            }
+		public void TakeDamageHandler(IslandChunk chunk, int damage, Vector3 velocityGiven) {
+			//If no damage
+			if (damage < 1) {
+				return;
+			}
+			//If the chunk has no connection
+			if (chunk.parentIsland == null || chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
+				return;
+			}
+			//Make every part not mergeable for a time
+			foreach (IslandChunk c in chunk.parentIsland.chunks) {
+				c.ResetMergeability(0.5f);
+			}
 
-            //Make every part not mergeable for a time
-            foreach (IslandChunk c in chunk.parentIsland.chunks) {
-                c.ResetMergeability(0.5f);
-            }
+			//Spawn Particle and play sound
+			if (chunk.color == IslandUtils.color.red) Instantiate(DestroyParticle_SO, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+			if (chunk.color == IslandUtils.color.blue) Instantiate(DestroyParticle_CT, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
 
-            //Spawn Particle and play sound
-            if(chunk.color == IslandUtils.color.red) Instantiate(DestroyParticle_SO, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
-            if (chunk.color == IslandUtils.color.blue) Instantiate(DestroyParticle_CT, chunk.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+			Island islandLink = chunk.parentIsland;
+			//Find median point for all chunks
+			Vector3 medianIslandPos = FindMedianPos(islandLink.chunks);
 
-            Island islandLink = chunk.parentIsland;
+			//Check if the damage is too high for the island (the maximum is to divided the island in 2
+			if (islandLink.chunks.Count <= damage) {
+				damage = Mathf.CeilToInt(islandLink.chunks.Count / 2f);
+			}
 
-            //Check if the damage is too high for the island (the maximum is to divided the island in 2
-            if (islandLink.chunks.Count <= damage) {
-                damage = Mathf.CeilToInt(islandLink.chunks.Count / 2f);
-            }
+			//Recursivly remove island
+			List<IslandChunk> islandRemoved = new List<IslandChunk>();
+			islandRemoved.Add(chunk);
+			if (damage > 1) {
+				islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
+			}
 
-            //Recursivly remove island
-            List<IslandChunk> islandRemoved = new List<IslandChunk>();
-            islandRemoved.Add(chunk);
-            if (damage > 1) {
-                islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
-            }
+			//Remove chunk from island
+			foreach (IslandChunk c in islandRemoved) {
+				islandLink.RemoveChunkToIsland(c);
+			}
 
-            //Remove chunk from island
-            foreach (IslandChunk c in islandRemoved) {
-                islandLink.RemoveChunkToIsland(c);
-            }
+			//Remove connection (only need to remove the connection from one side, one chunk removes the connection from both)
+			foreach (IslandChunk c in islandLink.chunks) {
+				if (!islandRemoved.Contains(c)) {
+					c.RemoveConnectedChunk(islandRemoved);
+				}
+			}
 
-            //Divide Island
-            if (islandRemoved.Count > 1)  { //Multiple Chunk
-                Island island = CreateIsland(islandRemoved[0], islandRemoved[1]);
-                if (islandRemoved.Count >= 3) {
-                    for (int i = 2; i < islandRemoved.Count; i++) {
-                        island.AddChunkToIsland(islandRemoved[i]);
-                    }
-                }
-            }
+			//Divide Island and gives velocity to this piece
+			if (islandRemoved.Count > 1) { //Multiple Chunk
+				Island island = CreateIsland(islandRemoved[0], islandRemoved[1]);
+				if (islandRemoved.Count >= 3) {
+					for (int i = 2; i < islandRemoved.Count; i++) {
+						island.AddChunkToIsland(islandRemoved[i]);
+					}
+				}
+				island.gravityBody.Velocity = DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks));
 
-            //TODO replace
-            islandLink.gravityBody.Velocity = velocityGiven;
+			} else {
+				islandRemoved[0].gravityBody.Velocity = DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position);
+			}
 
-            //Remove connection (only need to remove the connection from one side, one chunk removes the connection from both)
-            foreach (IslandChunk c in islandLink.chunks) {
-                if (!islandRemoved.Contains(c)) {
-                    c.RemoveConnectedChunk(islandRemoved);
-                } 
-            }
-            CheckIslandBroken(islandLink);
-        }
+			//Divide island and Set velocity for every pieces
+			List<GravityBody> pieces = CheckIslandBroken(islandLink);
+			foreach (GravityBody piece in pieces) {
+				Island islandRef = piece.GetComponent<Island>();
+				if (islandRef != null) {
+					piece.Velocity = DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks));
+				} else {
+					piece.Velocity = DamageResultingVelocity(medianIslandPos, piece.transform.position);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Finds resulting velocity after a take Damage Hit
+		/// </summary>
+		/// <param name="center">The center point (or the origin of the damage)</param>
+		/// <param name="target">The Target to give velocity to</param>
+		/// <returns></returns>
+		private Vector3 DamageResultingVelocity(Vector3 center, Vector3 target) {
+			Debug.DrawLine(new Vector3(center.x, center.y, -10), new Vector3(target.x, target.y, -10), Color.red, 2f);
+			Vector3 direction = target - center;
+			direction.Normalize();
+			Vector3 velocity = direction * 6 * Vector3.Distance(center, target);
+			Debug.Log(velocity);
+			return velocity;
+		}
+
+		/// <summary>
+		/// Find the median position between multiple points
+		/// </summary>
+		/// <param name="positions"></param>
+		/// <returns></returns>
+		private Vector3 FindMedianPos(List<IslandChunk> positions) {
+			Bounds box = new Bounds(positions[0].transform.position, Vector3.zero);
+			foreach (IslandChunk pos in positions) {
+				box.Encapsulate(pos.transform.position);
+			}
+			return box.center;
+		}
 
         /// <summary>
         /// Calculate the velocity resulting from a chunk being destroyed
