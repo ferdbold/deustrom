@@ -251,7 +251,7 @@ namespace Simoncouche.Islands {
         IEnumerator ActivateIsland(ChunkWithCollider chunkWithCollider) {
             float t = 0;
             Tweener shakeTweener = chunkWithCollider.chunk.transform.DOShakePosition(SHAKE_TIME_EXTREMUMS.y, .30f, 14, 45, false);
-            _islandManager.CreatedIslandChunk(chunkWithCollider.chunk); //Add chunk to chunk list
+            
 
             while (t <= SHAKE_TIME_EXTREMUMS.y) {
                 t += Time.deltaTime; //Timer
@@ -271,11 +271,15 @@ namespace Simoncouche.Islands {
         /// <param name="chunk">chunk to release </param>
         private void ReleaseIsland(ChunkWithCollider chunkWithCollider) {
             Destroy(chunkWithCollider.collider.gameObject); //remove temporary collider
+            _islandManager.CreatedIslandChunk(chunkWithCollider.chunk); //Add chunk to chunk list
 
             chunkWithCollider.chunk.transform.parent = _islandParentTransform; //Set parent
             ToggleCollisionLayer(chunkWithCollider.chunk.gameObject, true); //Toggle island collisions back on
             chunkWithCollider.chunk.gravityBody.Velocity += new Vector2(_releaseForce * (GENERATE_LEFT ? 1 : -1), 0); //Add velocity
             chunkWithCollider.chunk.gameObject.layer = gravityBodyLayer;
+
+            //Play Audio
+            chunkWithCollider.chunk.GetComponent<AudioSource>().PlayOneShot(GameManager.audioManager.islandSpecificSound.feederRelease);
 
         }
 

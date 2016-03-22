@@ -183,6 +183,10 @@ public class IslandSound : SoundClass {
     [SerializeField] [Tooltip("Sound played when 2 island merge togeter")]
     private List<AudioClip> _destruction;
     public AudioClip destructionSound { get { return GetRandom(_destruction); } }
+
+    [SerializeField] [Tooltip("Sound played when island is released from feeder")]
+    private List<AudioClip> _feederRelease;
+    public AudioClip feederRelease { get { return GetRandom(_feederRelease); } }
 }
 
 [System.Serializable]
@@ -190,6 +194,8 @@ public class EnvironmentSound : SoundClass {
     [SerializeField] [Tooltip("Sound played when island is destroyed in maelstrom")]
     private List<AudioClip> _maelstromDestruction;
     public AudioClip maelstromDestructionSound { get { return GetRandom(_maelstromDestruction); } }
+
+
 }
 
 [System.Serializable]

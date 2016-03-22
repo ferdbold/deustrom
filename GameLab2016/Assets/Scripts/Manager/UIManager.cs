@@ -23,6 +23,13 @@ public class UIManager : MonoBehaviour {
     [SerializeField]
     private Image _cthulhuRunePrefab;
 
+    [SerializeField]
+    private Sprite[] _roundSeals;
+    [SerializeField]
+    private Sprite _sealSobek;
+    [SerializeField]
+    private Sprite _sealCthulhu;
+
     private List<Image> sobekRunesPool = new List<Image>();
     private List<Image> cthulhuRunesPool = new List<Image>();
 
@@ -32,6 +39,7 @@ public class UIManager : MonoBehaviour {
     private List<ScoreWidget> _scoreWidgets;
     private List<WinsWidget> _winsWidgets;
     private List<IslandCountWidget> _islandCountWidgets;
+    private Image _seal;
 
     // METHODS
 
@@ -50,13 +58,18 @@ public class UIManager : MonoBehaviour {
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Sobek").GetComponent<IslandCountWidget>());
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Cthulhu").GetComponent<IslandCountWidget>());
     
+        _seal = GameObject.Find("UI/Seal").GetComponent<Image>();
+
         RefreshWins();
 
-        //Pooling
+        // Pooling
         for (int i = 0; i < 15; i++) {
             InstantiateRune(LevelManager.Player.sobek);
             InstantiateRune(LevelManager.Player.cthulu);
         }
+
+        // Set seal
+        _seal.sprite = _roundSeals[GameManager.levelManager.currentRound];
     }
 
     private void Update() {
