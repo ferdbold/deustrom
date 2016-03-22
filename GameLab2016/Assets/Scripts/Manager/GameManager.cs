@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour {
             if(_currentScene != Scene.BibleWriter)SwitchScene(Scene.Menu);
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            Application.Quit();
+            QuitGame();
         }
 
         #if UNITY_EDITOR
@@ -211,8 +211,7 @@ public class GameManager : MonoBehaviour {
             case Scene.PlayLevel:
                 islandManager.Setup();
                 if (levelManager == null) {
-                    levelManager = new LevelManager(_pointsGoal, _matchToWin);
-                    StartTutorial();
+                    levelManager = new LevelManager(_matchToWin);
                 } else {
                     levelManager.Setup();
                 }
@@ -261,7 +260,7 @@ public class GameManager : MonoBehaviour {
 
     #region Tutorial
 
-    private void StartTutorial() {
+    public void StartVideoTutorial() {
         Pause();
         TutorialUI tuto = (Instantiate(Resources.Load("Tutorial")) as GameObject).GetComponent<TutorialUI>();
         tuto.StartTuto();
@@ -275,6 +274,7 @@ public class GameManager : MonoBehaviour {
     /// Pause the game
     /// </summary>
     public void Pause() {
+        Debug.LogWarning("The game was paused, don't freak out");
         ChangePauseStatus(true);
     }
 
@@ -288,6 +288,7 @@ public class GameManager : MonoBehaviour {
     private void ChangePauseStatus(bool pause) {
         isPaused = pause;
         Time.timeScale = isPaused ? 0 : 1;
+        inputManager.isDisabled = pause;
     }
 
     #endregion

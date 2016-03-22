@@ -19,9 +19,6 @@ public class LevelManager {
     /// <summary>Cthulu (player two)</summary>
     public int cthuluScore { get; private set; }
 
-    /// <summary>Score need to win </summary>
-    public int scoreNeededToWin { get; private set; }
-
     /// <summary>Number of match to win a game </summary>
     public int matchToWin { get; private set; }
 
@@ -36,10 +33,10 @@ public class LevelManager {
 
     #region Setup
 
-    public LevelManager(int scoreToWin, int numberOfMatchToWin) {
-        scoreNeededToWin = scoreToWin;
+    public LevelManager(int numberOfMatchToWin) {
         matchToWin = numberOfMatchToWin;
         Setup();
+        GameManager.Instance.StartVideoTutorial();
     }
 
     public void Setup() {
@@ -47,6 +44,7 @@ public class LevelManager {
         ui = GameObject.FindObjectOfType<UIManager>();
         sobekScore = 0;
         cthuluScore = 0;
+        OnMatchStart();
     }
 
     /// <summary> Setup ref to players </summary>
@@ -79,14 +77,14 @@ public class LevelManager {
         if (!GameManager.Instance.disableScoring) {
             if (player == Player.sobek) {
                 sobekScore += scoreAdded;
-                if (sobekScore >= scoreNeededToWin) {
-                    sobekScore = scoreNeededToWin;
+                if (sobekScore >= GameManager.Instance.pointsGoal) {
+                    sobekScore = GameManager.Instance.pointsGoal;
                     OnMatchEnd(Player.sobek);
                 }
             } else {
                 cthuluScore += scoreAdded;
-                if (cthuluScore >= scoreNeededToWin) {
-                    cthuluScore = scoreNeededToWin;
+                if (cthuluScore >= GameManager.Instance.pointsGoal) {
+                    cthuluScore = GameManager.Instance.pointsGoal;
                     OnMatchEnd(Player.cthulu);
                 }
             }
@@ -94,6 +92,16 @@ public class LevelManager {
                 if (ui != null) ui.AddPoint(player, originPos);
             }
         }
+    }
+    #endregion
+
+    #region Events
+
+    /// <summary>
+    /// Event called when the match starts
+    /// </summary>
+    private void OnMatchStart() {
+
     }
 
     /// <summary>
