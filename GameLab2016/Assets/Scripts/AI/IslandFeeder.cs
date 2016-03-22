@@ -412,8 +412,8 @@ namespace Simoncouche.Islands {
                 List<IslandChunk> _CurPendingChunks = _islandManager.GetPendingIslandChunks();
 
 
-                float _pSobekScorePercent = (float)GameManager.levelManager.sobekScore / (float)GameManager.levelManager.scoreNeededToWin * 100f;
-                float _pCthulhuScorePercent = (float)GameManager.levelManager.cthuluScore / (float)GameManager.levelManager.scoreNeededToWin * 100f;
+                float _pSobekScorePercent = (float)GameManager.levelManager.sobekScore / (float)GameManager.Instance.pointsGoal * 100f;
+                float _pCthulhuScorePercent = (float)GameManager.levelManager.cthuluScore / (float)GameManager.Instance.pointsGoal * 100f;
 
 
                 foreach (IslandChunk ic in _CurChunks) {

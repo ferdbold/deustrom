@@ -157,8 +157,24 @@ public class InputManager : MonoBehaviour {
 
     #endregion
 
+    #region Utils
+
+    private bool _isDisabled = false;
+    public bool isDisabled {
+        get {
+            return _isDisabled;
+        }
+        set {
+            Debug.LogWarning("Input have been disabled");
+            _isDisabled = value;
+        }
+    }
+
+    #endregion
+
     void Update() {
-        List<AxisTuple> axii = new List<AxisTuple>() {
+        if (!_isDisabled) {
+            List<AxisTuple> axii = new List<AxisTuple>() {
             new AxisTuple("P1 Left Analog", p1_leftAnalog, Input.GetAxis("P1_L_Horizontal"), Input.GetAxis("P1_L_Vertical")),
             new AxisTuple("P1 Right Analog", p1_rightAnalog, Input.GetAxis("P1_R_Horizontal"), Input.GetAxis("P1_R_Vertical")),
             new AxisTuple("P2 Left Trigger", p1_leftTrigger, Input.GetAxis("P1_L_Trigger"), 0),                                     //This axis has only 1 direction
@@ -169,7 +185,7 @@ public class InputManager : MonoBehaviour {
             new AxisTuple("P2 Right Trigger", p2_rightTrigger, Input.GetAxis("P2_R_Trigger"), 0)                                    //This axis has only 1 direction
         };
 
-        List<ButtonTuple> buttons = new List<ButtonTuple>() {
+            List<ButtonTuple> buttons = new List<ButtonTuple>() {
             new ButtonTuple("P1 Push", p1_pushButton, Input.GetButtonDown("P1_Push")),
             new ButtonTuple("P2 Push", p2_pushButton, Input.GetButtonDown("P2_Push")),
             new ButtonTuple("P1 Fire Hook Down", p1_fireHookButtonDown, Input.GetButtonDown("P1_FireHook")),
@@ -185,16 +201,17 @@ public class InputManager : MonoBehaviour {
             new ButtonTuple("P2 Cut Link Chain", p2_cutLinkWithChainButton,Input.GetButtonDown("P2_Cut_Link_Chain"))
         };
 
-        foreach(AxisTuple axis in axii) {
-            if (axis.Item2 != null) {
-                axis.Item2.Invoke(axis.Item3, axis.Item4);
+            foreach (AxisTuple axis in axii) {
+                if (axis.Item2 != null) {
+                    axis.Item2.Invoke(axis.Item3, axis.Item4);
+                }
             }
-        }
 
-        foreach (ButtonTuple button in buttons) {
-            if (button.Item1 != null) {
-                if (button.Item3 && button.Item2 != null) {
-                    button.Item2.Invoke();
+            foreach (ButtonTuple button in buttons) {
+                if (button.Item1 != null) {
+                    if (button.Item3 && button.Item2 != null) {
+                        button.Item2.Invoke();
+                    }
                 }
             }
         }
