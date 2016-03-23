@@ -218,6 +218,12 @@ namespace Simoncouche.Islands {
             if(chunkToPush != null) {
                 PushChunk(chunkToPush, volcano);
             }
+
+            Simoncouche.Chain.Hook[] hooks = GameObject.FindObjectsOfType<Simoncouche.Chain.Hook>();
+            IslandChunk[] twoCollidedChunks = new IslandChunk[2] { a, b };
+            foreach(Simoncouche.Chain.Hook hook in hooks) {
+                hook.SendMessage("CheckConnectedVolcanoWithOtherIsland", twoCollidedChunks);
+            }
         }
 
         /// <summary> Push the chunk away from the volcano and convert it to neutral </summary>
