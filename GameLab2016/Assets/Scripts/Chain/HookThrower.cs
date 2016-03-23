@@ -71,13 +71,6 @@ namespace Simoncouche.Chain {
         public bool isPlayerOne { get; private set; }
         public bool isSobek { get; private set; }
 
-        // PROPERTIES
-        private bool _canUseHooks;
-        public bool canUseHooks {
-            get { return _canUseHooks; }
-            set { _canUseHooks = value; }
-        }
-
         private bool _triggerIsHeld = false;
         private bool _isRetracting = false;
 
@@ -152,7 +145,7 @@ namespace Simoncouche.Chain {
 
         /// <summary>Handle user input to throw a new chain and hook</summary>
         private void Fire() {
-            if (!_canUseHooks) {
+            if (GameManager.Instance.mustEnableChainThrower) {
                 // Exit early if currently respawning
                 if (playerController.InRespawnState) return;
 
@@ -208,7 +201,7 @@ namespace Simoncouche.Chain {
         }
 
         private void CheckPlayerInputs(params float[] input) {
-            if (playerController.InRespawnState == true  || !_canUseHooks) return; //Deactivate hook if currently respawning
+            if (playerController.InRespawnState == true  || !GameManager.Instance.mustEnableChainThrower) return; //Deactivate hook if currently respawning
             bool isCurrentlyHeld = (input[0] == 1);
 
             if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
