@@ -10,12 +10,13 @@ namespace Simoncouche.UI {
         private string _verseValue;
         private string _authorValue;
 
+        private bool _waitingForBeginningInput = true;
+
         // COMPONENTS
 
         private BibleQuoteWriter _writer;
 
         private Text _titleLabel;
-        private Text _descriptionLabel;
 
         private InputField _verseField;
         private InputField _authorField;
@@ -28,47 +29,50 @@ namespace Simoncouche.UI {
         // METHODS
 
         private void Awake() {
+            string godName = (GameManager.Instance.lastWinner == LevelManager.Player.cthulu) ? "CTHULHU" : "SOBEK";
+
             _writer = GetComponent<BibleQuoteWriter>();
 
             _titleLabel = transform.Find("TitleLabel").GetComponent<Text>();
-            _descriptionLabel = transform.Find("DescriptionLabel").GetComponent<Text>();
-
             _verseField = transform.Find("VerseField").GetComponent<InputField>();
             _authorField = transform.Find("AuthorField").GetComponent<InputField>();
-
             _versePlaceholder = transform.Find("VerseField/Placeholder").GetComponent<Text>();
             _authorPlaceholder = transform.Find("AuthorField/Placeholder").GetComponent<Text>();
 
-            _scrolls[LevelManager.Player.cthulu] = transform.Find("Scrolls/Cthulhu").transform;
-            _scrolls[LevelManager.Player.sobek] = transform.Find("Scrolls/Sobek").transform;
-
-
-            // Event binding
-            _verseField.onEndEdit.AddListener(OnVerseEndEdit);
-            _authorField.onEndEdit.AddListener(OnAuthorEndEdit);
+            _scrolls[(int)LevelManager.Player.cthulu] = transform.Find("Scrolls/Cthulhu").transform;
+            _scrolls[(int)LevelManager.Player.sobek] = transform.Find("Scrolls/Sobek").transform;
 
             // Initialization
-            _scrolls[LevelManager.Player.cthulu].gameObject.SetActive(GameManager.Instance.lastWinner == LevelManager.Player.cthulu);
-            _scrolls[LevelManager.Player.sobek].gameObject.SetActive(GameManager.Instance.lastWinner == LevelManager.Player.sobek);
-            
+            _scrolls[(int)LevelManager.Player.cthulu].gameObject.SetActive(GameManager.Instance.lastWinner == LevelManager.Player.cthulu);
+            _scrolls[(int)LevelManager.Player.sobek].gameObject.SetActive(GameManager.Instance.lastWinner == LevelManager.Player.sobek);
+
+            _titleLabel.text = string.Format("CULTISTE DE {0}!", godName);
+
             switch (GameManager.Instance.lastWinner) {
-            default:
-            break;
+            case LevelManager.Player.cthulu:
+                _versePlaceholder.text = "Et depuis ce jour, il fut interdit de manger du poulpe le dimanche. #praisethetentacles";
+                _authorPlaceholder.text = "Archevêque Ventouse";
+                break;
+            case LevelManager.Player.sobek:
+                _versePlaceholder.text = "Et depuis ce jour, plus aucune sacoche en peau de crocodile ne fut jamais produite. #fashion";
+                _authorPlaceholder.text = "Croque-mister";
+                break;
             }
         }
 
-        private void Start() {
-            _verseField.Select();
-        }
+        private void Update() {
+            if (Input.GetKeyDown(KeyCode.Tab)) {
+                if (_verseField.isFocused) {
+                    _authorField.Select();
+                } else {
+                    _verseField.Select();
+                }
+            }
 
-        private void OnVerseEndEdit(string value) {
-            _verseValue = value;
-            _authorField.Select();
-        }
-
-        private void OnAuthorEndEdit(string value) {
-            _authorValue = value;
-            _writer.SaveQuote(_verseField, _authorValue, (GameManager.Instance.lastWinner == LevelManager.Player.sobek));
+            if (Input.GetKeyDown(KeyCode.Return) && _verseField.text != "" && _authorField.text != "") {
+                _writer.SaveQuote(_verseField.text, _authorField.text, (GameManager.Instance.lastWinner == LevelManager.Player.sobek));
+                GameManager.Instance.SwitchScene(GameManager.Scene.Menu);
+            }
         }
     }
 }
