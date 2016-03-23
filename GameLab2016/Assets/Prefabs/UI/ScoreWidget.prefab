@@ -9,7 +9,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 22482034}
   - 114: {fileID: 11448080}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LerpingSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24,7 +24,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 22451418}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   - 224: {fileID: 22404090}
   - 222: {fileID: 22225480}
   - 114: {fileID: 11480534}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,7 +56,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 22483722}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -73,7 +73,7 @@ GameObject:
   - 224: {fileID: 22454404}
   - 222: {fileID: 22295640}
   - 114: {fileID: 11447008}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -90,7 +90,7 @@ GameObject:
   - 224: {fileID: 22455612}
   - 222: {fileID: 22213188}
   - 114: {fileID: 11431824}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: DirectRoll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,7 +107,7 @@ GameObject:
   - 224: {fileID: 22453908}
   - 222: {fileID: 22283060}
   - 114: {fileID: 11422160}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BottomRoll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,7 +123,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 22410912}
   - 114: {fileID: 11486966}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: DirectSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 22407346}
   - 114: {fileID: 11425892}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ScoreWidget
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -156,7 +156,7 @@ GameObject:
   - 224: {fileID: 22461594}
   - 222: {fileID: 22225154}
   - 114: {fileID: 11443070}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: LerpingRoll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -173,7 +173,7 @@ GameObject:
   - 224: {fileID: 22457114}
   - 222: {fileID: 22272764}
   - 114: {fileID: 11460810}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -701,6 +701,10 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: _gainAnimDuration
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

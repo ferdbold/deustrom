@@ -11,6 +11,8 @@ namespace Simoncouche.UI {
 
         // COMPONENTS
 
+        public Transform leadParticles { get; set; }
+
         private Slider _directSlider;
         private Slider _lerpingSlider;
         private Image _directRoll;
@@ -31,6 +33,17 @@ namespace Simoncouche.UI {
 
             _directSlider.value = 0;
             _lerpingSlider.value = 0;
+        }
+
+        private void Update() {
+            if (this.leadParticles != null) {
+                Vector3 uiWorldPos =  GameManager.uiManager.particleCamera.ScreenToWorldPoint(this.GetLerpingFillEndPosition());
+                this.leadParticles.position = new Vector3(
+                    uiWorldPos.x,
+                    uiWorldPos.y + 0.6f,
+                    1
+                );
+            }
         }
 
         /// <summary>Add points to the widget.</summary>
@@ -61,15 +74,24 @@ namespace Simoncouche.UI {
         }
 
         /// <summary>
-        /// Returns the world position
+        /// Returns the screen position of the direct roll fill rect end
         /// </summary>
         /// <returns>The fill end position.</returns>
         public Vector3 GetFillEndPosition() {
-            //Debug.Log("Y: " + _directSlider.fillRect.rect.height / 2 * GameManager.uiManager.root.scaleFactor);
-
             return new Vector3(
                 _directSlider.fillRect.position.x + (_directSlider.fillRect.rect.width / 2 * GameManager.uiManager.root.scaleFactor * ((transform.localRotation.eulerAngles.z == 0) ? 1 : -1)), 
                 _directSlider.fillRect.position.y - (_directSlider.fillRect.rect.height / 2 * GameManager.uiManager.root.scaleFactor),
+                0
+            );
+        }
+
+        /// <summary>
+        /// Returns the screen position of the lerping roll fill rect end
+        /// </summary>
+        public Vector3 GetLerpingFillEndPosition() {
+            return new Vector3(
+                _lerpingSlider.fillRect.position.x + (_lerpingSlider.fillRect.rect.width / 2 * GameManager.uiManager.root.scaleFactor * ((transform.localRotation.eulerAngles.z == 0) ? 1 : -1)), 
+                _lerpingSlider.fillRect.position.y - (_lerpingSlider.fillRect.rect.height / 2 * GameManager.uiManager.root.scaleFactor),
                 0
             );
         }

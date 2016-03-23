@@ -36,6 +36,8 @@ public class UIManager : MonoBehaviour {
     // COMPONENTS
 
     public Canvas root { get; private set; }
+    public Camera particleCamera { get; private set; }
+
     private List<ScoreWidget> _scoreWidgets;
     private List<WinsWidget> _winsWidgets;
     private List<IslandCountWidget> _islandCountWidgets;
@@ -45,11 +47,15 @@ public class UIManager : MonoBehaviour {
 
     public void Setup() {
         this.root = GameObject.Find("UI").GetComponent<Canvas>();
+        this.particleCamera = GameObject.Find("UIParticles").GetComponent<Camera>();
 
         _scoreWidgets = new List<ScoreWidget>();
         _scoreWidgets.Add(GameObject.Find("UI/Scores/Sobek").GetComponent<ScoreWidget>());
         _scoreWidgets.Add(GameObject.Find("UI/Scores/Cthulhu").GetComponent<ScoreWidget>());
     
+        _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles = GameObject.Find("UIParticles/Sobek").transform;
+        _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles = GameObject.Find("UIParticles/Cthulhu").transform;
+
         _winsWidgets = new List<WinsWidget>();
         _winsWidgets.Add(GameObject.Find("UI/Wins/Sobek").GetComponent<WinsWidget>());
         _winsWidgets.Add(GameObject.Find("UI/Wins/Cthulhu").GetComponent<WinsWidget>());
@@ -57,7 +63,7 @@ public class UIManager : MonoBehaviour {
         _islandCountWidgets = new List<IslandCountWidget>();
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Sobek").GetComponent<IslandCountWidget>());
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Cthulhu").GetComponent<IslandCountWidget>());
-    
+
         _seal = GameObject.Find("UI/Seal").GetComponent<Image>();
 
         RefreshWins();
@@ -138,10 +144,12 @@ public class UIManager : MonoBehaviour {
 
         if (player == LevelManager.Player.sobek) {
             instantiatedObj = (Image)GameObject.Instantiate(_sobekRunePrefab);
+            instantiatedObj.transform.SetParent(this.root.transform);
             instantiatedObj.gameObject.SetActive(false);
             sobekRunesPool.Add(instantiatedObj);
         } else {
             instantiatedObj = (Image)GameObject.Instantiate(_cthulhuRunePrefab);
+            instantiatedObj.transform.SetParent(this.root.transform);
             instantiatedObj.gameObject.SetActive(false);
             cthulhuRunesPool.Add(instantiatedObj);
         }
