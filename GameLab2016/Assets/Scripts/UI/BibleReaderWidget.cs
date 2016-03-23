@@ -94,7 +94,7 @@ namespace Simoncouche.UI {
                 _scrolls[(int)_currentPlayer].gameObject.SetActive(true);
                 _scrolls[(int)otherPlayer].gameObject.SetActive(false);
 
-                _scrollsContainer.DOLocalMoveY(-40, _swapAnimDuration).SetEase(Ease.OutCubic);
+                _scrollsContainer.DOLocalMoveY(230, _swapAnimDuration).SetEase(Ease.OutCubic);
             });
         }
     }
