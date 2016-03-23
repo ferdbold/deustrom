@@ -315,7 +315,6 @@ public class GameManager : MonoBehaviour {
         isPaused = pause;
         Time.timeScale = isPaused ? 0 : 1;
         inputManager.isDisabled = pause;
-        Debug.Log("Is disabled input manager" + inputManager.isDisabled);
 
     }
 

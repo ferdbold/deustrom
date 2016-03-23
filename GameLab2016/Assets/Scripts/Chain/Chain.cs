@@ -218,7 +218,8 @@ namespace Simoncouche.Chain {
                     mustDestroyChain = true;
                 else if (_endingHookIsSet && endingHook != null) {
                     //IF the connectedBody of our ending hook doesnt exist anymore then we destroy the chain
-                    if (endingHook.targetJoint.connectedBody == null) mustDestroyChain = true;
+                    if (beginningHook.targetJoint.connectedBody == null || beginningHook.currentAnchorPoint == null
+                        ||endingHook.targetJoint.connectedBody == null || endingHook.currentAnchorPoint == null) mustDestroyChain = true;
                     //IF the Island or the Chunk connected to our ending hook doesnt exist anymore then we destroy the chain
                     else if (endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
                         if (endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed
