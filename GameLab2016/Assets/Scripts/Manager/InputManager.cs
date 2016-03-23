@@ -164,7 +164,6 @@ public class InputManager : MonoBehaviour {
     #endregion
 
     void Update() {
-        Debug.Log(isDisabled);
         if (!isDisabled) {
             List<AxisTuple> axii = new List<AxisTuple>() {
             new AxisTuple("P1 Left Analog", p1_leftAnalog, Input.GetAxis("P1_L_Horizontal"), Input.GetAxis("P1_L_Vertical")),

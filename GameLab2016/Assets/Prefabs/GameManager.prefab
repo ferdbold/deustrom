@@ -175,8 +175,9 @@ AudioSource:
   m_GameObject: {fileID: 174666}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24372724, guid: 19e3b45c4ab55234bb874f7410cef789,
+    type: 2}
+  m_audioClip: {fileID: 8300000, guid: c80d86a01da3d0d47bfaa7086691290e, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -229,7 +230,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -558,6 +559,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4fd6e9f994d82c4c957f2eeecd391eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDisabled: 0
 --- !u!114 &11492070
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -573,7 +575,7 @@ MonoBehaviour:
   _disableScoring: 0
   _matchToWin: 2
   lastWinner: 1
-  _currentScene: 1
+  _currentScene: 0
   SCENE_MENU_NAME: Menu
   SCENE_CUTSCENE: Cutscene
   SCENE_BIBLE_WRITING: BibleWriter
@@ -581,6 +583,7 @@ MonoBehaviour:
   SCENE_NAMES:
   - Main
   timeForTuto: 1
+  _timeUntilControllersAreEnabled: 0.1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
