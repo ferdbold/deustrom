@@ -21,6 +21,10 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private float _timeUntilChainExpires = 10.0f;
 
+        [Tooltip("Time until we check if the first hook is correctly connected to an island")]
+        [SerializeField]
+        private float _timeUntilChainIsMissed = 2.0f;
+
         [Tooltip("If we are using the character's hook mesh for our hook")]
         [SerializeField]
         private bool _hasCharacterHook = false;
@@ -114,6 +118,7 @@ namespace Simoncouche.Chain {
         public void Start() {
             this._endingHookIsSet = false;
             CreateBeginningHook();
+            StartCoroutine(DestroyFirstChainOnMissAfterTime(_timeUntilChainIsMissed));
             this._maxDistanceBetweenTwoHooks = beginningHook.chainJoint.distance;
         }
 
@@ -318,6 +323,11 @@ namespace Simoncouche.Chain {
             } else Destroy(this.gameObject);
         }
 
+        IEnumerator DestroyFirstChainOnMissAfterTime(float timeUntilDestroy) {
+            yield return new WaitForSeconds(timeUntilDestroy);
+            if (!_beginningHookIsSet) DestroyChain(true);
+        }
+
         /// <summary>
         /// Update the color of the chain sections and destroy the chain after a certain amount of time
         /// </summary>
@@ -405,6 +415,11 @@ namespace Simoncouche.Chain {
             return null;
         }
 
+
+        /// <summary>
+        /// Modify the mass of the hooks based on the weigths the connected islands
+        /// </summary>
+        /// <param name="retractionForceToAdd">The force to add to the hook with the smallest island attached</param>
         public void RetractHooksMassModification(float retractionForceToAdd) {
             if (!_endingHookIsSet) {
                 if (beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland != null
@@ -414,22 +429,24 @@ namespace Simoncouche.Chain {
                     thrower.rigidbody.AddForce((thrower.transform.position - beginningHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
                 }
             } else {
-                if(beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland!=null 
-                    && endingHook.currentAnchorPoint.GetIslandChunk().parentIsland != null) {
-                    if(beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland.chunks.Count 
-                        > endingHook.currentAnchorPoint.GetIslandChunk().parentIsland.chunks.Count) {
+                if (beginningHook.currentAnchorPoint != null && endingHook.currentAnchorPoint != null) {
+                    if (beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland != null
+                        && endingHook.currentAnchorPoint.GetIslandChunk().parentIsland != null) {
+                        if (beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland.chunks.Count
+                            > endingHook.currentAnchorPoint.GetIslandChunk().parentIsland.chunks.Count) {
+                            endingHook.rigidbody.AddForce((beginningHook.transform.position - endingHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
+                        } else {
+                            beginningHook.rigidbody.AddForce((endingHook.transform.position - beginningHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
+                        }
+                    } else if (beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland != null
+                        && endingHook.currentAnchorPoint.GetIslandChunk().parentIsland == null) {
                         endingHook.rigidbody.AddForce((beginningHook.transform.position - endingHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
+                    } else if (beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland == null
+                        && endingHook.currentAnchorPoint.GetIslandChunk().parentIsland != null) {
+                        beginningHook.rigidbody.AddForce((endingHook.transform.position - beginningHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
                     } else {
                         beginningHook.rigidbody.AddForce((endingHook.transform.position - beginningHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
                     }
-                } else if (beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland != null 
-                    && endingHook.currentAnchorPoint.GetIslandChunk().parentIsland == null) {
-                    endingHook.rigidbody.AddForce((beginningHook.transform.position - endingHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
-                } else if(beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland==null 
-                    && endingHook.currentAnchorPoint.GetIslandChunk().parentIsland != null) {
-                    beginningHook.rigidbody.AddForce((endingHook.transform.position - beginningHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
-                } else {
-                    beginningHook.rigidbody.AddForce((endingHook.transform.position - beginningHook.transform.position) * retractionForceToAdd, ForceMode2D.Impulse);
                 }
             }
         }
