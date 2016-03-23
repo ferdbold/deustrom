@@ -45,11 +45,13 @@ namespace Simoncouche.Islands {
         /// <summary> the island subfolder in scene </summary>
         private Transform _islandSubFolder;
 
+        [SerializeField] [Tooltip("Time before a volcano becomes neutral after hitting something else")]
+        private float volcanoTurnTime = 1.5f;
+
         public void Setup() {
             try {
                 _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
-            }
-            catch (System.NullReferenceException e) {
+            } catch (System.NullReferenceException e) {
                 Debug.LogWarning("No Island sub folder in scene, you might have forgotten to add the tag to the subfolder. Error Thrown: " + e.Message);
             }
         }
@@ -67,12 +69,12 @@ namespace Simoncouche.Islands {
         public void CreatedIslandChunk(IslandChunk chunk) {
             _islandChunks.Add(chunk);
         }
-        
+
 
         #region Get/Set
         public List<Island> GetIslands() { return _island; }
         public List<IslandChunk> GetIslandChunks() { return _islandChunks; }
-        public List<IslandChunk> GetPendingIslandChunks() { return _pendingIslandChunks;  }
+        public List<IslandChunk> GetPendingIslandChunks() { return _pendingIslandChunks; }
         public void AddPendingIslandChunk(IslandChunk ic) { _pendingIslandChunks.Add(ic); }
         public void RemovePendingIslandChunk(IslandChunk ic) { _pendingIslandChunks.Remove(ic); }
         public int GetAmountPendingIslandChunk() { return _pendingIslandChunks.Count; }
@@ -95,7 +97,7 @@ namespace Simoncouche.Islands {
             Island b_IslandLink = b.parentIsland;
 
             //If one of the island is not mergeable
-            if (!a.isMergeable || !b.isMergeable) {
+            if (!a.isMergeable || !b.isMergeable /*|| a.gravityBody.inDestroyMode || b.gravityBody.inDestroyMode*/) {
                 return;
             }
             
@@ -191,6 +193,7 @@ namespace Simoncouche.Islands {
         /// <param name="b"> second chunk </param>
         private void HandleVolcanoCollision(IslandChunk a, IslandChunk b) {
             Island islandToBreak = null;
+            IslandChunk islandChunkToBreak = null;
             IslandChunk chunkToPush= null;
             IslandChunk volcano = null;
             if (a.color == IslandUtils.color.volcano && b.color == IslandUtils.color.volcano) { 
@@ -201,19 +204,25 @@ namespace Simoncouche.Islands {
             {
                 volcano = a;
                 if (b.parentIsland == null) chunkToPush = b;
-                else islandToBreak = b.parentIsland;
+                else {
+                    islandToBreak = b.parentIsland;
+                    islandChunkToBreak = b;
+                }
             }
             else {
                 volcano = b;
                 if (a.parentIsland == null) chunkToPush = a;
-                else islandToBreak = a.parentIsland;
+                else {
+                    islandToBreak = a.parentIsland;
+                    islandChunkToBreak = a;
+                }
             }
             GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
             ParticleGO.transform.parent = volcano.transform;
        
-            //TODO ANTOINE : DESTROY ISLAND that is not the volcano
             if(islandToBreak != null){
-                //Break Island Here
+                islandChunkToBreak.TakeDamage(PlayerGrab.BodyIsGrabbed(volcano.gravityBody) ? 1 : 1, volcano, 3 * volcano.gravityBody.Velocity);
+                StartCoroutine(ChangeVolcanoToNeutralIsland(volcano));
             }
             if(chunkToPush != null) {
                 PushChunk(chunkToPush, volcano);
@@ -223,6 +232,15 @@ namespace Simoncouche.Islands {
             IslandChunk[] twoCollidedChunks = new IslandChunk[2] { a, b };
             foreach(Simoncouche.Chain.Hook hook in hooks) {
                 hook.SendMessage("CheckConnectedVolcanoWithOtherIsland", twoCollidedChunks);
+            }
+        }
+
+        IEnumerator ChangeVolcanoToNeutralIsland(IslandChunk volcano) {
+            yield return new WaitForSeconds(volcanoTurnTime);
+            if (volcano != null) {
+                PlayerGrab.UngrabBody(volcano.gravityBody);
+                Destroy(volcano.gameObject);
+
             }
         }
 
@@ -340,10 +358,7 @@ namespace Simoncouche.Islands {
                 return null;
             }
 
-            //Make the player ungrab and then regrab only in 0.1seconds. 
-            foreach (IslandChunk check in island.chunks) {
-                PlayerGrab.UngrabBody(check.gravityBody, true, 0.1f);
-            }
+            List<IslandChunk> originIsland = island.chunks;
 
             List<GravityBody> everyPiece = new List<GravityBody>();
             everyPiece.Add(island.gravityBody);
@@ -362,6 +377,11 @@ namespace Simoncouche.Islands {
                             chunk.ChangeCollisionBetweenChunk(target, true);
                         }
                     }
+                }
+
+                //Make the player ungrab and then regrab only in 0.1seconds. 
+                foreach (IslandChunk check in originIsland) {
+                    PlayerGrab.UngrabBody(check.gravityBody, true, 0.1f);
                 }
             }
 
@@ -404,7 +424,6 @@ namespace Simoncouche.Islands {
             }
             island.RecreateIslandChunkConnection();
 
-
             //Update Conversion Status of the island
             island.UpdateConversionStatus();
 
@@ -427,7 +446,7 @@ namespace Simoncouche.Islands {
                     CheckIslandBroken_Helper(connection, islandChecked);
                 }
             }
-
+     
             return islandChecked;
         }
 
@@ -441,18 +460,21 @@ namespace Simoncouche.Islands {
         /// </summary>
         /// <param name="chunk">The chunk affected by this</param>
         /// <param name="damage">The number of chunk affected</param>
-		public void TakeDamageHandler(IslandChunk chunk, int damage, Vector3 velocityGiven) {
+		public void TakeDamageHandler(IslandChunk chunk, int damage, IslandChunk originChunk, Vector3 velocityGiven) {
 			//If no damage
 			if (damage < 1) {
 				return;
 			}
+            
 			//If the chunk has no connection
 			if (chunk.parentIsland == null || chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
 				return;
 			}
+
+            originChunk.ResetMergeability(1f);
 			//Make every part not mergeable for a time
 			foreach (IslandChunk c in chunk.parentIsland.chunks) {
-				//c.ResetMergeability(5f);
+				c.ResetMergeability(1f);
 			}
 
 			//Spawn Particle and play sound
@@ -464,19 +486,19 @@ namespace Simoncouche.Islands {
 			Vector3 medianIslandPos = FindMedianPos(islandLink.chunks);
 
 			//Check if the damage is too high for the island (the maximum is to divided the island in 2
-			if (islandLink.chunks.Count <= damage) {
+			if ((float)islandLink.chunks.Count / 2 <= damage) {
 				damage = Mathf.CeilToInt(islandLink.chunks.Count / 2f);
 			}
 
 			//Recursivly remove island
 			List<IslandChunk> islandRemoved = new List<IslandChunk>();
 			islandRemoved.Add(chunk);
-			if (damage > 1) {
+            if (damage > 1) {
 				islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
-			}
+            }
 
-			//Remove chunk from island
-			foreach (IslandChunk c in islandRemoved) {
+            //Remove chunk from island
+            foreach (IslandChunk c in islandRemoved) {
 				islandLink.RemoveChunkToIsland(c);
 			}
 
@@ -495,20 +517,22 @@ namespace Simoncouche.Islands {
 						island.AddChunkToIsland(islandRemoved[i]);
 					}
 				}
-				island.gravityBody.Velocity = 100 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks))).normalized;
+				island.gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks))).normalized;
+                originChunk.gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks))).normalized;
+            } else {
+				islandRemoved[0].gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
+                originChunk.gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
 
-			} else {
-				islandRemoved[0].gravityBody.Velocity = 100 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
-			}
+            }
 
 			//Divide island and Set velocity for every pieces
 			List<GravityBody> pieces = CheckIslandBroken(islandLink);
 			foreach (GravityBody piece in pieces) {
 				Island islandRef = piece.GetComponent<Island>();
 				if (islandRef != null) {
-					piece.Velocity = 20 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks))).normalized;
+					piece.Velocity = 2 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks))).normalized;
 				} else {
-					piece.Velocity = 20 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, piece.transform.position)).normalized;
+					piece.Velocity = 2 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, piece.transform.position)).normalized;
 				}
 			}
 		}
@@ -577,7 +601,6 @@ namespace Simoncouche.Islands {
 
                 islandRemoved = DamageConnectedIsland(current.connectedChunk[i], islandRemoved, damage);
             }
-
             return islandRemoved;
         }
 

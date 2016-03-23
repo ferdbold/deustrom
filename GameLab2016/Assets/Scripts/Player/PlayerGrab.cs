@@ -464,6 +464,20 @@ namespace Simoncouche.Controller {
 
         #region Static Utils
 
+        /// <summary>
+        /// Is the body grabbed by a player
+        /// </summary>
+        /// <param name="body">the body to check</param>
+        /// <returns></returns>
+        public static bool BodyIsGrabbed(GravityBody body) {
+            foreach (PlayerGrab player in _allPlayerGrabs) {
+                if (body == player.grabbedBody) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /// <summary> Make other player release the target chunk if they're holding it.</summary>
         /// <param name="targetChunk">Chunk to release</param>
         private static void MakeOtherPlayerRelease(IslandChunk targetChunk) {
