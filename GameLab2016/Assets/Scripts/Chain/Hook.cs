@@ -18,6 +18,10 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private float ATTACHED_MASS = 10f;
 
+        [Tooltip("The difference of z position between the hook and a connected island")]
+        [SerializeField]
+        private float hookZPositionDistanceWithConnectedIsland = -1.0f;
+
         /// <summary>Self-reference to the hook prefab for factory purposes</summary>
         private static GameObject _hookPrefabSobek;
         /// <summary>Self-reference to the hook prefab for factory purposes</summary>
@@ -64,6 +68,20 @@ namespace Simoncouche.Chain {
         public Island connectedIsland { get; private set; }
 
         public bool islandIsGrabbedEnemy { get; private set; }
+
+        /// <summary>
+        /// Must adjust the z position cause of the maelstrom
+        /// </summary>
+        void LateUpdate() {
+            if (currentAnchorPoint!=null) {
+                if (currentAnchorPoint.GetIslandChunk() != null)
+                    Debug.Log("Island chunk position z:" + currentAnchorPoint.GetIslandChunk().gravityBody.transform.position.z);
+                    this.rigidbody.transform.position = new Vector3(this.transform.position.x,
+                        this.transform.position.y,
+                        currentAnchorPoint.GetIslandChunk().gravityBody.transform.position.z + hookZPositionDistanceWithConnectedIsland);
+                    Debug.Log("New rigidbody position:" + this.rigidbody.position);
+            }
+        }
 
         /// <summary>Spawn a new hook inside a chain</summary>
         /// <param name="chain">The parent chain</param>
