@@ -241,7 +241,7 @@ namespace Simoncouche.Chain {
             islandIsGrabbedEnemy = true;
             // Reroute the chain to the player only if both hooks exist
             if (chain.beginningHook != null) {
-                if (this == chain.beginningHook) this.chain.beginningHook.targetJoint.connectedBody = playerGrab.rigidbody;//AJOUT
+                if (this == chain.beginningHook || this == chain.endingHook) this.targetJoint.connectedBody = playerGrab.rigidbody;//AJOUT
             }
             // Otherwise, deactivate chain physics while the player is grabbing
             else {
