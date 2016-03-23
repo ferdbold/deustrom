@@ -134,10 +134,8 @@ namespace Simoncouche.Islands {
 
         void Awake() {
             _islandRows = new List<List<ChunkWithCollider>>(); //Create data obj
-            _islandContainer = new GameObject(); //Create GameObject Container
-            _islandContainer.transform.parent = transform;
-            _islandContainer.transform.localPosition = Vector3.zero;
- 
+            GenerateIslandContainer();
+
             _volcanoPrefab = (GameObject)Resources.Load("Island/Volcano");
         }
 
@@ -167,6 +165,12 @@ namespace Simoncouche.Islands {
             if (_isStarted) {
                 MoveSpawner();
             }
+        }
+
+        private void GenerateIslandContainer() {
+            _islandContainer = new GameObject(); //Create GameObject Container
+            _islandContainer.transform.parent = transform;
+            _islandContainer.transform.localPosition = Vector3.zero;
         }
 
         /// <summary> Called on tick if not in tutorial. Controls island spawn. </summary>
@@ -274,6 +278,7 @@ namespace Simoncouche.Islands {
         /// <summary> Generate an island and place it in given Island list</summary>
         private ChunkWithCollider GenerateIsland(Vector3 position) {
             //Instantiate island
+            if (_islandContainer == null) GenerateIslandContainer();
             IslandChunk generatedChunk = (GameObject.Instantiate(_islandPrefab,
                                                                    _islandContainer.transform.position + position,
                                                                    Quaternion.identity)

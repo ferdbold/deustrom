@@ -50,19 +50,22 @@ namespace Simoncouche.Islands {
 
         public void Setup() {
             try {
+                //Clear lists
+                _island.Clear();
+                _islandChunks.Clear();
+                _pendingIslandChunks.Clear();
+                //Get Island sub folder
                 _islandSubFolder = GameObject.FindWithTag("IslandSubFolder").transform;
+                //Add starting chunks to the chunk list
+                IslandChunk[] chunks = GameObject.FindObjectsOfType<IslandChunk>();
+                foreach (IslandChunk chunk in chunks) {
+                    CreatedIslandChunk(chunk);
+                }
             } catch (System.NullReferenceException e) {
                 Debug.LogWarning("No Island sub folder in scene, you might have forgotten to add the tag to the subfolder. Error Thrown: " + e.Message);
             }
         }
 
-        void Start() {
-            //Add starting chunks to the chunk list
-            IslandChunk[] chunks = GameObject.FindObjectsOfType<IslandChunk>();
-            foreach (IslandChunk chunk in chunks) {
-                CreatedIslandChunk(chunk);
-            }
-        }
 
         /// <summary> Called when an island is created. Add it's reference to the island chunk list  </summary>
         /// <param name="ic">created island chunk</param>
