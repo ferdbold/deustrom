@@ -569,7 +569,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab0b4397cdca29a45acd824ad27408db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pointsGoal: 150
+  _pointsGoal: 20
   _disableScoring: 0
   _matchToWin: 2
   lastWinner: 1
@@ -579,7 +579,7 @@ MonoBehaviour:
   SCENE_BIBLE_WRITING: BibleWriter
   SCENE_BIBLE_READING: BibleReader
   SCENE_NAMES:
-  - Main_2
+  - Main
   timeForTuto: 1
 --- !u!1001 &100100000
 Prefab:
