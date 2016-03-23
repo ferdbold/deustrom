@@ -27,9 +27,6 @@ public class LevelManager {
 
     /// <summary>Cthulu number of match won </summary>
     public int cthuluMatchWon { get; private set; }
-
-    public int amountOfRoundsUntilChainsEnabled=1;
-
     #endregion
 
     #region Setup
@@ -49,21 +46,17 @@ public class LevelManager {
     /// <summary> Setup ref to players </summary>
     private void SetupPlayers() {
         bool mustEnableChains = false;
-        if (sobekMatchWon + cthuluMatchWon > amountOfRoundsUntilChainsEnabled) {
+        if (sobekMatchWon + cthuluMatchWon >= GameManager.Instance.amountOfRoundsUntilChainsEnabled) {
             mustEnableChains = true;
         } else {
             mustEnableChains = false;
         }
-        
+        GameManager.Instance.mustEnableChainThrower = mustEnableChains;
+
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         if (players.Length > 2) Debug.LogWarning("Their is more than 2 player in the scene");
 
         foreach (GameObject player in players) {
-            if (mustEnableChains) player.GetComponentInChildren<Simoncouche.Chain.HookThrower>().canUseHooks = true;
-            else {
-                player.GetComponentInChildren<Simoncouche.Chain.HookThrower>().canUseHooks = false;
-            }
-
             if (player.name=="Sobek") {
                 sobekPlayer = player;
             } else {
