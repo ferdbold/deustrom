@@ -5,7 +5,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.UI;
 
 namespace Simoncouche.Bible {
-    [RequireComponent(typeof(InputField))]
     public class BibleQuoteWriter : MonoBehaviour {
 
         [Tooltip("Minimum number of a quote")]
