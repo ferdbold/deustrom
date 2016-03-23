@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Simoncouche.Islands;
 
 namespace Simoncouche.Chain {
 
@@ -201,37 +202,81 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void AttachedHookToIslandsUpdate() {
             bool mustDestroyChain = false;
-            if (_beginningHookIsSet && beginningHook!=null) {
+            if (_beginningHookIsSet && beginningHook != null) {
                 //IF the connectedBody doesnt exist anymore then we destroy the chain
                 if (beginningHook.targetJoint.connectedBody == null) mustDestroyChain = true;
                 //IF the Island or the Chunk doesnt exist anymore then we destroy the chain
-                else if ( beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
-                    if (beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed 
-                        || beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed) 
+                else if (beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
+                    if (beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed
+                        || beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed)
                         mustDestroyChain = true;
                 }
                 //IF the island attached to our beginning hook and grabbed by the enemy doesnt exist anymore then we destroy the chain
-                if (beginningHook.islandIsGrabbedEnemy && 
+                if (beginningHook.islandIsGrabbedEnemy &&
                       (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
-                      LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) 
+                      LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))
                     mustDestroyChain = true;
                 else if (_endingHookIsSet && endingHook != null) {
                     //IF the connectedBody of our ending hook doesnt exist anymore then we destroy the chain
                     if (endingHook.targetJoint.connectedBody == null) mustDestroyChain = true;
                     //IF the Island or the Chunk connected to our ending hook doesnt exist anymore then we destroy the chain
-                    else if ( endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
-                        if (endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed 
+                    else if (endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
+                        if (endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed
                             || beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed)
                             mustDestroyChain = true;
                     }
                     //IF the island attached to our ending hook and grabbed by the enemy doesnt exist anymore then we destroy the chain
-                    if(endingHook.islandIsGrabbedEnemy &&
+                    if (endingHook.islandIsGrabbedEnemy &&
                         (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
-                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null)) 
+                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))
                         mustDestroyChain = true;
+
+                    if (mustDestroyChain) DestroyChain(true);
                 }
             }
-            if (mustDestroyChain) DestroyChain(true);
+        }
+
+
+        /// <summary>
+        /// Check if the volcano attached to a beginning hook is touching an island
+        /// </summary>
+        /// <returns>If the volcano touch an island, we return true to destroy the chain</returns>
+        private bool CheckVolcanoOnBeginningHook() {
+            bool mustDestroy = false;
+            Island parentIsland = endingHook.currentAnchorPoint.GetIslandChunk().parentIsland;
+            if (parentIsland != null) {
+                if (parentIsland.rigidbody.GetComponent<Collider2D>()
+                    .IsTouching(beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>())) {
+                    mustDestroy = true;
+                }
+            } else {
+                if (endingHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>()
+                    .IsTouching(beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>())) {
+                    mustDestroy = true;
+                }
+            }
+            return mustDestroy;
+        }
+
+        /// <summary>
+        /// Check if the volcano attached to a ending hook is touching an island
+        /// </summary>
+        /// <returns>If the volcano touch an island, we return true to destroy the chain</returns>
+        private bool CheckVolcanoOnEndingHook() {
+            bool mustDestroy = false;
+            Island parentIsland = beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland;
+            if (parentIsland != null) {
+                if (parentIsland.rigidbody.GetComponent<Collider2D>()
+                    .IsTouching(endingHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>())) {
+                    mustDestroy = true;
+                }
+            } else {
+                if (beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>()
+                    .IsTouching(endingHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>())) {
+                    mustDestroy = true;
+                }
+            }
+            return mustDestroy;
         }
 
         /// <summary>

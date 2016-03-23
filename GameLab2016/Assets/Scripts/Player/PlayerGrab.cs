@@ -258,7 +258,7 @@ namespace Simoncouche.Controller {
                     yield return null;
                 }
                 //finish movement
-                if (grabbedBody != null) transformToMove.localPosition = targetPosition;
+                if (grabbedBody != null && transformToMove != null) transformToMove.localPosition = targetPosition;
             }
         }
 

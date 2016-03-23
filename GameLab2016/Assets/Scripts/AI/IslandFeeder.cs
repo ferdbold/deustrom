@@ -109,7 +109,6 @@ namespace Simoncouche.Islands {
         private List<List<ChunkWithCollider>> _islandRows;
         private GameObject _islandContainer;
         //Objects refs
-        private IslandManager _islandManager;
         private Transform _islandParentTransform;
         //Layers
         private int _defaultLayer = 0;
@@ -130,6 +129,7 @@ namespace Simoncouche.Islands {
         [SerializeField][Tooltip("DO NOT TOUCH. Visible for DEBUG purposes only")]
         private float _modifiedSpawnRate = 5f; //current spawn rate
 
+        private bool _isStarted = false;
         
 
         void Awake() {
@@ -138,28 +138,35 @@ namespace Simoncouche.Islands {
             _islandContainer.transform.parent = transform;
             _islandContainer.transform.localPosition = Vector3.zero;
  
-            _islandManager = FindObjectOfType<IslandManager>().GetComponent<IslandManager>(); //Get Island Manager
+            _volcanoPrefab = (GameObject)Resources.Load("Island/Volcano");
         }
 
-        void Start() {
-            _islandParentTransform = _islandManager.GetIslandSubFolder(); //Get ISland Subfolder from manager
-            for (int i = 0; i <= MIN_COLUMN; ++i) {
-                GenerateColumn();
+        public void OnStart() {
+            if (_isStarted == false) {
+                _isStarted = true;
+                _islandParentTransform = GameManager.islandManager.GetIslandSubFolder(); //Get ISland Subfolder from manager
+                for (int i = 0; i <= MIN_COLUMN; ++i) {
+                    GenerateColumn();
+                }
+                _targetContinentX = 0;
+                StartCoroutine(UpdateSpawnParametersCoroutine());
             }
-            _targetContinentX = 0;
-            StartCoroutine(UpdateSpawnParametersCoroutine());
         }
 
         void Update() {
-            if (_inTutorial) {
-                ManageTutorial();
-            } else {
-                ManageSpawn();
+            if (_isStarted) {
+                if (_inTutorial) {
+                    ManageTutorial();
+                } else {
+                    ManageSpawn();
+                }
             }
         }
 
         void FixedUpdate() {
-            MoveSpawner();
+            if (_isStarted) {
+                MoveSpawner();
+            }
         }
 
         /// <summary> Called on tick if not in tutorial. Controls island spawn. </summary>
@@ -334,7 +341,7 @@ namespace Simoncouche.Islands {
         /// <param name="cwc">Chunk with collider to release</param>
         private void StartReleaseProcessOnTargetIsland(ChunkWithCollider cwc) {
             StartCoroutine(ActivateIsland(cwc));
-            if(cwc.chunk.color != IslandUtils.color.volcano) _islandManager.AddPendingIslandChunk(cwc.chunk); //Remove chunk from pending chunk list
+            if(cwc.chunk.color != IslandUtils.color.volcano) GameManager.islandManager.AddPendingIslandChunk(cwc.chunk); //Remove chunk from pending chunk list
             RemoveIslandChunkFromList(cwc, 0);
         }
 
@@ -345,7 +352,7 @@ namespace Simoncouche.Islands {
             RemoveIslandChunkFromList(selectedChunk, 0);
             IslandUtils.color prevColor = selectedChunk.chunk.color;
             selectedChunk.chunk.ConvertChunkToAnotherColor(IslandUtils.color.volcano);
-            _islandManager.AddPendingIslandChunk(selectedChunk.chunk);
+            GameManager.islandManager.AddPendingIslandChunk(selectedChunk.chunk);
             StartCoroutine(TransformIntoVolcano(selectedChunk, prevColor));
             
         }
@@ -358,8 +365,8 @@ namespace Simoncouche.Islands {
             Transform parentTransform = cwc.chunk.transform.Find("Model").transform;
             Transform[] oldModels = parentTransform.GetComponentsInChildren<Transform>();
             //Instantiate volcano prefab
-            Transform instantiatedVolcano = ((GameObject)Instantiate(_volcanoPrefab, parentTransform.position, Quaternion.identity)).transform;
-            instantiatedVolcano.parent = parentTransform;
+            GameObject instantiatedVolcano = ((GameObject)Instantiate(_volcanoPrefab, parentTransform.position, Quaternion.identity));
+            instantiatedVolcano.transform.parent = parentTransform;
             instantiatedVolcano.transform.localScale = Vector3.one;
             instantiatedVolcano.transform.localPosition = new Vector3(0, 0, 2f);
             //Particles
@@ -421,8 +428,8 @@ namespace Simoncouche.Islands {
         /// <param name="chunk">chunk to release </param>
         private void ReleaseIsland(ChunkWithCollider chunkWithCollider) {
             Destroy(chunkWithCollider.collider.gameObject); //remove temporary collider
-            _islandManager.RemovePendingIslandChunk(chunkWithCollider.chunk); //Remove chunk from pending chunk list
-            _islandManager.CreatedIslandChunk(chunkWithCollider.chunk); //Add chunk to chunk list
+            GameManager.islandManager.RemovePendingIslandChunk(chunkWithCollider.chunk); //Remove chunk from pending chunk list
+            GameManager.islandManager.CreatedIslandChunk(chunkWithCollider.chunk); //Add chunk to chunk list
 
             chunkWithCollider.chunk.transform.parent = _islandParentTransform; //Set parent
             ToggleCollisionLayer(chunkWithCollider.chunk.gameObject, true); //Toggle island collisions back on
@@ -472,8 +479,8 @@ namespace Simoncouche.Islands {
             _pSobekIsland = 0;
             _pCthulhuIsland = 0;
             _pVolcanoIsland = 0;
-            List<IslandChunk> _CurChunks = _islandManager.GetIslandChunks();
-            List<IslandChunk> _CurPendingChunks = _islandManager.GetPendingIslandChunks();
+            List<IslandChunk> _CurChunks = GameManager.islandManager.GetIslandChunks();
+            List<IslandChunk> _CurPendingChunks = GameManager.islandManager.GetPendingIslandChunks();
 
 
             float _pSobekScorePercent = (float)GameManager.levelManager.sobekScore / (float)GameManager.Instance.pointsGoal * 100f;

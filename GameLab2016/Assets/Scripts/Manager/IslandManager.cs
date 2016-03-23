@@ -200,7 +200,7 @@ namespace Simoncouche.Islands {
                 islandToBreak = null;
                 chunkToPush = null;
             }
-            if (a.color == IslandUtils.color.volcano)
+            else if (a.color == IslandUtils.color.volcano)
             {
                 volcano = a;
                 if (b.parentIsland == null) chunkToPush = b;
@@ -226,6 +226,12 @@ namespace Simoncouche.Islands {
             }
             if(chunkToPush != null) {
                 PushChunk(chunkToPush, volcano);
+            }
+
+            Simoncouche.Chain.Hook[] hooks = GameObject.FindObjectsOfType<Simoncouche.Chain.Hook>();
+            IslandChunk[] twoCollidedChunks = new IslandChunk[2] { a, b };
+            foreach(Simoncouche.Chain.Hook hook in hooks) {
+                hook.SendMessage("CheckConnectedVolcanoWithOtherIsland", twoCollidedChunks);
             }
         }
 
