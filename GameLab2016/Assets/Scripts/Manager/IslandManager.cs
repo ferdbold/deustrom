@@ -197,7 +197,7 @@ namespace Simoncouche.Islands {
                 islandToBreak = null;
                 chunkToPush = null;
             }
-            if (a.color == IslandUtils.color.volcano)
+            else if (a.color == IslandUtils.color.volcano)
             {
                 volcano = a;
                 if (b.parentIsland == null) chunkToPush = b;
