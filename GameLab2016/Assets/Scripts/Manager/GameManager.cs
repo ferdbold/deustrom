@@ -244,8 +244,6 @@ public class GameManager : MonoBehaviour {
 
             case Scene.BibleWriter:
                 audioManager.ToggleAmbiantSounds(false);
-                GameObject rootUI = GameObject.Find("BibleUIInput");
-                rootUI.GetComponentInChildren<Simoncouche.Bible.BibleQuoteWriter>().BeginWriting(this.lastWinner);
                 break;
 
             case Scene.BibleReader:
