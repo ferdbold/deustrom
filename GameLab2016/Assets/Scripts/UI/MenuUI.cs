@@ -6,6 +6,7 @@ namespace Simoncouche.UI {
     /// <summary>
     /// a MenuUI is the main controller class for the main menu UI.
     /// </summary>
+    [RequireComponent(typeof(CanvasScaler))]
     public class MenuUI : MonoBehaviour {
 
         [SerializeField]
@@ -13,9 +14,13 @@ namespace Simoncouche.UI {
 
         // COMPONENTS
 
+        public CanvasScaler scaler { get; private set; }
+
         private BibleReaderWidget _bibleReaderWidget;
 
         private void Awake() {
+            this.scaler = GetComponent<CanvasScaler>();
+
             _bibleReaderWidget = transform.Find("BibleReader").GetComponent<BibleReaderWidget>();
             _bibleReaderWidget.enabled = false;
 

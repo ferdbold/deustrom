@@ -21,6 +21,8 @@ namespace Simoncouche.UI {
         [SerializeField]
         private LevelManager.Player _currentPlayer = LevelManager.Player.cthulu;
 
+        private bool _swapped = false;
+
         // COMPONENTS
 
         private RectTransform _rectTransform;
@@ -56,12 +58,8 @@ namespace Simoncouche.UI {
 
         private void Start() {
             LoadBible();
-        }
 
-        private void Update() {
-            if (Input.GetKeyDown(KeyCode.I)) {
-                SwapPlayer();
-            }
+            GameManager.inputManager.AddEvent(InputManager.Axis.p1_leftTrigger, OnLeftTrigger);
         }
 
         private void OnEnable() {
@@ -69,7 +67,16 @@ namespace Simoncouche.UI {
         }
 
         private void OnDisable() {
-            _rectTransform.DOMoveY(-_rectTransform.rect.height, _slideAnimDuration).SetEase(Ease.InCubic);
+            _rectTransform.DOMoveY(-Screen.height, _slideAnimDuration).SetEase(Ease.InCubic);
+        }
+
+        private void OnLeftTrigger(float[] axis) {
+            if (axis[0] > 0.5f && !_swapped) {
+                SwapPlayer();
+                _swapped = true;
+            } else if (axis[0] == 0) {
+                _swapped = false;
+            }
         }
 
         /// <summary>
@@ -88,6 +95,7 @@ namespace Simoncouche.UI {
                 );
 
                 widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.cthulu]);
+                widget.transform.localScale = Vector3.one;
             }
 
             foreach (BibleQuote entry in entries.quoteListSobek) {
@@ -101,6 +109,7 @@ namespace Simoncouche.UI {
 
                 Debug.Log(_scrollContents.Count);
                 widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.sobek]);
+                widget.transform.localScale = Vector3.one;
             }
         }
 
@@ -126,7 +135,7 @@ namespace Simoncouche.UI {
             otherPlayerPictoRT.DOScale(Vector3.one/2, _swapAnimDuration);
             otherPlayerPictoRT.DOLocalMoveX(-70, _swapAnimDuration);
 
-            _scrollsContainer.DOMoveY(-_rectTransform.rect.height/2, _swapAnimDuration).SetEase(Ease.OutCubic).OnComplete(() => {
+            _scrollsContainer.DOMoveY(-(50 + _rectTransform.rect.height/720 * Screen.height/2), _swapAnimDuration).SetEase(Ease.OutCubic).OnComplete(() => {
                 _scrolls[(int)_currentPlayer].gameObject.SetActive(true);
                 _scrolls[(int)otherPlayer].gameObject.SetActive(false);
 
