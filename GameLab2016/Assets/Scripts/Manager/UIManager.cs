@@ -79,8 +79,10 @@ public class UIManager : MonoBehaviour {
     }
 
     private void Update() {
-        foreach (LevelManager.Player player in System.Enum.GetValues(typeof(LevelManager.Player))) {
-            _islandCountWidgets[(int)player].value = GameManager.islandManager.GetPlayerIslandCount(player);
+        if (_islandCountWidgets != null) { //Fix boboche dun bug dans le main menu ou _islandCountWidgets est tente detre acceder
+            foreach (LevelManager.Player player in System.Enum.GetValues(typeof(LevelManager.Player))) {
+                _islandCountWidgets[(int)player].value = GameManager.islandManager.GetPlayerIslandCount(player);
+            }
         }
     }
 
