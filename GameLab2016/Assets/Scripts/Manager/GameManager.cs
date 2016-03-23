@@ -179,7 +179,7 @@ public class GameManager : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene, CutsceneManager.Cutscene cutsceneVideo) {
         SceneManager.LoadSceneAsync(SCENE_CUTSCENE);
-        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Single);
         loading.allowSceneActivation = false;
 
         CutsceneManager cutscene = null;
