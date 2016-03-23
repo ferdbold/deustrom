@@ -238,6 +238,7 @@ public class GameManager : MonoBehaviour {
                     feeders[i].OnStart();
                 }
 
+                audioManager.PlayMusic(MusicSound.Choice.play);
                 this.gameStarted = true;
 
                 break;
