@@ -74,10 +74,13 @@ public class GameManager : MonoBehaviour {
     #endregion
 
     #region Utils Variables
+    public bool gameStarted { get; private set; }
     public bool isPaused { get; private set; }
     #endregion
 
     void Awake() {
+        this.gameStarted = false;
+
         if (Instance == null) {
             Instance = this;
             Application.targetFrameRate = 60; //Set target framerate
@@ -227,11 +230,14 @@ public class GameManager : MonoBehaviour {
                 }
 
                 uiManager.Setup();
-                //Start Feeder
+                    //Start Feeder
                 IslandFeeder[] feeders = GameObject.FindObjectsOfType<IslandFeeder>();
-                for(int i = 0; i < feeders.Length; i++) {
+                for (int i = 0; i < feeders.Length; i++) {
                     feeders[i].OnStart();
                 }
+
+                this.gameStarted = true;
+
                 break;
 
             case Scene.BibleWriter:
@@ -251,6 +257,8 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     /// <param name="scene">the scene closed</param>
     private void Scene_OnClose(Scene scene) {
+        this.gameStarted = false;
+
         switch (scene) {
             case Scene.Menu:
                 break;
