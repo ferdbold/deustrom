@@ -15,21 +15,20 @@ public class TutorialUI : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Joystick1Button7) || Input.GetKeyDown(KeyCode.Joystick1Button7) || Input.GetKeyDown(KeyCode.Space)) { //TODO change input
+        if (Input.GetKeyDown(KeyCode.F1)) { //TODO change input
             GameManager.Instance.UnPause();
             Destroy(gameObject);
         }
     }
 
     IEnumerator PlayTuto() {
-        if (video != null) {
-            movie.material.mainTexture = video;
-            GameManager.audioManager.PlayAudioClip(video.audioClip);
-            video.Play();
-            while (video.isPlaying) {
-                yield return new WaitForRealSeconds(0.05f);
-            }
-        } 
+        movie.material.mainTexture = video;
+        Debug.Log(video);
+        GameManager.audioManager.PlayAudioClip(video.audioClip);
+        video.Play();
+        while (video.isPlaying) {
+            yield return new WaitForRealSeconds(0.05f);
+        }
         GameManager.Instance.UnPause();
         Destroy(gameObject);
     }

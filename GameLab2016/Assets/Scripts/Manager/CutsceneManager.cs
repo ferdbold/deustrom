@@ -53,7 +53,7 @@ public class CutsceneManager : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Joystick1Button7) || Input.GetKeyDown(KeyCode.Joystick1Button7) || Input.GetKeyDown(KeyCode.Space)) { //TODO change input
+        if (Input.GetKeyDown(KeyCode.F1)) { //TODO change input
             skip = true;
             isDone = true;
             StopCoroutine("WaitForImageEnd");
@@ -109,11 +109,11 @@ public class CutsceneManager : MonoBehaviour {
     }
 
     IEnumerator WaitVideoEndToFade(MovieTexture movie) {
-        yield return new WaitForSeconds(timeToFade);
+        yield return new WaitForRealSeconds(timeToFade);
         Video.gameObject.SetActive(true);
 
         while (movie.isPlaying) {
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForRealSeconds(0.05f);
             if (skip) {
                 movie.Stop();
                 break;
@@ -127,10 +127,10 @@ public class CutsceneManager : MonoBehaviour {
     }
 
     IEnumerator WaitForImageEnd() {
-        yield return new WaitForSeconds(timeToFade);
+        yield return new WaitForRealSeconds(timeToFade);
         Video.gameObject.SetActive(true);
 
-        yield return new WaitForSeconds(imageTimeStaying);
+        yield return new WaitForRealSeconds(imageTimeStaying);
 
         isDone = true;
         

@@ -35,7 +35,6 @@ public class LevelManager {
     public LevelManager(int numberOfMatchToWin) {
         matchToWin = numberOfMatchToWin;
         Setup();
-        GameManager.Instance.StartVideoTutorial();
     }
 
     public void Setup() {
@@ -99,7 +98,9 @@ public class LevelManager {
     /// Event called when the match starts
     /// </summary>
     private void OnMatchStart() {
-
+        if (sobekMatchWon + cthuluMatchWon == 1) {
+            GameManager.Instance.StartVideoTutorial();
+        }
     }
 
     /// <summary>
