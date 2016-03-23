@@ -214,9 +214,11 @@ public class GameManager : MonoBehaviour {
     private void Scene_OnOpen(Scene scene) {
         switch (scene) {
             case Scene.Menu:
+                audioManager.ToggleAmbiantSounds(false);
                 break;
 
             case Scene.PlayLevel:
+                audioManager.ToggleAmbiantSounds(true);
                 islandManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_matchToWin);
@@ -233,11 +235,13 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case Scene.BibleWriter:
+                audioManager.ToggleAmbiantSounds(false);
                 GameObject rootUI = GameObject.Find("BibleUIInput");
                 rootUI.GetComponentInChildren<Simoncouche.Bible.BibleQuoteWriter>().BeginWriting(this.lastWinner);
                 break;
 
             case Scene.BibleReader:
+                audioManager.ToggleAmbiantSounds(false);
                 break;
         }
     }
