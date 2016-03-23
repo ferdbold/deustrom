@@ -113,5 +113,12 @@ namespace Simoncouche.Chain {
         public void AttachVisualJointTo(Rigidbody2D rb) {
             this.joint.connectedBody = rb;
         }
+
+        /// <summary>
+        /// Must adjust the z position cause of the maelstrom
+        /// </summary>
+        void LateUpdate() {
+            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, prev.transform.position.z);
+        }
     }
 }
