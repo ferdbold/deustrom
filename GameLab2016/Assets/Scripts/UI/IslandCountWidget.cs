@@ -16,6 +16,10 @@ public class IslandCountWidget : MonoBehaviour {
     private float _bigValueAnimSpeed = 3f;
 
     [SerializeField]
+    [Range(1f, 5f)]
+    private float _gainAnimAmplitude = 2f;
+
+    [SerializeField]
     private float _gainAnimDuration = 0.5f;
 
     [Tooltip("Color of the animation fired when an island is gained")]
@@ -46,7 +50,7 @@ public class IslandCountWidget : MonoBehaviour {
         _text.DOColor(Color.white, _gainAnimDuration);
 
         if (!_bigValueAnimRunning) {
-            _text.rectTransform.localScale = new Vector3(2f, 2f, 1);
+            _text.rectTransform.localScale = new Vector3(_gainAnimAmplitude, _gainAnimAmplitude, 1);
             _text.transform.DOScale(Vector3.one, _gainAnimDuration).SetEase(Ease.OutCubic);
         }
     }

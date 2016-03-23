@@ -430,7 +430,6 @@ namespace Simoncouche.Islands {
             Destroy(chunkWithCollider.collider.gameObject); //remove temporary collider
             GameManager.islandManager.RemovePendingIslandChunk(chunkWithCollider.chunk); //Remove chunk from pending chunk list
             GameManager.islandManager.CreatedIslandChunk(chunkWithCollider.chunk); //Add chunk to chunk list
-            Debug.Log(GameManager.islandManager.GetIslandChunks().Count);
 
             chunkWithCollider.chunk.transform.parent = _islandParentTransform; //Set parent
             ToggleCollisionLayer(chunkWithCollider.chunk.gameObject, true); //Toggle island collisions back on
