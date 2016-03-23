@@ -325,7 +325,7 @@ namespace Simoncouche.Islands {
                 newColor = IslandUtils.color.blue;
                 particlesPrefabPop = CT_POP;
             } else {
-                newColor = IslandUtils.color.green;
+                newColor = IslandUtils.color.volcano;
                 particlesPrefabPop = null;
                 Debug.LogError("Tried to convert when island was equal !");
             }

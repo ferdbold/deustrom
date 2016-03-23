@@ -148,9 +148,9 @@ namespace Simoncouche.Islands {
 
             //If only a is contained in a Island
             else if (a_IslandLink != null) {
-                if (a.color == IslandUtils.color.green || b.color == IslandUtils.color.green) {
+                if (a.color == IslandUtils.color.volcano || b.color == IslandUtils.color.volcano) {
                     Transform anchor;
-                    if (a.color == IslandUtils.color.green) anchor = a.transform;
+                    if (a.color == IslandUtils.color.volcano) anchor = a.transform;
                     else anchor = b.transform;
                     GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
                     ParticleGO.transform.parent = anchor.transform;
@@ -164,9 +164,9 @@ namespace Simoncouche.Islands {
 
            //If only b is contained in a Island
            else if (b_IslandLink != null) {
-               if (a.color == IslandUtils.color.green || b.color == IslandUtils.color.green) {
+               if (a.color == IslandUtils.color.volcano || b.color == IslandUtils.color.volcano) {
                    Transform anchor;
-                   if (a.color == IslandUtils.color.green) anchor = a.transform;
+                   if (a.color == IslandUtils.color.volcano) anchor = a.transform;
                    else anchor = b.transform;
                    GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
                    ParticleGO.transform.parent = anchor.transform;
@@ -180,9 +180,9 @@ namespace Simoncouche.Islands {
 
             //If a & b are not contained in a Island
             else {
-                if (a.color == IslandUtils.color.green || b.color == IslandUtils.color.green) {
+                if (a.color == IslandUtils.color.volcano || b.color == IslandUtils.color.volcano) {
                     Transform anchor;
-                    if (a.color == IslandUtils.color.green) anchor = a.transform;
+                    if (a.color == IslandUtils.color.volcano) anchor = a.transform;
                     else anchor = b.transform;
                     GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
                     ParticleGO.transform.parent = anchor.transform;
@@ -195,7 +195,7 @@ namespace Simoncouche.Islands {
             }
 
             //All chunks in island change to the same color which is the most present
-            if (!(a.color == IslandUtils.color.green || b.color == IslandUtils.color.green)) SimpleIslandConversion(a.parentIsland);
+            if (!(a.color == IslandUtils.color.volcano || b.color == IslandUtils.color.volcano)) SimpleIslandConversion(a.parentIsland);
         }
 
         /// <summary>
@@ -627,7 +627,7 @@ namespace Simoncouche.Islands {
             switch (color) {
                 case Islands.IslandUtils.color.red: type = 0; break;
                 case Islands.IslandUtils.color.blue: type = 1; break;
-                case Islands.IslandUtils.color.green: type = 2; break;
+                case Islands.IslandUtils.color.volcano: type = 2; break;
                 default: Debug.Log("Island color is not not blue, red or green! "); break;
             }
 

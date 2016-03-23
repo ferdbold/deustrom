@@ -250,12 +250,12 @@ namespace Simoncouche.Controller {
                 Vector2 startPosition = transformToMove.localPosition;
                 Vector2 targetPosition = new Vector2(1.2f, 0);
                 if (grabbedBody.transform != transformToMove) targetPosition -= (Vector2)(transformToMove.localRotation * (grabbedBody.transform.localPosition * transformToMove.localScale.x));
-                
+
                 //Lerp to target position
-                while (i < 1f && grabbedBody != null) {
-                    yield return null;
+                while (i < 1f && grabbedBody != null && transformToMove != null) {   
                     transformToMove.localPosition = Vector3.Lerp(startPosition, targetPosition, i);
                     i += Time.deltaTime / repositionTime;
+                    yield return null;
                 }
                 //finish movement
                 if (grabbedBody != null) transformToMove.localPosition = targetPosition;

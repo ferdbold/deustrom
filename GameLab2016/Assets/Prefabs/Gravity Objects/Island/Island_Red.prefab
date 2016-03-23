@@ -545,6 +545,14 @@ MonoBehaviour:
   - {fileID: 182788, guid: 32c6f9b147b072c4685dfad3d15efbae, type: 2}
   ISLANDS_PROPS_SOBEK:
   - {fileID: 174274, guid: de8bd4e7aed457d44a8cefaf43b90744, type: 2}
+  ISLANDS_BASE_NEUTRAL:
+  - {fileID: 195122, guid: 3a3b004be3f329242aefff54c7e48b81, type: 2}
+  - {fileID: 101576, guid: 562c31762b60d0345926fd99cea4f657, type: 2}
+  - {fileID: 102128, guid: f9a357ffda3028d4d9b951eb4acef4f6, type: 2}
+  - {fileID: 138988, guid: ece56ee71dd47964e9486a8308ad7323, type: 2}
+  - {fileID: 154830, guid: 4c0bcd5b93a559846a8127de83583d22, type: 2}
+  ISLANDS_PROPS_NEUTRAL:
+  - {fileID: 174274, guid: de8bd4e7aed457d44a8cefaf43b90744, type: 2}
   VARIATION_SCALE_MIN: {x: 0.95, y: 0.95, z: 0.975}
   VARIATION_SCALE_MAX: {x: 1.05, y: 1.05, z: 1.025}
   VARIATION_ROTATION_MIN: {x: 0, y: 0, z: 0}
@@ -556,6 +564,14 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: ISLANDS_BASE_NEUTRAL.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ISLANDS_PROPS_NEUTRAL.Array.size
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_GravityScale
       value: 0
@@ -624,6 +640,30 @@ Prefab:
       propertyPath: VARIATION_SCALE_MAX.z
       value: 1.025
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ISLANDS_PROPS_NEUTRAL.Array.data[0]
+      value: 
+      objectReference: {fileID: 174274, guid: de8bd4e7aed457d44a8cefaf43b90744, type: 2}
+    - target: {fileID: 0}
+      propertyPath: ISLANDS_BASE_NEUTRAL.Array.data[0]
+      value: 
+      objectReference: {fileID: 195122, guid: 3a3b004be3f329242aefff54c7e48b81, type: 2}
+    - target: {fileID: 0}
+      propertyPath: ISLANDS_BASE_NEUTRAL.Array.data[1]
+      value: 
+      objectReference: {fileID: 101576, guid: 562c31762b60d0345926fd99cea4f657, type: 2}
+    - target: {fileID: 0}
+      propertyPath: ISLANDS_BASE_NEUTRAL.Array.data[2]
+      value: 
+      objectReference: {fileID: 102128, guid: f9a357ffda3028d4d9b951eb4acef4f6, type: 2}
+    - target: {fileID: 0}
+      propertyPath: ISLANDS_BASE_NEUTRAL.Array.data[3]
+      value: 
+      objectReference: {fileID: 138988, guid: ece56ee71dd47964e9486a8308ad7323, type: 2}
+    - target: {fileID: 0}
+      propertyPath: ISLANDS_BASE_NEUTRAL.Array.data[4]
+      value: 
+      objectReference: {fileID: 154830, guid: 4c0bcd5b93a559846a8127de83583d22, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 185502}
