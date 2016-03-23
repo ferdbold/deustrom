@@ -221,7 +221,7 @@ namespace Simoncouche.Islands {
             ParticleGO.transform.parent = volcano.transform;
        
             if(islandToBreak != null){
-                islandChunkToBreak.TakeDamage(PlayerGrab.BodyIsGrabbed(volcano.gravityBody) ? 1 : 1, volcano, 3 * volcano.gravityBody.Velocity);
+                islandChunkToBreak.TakeDamage(PlayerGrab.BodyIsGrabbed(volcano.gravityBody) ? 100 : 1, volcano, 3 * volcano.gravityBody.Velocity);
                 StartCoroutine(ChangeVolcanoToNeutralIsland(volcano));
             }
             if(chunkToPush != null) {
@@ -492,10 +492,15 @@ namespace Simoncouche.Islands {
 
 			//Recursivly remove island
 			List<IslandChunk> islandRemoved = new List<IslandChunk>();
-			islandRemoved.Add(chunk);
-            if (damage > 1) {
-				islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
+            if (damage == 1) {
+                islandRemoved.Add(chunk);
+            } else {
+                islandRemoved = islandLink.chunks;
             }
+			
+            /*if (damage > 1) {
+				islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
+            }*/
 
             //Remove chunk from island
             foreach (IslandChunk c in islandRemoved) {
@@ -509,32 +514,26 @@ namespace Simoncouche.Islands {
 				}
 			}
 
-			//Divide Island and gives velocity to this piece
-			if (islandRemoved.Count > 1) { //Multiple Chunk
-				Island island = CreateIsland(islandRemoved[0], islandRemoved[1]);
-				if (islandRemoved.Count >= 3) {
-					for (int i = 2; i < islandRemoved.Count; i++) {
-						island.AddChunkToIsland(islandRemoved[i]);
-					}
-				}
-				island.gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks))).normalized;
-                originChunk.gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(island.chunks))).normalized;
+            //Divide Island and gives velocity to this piece
+            if (islandRemoved.Count > 1) { //Multiple Chunk
+                foreach (IslandChunk c in islandRemoved) {
+                    c.gravityBody.Velocity = 30 * (DamageResultingVelocity(medianIslandPos, c.transform.position)).normalized;
+                }
             } else {
-				islandRemoved[0].gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
+                islandRemoved[0].gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
                 originChunk.gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
 
+                //Divide island and Set velocity for every pieces
+                List<GravityBody> pieces = CheckIslandBroken(islandLink);
+                foreach (GravityBody piece in pieces) {
+                    Island islandRef = piece.GetComponent<Island>();
+                    if (islandRef != null) {
+                        piece.Velocity = 2 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks))).normalized;
+                    } else {
+                        piece.Velocity = 2 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, piece.transform.position)).normalized;
+                    }
+                }
             }
-
-			//Divide island and Set velocity for every pieces
-			List<GravityBody> pieces = CheckIslandBroken(islandLink);
-			foreach (GravityBody piece in pieces) {
-				Island islandRef = piece.GetComponent<Island>();
-				if (islandRef != null) {
-					piece.Velocity = 2 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks))).normalized;
-				} else {
-					piece.Velocity = 2 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, piece.transform.position)).normalized;
-				}
-			}
 		}
 
 		/// <summary>
