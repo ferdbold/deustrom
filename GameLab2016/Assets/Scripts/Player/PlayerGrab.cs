@@ -239,7 +239,7 @@ namespace Simoncouche.Controller {
         /// <param name="transformToMove"> Transform that was grabbed </param>
         /// <param name="delay">delay before starting repositioning. Used in cases where island get merged at the same time</param>
         /// <returns></returns>
-        IEnumerator RepositionGrabbedBody(Transform transformToMove, float delay) {            
+        IEnumerator RepositionGrabbedBody(Transform transformToMove, float delay) {
             yield return new WaitForSeconds(delay);
             if (transformToMove == null) Debug.LogWarning("Attempted to reposition grabbed transform after " + delay + " seconds but it was null.");
             else if(grabbedBody == null) Debug.LogWarning("Attempted to reposition grabbed transform after " + delay + " seconds but grabbedBody was null.");
@@ -250,10 +250,11 @@ namespace Simoncouche.Controller {
                 Vector2 startPosition = transformToMove.localPosition;
                 Vector2 targetPosition = new Vector2(1.2f, 0);
                 if (grabbedBody.transform != transformToMove) targetPosition -= (Vector2)(transformToMove.localRotation * (grabbedBody.transform.localPosition * transformToMove.localScale.x));
-
+                
                 //Lerp to target position
                 while (i < 1f && grabbedBody != null) {
                     yield return null;
+                    transformToMove.localPosition = Vector3.Lerp(startPosition, targetPosition, i);
                     i += Time.deltaTime / repositionTime;
                 }
                 //finish movement
