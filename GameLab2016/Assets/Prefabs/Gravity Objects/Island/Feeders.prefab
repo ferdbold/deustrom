@@ -980,6 +980,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _islandPrefab: {fileID: 185502, guid: 9fa74664a2b45da4692ea772246e058a, type: 2}
   _volcanoPrefab: {fileID: 166278, guid: 52c9e8324ff53f14c9518942ef7f02d3, type: 2}
+  _volcanoParticlePrefab: {fileID: 177330, guid: 70a272643b93d44448d2b8b30f9f42fa,
+    type: 2}
+  _volcanoParticlePrefab_SO: {fileID: 112796, guid: 09ae9216e16067f49a3b60aa90f9951d,
+    type: 2}
+  _volcanoParticlePrefab_CT: {fileID: 184754, guid: 1100a364c9bba1847a13c25069e55ede,
+    type: 2}
   _islandTemporaryColliderPrefab: {fileID: 168238, guid: b4a53183a5360f547bff0182330e7b40,
     type: 2}
   GENERATE_LEFT: 1
@@ -1018,6 +1024,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _islandPrefab: {fileID: 185502, guid: 25dee7d767a3ae04aae7b2fd602298ab, type: 2}
   _volcanoPrefab: {fileID: 166278, guid: 52c9e8324ff53f14c9518942ef7f02d3, type: 2}
+  _volcanoParticlePrefab: {fileID: 177330, guid: 70a272643b93d44448d2b8b30f9f42fa,
+    type: 2}
+  _volcanoParticlePrefab_SO: {fileID: 112796, guid: 09ae9216e16067f49a3b60aa90f9951d,
+    type: 2}
+  _volcanoParticlePrefab_CT: {fileID: 184754, guid: 1100a364c9bba1847a13c25069e55ede,
+    type: 2}
   _islandTemporaryColliderPrefab: {fileID: 168238, guid: b4a53183a5360f547bff0182330e7b40,
     type: 2}
   GENERATE_LEFT: 0

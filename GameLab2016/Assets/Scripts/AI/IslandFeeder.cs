@@ -21,8 +21,17 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Prefab of normal island")]
         private GameObject _islandPrefab;
 
-        [SerializeField] [Tooltip("Prefab of normal island")]
+        [SerializeField] [Tooltip("Prefab of the volcano")]
         private GameObject _volcanoPrefab;
+
+        [SerializeField] [Tooltip("Prefab of the volcano particles")]
+        private GameObject _volcanoParticlePrefab;
+
+        [SerializeField] [Tooltip("Prefab of the volcano particles for sobek")]
+        private GameObject _volcanoParticlePrefab_SO;
+
+        [SerializeField] [Tooltip("Prefab of the volcano particles for cthulhu")]
+        private GameObject _volcanoParticlePrefab_CT;
 
         [SerializeField] [Tooltip("DO NOT CHANGE. Prefab of island collider.")]
         private GameObject _islandTemporaryColliderPrefab;
@@ -108,8 +117,10 @@ namespace Simoncouche.Islands {
         private float _releaseForce = 15f; //force applied when island is released after shake
         private float _timeSinceLastSpawn = 0f; //current time since last island spawn
         //Tutorial Spawning
-        private enum TutorialState { NoIsland, OneIsland, ThreeIsland, VolcanoPhase };
-        private bool _inTutorial = false;
+        private enum TutorialState { NoIsland, OneIsland, ThreeIsland, VolcanoPhase, EndTutorial };
+        [Header("TUTORIAL")]
+        [SerializeField]  [Tooltip("Start tutorial or not")]
+        private bool _inTutorial = true;
         private TutorialState _state = TutorialState.NoIsland;
         private int _tutoTargetIsland = 0;
         [SerializeField] private float _tutoTimeInPhase = 0f;
@@ -175,16 +186,16 @@ namespace Simoncouche.Islands {
                     if (_tutoTimeInPhase > 5f) ChangeState(TutorialState.OneIsland);
                     break;
                 case (TutorialState.OneIsland):
-                    if (_tutoTimeInPhase > 5f) ChangeState(TutorialState.ThreeIsland);
+                    if (_tutoTimeInPhase > 8f) ChangeState(TutorialState.ThreeIsland);
                     break;
                 case (TutorialState.ThreeIsland):
-                    if (_tutoTimeInPhase > 5f) ChangeState(TutorialState.VolcanoPhase);
+                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.VolcanoPhase);
                     break;
                 case (TutorialState.VolcanoPhase):
-                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.OneIsland);
+                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.EndTutorial);
                     if (_pVolcanoIsland < 1) { //Spawn volcano if there is none
                         StartReleaseProcessOnVolcano();
-                        CalculateSpawnRate();
+                        UpdateSpawnParameters();
                     }
                     break;
             }
@@ -206,6 +217,10 @@ namespace Simoncouche.Islands {
                     break;
                 case (TutorialState.VolcanoPhase):
                     _tutoTargetIsland = 4;
+                    break;
+                case (TutorialState.EndTutorial):
+                    _tutoTargetIsland = 0;
+                    _inTutorial = false;
                     break;
             }
         }
@@ -327,15 +342,16 @@ namespace Simoncouche.Islands {
             int randIndex = Random.Range(0, _islandRows[0].Count);
             ChunkWithCollider selectedChunk = _islandRows[0][randIndex];
             RemoveIslandChunkFromList(selectedChunk, 0);
+            IslandUtils.color prevColor = selectedChunk.chunk.color;
             selectedChunk.chunk.ConvertChunkToAnotherColor(IslandUtils.color.green);
             _islandManager.AddPendingIslandChunk(selectedChunk.chunk);
-            StartCoroutine(TransformIntoVolcano(selectedChunk));
+            StartCoroutine(TransformIntoVolcano(selectedChunk, prevColor));
             
         }
 
         /// <summary> Coroutine that transform a basic island into a volcano then start it's spawn process</summary>
         /// <param name="cwc"> Chunk with collider to transform </param> 
-        private IEnumerator TransformIntoVolcano(ChunkWithCollider cwc) {
+        private IEnumerator TransformIntoVolcano(ChunkWithCollider cwc, IslandUtils.color destroyedChunkColor) {
             float volcanoAnimTime = 3f;
             //Get old island model references
             Transform parentTransform = cwc.chunk.transform.Find("Model").transform;
@@ -344,8 +360,22 @@ namespace Simoncouche.Islands {
             Transform instantiatedVolcano = ((GameObject)Instantiate(_volcanoPrefab, parentTransform.position, Quaternion.identity)).transform;
             instantiatedVolcano.parent = parentTransform;
             instantiatedVolcano.transform.localScale = Vector3.one;
-            instantiatedVolcano.transform.localPosition = new Vector3(0, -1.5f, 0);
-
+            instantiatedVolcano.transform.localPosition = new Vector3(0, 0, 2f);
+            //Particles
+            GameObject volcanoParticles = (GameObject) Instantiate(_volcanoParticlePrefab, parentTransform.position, Quaternion.identity);
+            volcanoParticles.transform.parent = parentTransform;
+            volcanoParticles.transform.localScale = Vector3.one;
+            volcanoParticles.transform.localRotation = Quaternion.Euler(180f, 0f, 0f);
+            if (destroyedChunkColor == IslandUtils.color.red) {
+                GameObject volcanoParticles_SO = (GameObject)Instantiate(_volcanoParticlePrefab_SO, parentTransform.position, Quaternion.identity);
+                volcanoParticles_SO.transform.parent = parentTransform;
+                volcanoParticles_SO.transform.localScale = Vector3.one;
+            }
+            if (destroyedChunkColor == IslandUtils.color.blue) {
+                GameObject volcanoParticles_CT = (GameObject) Instantiate(_volcanoParticlePrefab_CT, parentTransform.position, Quaternion.identity);
+                volcanoParticles_CT.transform.parent = parentTransform;
+                volcanoParticles_CT.transform.localScale = Vector3.one;
+            }
             //Lerp Volcano into island
             Vector3 sPos = instantiatedVolcano.transform.localPosition;
             for (float i = 0f; i < 1f; i += Time.deltaTime / volcanoAnimTime) {
@@ -358,6 +388,10 @@ namespace Simoncouche.Islands {
             }
 
             StartReleaseProcessOnTargetIsland(cwc);
+
+            volcanoParticles.GetComponentInChildren<ParticleSystem>().emissionRate = 0;
+            yield return new WaitForSeconds(1f);
+            Destroy(volcanoParticles);
         }
 
         /// <summary> Activate an island. Island will check player's position to see if it can be released early if they are far. Otherwise wait for the whole duration</summary>
@@ -436,6 +470,7 @@ namespace Simoncouche.Islands {
             _pIslandDiffPlayers = 0;
             _pSobekIsland = 0;
             _pCthulhuIsland = 0;
+            _pVolcanoIsland = 0;
             List<IslandChunk> _CurChunks = _islandManager.GetIslandChunks();
             List<IslandChunk> _CurPendingChunks = _islandManager.GetPendingIslandChunks();
 
