@@ -63,6 +63,14 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
     private float timeForTuto = 1f;
 
+
+    /// <summary> Amount of time players have to wait until controllers are enabled in a level</summary>
+    [Tooltip("Amount of time players have to wait until controllers are enabled in a level")]
+    [SerializeField]
+    private float _timeUntilControllersAreEnabled=0.1f;
+    public float timeUntilControllersAreEnabled { get { return _timeUntilControllersAreEnabled; } }
+    
+
     #endregion
 
     #region Utils Variables
@@ -215,6 +223,7 @@ public class GameManager : MonoBehaviour {
                 } else {
                     levelManager.Setup();
                 }
+
                 uiManager.Setup();
                 break;
 
@@ -289,6 +298,8 @@ public class GameManager : MonoBehaviour {
         isPaused = pause;
         Time.timeScale = isPaused ? 0 : 1;
         inputManager.isDisabled = pause;
+        Debug.Log("Is disabled input manager" + inputManager.isDisabled);
+
     }
 
     #endregion

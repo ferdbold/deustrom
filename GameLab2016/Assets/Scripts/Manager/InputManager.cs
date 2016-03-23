@@ -159,21 +159,13 @@ public class InputManager : MonoBehaviour {
 
     #region Utils
 
-    private bool _isDisabled = false;
-    public bool isDisabled {
-        get {
-            return _isDisabled;
-        }
-        set {
-            _isDisabled = value;
-            if (_isDisabled) Debug.LogWarning("Input have been disabled");
-        }
-    }
+    public bool isDisabled = false;
 
     #endregion
 
     void Update() {
-        if (!_isDisabled) {
+        Debug.Log(isDisabled);
+        if (!isDisabled) {
             List<AxisTuple> axii = new List<AxisTuple>() {
             new AxisTuple("P1 Left Analog", p1_leftAnalog, Input.GetAxis("P1_L_Horizontal"), Input.GetAxis("P1_L_Vertical")),
             new AxisTuple("P1 Right Analog", p1_rightAnalog, Input.GetAxis("P1_R_Horizontal"), Input.GetAxis("P1_R_Vertical")),
