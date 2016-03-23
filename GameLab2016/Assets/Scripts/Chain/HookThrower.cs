@@ -71,7 +71,6 @@ namespace Simoncouche.Chain {
         public bool isPlayerOne { get; private set; }
         public bool isSobek { get; private set; }
 
-        // PROPERTIES
         private bool _triggerIsHeld = false;
         private bool _isRetracting = false;
 
@@ -146,61 +145,63 @@ namespace Simoncouche.Chain {
 
         /// <summary>Handle user input to throw a new chain and hook</summary>
         private void Fire() {
-            // Exit early if currently respawning
-            if (playerController.InRespawnState) return;
+            if (GameManager.Instance.mustEnableChainThrower) {
+                // Exit early if currently respawning
+                if (playerController.InRespawnState) return;
 
-            // Exit early if currently in cooldown
-            if (_throwCooldownRemaining > 0) {
-                this.playerAudio.PlaySound(PlayerSounds.PlayerCooldown);
-                return;
+                // Exit early if currently in cooldown
+                if (_throwCooldownRemaining > 0) {
+                    this.playerAudio.PlaySound(PlayerSounds.PlayerCooldown);
+                    return;
+                }
+
+                // Exit early if the player is currently grabbing an island
+                if (playerGrab.grabbedBody != null) {
+                    return;
+                }
+
+                float orientation = this.aimController.aimOrientation;
+                if (this.autoAimController.target != null) {
+                    orientation = this.autoAimController.targetOrientation;
+                }
+
+                switch (_currentState) {
+                    // If we press fire when we don't have any hook,
+                    // we create a hook and switch the currentState to OneHook
+                    case State.NoHook:
+                        chains.Add(Chain.Create(this, _initialForceAmount, orientation));
+                        _currentState = State.Waiting;
+
+                        // Animation handling
+                        playerController.HandleFirstHookAnimation();
+
+                        // Audio
+                        playerAudio.PlaySound(PlayerSounds.PlayerChainFirst);
+
+                        break;
+
+                    // If we press fire when we have 1 hook, 
+                    // we create a hook and switch the currentState to NoHook
+                    case State.OneHook:
+                        chains[chains.Count - 1].CreateEndingHook(orientation);
+                        _currentState = State.Waiting;
+
+                        // Animation handling
+                        playerController.HandleSecondHookAnimation();
+
+                        // Audio
+                        playerAudio.PlaySound(PlayerSounds.PlayerChainSecond);
+
+                        break;
+                }
+
+                // Apply cooldown
+                _throwCooldownRemaining = _throwCooldown;
             }
-
-            // Exit early if the player is currently grabbing an island
-            if (playerGrab.grabbedBody != null) {
-                return;
-            }
-
-            float orientation = this.aimController.aimOrientation;
-            if (this.autoAimController.target != null) {
-                orientation = this.autoAimController.targetOrientation;
-            }
-
-            switch (_currentState) {
-            // If we press fire when we don't have any hook,
-            // we create a hook and switch the currentState to OneHook
-            case State.NoHook:
-                chains.Add(Chain.Create(this, _initialForceAmount, orientation));
-                _currentState = State.Waiting;
-
-                // Animation handling
-                playerController.HandleFirstHookAnimation();
-
-                // Audio
-                playerAudio.PlaySound(PlayerSounds.PlayerChainFirst);
-
-                break;
-
-            // If we press fire when we have 1 hook, 
-            // we create a hook and switch the currentState to NoHook
-            case State.OneHook: 
-                chains[chains.Count - 1].CreateEndingHook(orientation);
-                _currentState = State.Waiting;
-
-                // Animation handling
-                playerController.HandleSecondHookAnimation();
-
-                // Audio
-                playerAudio.PlaySound(PlayerSounds.PlayerChainSecond);
-
-                break;
-            }
-
-            // Apply cooldown
-            _throwCooldownRemaining = _throwCooldown;
         }
 
         private void CheckPlayerInputs(params float[] input) {
-            if (playerController.InRespawnState == true) return; //Deactivate hook if currently respawning
+            if (playerController.InRespawnState == true  || !GameManager.Instance.mustEnableChainThrower) return; //Deactivate hook if currently respawning
             bool isCurrentlyHeld = (input[0] == 1);
 
             if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing

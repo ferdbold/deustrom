@@ -64,12 +64,25 @@ public class GameManager : MonoBehaviour {
     private float timeForTuto = 1f;
 
 
-    /// <summary> Amount of time players have to wait until controllers are enabled in a level</summary>
-    [Tooltip("Amount of time players have to wait until controllers are enabled in a level")]
+    /// <summary>Amount of time players have to wait until controllers are enabled in a match</summary>
+    [Tooltip("Amount of time players have to wait until chains are enabled in a level")]
     [SerializeField]
     private float _timeUntilControllersAreEnabled=0.1f;
     public float timeUntilControllersAreEnabled { get { return _timeUntilControllersAreEnabled; } }
-    
+
+
+    /// <summary>Amount of rounds players have to wait until chains are enabled in a match</summary>
+    [Tooltip("Amount of rounds players have to wait until chains are enabled in a match")]
+    [SerializeField]
+    private int _amountOfRoundsUntilChainsEnabled = 1;
+    public int amountOfRoundsUntilChainsEnabled { get { return _amountOfRoundsUntilChainsEnabled; } }
+
+    /// <summary>
+    /// This allows to turn on/off the hook thrower
+    /// </summary>
+    public bool mustEnableChainThrower { get { return _mustEnableChainThrower; } set { _mustEnableChainThrower = value; } }
+    private bool _mustEnableChainThrower;
+
 
     #endregion
 
@@ -315,7 +328,6 @@ public class GameManager : MonoBehaviour {
         isPaused = pause;
         Time.timeScale = isPaused ? 0 : 1;
         inputManager.isDisabled = pause;
-        Debug.Log("Is disabled input manager" + inputManager.isDisabled);
 
     }
 
