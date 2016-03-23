@@ -81,7 +81,9 @@ public class UIManager : MonoBehaviour {
     }
 
     private void Update() {
-        if (_islandCountWidgets != null) { //Fix boboche dun bug dans le main menu ou _islandCountWidgets est tente detre acceder
+        if (GameManager.Instance.currentScene == GameManager.Scene.PlayLevel && GameManager.Instance.gameStarted) {
+            UpdateLeadParticles();
+
             foreach (LevelManager.Player player in System.Enum.GetValues(typeof(LevelManager.Player))) {
                 _islandCountWidgets[(int)player].value = GameManager.islandManager.GetPlayerIslandCount(player);
             }
@@ -106,6 +108,21 @@ public class UIManager : MonoBehaviour {
                 .SetEase(Ease.InOutCubic)
                 .OnComplete(() => this.OnOrbAnimComplete(player, newScoreOrb));
         }
+    }
+
+    /// <summary>
+    /// Update the visibility of both players' lead particles
+    /// </summary>
+    private void UpdateLeadParticles() {
+        _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive(
+            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) > 
+            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
+        );
+
+        _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive(
+            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek) >
+            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu)
+        );
     }
 
     private void RefreshWins() {
