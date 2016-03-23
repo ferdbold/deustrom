@@ -100,7 +100,7 @@ namespace Simoncouche.Islands {
         }
 
         void Start() {
-            if (color != IslandUtils.color.green) _randomizeIslandVisual.SetIslandColorVisual(color);
+            if (color != IslandUtils.color.volcano) _randomizeIslandVisual.SetIslandColorVisual(color);
             StartCoroutine(DebugPoint());
         }
 
@@ -376,7 +376,7 @@ namespace Simoncouche.Islands {
             //Play Sound
             if (newColor == IslandUtils.color.red) audioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.conversion);
             else if (newColor == IslandUtils.color.blue) audioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.Conversion);
-            else if (newColor == IslandUtils.color.green) Debug.Log("No Audio set for conversion to green color !");
+            else if (newColor == IslandUtils.color.volcano) Debug.Log("No Audio set for conversion to green color !");
         }
 
         #endregion

@@ -15,8 +15,10 @@ namespace Simoncouche.Islands {
 			red,
             /// <summary>Cthulu</summary>
 			blue,
-            /// <summary>Neutral</summary>
-			green
+            /// <summary>Volcano</summary>
+			volcano,
+            /// <summary> Neutral</summary>
+            neutral
 		}
 
         /// <summary>

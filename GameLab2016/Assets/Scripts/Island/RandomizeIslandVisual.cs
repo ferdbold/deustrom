@@ -27,6 +27,15 @@ namespace Simoncouche.Islands {
         [Tooltip("List of island props configurations. Props will be randomized on play.")]
         private List<GameObject> ISLANDS_PROPS_SOBEK;
 
+        [Header("Neutral :")]
+        [SerializeField]
+        [Tooltip("List of island base. Base of the island will be randomized on play.")]
+        private List<GameObject> ISLANDS_BASE_NEUTRAL;
+
+        [SerializeField]
+        [Tooltip("List of island props configurations. Props will be randomized on play.")]
+        private List<GameObject> ISLANDS_PROPS_NEUTRAL;
+
         [Header("Other :")]
         [Tooltip("Minimum scale for each values of transform")]
         [SerializeField]
@@ -48,6 +57,7 @@ namespace Simoncouche.Islands {
         private Transform _islandModel;
         private GameObject _CT_island;
         private GameObject _SO_island;
+        private GameObject _N_island;
 
         // Get Components
         void Awake() {
@@ -60,16 +70,23 @@ namespace Simoncouche.Islands {
 
 
         /// <summary> Toggles the island visual to show only the visual of the sent color </summary>
-        /// <param name="newColor"> Wanted color. red is Sobek, blue is Cthulhu, green is neutral. </param>
+        /// <param name="newColor"> Wanted color. red is Sobek, blue is Cthulhu. </param>
         public void SetIslandColorVisual(IslandUtils.color newColor) {
             switch (newColor) {
                 case IslandUtils.color.red:
                     _CT_island.SetActive(false);
                     _SO_island.SetActive(true);
+                    _N_island.SetActive(false);
                     break;
                 case IslandUtils.color.blue:
                     _CT_island.SetActive(true);
                     _SO_island.SetActive(false);
+                    _N_island.SetActive(false);
+                    break;
+                case IslandUtils.color.neutral:
+                    _CT_island.SetActive(false);
+                    _SO_island.SetActive(false);
+                    _N_island.SetActive(true);
                     break;
                 default:
                     Debug.LogWarning("Neutral Color received in SetIslandColorVisual...");
@@ -94,6 +111,12 @@ namespace Simoncouche.Islands {
             _CT_island.transform.parent = _islandModel;
             _CT_island.transform.localPosition = Vector3.zero;
             _CT_island.transform.localScale = Vector3.one;
+            //Neutral
+            _N_island = new GameObject();
+            _N_island.name = "NEUTRAL_ISLAND";
+            _N_island.transform.parent = _islandModel;
+            _N_island.transform.localPosition = Vector3.zero;
+            _N_island.transform.localScale = Vector3.one;
             //Create random islands and populate them
             RandomizeIslandBase();
             ApplyVariation();
@@ -121,14 +144,20 @@ namespace Simoncouche.Islands {
             ctBase.transform.parent = _CT_island.transform;
             ctBase.transform.localPosition = Vector3.zero;
             ctBase.transform.localScale = Vector3.one;
+            //Create cthulhu Island
+            randNum = Random.Range(0, ISLANDS_BASE_NEUTRAL.Count);
+            GameObject nBase = (GameObject)Instantiate(ISLANDS_BASE_NEUTRAL[randNum], _N_island.transform.position, Quaternion.identity);
+            nBase.transform.parent = _N_island.transform;
+            nBase.transform.localPosition = Vector3.zero;
+            nBase.transform.localScale = Vector3.one;
             //Add Props to islands
-            RandomizeIslandProps(soBase, ctBase);
+            RandomizeIslandProps(soBase, ctBase, nBase);
         }
 
         /// <summary> Populate the island with props </summary>
         /// <param name="soBase"> Refrence so sobek Base island </param>
         /// <param name="ctBase"> Refrence so cthulhu Base island</param>
-        private void RandomizeIslandProps(GameObject soBase, GameObject ctBase) {
+        private void RandomizeIslandProps(GameObject soBase, GameObject ctBase, GameObject nBase) {
             //Create Sobek Island
             int randNum = Random.Range(0, ISLANDS_PROPS_SOBEK.Count);
             GameObject soProps = (GameObject)Instantiate(ISLANDS_PROPS_SOBEK[randNum], _islandModel.transform.position, Quaternion.identity);
@@ -141,6 +170,12 @@ namespace Simoncouche.Islands {
             ctProps.transform.parent = ctBase.transform;
             ctProps.transform.localPosition = Vector3.zero;
             ctProps.transform.localScale = Vector3.one;
+            //Create neutral Island
+            randNum = Random.Range(0, ISLANDS_PROPS_NEUTRAL.Count);
+            GameObject nProps = (GameObject)Instantiate(ISLANDS_PROPS_NEUTRAL[randNum], _islandModel.transform.position, Quaternion.identity);
+            nProps.transform.parent = nBase.transform;
+            nProps.transform.localPosition = Vector3.zero;
+            nProps.transform.localScale = Vector3.one;
         }
 
         /// <summary> Modify the visuals of the island's model </summary>

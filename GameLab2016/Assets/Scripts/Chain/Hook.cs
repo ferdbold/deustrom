@@ -75,11 +75,9 @@ namespace Simoncouche.Chain {
         void LateUpdate() {
             if (currentAnchorPoint!=null) {
                 if (currentAnchorPoint.GetIslandChunk() != null)
-                    Debug.Log("Island chunk position z:" + currentAnchorPoint.GetIslandChunk().gravityBody.transform.position.z);
                     this.rigidbody.transform.position = new Vector3(this.transform.position.x,
                         this.transform.position.y,
                         currentAnchorPoint.GetIslandChunk().gravityBody.transform.position.z + hookZPositionDistanceWithConnectedIsland);
-                    Debug.Log("New rigidbody position:" + this.rigidbody.position);
             }
         }
 

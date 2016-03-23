@@ -104,6 +104,7 @@ namespace Simoncouche.Islands {
         private int _pSobekIsland = 0; //current Number of island of sobek
         private int _pCthulhuIsland = 0; //current Number of island of cthulhu
         private int _pVolcanoIsland = 0; //current Number of volcano islands
+        private int _pNeutralIsland = 0; //current Number of neutral islands
         //Instantiated objects refs
         private List<List<ChunkWithCollider>> _islandRows;
         private GameObject _islandContainer;
@@ -333,7 +334,7 @@ namespace Simoncouche.Islands {
         /// <param name="cwc">Chunk with collider to release</param>
         private void StartReleaseProcessOnTargetIsland(ChunkWithCollider cwc) {
             StartCoroutine(ActivateIsland(cwc));
-            if(cwc.chunk.color != IslandUtils.color.green) _islandManager.AddPendingIslandChunk(cwc.chunk); //Remove chunk from pending chunk list
+            if(cwc.chunk.color != IslandUtils.color.volcano) _islandManager.AddPendingIslandChunk(cwc.chunk); //Remove chunk from pending chunk list
             RemoveIslandChunkFromList(cwc, 0);
         }
 
@@ -343,7 +344,7 @@ namespace Simoncouche.Islands {
             ChunkWithCollider selectedChunk = _islandRows[0][randIndex];
             RemoveIslandChunkFromList(selectedChunk, 0);
             IslandUtils.color prevColor = selectedChunk.chunk.color;
-            selectedChunk.chunk.ConvertChunkToAnotherColor(IslandUtils.color.green);
+            selectedChunk.chunk.ConvertChunkToAnotherColor(IslandUtils.color.volcano);
             _islandManager.AddPendingIslandChunk(selectedChunk.chunk);
             StartCoroutine(TransformIntoVolcano(selectedChunk, prevColor));
             
@@ -483,13 +484,13 @@ namespace Simoncouche.Islands {
             {
                 if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
                 if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
-                if (ic.color == IslandUtils.color.green) ++_pVolcanoIsland;
+                if (ic.color == IslandUtils.color.volcano) ++_pVolcanoIsland;
             }
             foreach (IslandChunk ic in _CurPendingChunks)
             {
                 if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
                 if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
-                if (ic.color == IslandUtils.color.green) ++_pVolcanoIsland;
+                if (ic.color == IslandUtils.color.volcano) ++_pVolcanoIsland;
             }
             if (IS_SOBEK)
             {
