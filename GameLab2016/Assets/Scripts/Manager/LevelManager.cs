@@ -101,6 +101,15 @@ public class LevelManager {
         if (sobekMatchWon + cthuluMatchWon == 1) {
             GameManager.Instance.StartVideoTutorial();
         }
+        GameManager.Instance.StartCoroutine(WaitTimeUntilPlayerCanPlay(GameManager.Instance.timeUntilControllersAreEnabled));
+    }
+
+    IEnumerator WaitTimeUntilPlayerCanPlay(float time) {
+        //GameManager.inputManager.enabled = false;
+        GameManager.Instance.Pause();
+        yield return new WaitForRealSeconds(time);
+        GameManager.Instance.UnPause();
+        //GameManager.inputManager.enabled = true;
     }
 
     /// <summary>

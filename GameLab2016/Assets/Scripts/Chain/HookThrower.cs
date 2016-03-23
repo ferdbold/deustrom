@@ -378,7 +378,6 @@ namespace Simoncouche.Chain {
         /// </summary>
         private void AttachTouchedChunkToPlayer(GravityBody gBody) {
             Vector3 vectorPlayerChunk = Vector3.Normalize(gBody.transform.position - this.transform.position);
-            Debug.Log("VectorPlayerChunk" + vectorPlayerChunk);
             float angle = Vector3.Angle(this.transform.right, vectorPlayerChunk);
             
             //Must apply a rotation towards the island in order to prevent the player from going on the other side of the island when grabbing

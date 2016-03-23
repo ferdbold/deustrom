@@ -149,11 +149,7 @@ namespace Simoncouche.Islands {
             //If only a is contained in a Island
             else if (a_IslandLink != null) {
                 if (a.color == IslandUtils.color.volcano || b.color == IslandUtils.color.volcano) {
-                    Transform anchor;
-                    if (a.color == IslandUtils.color.volcano) anchor = a.transform;
-                    else anchor = b.transform;
-                    GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
-                    ParticleGO.transform.parent = anchor.transform;
+                    HandleVolcanoCollision(a, b); //Handle Volcano collision
                 } else {
                     AddChunkToExistingIsland(a_IslandLink, b);
 
@@ -165,12 +161,8 @@ namespace Simoncouche.Islands {
            //If only b is contained in a Island
            else if (b_IslandLink != null) {
                if (a.color == IslandUtils.color.volcano || b.color == IslandUtils.color.volcano) {
-                   Transform anchor;
-                   if (a.color == IslandUtils.color.volcano) anchor = a.transform;
-                   else anchor = b.transform;
-                   GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
-                   ParticleGO.transform.parent = anchor.transform;
-               } else {
+                    HandleVolcanoCollision(a, b); //Handle Volcano collision
+                } else {
                    AddChunkToExistingIsland(b_IslandLink, a);
 
                    JoinTwoChunk(a, a_anchor, b, b_anchor, b_IslandLink);
@@ -181,11 +173,7 @@ namespace Simoncouche.Islands {
             //If a & b are not contained in a Island
             else {
                 if (a.color == IslandUtils.color.volcano || b.color == IslandUtils.color.volcano) {
-                    Transform anchor;
-                    if (a.color == IslandUtils.color.volcano) anchor = a.transform;
-                    else anchor = b.transform;
-                    GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
-                    ParticleGO.transform.parent = anchor.transform;
+                    HandleVolcanoCollision(a, b);  //Handle Volcano collision
                 } else {
                     Island createdIsland = CreateIsland(a, b);
                     JoinTwoChunk(b, b_anchor, a, a_anchor, createdIsland);
@@ -196,6 +184,51 @@ namespace Simoncouche.Islands {
 
             //All chunks in island change to the same color which is the most present
             if (!(a.color == IslandUtils.color.volcano || b.color == IslandUtils.color.volcano)) SimpleIslandConversion(a.parentIsland);
+        }
+
+        /// <summary> Handle Collisions if one of the chunk was a volcano</summary>
+        /// <param name="a"> first chunk </param>
+        /// <param name="b"> second chunk </param>
+        private void HandleVolcanoCollision(IslandChunk a, IslandChunk b) {
+            Island islandToBreak = null;
+            IslandChunk chunkToPush= null;
+            IslandChunk volcano = null;
+            if (a.color == IslandUtils.color.volcano && b.color == IslandUtils.color.volcano) { 
+                islandToBreak = null;
+                chunkToPush = null;
+            }
+            if (a.color == IslandUtils.color.volcano)
+            {
+                volcano = a;
+                if (b.parentIsland == null) chunkToPush = b;
+                else islandToBreak = b.parentIsland;
+            }
+            else {
+                volcano = b;
+                if (a.parentIsland == null) chunkToPush = a;
+                else islandToBreak = a.parentIsland;
+            }
+            GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+            ParticleGO.transform.parent = volcano.transform;
+       
+            //TODO ANTOINE : DESTROY ISLAND that is not the volcano
+            if(islandToBreak != null){
+                //Break Island Here
+            }
+            if(chunkToPush != null) {
+                PushChunk(chunkToPush, volcano);
+            }
+        }
+
+        /// <summary> Push the chunk away from the volcano and convert it to neutral </summary>
+        /// <param name="chunkToPush">Chunk to push </param>
+        /// <param name="volcano">Chunk to push </param>
+        private void PushChunk(IslandChunk chunkToPush, IslandChunk volcano) {
+            //Add Force
+            Vector2 forceDirection = ((Vector2)(chunkToPush.transform.position - volcano.transform.position)).normalized;
+            chunkToPush.gravityBody.Velocity += forceDirection * 5f;
+            //Convert to neutral
+            if(chunkToPush.color != IslandUtils.color.neutral) chunkToPush.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
         }
 
         /// <summary>
@@ -627,13 +660,14 @@ namespace Simoncouche.Islands {
             switch (color) {
                 case Islands.IslandUtils.color.red: type = 0; break;
                 case Islands.IslandUtils.color.blue: type = 1; break;
-                case Islands.IslandUtils.color.volcano: type = 2; break;
-                default: Debug.Log("Island color is not not blue, red or green! "); break;
+                case Islands.IslandUtils.color.neutral: type = 2; break;
+                default: Debug.LogWarning("Island color is not not blue, red or neutral! "); break;
             }
-
             //Instantiate Particles FX
-            GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[type], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
-            ParticleGO.transform.parent = anchor.transform;
+            if (type != -1) {
+                GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[type], anchor.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+                ParticleGO.transform.parent = anchor.transform;
+            }
         }
 
         /// <summary>

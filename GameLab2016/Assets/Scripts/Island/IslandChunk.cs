@@ -80,8 +80,12 @@ namespace Simoncouche.Islands {
         private RandomizeIslandVisual _randomizeIslandVisual;
 
         public bool isMergeable { get; private set; }
+
+        private static GameObject N_POP;
         #endregion
-        
+
+
+
         void Awake() {
             gravityBody = GetComponent<GravityBody>();
             if (_anchorPointObject == null) {
@@ -97,6 +101,8 @@ namespace Simoncouche.Islands {
             this.MergeIntoIsland = new IslandEvent();
             this.GrabbedByPlayer = new PlayerGrabEvent();
             this.ReleasedByPlayer = new Rigidbody2DEvent();
+
+            if(N_POP == null) N_POP = (GameObject)Resources.Load("Particles/P_N_Convert_POP");
         }
 
         void Start() {
@@ -373,10 +379,15 @@ namespace Simoncouche.Islands {
         public void ConvertChunkToAnotherColor(IslandUtils.color newColor) {
             _color = newColor;
             _randomizeIslandVisual.SetIslandColorVisual(newColor);
-            //Play Sound
+            //Play Sound and, if volcano, spawn particles
             if (newColor == IslandUtils.color.red) audioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.conversion);
             else if (newColor == IslandUtils.color.blue) audioSource.PlayOneShot(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.Conversion);
-            else if (newColor == IslandUtils.color.volcano) Debug.Log("No Audio set for conversion to green color !");
+            else if (newColor == IslandUtils.color.volcano) Debug.Log("No Audio set for conversion to volcano !");
+            else if (newColor == IslandUtils.color.neutral) { 
+                Debug.Log("No Audio set for conversion to neutral !");
+                GameObject particlesGO = (GameObject)Instantiate(N_POP, transform.position + new Vector3(0f,0f,-1f), Quaternion.identity);
+                particlesGO.transform.parent = transform;
+            }
         }
 
         #endregion

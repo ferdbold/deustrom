@@ -16,20 +16,21 @@ public class TutorialUI : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.F1)) { //TODO change input
-            GameManager.Instance.UnPause();
+            //GameManager.Instance.UnPause(); UnPause bizarre kinda useless
             Destroy(gameObject);
         }
     }
 
     IEnumerator PlayTuto() {
-        movie.material.mainTexture = video;
-        Debug.Log(video);
-        GameManager.audioManager.PlayAudioClip(video.audioClip);
-        video.Play();
-        while (video.isPlaying) {
-            yield return new WaitForRealSeconds(0.05f);
-        }
-        GameManager.Instance.UnPause();
+        if (video != null) {
+            movie.material.mainTexture = video;
+            GameManager.audioManager.PlayAudioClip(video.audioClip);
+            video.Play();
+            while (video.isPlaying) {
+                yield return new WaitForRealSeconds(0.05f);
+            }
+        } 
+        //GameManager.Instance.UnPause(); UnPause bizarre kinda useless
         Destroy(gameObject);
     }
 }

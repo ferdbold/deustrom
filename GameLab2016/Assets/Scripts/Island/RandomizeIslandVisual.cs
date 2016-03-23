@@ -86,10 +86,10 @@ namespace Simoncouche.Islands {
                 case IslandUtils.color.neutral:
                     _CT_island.SetActive(false);
                     _SO_island.SetActive(false);
-                    _N_island.SetActive(true);
+                    _N_island.SetActive(true);                
                     break;
                 default:
-                    Debug.LogWarning("Neutral Color received in SetIslandColorVisual...");
+                    Debug.LogWarning("Other Color received in SetIslandColorVisual...");
                     break;
             }
         }
