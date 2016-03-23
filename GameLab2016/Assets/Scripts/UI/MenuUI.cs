@@ -1,24 +1,37 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class MenuUI : MonoBehaviour {
+namespace Simoncouche.UI {
 
-    [SerializeField]
-    private Button firstActiveButton;
+    /// <summary>
+    /// a MenuUI is the main controller class for the main menu UI.
+    /// </summary>
+    public class MenuUI : MonoBehaviour {
 
-    private void Awake() {
-        firstActiveButton.Select();
-    }
+        [SerializeField]
+        private Button firstActiveButton;
 
-	public void PlayButton() {
-        GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, CutsceneManager.Cutscene.Intro);
-    }
+        // COMPONENTS
 
-    public void BiblesButton() {
-        GameManager.Instance.SwitchScene(GameManager.Scene.BibleReader);
-    }
+        private BibleReaderWidget _bibleReaderWidget;
 
-    public void QuitGame() {
-        GameManager.Instance.QuitGame();
+        private void Awake() {
+            _bibleReaderWidget = transform.Find("BibleReader").GetComponent<BibleReaderWidget>();
+            _bibleReaderWidget.enabled = false;
+
+            firstActiveButton.Select();
+        }
+
+    	public void PlayButton() {
+            GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, CutsceneManager.Cutscene.Intro);
+        }
+
+        public void BiblesButton() {
+            _bibleReaderWidget.enabled = !_bibleReaderWidget.enabled;
+        }
+
+        public void QuitGame() {
+            GameManager.Instance.QuitGame();
+        }
     }
 }
