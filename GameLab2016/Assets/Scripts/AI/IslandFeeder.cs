@@ -119,8 +119,8 @@ namespace Simoncouche.Islands {
         //Tutorial Spawning
         private enum TutorialState { NoIsland, OneIsland, ThreeIsland, VolcanoPhase, EndTutorial };
         [Header("TUTORIAL")]
-        [SerializeField]  [Tooltip("Start tutorial or not")]
-        private bool _inTutorial = true;
+        [Tooltip("Start tutorial or not")]
+        public bool _inTutorial = true;
         private TutorialState _state = TutorialState.NoIsland;
         private int _tutoTargetIsland = 0;
         [SerializeField] private float _tutoTimeInPhase = 0f;
