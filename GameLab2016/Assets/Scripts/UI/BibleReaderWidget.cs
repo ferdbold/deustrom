@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using DG.Tweening;
 
+using Simoncouche.Bible;
+
 namespace Simoncouche.UI {
 
     /// <summary>
@@ -19,18 +21,23 @@ namespace Simoncouche.UI {
         [SerializeField]
         private LevelManager.Player _currentPlayer = LevelManager.Player.cthulu;
 
+        private bool _swapped = false;
+
         // COMPONENTS
 
         private RectTransform _rectTransform;
+        private RectTransform _swapIcon;
 
         private List<Image> _pictos;
         private RectTransform _scrollsContainer;
         private List<RectTransform> _scrolls;
+        private List<RectTransform> _scrollContents;
 
         // METHODS
 
         private void Awake() {
             _rectTransform = GetComponent<RectTransform>();
+            _swapIcon = transform.Find("SwapIcon").GetComponent<RectTransform>();
 
             _pictos = new List<Image>();
             _pictos.Add(transform.Find("Pictos/Sobek").GetComponent<Image>());
@@ -42,46 +49,86 @@ namespace Simoncouche.UI {
             _scrolls.Add(transform.Find("Scrolls/Sobek").GetComponent<RectTransform>());
             _scrolls.Add(transform.Find("Scrolls/Cthulhu").GetComponent<RectTransform>());
 
+            _scrollContents = new List<RectTransform>();
+            _scrollContents.Add(transform.Find("Scrolls/Sobek/Scroll View/Viewport/Content").GetComponent<RectTransform>());
+            _scrollContents.Add(transform.Find("Scrolls/Cthulhu/Scroll View/Viewport/Content").GetComponent<RectTransform>());
+
             _rectTransform.anchoredPosition = new Vector2(0, -600);
         }
 
-        private void Update() {
-            if (Input.GetKeyDown(KeyCode.I)) {
-                Debug.Log("swap");
-                SwapPlayer();
-            }
+        private void Start() {
+            LoadBible();
+
+            GameManager.inputManager.AddEvent(InputManager.Axis.p1_leftTrigger, OnLeftTrigger);
         }
 
         private void OnEnable() {
-            /*if (_currentPlayer == LevelManager.Player.cthulu) {
-                _animator.SetTrigger("Cthulhu");
-            } else {
-                _animator.SetTrigger("Sobek");
-            }*/
             _rectTransform.DOMoveY(0, _slideAnimDuration).SetEase(Ease.OutCubic);
         }
 
         private void OnDisable() {
-            // _animator.SetTrigger("Close");
-            _rectTransform.DOMoveY(-_rectTransform.rect.height, _slideAnimDuration).SetEase(Ease.InCubic);
+            _rectTransform.DOMoveY(-Screen.height, _slideAnimDuration).SetEase(Ease.InCubic);
         }
 
-        public void SwapPlayer() {
+        private void OnLeftTrigger(float[] axis) {
+            if (axis[0] > 0.5f && !_swapped) {
+                SwapPlayer();
+                _swapped = true;
+            } else if (axis[0] == 0) {
+                _swapped = false;
+            }
+        }
+
+        /// <summary>
+        /// Load the bible from the bible manager and build the scroll views
+        /// </summary>
+        private void LoadBible() {
+            BibleEntries entries = BibleEntries.LoadBibleEntries();
+
+            if (entries != null) {
+                foreach (BibleQuote entry in entries.quoteListCthulu) {
+                    BibleQuoteWidget widget = BibleQuoteWidget.Create(
+                        LevelManager.Player.cthulu, 
+                        entry.quoteString, 
+                        entry.godName, 
+                        entry.quoteFirstNo,
+                        entry.quoteSecondNo
+                    );
+
+                    widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.cthulu]);
+                    widget.transform.localScale = Vector3.one;
+                }
+
+                foreach (BibleQuote entry in entries.quoteListSobek) {
+                    BibleQuoteWidget widget = BibleQuoteWidget.Create(
+                        LevelManager.Player.sobek, 
+                        entry.quoteString, 
+                        entry.godName, 
+                        entry.quoteFirstNo,
+                        entry.quoteSecondNo
+                    );
+
+                    Debug.Log(_scrollContents.Count);
+                    widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.sobek]);
+                    widget.transform.localScale = Vector3.one;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Swaps the active god in the widget
+        /// </summary>
+        private void SwapPlayer() {
             LevelManager.Player otherPlayer = _currentPlayer;
             _currentPlayer = (_currentPlayer == LevelManager.Player.cthulu) ? 
                 LevelManager.Player.sobek : 
                 LevelManager.Player.cthulu;
 
-            /*_animator.SetTrigger("Swap");
-            if (_currentPlayer == LevelManager.Player.sobek) {
-                _animator.SetTrigger("Sobek");
-            } else {
-                _animator.SetTrigger("Cthulhu");
-            }*/
-
             // Animation sequence
             RectTransform currentPlayerPictoRT = _pictos[(int)_currentPlayer].GetComponent<RectTransform>();
             RectTransform otherPlayerPictoRT = _pictos[(int)otherPlayer].GetComponent<RectTransform>();
+
+            _swapIcon.DOShakeScale(0.3f, 0.5f);
 
             currentPlayerPictoRT.DOScale(Vector3.one, _swapAnimDuration);
             currentPlayerPictoRT.DOLocalMoveX(0, _swapAnimDuration);
@@ -90,12 +137,13 @@ namespace Simoncouche.UI {
             otherPlayerPictoRT.DOScale(Vector3.one/2, _swapAnimDuration);
             otherPlayerPictoRT.DOLocalMoveX(-70, _swapAnimDuration);
 
-            _scrollsContainer.DOMoveY(-_rectTransform.rect.height/2, _swapAnimDuration).SetEase(Ease.OutCubic).OnComplete(() => {
+            _scrollsContainer.DOMoveY(-(50 + _rectTransform.rect.height/720 * Screen.height/2), _swapAnimDuration).SetEase(Ease.OutCubic).OnComplete(() => {
                 _scrolls[(int)_currentPlayer].gameObject.SetActive(true);
                 _scrolls[(int)otherPlayer].gameObject.SetActive(false);
 
-                _scrollsContainer.DOLocalMoveY(-40, _swapAnimDuration).SetEase(Ease.OutCubic);
+                _scrollsContainer.DOLocalMoveY(230, _swapAnimDuration).SetEase(Ease.OutCubic);
             });
+
         }
     }
 }
