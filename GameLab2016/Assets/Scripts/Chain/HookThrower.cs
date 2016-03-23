@@ -34,6 +34,10 @@ namespace Simoncouche.Chain {
         [SerializeField]
         private float _timeBetweenChainLengthRetraction = 0.5f;
 
+        [Tooltip("The addforce force value to be added at each tick of retraction")]
+        [SerializeField]
+        private float _addedForceToRetraction = 10f;
+
         [Tooltip("Check this to replace hook already present on an island by new hook")]
         [SerializeField]
         private bool _doesHookReplacePresentHookOnIsland = false;
@@ -267,6 +271,7 @@ namespace Simoncouche.Chain {
                     if (chains[i]._beginningHookIsSet) {
                         mustPlaySound = true; //Parce qu'on ne rétracte pas les chaînes qui viennent tout juste d'être lancé
                         GravityBody mustAttachedToBody = chains[i].RetractChain(_distanceRetractionValue);
+                        chains[i].RetractHooksMassModification(_addedForceToRetraction);
                         if (mustAttachedToBody != null) {
                             this.OnCutLinkWithPlayer();
                             this.AttachTouchedChunkToPlayer(mustAttachedToBody);
@@ -277,6 +282,7 @@ namespace Simoncouche.Chain {
                 if (mustPlaySound) playerAudio.PlaySound(PlayerSounds.PlayerRetractChains);
                 yield return new WaitForSeconds(time);
             }
+            this.rigidbody.mass = this.playerController._startPlayerWeight;
             _isRetracting = false;
         }
 
@@ -357,7 +363,7 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void RemoveChainOnPlayerMaelstromEnter() {
             if (chains.Count > 0) {
-                if (chains[chains.Count - 1] != null & (chains[chains.Count - 1]._beginningHook!=null && !chains[chains.Count - 1]._endingHookIsSet)) {
+                if (chains[chains.Count - 1] != null & (chains[chains.Count - 1].beginningHook!=null && !chains[chains.Count - 1]._endingHookIsSet)) {
                     chains[chains.Count - 1].DestroyChain(true);
                     this.OnCutLinkWithPlayer();
                 }
