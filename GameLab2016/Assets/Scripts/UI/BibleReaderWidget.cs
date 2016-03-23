@@ -85,31 +85,33 @@ namespace Simoncouche.UI {
         private void LoadBible() {
             BibleEntries entries = BibleEntries.LoadBibleEntries();
 
-            foreach (BibleQuote entry in entries.quoteListCthulu) {
-                BibleQuoteWidget widget = BibleQuoteWidget.Create(
-                    LevelManager.Player.cthulu, 
-                    entry.quoteString, 
-                    entry.godName, 
-                    entry.quoteFirstNo,
-                    entry.quoteSecondNo
-                );
+            if (entries != null) {
+                foreach (BibleQuote entry in entries.quoteListCthulu) {
+                    BibleQuoteWidget widget = BibleQuoteWidget.Create(
+                        LevelManager.Player.cthulu, 
+                        entry.quoteString, 
+                        entry.godName, 
+                        entry.quoteFirstNo,
+                        entry.quoteSecondNo
+                    );
 
-                widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.cthulu]);
-                widget.transform.localScale = Vector3.one;
-            }
+                    widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.cthulu]);
+                    widget.transform.localScale = Vector3.one;
+                }
 
-            foreach (BibleQuote entry in entries.quoteListSobek) {
-                BibleQuoteWidget widget = BibleQuoteWidget.Create(
-                    LevelManager.Player.sobek, 
-                    entry.quoteString, 
-                    entry.godName, 
-                    entry.quoteFirstNo,
-                    entry.quoteSecondNo
-                );
+                foreach (BibleQuote entry in entries.quoteListSobek) {
+                    BibleQuoteWidget widget = BibleQuoteWidget.Create(
+                        LevelManager.Player.sobek, 
+                        entry.quoteString, 
+                        entry.godName, 
+                        entry.quoteFirstNo,
+                        entry.quoteSecondNo
+                    );
 
-                Debug.Log(_scrollContents.Count);
-                widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.sobek]);
-                widget.transform.localScale = Vector3.one;
+                    Debug.Log(_scrollContents.Count);
+                    widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.sobek]);
+                    widget.transform.localScale = Vector3.one;
+                }
             }
         }
 
