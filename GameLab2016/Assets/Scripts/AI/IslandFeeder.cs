@@ -130,6 +130,7 @@ namespace Simoncouche.Islands {
         [SerializeField][Tooltip("DO NOT TOUCH. Visible for DEBUG purposes only")]
         private float _modifiedSpawnRate = 5f; //current spawn rate
 
+        private bool _isStarted = false;
         
 
         void Awake() {
@@ -141,20 +142,25 @@ namespace Simoncouche.Islands {
             _islandManager = FindObjectOfType<IslandManager>().GetComponent<IslandManager>(); //Get Island Manager
         }
 
-        void Start() {
-            _islandParentTransform = _islandManager.GetIslandSubFolder(); //Get ISland Subfolder from manager
-            for (int i = 0; i <= MIN_COLUMN; ++i) {
-                GenerateColumn();
+        public void OnStart() {
+            if (_isStarted == false) {
+                _isStarted = true;
+                _islandParentTransform = _islandManager.GetIslandSubFolder(); //Get ISland Subfolder from manager
+                for (int i = 0; i <= MIN_COLUMN; ++i) {
+                    GenerateColumn();
+                }
+                _targetContinentX = 0;
+                StartCoroutine(UpdateSpawnParametersCoroutine());
             }
-            _targetContinentX = 0;
-            StartCoroutine(UpdateSpawnParametersCoroutine());
         }
 
         void Update() {
-            if (_inTutorial) {
-                ManageTutorial();
-            } else {
-                ManageSpawn();
+            if (_isStarted) {
+                if (_inTutorial) {
+                    ManageTutorial();
+                } else {
+                    ManageSpawn();
+                }
             }
         }
 

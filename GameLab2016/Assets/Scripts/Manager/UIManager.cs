@@ -69,6 +69,8 @@ public class UIManager : MonoBehaviour {
         RefreshWins();
 
         // Pooling
+        sobekRunesPool.Clear();
+        cthulhuRunesPool.Clear();
         for (int i = 0; i < 15; i++) {
             InstantiateRune(LevelManager.Player.sobek);
             InstantiateRune(LevelManager.Player.cthulu);

@@ -225,6 +225,11 @@ public class GameManager : MonoBehaviour {
                 }
 
                 uiManager.Setup();
+                //Start Feeder
+                IslandFeeder[] feeders = GameObject.FindObjectsOfType<IslandFeeder>();
+                for(int i = 0; i < feeders.Length; i++) {
+                    feeders[i].OnStart();
+                }
                 break;
 
             case Scene.BibleWriter:
