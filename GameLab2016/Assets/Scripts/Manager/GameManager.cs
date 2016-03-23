@@ -74,10 +74,13 @@ public class GameManager : MonoBehaviour {
     #endregion
 
     #region Utils Variables
+    public bool gameStarted { get; private set; }
     public bool isPaused { get; private set; }
     #endregion
 
     void Awake() {
+        this.gameStarted = false;
+
         if (Instance == null) {
             Instance = this;
             Application.targetFrameRate = 60; //Set target framerate
@@ -179,7 +182,7 @@ public class GameManager : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene, CutsceneManager.Cutscene cutsceneVideo) {
         SceneManager.LoadSceneAsync(SCENE_CUTSCENE);
-        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Single);
         loading.allowSceneActivation = false;
 
         CutsceneManager cutscene = null;
@@ -214,9 +217,11 @@ public class GameManager : MonoBehaviour {
     private void Scene_OnOpen(Scene scene) {
         switch (scene) {
             case Scene.Menu:
+                audioManager.ToggleAmbiantSounds(false);
                 break;
 
             case Scene.PlayLevel:
+                audioManager.ToggleAmbiantSounds(true);
                 islandManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_matchToWin);
@@ -225,14 +230,24 @@ public class GameManager : MonoBehaviour {
                 }
 
                 uiManager.Setup();
+                    //Start Feeder
+                IslandFeeder[] feeders = GameObject.FindObjectsOfType<IslandFeeder>();
+                for (int i = 0; i < feeders.Length; i++) {
+                    feeders[i].OnStart();
+                }
+
+                this.gameStarted = true;
+
                 break;
 
             case Scene.BibleWriter:
+                audioManager.ToggleAmbiantSounds(false);
                 GameObject rootUI = GameObject.Find("BibleUIInput");
                 rootUI.GetComponentInChildren<Simoncouche.Bible.BibleQuoteWriter>().BeginWriting(this.lastWinner);
                 break;
 
             case Scene.BibleReader:
+                audioManager.ToggleAmbiantSounds(false);
                 break;
         }
     }
@@ -242,6 +257,8 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     /// <param name="scene">the scene closed</param>
     private void Scene_OnClose(Scene scene) {
+        this.gameStarted = false;
+
         switch (scene) {
             case Scene.Menu:
                 break;

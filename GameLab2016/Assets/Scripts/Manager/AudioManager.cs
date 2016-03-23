@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class AudioManager : MonoBehaviour {
 
+    private GameObject AmbiantSounds;
+
     [Header("Audio Clip")]
     [SerializeField]
     private CharacterSound _characterSound;
@@ -24,11 +26,16 @@ public class AudioManager : MonoBehaviour {
 
     private void Awake() {
         source = GetComponentInChildren<AudioSource>();
+        AmbiantSounds = transform.Find("Ambiant").gameObject;
     }
 
     public void PlayAudioClip(AudioClip clip) {
         source.clip = clip;
         source.Play();
+    }
+
+    public void ToggleAmbiantSounds(bool active) {
+        AmbiantSounds.SetActive(active);
     }
     
 }
