@@ -16,7 +16,7 @@ public class TutorialUI : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Joystick1Button7) || Input.GetKeyDown(KeyCode.Joystick1Button7) || Input.GetKeyDown(KeyCode.Space)) { //TODO change input
-            GameManager.Instance.UnPause();
+            //GameManager.Instance.UnPause(); UnPause bizarre kinda useless
             Destroy(gameObject);
         }
     }
@@ -30,7 +30,7 @@ public class TutorialUI : MonoBehaviour {
                 yield return new WaitForRealSeconds(0.05f);
             }
         } 
-        GameManager.Instance.UnPause();
+        //GameManager.Instance.UnPause(); UnPause bizarre kinda useless
         Destroy(gameObject);
     }
 }
