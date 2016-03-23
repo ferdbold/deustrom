@@ -21,6 +21,9 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Prefab of normal island")]
         private GameObject _islandPrefab;
 
+        [SerializeField] [Tooltip("Prefab of normal island")]
+        private GameObject _volcanoPrefab;
+
         [SerializeField] [Tooltip("DO NOT CHANGE. Prefab of island collider.")]
         private GameObject _islandTemporaryColliderPrefab;
 
@@ -67,14 +70,14 @@ namespace Simoncouche.Islands {
 
         [SerializeField] [Tooltip("Spawn rate change in % for each island difference between median.")]
         private float SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX = 40f;
-        
+
         [Tooltip("If true, Spawn change will act in a multiplicative manner. If false, will simply add % together.")]
         private bool SPAWN_CHANGE_MULTIPLICATIVE = false;
 
 
         [Header("Visual")]
 
-        [SerializeField] 
+        [SerializeField]
         [Tooltip("Min and Max time the island will shake before being spawned.")]
         private Vector2 SHAKE_TIME_EXTREMUMS = new Vector2(2.5f, 10f);
 
@@ -105,11 +108,11 @@ namespace Simoncouche.Islands {
         private float _releaseForce = 15f; //force applied when island is released after shake
         private float _timeSinceLastSpawn = 0f; //current time since last island spawn
         //Tutorial Spawning
-        private enum TutorialState { NoIsland, OneIsland, ThreeIsland, VolcanoPhase};
+        private enum TutorialState { NoIsland, OneIsland, ThreeIsland, VolcanoPhase };
         private bool _inTutorial = false;
         private TutorialState _state = TutorialState.NoIsland;
         private int _tutoTargetIsland = 0;
-        private float _tutoTimeInPhase = 0f;
+        [SerializeField] private float _tutoTimeInPhase = 0f;
 
         [Header("DEBUG")]
         [SerializeField][Tooltip("DO NOT TOUCH. Visible for DEBUG purposes only")]
@@ -132,7 +135,7 @@ namespace Simoncouche.Islands {
                 GenerateColumn();
             }
             _targetContinentX = 0;
-            StartCoroutine(UpdateSpawnParameters());
+            StartCoroutine(UpdateSpawnParametersCoroutine());
         }
 
         void Update() {
@@ -164,18 +167,18 @@ namespace Simoncouche.Islands {
             int curAmtIsland = IS_SOBEK ? _pSobekIsland : _pCthulhuIsland;
             if (curAmtIsland < _tutoTargetIsland) {
                 StartReleaseProcessOnRandomIsland();
-                CalculateSpawnRate();
+                UpdateSpawnParameters();
             }
 
             switch (_state) {
                 case(TutorialState.NoIsland) :
-                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.OneIsland);
+                    if (_tutoTimeInPhase > 5f) ChangeState(TutorialState.OneIsland);
                     break;
                 case (TutorialState.OneIsland):
-                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.ThreeIsland);
+                    if (_tutoTimeInPhase > 5f) ChangeState(TutorialState.ThreeIsland);
                     break;
                 case (TutorialState.ThreeIsland):
-                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.VolcanoPhase);
+                    if (_tutoTimeInPhase > 5f) ChangeState(TutorialState.VolcanoPhase);
                     break;
                 case (TutorialState.VolcanoPhase):
                     if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.OneIsland);
@@ -315,7 +318,7 @@ namespace Simoncouche.Islands {
         /// <param name="cwc">Chunk with collider to release</param>
         private void StartReleaseProcessOnTargetIsland(ChunkWithCollider cwc) {
             StartCoroutine(ActivateIsland(cwc));
-            _islandManager.AddPendingIslandChunk(cwc.chunk); //Remove chunk from pending chunk list
+            if(cwc.chunk.color != IslandUtils.color.green) _islandManager.AddPendingIslandChunk(cwc.chunk); //Remove chunk from pending chunk list
             RemoveIslandChunkFromList(cwc, 0);
         }
 
@@ -324,6 +327,8 @@ namespace Simoncouche.Islands {
             int randIndex = Random.Range(0, _islandRows[0].Count);
             ChunkWithCollider selectedChunk = _islandRows[0][randIndex];
             RemoveIslandChunkFromList(selectedChunk, 0);
+            selectedChunk.chunk.ConvertChunkToAnotherColor(IslandUtils.color.green);
+            _islandManager.AddPendingIslandChunk(selectedChunk.chunk);
             StartCoroutine(TransformIntoVolcano(selectedChunk));
             
         }
@@ -332,9 +337,26 @@ namespace Simoncouche.Islands {
         /// <param name="cwc"> Chunk with collider to transform </param> 
         private IEnumerator TransformIntoVolcano(ChunkWithCollider cwc) {
             float volcanoAnimTime = 3f;
+            //Get old island model references
+            Transform parentTransform = cwc.chunk.transform.Find("Model").transform;
+            Transform[] oldModels = parentTransform.GetComponentsInChildren<Transform>();
+            //Instantiate volcano prefab
+            Transform instantiatedVolcano = ((GameObject)Instantiate(_volcanoPrefab, parentTransform.position, Quaternion.identity)).transform;
+            instantiatedVolcano.parent = parentTransform;
+            instantiatedVolcano.transform.localScale = Vector3.one;
+            instantiatedVolcano.transform.localPosition = new Vector3(0, -1.5f, 0);
+
+            //Lerp Volcano into island
+            Vector3 sPos = instantiatedVolcano.transform.localPosition;
             for (float i = 0f; i < 1f; i += Time.deltaTime / volcanoAnimTime) {
+                instantiatedVolcano.transform.localPosition = Vector3.Lerp(sPos, Vector3.zero, i);
                 yield return null;
+            }           
+            //Destroy old models
+            for(int i = 0; i < oldModels.Length; i++) {
+                if (oldModels[i] != parentTransform) Destroy(oldModels[i].gameObject);
             }
+
             StartReleaseProcessOnTargetIsland(cwc);
         }
 
@@ -402,46 +424,53 @@ namespace Simoncouche.Islands {
         }
 
         /// <summary> Update the spawn paramaters in a timed loop</summary>
-        private IEnumerator UpdateSpawnParameters() {
+        private IEnumerator UpdateSpawnParametersCoroutine() {
             while (true) {
-                _pScoreDiff = 0f;
-                _pIslandDiffPlayers = 0;
-                _pSobekIsland = 0;
-                _pCthulhuIsland = 0;
-                List<IslandChunk> _CurChunks = _islandManager.GetIslandChunks();
-                List<IslandChunk> _CurPendingChunks = _islandManager.GetPendingIslandChunks();
-
-
-                float _pSobekScorePercent = (float)GameManager.levelManager.sobekScore / (float)GameManager.Instance.pointsGoal * 100f;
-                float _pCthulhuScorePercent = (float)GameManager.levelManager.cthuluScore / (float)GameManager.Instance.pointsGoal * 100f;
-
-
-                foreach (IslandChunk ic in _CurChunks) {
-                    if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
-                    if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
-                    if (ic.color == IslandUtils.color.green) ++_pVolcanoIsland;
-                }
-                foreach (IslandChunk ic in _CurPendingChunks) {
-                    if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
-                    if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
-                    if (ic.color == IslandUtils.color.green) ++_pVolcanoIsland;
-                }
-                if (IS_SOBEK) {
-                    _pIslandDiffPlayers = _pSobekIsland - _pCthulhuIsland;
-                    _pIslandDiffMin = _pSobekIsland - AMT_ISLAND_MIN;
-                    _pIslandDiffMax = AMT_ISLAND_MAX - _pSobekIsland;
-                    _pScoreDiff = _pSobekScorePercent - _pCthulhuScorePercent;
-                } else {
-                    _pIslandDiffPlayers = _pCthulhuIsland - _pSobekIsland;
-                    _pIslandDiffMin = _pCthulhuIsland - AMT_ISLAND_MIN;
-                    _pIslandDiffMax = AMT_ISLAND_MAX - _pCthulhuIsland;
-                    _pScoreDiff = _pCthulhuScorePercent - _pSobekScorePercent;
-                }
-
-                CalculateSpawnRate();
-
+                UpdateSpawnParameters();
                 yield return new WaitForSeconds(0.5f);
             }
+        }
+
+        private void UpdateSpawnParameters() {
+            _pScoreDiff = 0f;
+            _pIslandDiffPlayers = 0;
+            _pSobekIsland = 0;
+            _pCthulhuIsland = 0;
+            List<IslandChunk> _CurChunks = _islandManager.GetIslandChunks();
+            List<IslandChunk> _CurPendingChunks = _islandManager.GetPendingIslandChunks();
+
+
+            float _pSobekScorePercent = (float)GameManager.levelManager.sobekScore / (float)GameManager.Instance.pointsGoal * 100f;
+            float _pCthulhuScorePercent = (float)GameManager.levelManager.cthuluScore / (float)GameManager.Instance.pointsGoal * 100f;
+
+
+            foreach (IslandChunk ic in _CurChunks)
+            {
+                if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
+                if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
+                if (ic.color == IslandUtils.color.green) ++_pVolcanoIsland;
+            }
+            foreach (IslandChunk ic in _CurPendingChunks)
+            {
+                if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
+                if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
+                if (ic.color == IslandUtils.color.green) ++_pVolcanoIsland;
+            }
+            if (IS_SOBEK)
+            {
+                _pIslandDiffPlayers = _pSobekIsland - _pCthulhuIsland;
+                _pIslandDiffMin = _pSobekIsland - AMT_ISLAND_MIN;
+                _pIslandDiffMax = AMT_ISLAND_MAX - _pSobekIsland;
+                _pScoreDiff = _pSobekScorePercent - _pCthulhuScorePercent;
+            }
+            else {
+                _pIslandDiffPlayers = _pCthulhuIsland - _pSobekIsland;
+                _pIslandDiffMin = _pCthulhuIsland - AMT_ISLAND_MIN;
+                _pIslandDiffMax = AMT_ISLAND_MAX - _pCthulhuIsland;
+                _pScoreDiff = _pCthulhuScorePercent - _pSobekScorePercent;
+            }
+
+            CalculateSpawnRate();
         }
     }
 }

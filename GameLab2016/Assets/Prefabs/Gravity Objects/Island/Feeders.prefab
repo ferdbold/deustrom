@@ -979,6 +979,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _islandPrefab: {fileID: 185502, guid: 9fa74664a2b45da4692ea772246e058a, type: 2}
+  _volcanoPrefab: {fileID: 166278, guid: 52c9e8324ff53f14c9518942ef7f02d3, type: 2}
   _islandTemporaryColliderPrefab: {fileID: 168238, guid: b4a53183a5360f547bff0182330e7b40,
     type: 2}
   GENERATE_LEFT: 1
@@ -1002,6 +1003,7 @@ MonoBehaviour:
   SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN: 10
   SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX: 40
   SHAKE_TIME_EXTREMUMS: {x: 2.5, y: 10}
+  _tutoTimeInPhase: 0
   _modifiedSpawnRate: 5
 --- !u!114 &11460940
 MonoBehaviour:
@@ -1015,6 +1017,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _islandPrefab: {fileID: 185502, guid: 25dee7d767a3ae04aae7b2fd602298ab, type: 2}
+  _volcanoPrefab: {fileID: 166278, guid: 52c9e8324ff53f14c9518942ef7f02d3, type: 2}
   _islandTemporaryColliderPrefab: {fileID: 168238, guid: b4a53183a5360f547bff0182330e7b40,
     type: 2}
   GENERATE_LEFT: 0
@@ -1038,6 +1041,7 @@ MonoBehaviour:
   SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MIN: 10
   SPAWN_CHANGE_PER_ISLAND_DIFFERENCE_BETWEEN_MAX: 40
   SHAKE_TIME_EXTREMUMS: {x: 2.5, y: 10}
+  _tutoTimeInPhase: 0
   _modifiedSpawnRate: 5
 --- !u!1001 &100100000
 Prefab:
