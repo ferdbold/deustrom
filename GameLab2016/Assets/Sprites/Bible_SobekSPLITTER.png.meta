@@ -1,9 +1,10 @@
 fileFormatVersion: 2
 guid: 8c1892db935cd0542809c9c983c9d6ab
-timeCreated: 1458752185
+timeCreated: 1458753696
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: Bible_SobekSPLITTER_0
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -30,26 +31,43 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     filterMode: -1
-    aniso: -1
+    aniso: 16
     mipBias: -1
-    wrapMode: -1
-  nPOTScale: 1
+    wrapMode: 1
+  nPOTScale: 0
   lightmap: 0
   rGBM: 0
   compressionQuality: 50
   allowsAlphaSplitting: 0
-  spriteMode: 0
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
-  alphaIsTransparency: 0
-  textureType: -1
+  alphaIsTransparency: 1
+  textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    sprites:
+    - name: Bible_SobekSPLITTER_0
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 204
+        width: 953
+        height: 51
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -472.5, y: 25.5}
+        - {x: -472.5, y: -2.5}
+        - {x: -449.5, y: -20.5}
+        - {x: 473.5, y: -20.5}
+        - {x: 473.5, y: 24.5}
+        - {x: 460.5, y: 25.5}
     outline: []
   spritePackingTag: 
   userData: 
