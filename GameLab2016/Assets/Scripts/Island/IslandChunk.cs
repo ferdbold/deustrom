@@ -298,11 +298,11 @@ namespace Simoncouche.Islands {
             if (chunk != null && chunk.parentIsland != null && chunk.parentIsland.gravityBody.inDestroyMode) {
                 chunk.parentIsland.gravityBody.Velocity = 5 * Vector3.Normalize(transform.localPosition - chunk.transform.localPosition);
                 //chunk.parentIsland.gravityBody.RemoveInDestroyMode();
-                TakeDamage(1, chunk.parentIsland.gravityBody.Velocity);
+                //TakeDamage(1, chunk, chunk.parentIsland.gravityBody.Velocity); TODO READD
             } else if (chunk != null && chunk.gravityBody.inDestroyMode) {
                 chunk.gravityBody.Velocity = 5 * Vector3.Normalize(transform.localPosition - chunk.transform.localPosition);
                 //chunk.gravityBody.RemoveInDestroyMode();
-                TakeDamage(1, chunk.gravityBody.Velocity);
+                //TakeDamage(1, chunk, chunk.gravityBody.Velocity); TODO READD
             }
 
             //Collide with chunk of other color
@@ -314,13 +314,13 @@ namespace Simoncouche.Islands {
         /// The damage taken by the island connected to this chunk. A chunk not part of an island does not take damage
         /// </summary>
         /// <param name="damage">The number of chunk affected by the division</param>
-        public void TakeDamage(int damage, Vector3 givenVelocity) {
+        public void TakeDamage(int damage, IslandChunk origin, Vector3 givenVelocity) {
             if (damage > 0 && isDamageable) {
-                GameManager.islandManager.TakeDamageHandler(this, damage, givenVelocity);
+                GameManager.islandManager.TakeDamageHandler(this, damage, origin, givenVelocity);
                 isDamageable = false;
                 StartCoroutine(TakeDamageCooldown());
             } else {
-                Debug.LogWarning("The damage sent to the island chunk should be higher than 0");
+                if (damage <= 0) Debug.LogWarning("The damage sent to the island chunk should be higher than 0");
             }
         }
 

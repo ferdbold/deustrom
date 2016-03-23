@@ -65,10 +65,18 @@ namespace Simoncouche.Islands {
         
         private void Start() {
             if (_collider != null) _collider.isTrigger = true;
+            StartCoroutine("BrokenCheck");
         }
 
         private void OnDestroy() {
             ResetConvertingLists(); //Clear list and particles on destroy
+        }
+
+        private IEnumerator BrokenCheck() {
+            while (true) {
+                yield return new WaitForSeconds(1f);
+                GameManager.islandManager.CheckIslandBroken(this);
+            }
         }
 
         private static void GetParticlesGameObject() {
