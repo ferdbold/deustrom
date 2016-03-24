@@ -59,7 +59,6 @@ public class TutorialUI : MonoBehaviour {
         MovieTexture video = (MovieTexture)movie.mainTexture;
         video.loop = true;
         video.Play();
-        GameManager.audioManager.PlayAudioClip(video.audioClip);
         GameManager.Instance.Pause();
 
         while (!skip) {
