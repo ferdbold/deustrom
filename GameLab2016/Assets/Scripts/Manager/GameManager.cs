@@ -198,7 +198,7 @@ public class GameManager : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene, CutsceneManager.Cutscene cutsceneVideo) {
         SceneManager.LoadSceneAsync(SCENE_CUTSCENE);
-        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
+        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Single);
         loading.allowSceneActivation = false;
 
         CutsceneManager cutscene = null;
@@ -306,10 +306,9 @@ public class GameManager : MonoBehaviour {
 
     #region Tutorial
 
-    public void StartVideoTutorial() {
-        Pause();
-        TutorialUI tuto = (Instantiate(Resources.Load("Tutorial")) as GameObject).GetComponent<TutorialUI>();
-        tuto.StartTuto();
+    public void StartVideoTutorial(TutorialUI.TutoChoice choice) {
+        GameManager.uiManager.SetupTutoWidget();
+        GameManager.uiManager._tutoWidget.StartTuto(choice);
     }
 
     #endregion

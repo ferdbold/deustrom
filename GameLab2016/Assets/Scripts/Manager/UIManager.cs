@@ -41,9 +41,14 @@ public class UIManager : MonoBehaviour {
     private List<ScoreWidget> _scoreWidgets;
     private List<WinsWidget> _winsWidgets;
     private List<IslandCountWidget> _islandCountWidgets;
+    public TutorialUI _tutoWidget { get; private set; }
     private Image _seal;
 
     // METHODS
+
+    public void SetupTutoWidget() {
+        _tutoWidget = GameObject.Find("UI/Tutorial").GetComponent<TutorialUI>();
+    }
 
     public void Setup() {
         this.root = GameObject.Find("UI").GetComponent<Canvas>();
