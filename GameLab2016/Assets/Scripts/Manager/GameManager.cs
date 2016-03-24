@@ -117,11 +117,19 @@ public class GameManager : MonoBehaviour {
     void Update() {
         if (GameManager.levelManager != null && GameManager.levelManager._waitingForMatchEndInput && (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick2Button0))) {
             GameManager.levelManager._waitingForMatchEndInput = false;
-            GameManager.Instance.SwitchScene(
-                GameManager.Scene.PlayLevel,
-                (lastWinner == LevelManager.Player.sobek) ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch,
-                dontClose: true
-            );
+
+            if (GameManager.levelManager.sobekMatchWon >= _matchToWin || GameManager.levelManager.cthuluMatchWon >= _matchToWin) {
+                GameManager.Instance.SwitchScene(
+                    GameManager.Scene.BibleWriter, 
+                    (lastWinner == LevelManager.Player.sobek) ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch
+                );
+            } else {
+                GameManager.Instance.SwitchScene(
+                    GameManager.Scene.PlayLevel,
+                    (lastWinner == LevelManager.Player.sobek) ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch,
+                    dontClose: true
+                );
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.R)) {

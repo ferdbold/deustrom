@@ -43,6 +43,7 @@ public class TutorialUI : MonoBehaviour {
 
     void Awake() {
         isCompleted = false;
+        GetComponent<RectTransform>().DOScale(0, 0);
     }
 
     void Update() {

@@ -118,15 +118,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timeToFade: 2
   imageTimeStaying: 5
-  Base_Loading_Cutscene: {fileID: 0}
-  Intro_Cutscene: {fileID: 15200000, guid: b95919ead54cb5f47864186973028c5b, type: 3}
-  Sobek_WinMatch_Cutscene: {fileID: 2800000, guid: ef31d3b3d13ac1745b9e8db687b632d5,
+  Base_Loading_Cutscene: {fileID: 15200000, guid: a8a2a2c5de6fe7945a4367cd675d47df,
     type: 3}
-  Cthulu_WinMatch_Cutscene: {fileID: 2800000, guid: a8853372c37e9994db07458868e8e2e0,
+  Intro_Cutscene: {fileID: 15200000, guid: a0b5a75b165364744a8583214ec7aecd, type: 3}
+  Sobek_WinMatch_Cutscene: {fileID: 15200000, guid: 48d35f0018187384ea45f0ab59ae69bd,
     type: 3}
-  Sobek_WinGame_Cutscene: {fileID: 2800000, guid: 87f6ed76e5555cb4697d7ccb99485cbe,
+  Cthulu_WinMatch_Cutscene: {fileID: 15200000, guid: 10a350376c15022409e76ff64e982204,
     type: 3}
-  Cthulu_WinGame_Cutscene: {fileID: 2800000, guid: 3e922fb579b80ce4e88dd305068a83c9,
+  Sobek_WinGame_Cutscene: {fileID: 15200000, guid: 31943d0e4b40da34e9695f6f70e3e8c4,
+    type: 3}
+  Cthulu_WinGame_Cutscene: {fileID: 15200000, guid: 2e3781efc9731cb4485429e10af5108f,
     type: 3}
   Video: {fileID: 11437630}
   FadeRect: {fileID: 11494576}
@@ -499,6 +500,26 @@ Prefab:
       propertyPath: timeToFade
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Sobek_WinMatch_Cutscene
+      value: 
+      objectReference: {fileID: 15200000, guid: 48d35f0018187384ea45f0ab59ae69bd,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: Cthulu_WinMatch_Cutscene
+      value: 
+      objectReference: {fileID: 15200000, guid: 10a350376c15022409e76ff64e982204,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: Cthulu_WinGame_Cutscene
+      value: 
+      objectReference: {fileID: 15200000, guid: 2e3781efc9731cb4485429e10af5108f,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: Sobek_WinGame_Cutscene
+      value: 
+      objectReference: {fileID: 15200000, guid: 31943d0e4b40da34e9695f6f70e3e8c4,
+        type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 147470}

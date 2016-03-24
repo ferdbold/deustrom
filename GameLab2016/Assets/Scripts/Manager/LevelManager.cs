@@ -102,6 +102,7 @@ public class LevelManager {
     /// <param name="scoreAdded">The score added to the player score</param>
     /// <param name="originPos">The position of the object that produced the points </param>
     public void AddScore(Player player, int scoreAdded, Vector3 originPos) {
+        Debug.Log(cthuluScore);
         if (!GameManager.Instance.disableScoring) {
             if (player == Player.sobek) {
                 sobekScore += scoreAdded;
@@ -150,19 +151,12 @@ public class LevelManager {
     /// <param name="winner"></param>
     private void OnMatchEnd(Player winner) {
         _winner = winner;
+        GameManager.Instance.lastWinner = winner;
 
         if (winner == Player.sobek) {
             ++sobekMatchWon;
-            if (sobekMatchWon >= matchToWin) {
-                new Simoncouche.Utils.WaitWithCallback(1f, OnMatchEndSobek);
-                return;
-            }
         } else {
             ++cthuluMatchWon;
-            if (cthuluMatchWon >= matchToWin) {
-                new Simoncouche.Utils.WaitWithCallback(1f, OnMatchEndCthulu);
-                return;
-            }
         }
 
         sobekScore = -10000;
@@ -176,6 +170,12 @@ public class LevelManager {
         }
 
         this.MatchEnd.Invoke(winner);
+
+        if (sobekMatchWon >= matchToWin) {
+            OnGameEnd(Player.sobek);
+        } else if (cthuluMatchWon >= matchToWin) {
+            OnGameEnd(Player.cthulu);
+        }
     }
 
     #region Used for callback
@@ -194,10 +194,6 @@ public class LevelManager {
     /// <param name="winner"></param>
     private void OnGameEnd(Player winner) {
         GameManager.Instance.lastWinner = winner;
-        GameManager.Instance.SwitchScene(
-            GameManager.Scene.BibleWriter,
-            winner == Player.sobek ? CutsceneManager.Cutscene.Sobek_WinGame : CutsceneManager.Cutscene.Cthulu_WinGame
-        );
     }
 
     #endregion

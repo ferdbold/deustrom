@@ -25,16 +25,16 @@ public class CutsceneManager : MonoBehaviour {
     private MovieTexture Intro_Cutscene;
 
     [SerializeField]
-    private Texture2D Sobek_WinMatch_Cutscene;
+    private MovieTexture Sobek_WinMatch_Cutscene;
 
     [SerializeField]
-    private Texture2D Cthulu_WinMatch_Cutscene;
+    private MovieTexture Cthulu_WinMatch_Cutscene;
 
     [SerializeField]
-    private Texture2D Sobek_WinGame_Cutscene;
+    private MovieTexture Sobek_WinGame_Cutscene;
 
     [SerializeField]
-    private Texture2D Cthulu_WinGame_Cutscene;
+    private MovieTexture Cthulu_WinGame_Cutscene;
 
     [Header("Component")]
     [SerializeField]
@@ -67,30 +67,22 @@ public class CutsceneManager : MonoBehaviour {
         switch (scene) {
             case Cutscene.Intro:
                 movie = Intro_Cutscene;
-                Video.material.mainTexture = movie;
-                movie.Play();
-                GameManager.audioManager.PlayAudioClip(movie.audioClip);
-                StartCoroutine(WaitVideoEndToFade(movie));
                 break;
 
             case Cutscene.Sobek_WinMatch:
-                Video.material.mainTexture = Sobek_WinMatch_Cutscene;
-                StartCoroutine("WaitForImageEnd");
+                movie = Sobek_WinMatch_Cutscene;
                 break;
 
             case Cutscene.Cthulu_WinMatch:
-                Video.material.mainTexture = Cthulu_WinMatch_Cutscene;
-                StartCoroutine("WaitForImageEnd");
+                movie = Cthulu_WinMatch_Cutscene;
                 break;
 
             case Cutscene.Sobek_WinGame:
-                Video.material.mainTexture = Sobek_WinGame_Cutscene;
-                StartCoroutine("WaitForImageEnd");
+                movie = Sobek_WinGame_Cutscene;
                 break;
 
             case Cutscene.Cthulu_WinGame:
-                Video.material.mainTexture = Cthulu_WinGame_Cutscene;
-                StartCoroutine("WaitForImageEnd");
+                movie = Cthulu_WinGame_Cutscene;
                 break;
 
             case Cutscene.Base_Loading:
@@ -104,8 +96,10 @@ public class CutsceneManager : MonoBehaviour {
                 }
                 break;
         }
-
-		
+        Video.material.mainTexture = movie;
+        movie.Play();
+        GameManager.audioManager.PlayAudioClip(movie.audioClip);
+        StartCoroutine(WaitVideoEndToFade(movie));
     }
 
     IEnumerator WaitVideoEndToFade(MovieTexture movie) {
