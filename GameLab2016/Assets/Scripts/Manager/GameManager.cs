@@ -119,7 +119,6 @@ public class GameManager : MonoBehaviour {
 
             inputManager.AddEvent(InputManager.Button.start, OnStartButton);
 
-
             DontDestroyOnLoad(gameObject);
 
             Scene_OnOpen(currentScene);
@@ -143,10 +142,6 @@ public class GameManager : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
             OnStartButton();
-        }
-
-        if (Input.GetButtonDown("Start")) {
-            Debug.Log("Start");
         }
 
         #if UNITY_EDITOR
@@ -327,6 +322,8 @@ public class GameManager : MonoBehaviour {
     }
 
     private void OnStartButton() {
+        Debug.Log("Start button");
+
         switch (_currentScene) {
         case Scene.Menu:
             QuitGame();
