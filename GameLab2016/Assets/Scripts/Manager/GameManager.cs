@@ -64,12 +64,25 @@ public class GameManager : MonoBehaviour {
     private float timeForTuto = 1f;
 
 
-    /// <summary> Amount of time players have to wait until controllers are enabled in a level</summary>
-    [Tooltip("Amount of time players have to wait until controllers are enabled in a level")]
+    /// <summary>Amount of time players have to wait until controllers are enabled in a match</summary>
+    [Tooltip("Amount of time players have to wait until chains are enabled in a level")]
     [SerializeField]
     private float _timeUntilControllersAreEnabled=0.1f;
     public float timeUntilControllersAreEnabled { get { return _timeUntilControllersAreEnabled; } }
-    
+
+
+    /// <summary>Amount of rounds players have to wait until chains are enabled in a match</summary>
+    [Tooltip("Amount of rounds players have to wait until chains are enabled in a match")]
+    [SerializeField]
+    private int _amountOfRoundsUntilChainsEnabled = 1;
+    public int amountOfRoundsUntilChainsEnabled { get { return _amountOfRoundsUntilChainsEnabled; } }
+
+    /// <summary>
+    /// This allows to turn on/off the hook thrower
+    /// </summary>
+    public bool mustEnableChainThrower { get { return _mustEnableChainThrower; } set { _mustEnableChainThrower = value; } }
+    private bool _mustEnableChainThrower;
+
 
     #endregion
 
@@ -221,7 +234,7 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case Scene.PlayLevel:
-                audioManager.ToggleAmbiantSounds(true);
+                
                 islandManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_matchToWin);
@@ -238,14 +251,14 @@ public class GameManager : MonoBehaviour {
                     feeders[i].OnStart();
                 }
 
+                audioManager.ToggleAmbiantSounds(true);
+                StartCoroutine("CalculateScoreCoroutine");
                 this.gameStarted = true;
 
                 break;
 
             case Scene.BibleWriter:
                 audioManager.ToggleAmbiantSounds(false);
-                GameObject rootUI = GameObject.Find("BibleUIInput");
-                rootUI.GetComponentInChildren<Simoncouche.Bible.BibleQuoteWriter>().BeginWriting(this.lastWinner);
                 break;
 
             case Scene.BibleReader:
@@ -267,6 +280,7 @@ public class GameManager : MonoBehaviour {
 
             case Scene.PlayLevel:
                 levelManager = null;
+                StopCoroutine("CalculateScoreCoroutine");
                 break;
 
             case Scene.BibleWriter:
@@ -317,9 +331,23 @@ public class GameManager : MonoBehaviour {
         isPaused = pause;
         Time.timeScale = isPaused ? 0 : 1;
         inputManager.isDisabled = pause;
-        Debug.Log("Is disabled input manager" + inputManager.isDisabled);
 
     }
 
     #endregion
+
+    private IEnumerator CalculateScoreCoroutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(5f);
+            if (levelManager == null) break;
+            foreach (IslandChunk ic in islandManager.GetIslandChunks())
+            {
+                if (ic.color == IslandUtils.color.red) levelManager.AddScore(LevelManager.Player.sobek, 1, ic.transform.position);
+                else if (ic.color == IslandUtils.color.blue) levelManager.AddScore(LevelManager.Player.cthulu, 1, ic.transform.position);
+            }
+
+        }
+    }
 }

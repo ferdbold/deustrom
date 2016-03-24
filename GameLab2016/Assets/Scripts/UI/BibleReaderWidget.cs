@@ -19,6 +19,9 @@ namespace Simoncouche.UI {
         private float _swapAnimDuration = 0.1f;
 
         [SerializeField]
+        private float _scrollSpeed = 15f;
+
+        [SerializeField]
         private LevelManager.Player _currentPlayer = LevelManager.Player.cthulu;
 
         private bool _swapped = false;
@@ -59,6 +62,8 @@ namespace Simoncouche.UI {
         private void Start() {
             LoadBible();
 
+            // Input
+            GameManager.inputManager.AddEvent(InputManager.Axis.p1_rightAnalog, ScrollReader);
             GameManager.inputManager.AddEvent(InputManager.Axis.p1_leftTrigger, OnLeftTrigger);
         }
 
@@ -85,7 +90,13 @@ namespace Simoncouche.UI {
         private void LoadBible() {
             BibleEntries entries = BibleEntries.LoadBibleEntries();
 
+            
+
             if (entries != null) {
+                // Reverse entry order for twitter-like behaviour
+                entries.quoteListCthulu.Reverse();
+                entries.quoteListSobek.Reverse();
+
                 foreach (BibleQuote entry in entries.quoteListCthulu) {
                     BibleQuoteWidget widget = BibleQuoteWidget.Create(
                         LevelManager.Player.cthulu, 
@@ -108,7 +119,6 @@ namespace Simoncouche.UI {
                         entry.quoteSecondNo
                     );
 
-                    Debug.Log(_scrollContents.Count);
                     widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.sobek]);
                     widget.transform.localScale = Vector3.one;
                 }
@@ -143,7 +153,19 @@ namespace Simoncouche.UI {
 
                 _scrollsContainer.DOLocalMoveY(230, _swapAnimDuration).SetEase(Ease.OutCubic);
             });
+        }
 
+        private void ScrollReader(float[] axii) {
+            if (axii[1] != 0f) {
+                RectTransform content = _scrollContents[(int)_currentPlayer];
+                RectTransform parent = content.transform.parent.GetComponent<RectTransform>();
+
+                content.localPosition = new Vector2(
+                    content.localPosition.x,
+                    Mathf.Clamp(content.localPosition.y - axii[1] * _scrollSpeed,
+                        0, Mathf.Max(0, content.rect.height - parent.rect.height))
+                );
+            }
         }
     }
 }

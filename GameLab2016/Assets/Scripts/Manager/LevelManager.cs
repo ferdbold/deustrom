@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Simoncouche.Controller;
+using Simoncouche.Islands;
 
 public class LevelManager {
 
@@ -27,7 +28,6 @@ public class LevelManager {
 
     /// <summary>Cthulu number of match won </summary>
     public int cthuluMatchWon { get; private set; }
-
     #endregion
 
     #region Setup
@@ -38,14 +38,22 @@ public class LevelManager {
     }
 
     public void Setup() {
-        SetupPlayers();
-        sobekScore = 0;
-        cthuluScore = 0;
-        OnMatchStart();
+            SetupPlayers();
+            sobekScore = 0;
+            cthuluScore = 0;
+            OnMatchStart();
     }
 
     /// <summary> Setup ref to players </summary>
     private void SetupPlayers() {
+        bool mustEnableChains = false;
+        if (sobekMatchWon + cthuluMatchWon >= GameManager.Instance.amountOfRoundsUntilChainsEnabled) {
+            mustEnableChains = true;
+        } else {
+            mustEnableChains = false;
+        }
+        GameManager.Instance.mustEnableChainThrower = mustEnableChains;
+
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         if (players.Length > 2) Debug.LogWarning("Their is more than 2 player in the scene");
 
@@ -55,6 +63,7 @@ public class LevelManager {
             } else {
                 cthulhuPlayer = player;
             }
+            player.GetComponent<Simoncouche.Chain.HookThrower>().SetupInput(player.GetComponent<PlayerController>().IsPlayerOne);
         }
     }
 

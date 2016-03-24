@@ -133,7 +133,7 @@ namespace Simoncouche.Islands {
         
 
         void Awake() {
-            _islandRows = new List<List<ChunkWithCollider>>(); //Create data obj
+            _islandRows = new List<List<ChunkWithCollider>>(); //Create data obj_islandRows = new List<List<ChunkWithCollider>>(); //Create data obj
             GenerateIslandContainer();
 
             _volcanoPrefab = (GameObject)Resources.Load("Island/Volcano");
@@ -141,11 +141,13 @@ namespace Simoncouche.Islands {
 
         public void OnStart() {
             if (_isStarted == false) {
+                if(_islandRows == null) _islandRows = new List<List<ChunkWithCollider>>(); 
                 _isStarted = true;
                 _islandParentTransform = GameManager.islandManager.GetIslandSubFolder(); //Get ISland Subfolder from manager
                 for (int i = 0; i <= MIN_COLUMN; ++i) {
                     GenerateColumn();
                 }
+
                 _targetContinentX = 0;
                 StartCoroutine(UpdateSpawnParametersCoroutine());
             }

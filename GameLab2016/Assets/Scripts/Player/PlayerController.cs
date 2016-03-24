@@ -170,6 +170,10 @@ namespace Simoncouche.Controller {
                 StartRespawnState();
                 StartCoroutine(Respawn_Spin(deathPosition));
                 _hookThrower.RemoveChainOnPlayerMaelstromEnter();
+                Chain.Chain[] chains = GameObject.FindObjectsOfType<Chain.Chain>();
+                foreach(Chain.Chain chain in chains){
+                    chain.SendMessage("OnMaelstromEnterOfPlayer", this);
+                }
             }
         }
 
@@ -452,7 +456,10 @@ namespace Simoncouche.Controller {
                     otherPlayer.GetBumped(col.relativeVelocity * BUMP_FORCE);
                     //Decrease speed and start Bump cooldown
                     _playerRigidBody.velocity = _playerRigidBody.velocity - col.relativeVelocity;
-                    StartPlayerBumpCooldown();                   
+                    StartPlayerBumpCooldown();
+                    //Rumble both players
+                    GameManager.inputManager.RumbleGamepad_Light(0);
+                    GameManager.inputManager.RumbleGamepad_Light(1);
                 }
             }
         }

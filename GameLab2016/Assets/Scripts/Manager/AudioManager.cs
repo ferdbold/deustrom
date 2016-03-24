@@ -22,6 +22,9 @@ public class AudioManager : MonoBehaviour {
     private ChainSound _chainSound;
     public ChainSound chainSound { get { return _chainSound; } }
 
+    [SerializeField]
+    private MusicSound _music;
+
     private AudioSource source;
 
     private void Awake() {
@@ -38,6 +41,26 @@ public class AudioManager : MonoBehaviour {
         AmbiantSounds.SetActive(active);
     }
     
+    public void PlayMusic(MusicSound.Choice music) {
+        AudioClip choice = null;
+        switch (music) {
+            case MusicSound.Choice.menu:
+                choice = _music.menuMusic;
+                break;
+
+            case MusicSound.Choice.play:
+                choice = _music.playMusic;
+                break;
+
+            case MusicSound.Choice.endGame:
+                choice = _music.endGameMusic;
+                break;
+        }
+
+        source.loop = true;
+        source.clip = choice;
+        source.Play();
+    }
 }
 
 [System.Serializable]
@@ -207,8 +230,20 @@ public class EnvironmentSound : SoundClass {
 
 [System.Serializable]
 public class ChainSound : SoundClass {
-    [SerializeField]
-    [Tooltip("Sound played when an island is destroyed")]
+    [SerializeField] [Tooltip("Sound played when a chain is destroyed")]
     private List<AudioClip> _chainDestruction;
     public AudioClip chainDestruction { get { return GetRandom(_chainDestruction); } }
+
+    [SerializeField] [Tooltip("Sound played when a chain hits an island")]
+    private List<AudioClip> _chainHit;
+    public AudioClip chainHit { get { return GetRandom(_chainHit); } }
+}
+
+[System.Serializable]
+public class MusicSound : SoundClass {
+    public enum Choice { menu, play, endGame }
+
+    public AudioClip menuMusic;
+    public AudioClip playMusic;
+    public AudioClip endGameMusic;
 }

@@ -40,6 +40,8 @@ namespace Simoncouche.Chain {
         /// <summary>Whether this hook is currently attached to a target</summary>
         public bool attachedToTarget { get; private set; }
 
+
+
         // EVENTS
 
         /// <summary>Invoked when this hook attaches itself to an island</summary>
@@ -223,7 +225,11 @@ namespace Simoncouche.Chain {
 
             this.Attach.Invoke();
 
-
+            //Sound
+            this.chain.thrower.playerAudio.PlaySound(PlayerSounds.PlayerChainHit);
+            //Rumble
+            if (this.chain.thrower.playerController.IsPlayerOne) GameManager.inputManager.RumbleGamepad_Light(0);
+            else GameManager.inputManager.RumbleGamepad_Light(1);
         }
 
         /// <summary>
@@ -335,42 +341,43 @@ namespace Simoncouche.Chain {
         /// </summary>
         /// <param name="chunkAB">Two island chunks (one of them is a volcano)</param>
         private void CheckConnectedVolcanoWithOtherIsland(IslandChunk[] chunkAB) {
-            if (chunkAB[0].color == IslandUtils.color.volcano) {
-                if (chunkAB[0] == chain.beginningHook.currentAnchorPoint.GetIslandChunk()) { //Beginning hook attached to volcano (chunk 0)
-                    if (chunkAB[1].parentIsland == chain.endingHook.currentAnchorPoint.GetIslandChunk().parentIsland && chunkAB[1].parentIsland != null) { //Check Island with chunk volcano
-                        chain.DestroyChain(true);
-                        return;
-                    } else if (chunkAB[1] == chain.endingHook.currentAnchorPoint.GetIslandChunk()) { //Check chunk with chunk volcano
-                        chain.DestroyChain(true);
-                        return;
+            if (chain._endingHookIsSet) {
+                if (chunkAB[0].color == IslandUtils.color.volcano) {
+                    if (chunkAB[0] == chain.beginningHook.currentAnchorPoint.GetIslandChunk()) { //Beginning hook attached to volcano (chunk 0)
+                        if (chunkAB[1].parentIsland == chain.endingHook.currentAnchorPoint.GetIslandChunk().parentIsland && chunkAB[1].parentIsland != null) { //Check Island with chunk volcano
+                            chain.DestroyChain(true);
+                            return;
+                        } else if (chunkAB[1] == chain.endingHook.currentAnchorPoint.GetIslandChunk()) { //Check chunk with chunk volcano
+                            chain.DestroyChain(true);
+                            return;
+                        }
+                    } else if (chunkAB[0] == chain.endingHook.currentAnchorPoint.GetIslandChunk()) { //Ending hook attached to volcano (chunk 0)
+                        if (chunkAB[1].parentIsland == chain.beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland && chunkAB[1].parentIsland != null) { //Check Island with chunk volcano
+                            chain.DestroyChain(true);
+                            return;
+                        } else if (chunkAB[1] == chain.beginningHook.currentAnchorPoint.GetIslandChunk()) { //Check chunk with chunk volcano
+                            chain.DestroyChain(true);
+                            return;
+                        }
                     }
-                } else if (chunkAB[0] == chain.endingHook.currentAnchorPoint.GetIslandChunk()) { //Ending hook attached to volcano (chunk 0)
-                    if (chunkAB[1].parentIsland == chain.beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland && chunkAB[1].parentIsland != null) { //Check Island with chunk volcano
-                        chain.DestroyChain(true);
-                        return;
-                    } else if (chunkAB[1] == chain.beginningHook.currentAnchorPoint.GetIslandChunk()) { //Check chunk with chunk volcano
-                        chain.DestroyChain(true);
-                        return;
-                    }
-                }
-            } 
-            else {
-                if (chunkAB[1] == chain.beginningHook.currentAnchorPoint.GetIslandChunk()) { //Beginning hook attached to volcano (chunk 1)
-                    if (chunkAB[0].parentIsland == chain.endingHook.currentAnchorPoint.GetIslandChunk().parentIsland && chunkAB[0].parentIsland != null) { //Check Island with chunk volcano
-                        chain.DestroyChain(true);
-                        return;
-                    } else if (chunkAB[0] == chain.endingHook.currentAnchorPoint.GetIslandChunk()) { //Check chunk with chunk volcano
-                        chain.DestroyChain(true);
-                        return;
-                    }
+                } else {
+                    if (chunkAB[1] == chain.beginningHook.currentAnchorPoint.GetIslandChunk()) { //Beginning hook attached to volcano (chunk 1)
+                        if (chunkAB[0].parentIsland == chain.endingHook.currentAnchorPoint.GetIslandChunk().parentIsland && chunkAB[0].parentIsland != null) { //Check Island with chunk volcano
+                            chain.DestroyChain(true);
+                            return;
+                        } else if (chunkAB[0] == chain.endingHook.currentAnchorPoint.GetIslandChunk()) { //Check chunk with chunk volcano
+                            chain.DestroyChain(true);
+                            return;
+                        }
 
-                } else if (chunkAB[1] == chain.endingHook.currentAnchorPoint.GetIslandChunk()) { //Ending hook attached to volcano (chunk 1)
-                    if (chunkAB[0].parentIsland == chain.beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland && chunkAB[0].parentIsland != null) { //Check Island with chunk volcano
-                        chain.DestroyChain(true);
-                        return;
-                    } else if (chunkAB[0] == chain.beginningHook.currentAnchorPoint.GetIslandChunk()) { //Check chunk with chunk volcano
-                        chain.DestroyChain(true);
-                        return;
+                    } else if (chunkAB[1] == chain.endingHook.currentAnchorPoint.GetIslandChunk()) { //Ending hook attached to volcano (chunk 1)
+                        if (chunkAB[0].parentIsland == chain.beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland && chunkAB[0].parentIsland != null) { //Check Island with chunk volcano
+                            chain.DestroyChain(true);
+                            return;
+                        } else if (chunkAB[0] == chain.beginningHook.currentAnchorPoint.GetIslandChunk()) { //Check chunk with chunk volcano
+                            chain.DestroyChain(true);
+                            return;
+                        }
                     }
                 }
             }

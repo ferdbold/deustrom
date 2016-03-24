@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using XInputDotNetPure;
 
 using AxisTuple = Eppy.Tuple<string, InputManager.EventAxis, float, float>;
 using ButtonTuple = Eppy.Tuple<string, InputManager.EventButton, bool>;
@@ -54,12 +56,13 @@ public class InputManager : MonoBehaviour {
         p2_rightTrigger 
     }
 
-    /// <summary>
-    /// Link a function to an event
-    /// </summary>
-    /// <param name="input">The event to be used</param>
-    /// <param name="eventFunction">The function to be call when the event is triggered</param>
-    public void AddEvent(Axis axis, EventAxis eventFunction) {
+   
+/// <summary>
+/// Link a function to an event
+/// </summary>
+/// <param name="input">The event to be used</param>
+/// <param name="eventFunction">The function to be call when the event is triggered</param>
+public void AddEvent(Axis axis, EventAxis eventFunction) {
         switch (axis) {
             case Axis.p1_leftAnalog: p1_leftAnalog += eventFunction; break;
             case Axis.p1_rightAnalog: p1_rightAnalog += eventFunction; break;
@@ -160,6 +163,56 @@ public class InputManager : MonoBehaviour {
     #region Utils
 
     public bool isDisabled = false;
+
+    #endregion
+
+    void Start() {
+        ConfigureGamepad();
+    }
+
+    void OnDestroy() {
+        RumbleGamePad(playerIndex1, 0f);
+        RumbleGamePad(playerIndex2, 0f);
+    }
+
+
+    #region Gamepad Rumble
+    private PlayerIndex playerIndex1;
+    private PlayerIndex playerIndex2;
+    private GamePadState padState1;
+    private GamePadState padState2;
+
+    void ConfigureGamepad() {
+        playerIndex1 = (PlayerIndex)0;
+        playerIndex2 = (PlayerIndex)1;
+        padState1 = GamePad.GetState(playerIndex1);
+        padState2 = GamePad.GetState(playerIndex1);
+    }
+
+    public void RumbleGamepad_Light(int playerIndex) {
+        switch(playerIndex) {
+            case 0:
+                StartCoroutine(RumbleGamePadTimed(playerIndex1, 0.30f, 0.15f));
+                break;
+            case 1:
+                StartCoroutine(RumbleGamePadTimed(playerIndex2, 0.30f, 0.15f));
+                break;
+            default:
+                Debug.Log("invalide player index given.");
+                break;
+
+        }  
+    }
+
+    private void RumbleGamePad(PlayerIndex playerIndex, float rumbleForce) {     
+        GamePad.SetVibration(playerIndex,rumbleForce, rumbleForce);
+    }
+
+    private IEnumerator RumbleGamePadTimed(PlayerIndex playerIndex, float rumbleForce, float time) {
+        RumbleGamePad(playerIndex, rumbleForce);
+        yield return new WaitForSeconds(time);
+        RumbleGamePad(playerIndex, 0f);
+    }
 
     #endregion
 

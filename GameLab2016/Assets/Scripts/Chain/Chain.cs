@@ -127,7 +127,7 @@ namespace Simoncouche.Chain {
             if (!_isPlayingSoundOnDestroy) {
                 RecalculateChainSections();
                 ChainMissAndHitUpdate();
-                //AttachedHookToIslandsUpdate();
+                AttachedHookToIslandsUpdateSimple();
             }
         }
             
@@ -200,83 +200,29 @@ namespace Simoncouche.Chain {
         /// <summary>
         /// Check if the connected islands of the hooks are null.  If they are, we destroy the chain.
         /// </summary>
-        private void AttachedHookToIslandsUpdate() {
-            bool mustDestroyChain = false;
+        private void AttachedHookToIslandsUpdateSimple() {
+            bool mustDestroy = false;
+            if(_beginningHookIsSet && beginningHook != null) {
+                if (beginningHook.currentAnchorPoint == null) mustDestroy = true;
+                else if (beginningHook.targetJoint == null) mustDestroy = true;
+                else if(_endingHookIsSet && endingHook != null) {
+                    if (endingHook.currentAnchorPoint == null) mustDestroy = true;
+                    else if (endingHook.targetJoint == null) mustDestroy = true;
+                }
+            }
+            if(mustDestroy) this.DestroyChain(true);
+        }
+
+        /// <summary>
+        /// Check if the player who entered the maelstrom  is currently attached to a hook. If so, we destroy the chain.
+        /// </summary>
+        /// <param name="pc">Player controller of the player who entered the maelstrom</param>
+        private void OnMaelstromEnterOfPlayer(Controller.PlayerController pc) {
             if (_beginningHookIsSet && beginningHook != null) {
-                //IF the connectedBody doesnt exist anymore then we destroy the chain
-                if (beginningHook.targetJoint.connectedBody == null) mustDestroyChain = true;
-                //IF the Island or the Chunk doesnt exist anymore then we destroy the chain
-                else if (beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
-                    if (beginningHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed
-                        || beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed)
-                        mustDestroyChain = true;
-                }
-                //IF the island attached to our beginning hook and grabbed by the enemy doesnt exist anymore then we destroy the chain
-                if (beginningHook.islandIsGrabbedEnemy &&
-                      (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
-                      LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))
-                    mustDestroyChain = true;
-                else if (_endingHookIsSet && endingHook != null) {
-                    //IF the connectedBody of our ending hook doesnt exist anymore then we destroy the chain
-                    if (endingHook.targetJoint.connectedBody == null) mustDestroyChain = true;
-                    //IF the Island or the Chunk connected to our ending hook doesnt exist anymore then we destroy the chain
-                    else if (endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>() != null) {
-                        if (endingHook.targetJoint.connectedBody.gameObject.GetComponent<GravityBody>().isDestroyed
-                            || beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.isDestroyed)
-                            mustDestroyChain = true;
-                    }
-                    //IF the island attached to our ending hook and grabbed by the enemy doesnt exist anymore then we destroy the chain
-                    if (endingHook.islandIsGrabbedEnemy &&
-                        (thrower.isSobek ? LevelManager.cthulhuPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null :
-                        LevelManager.sobekPlayer.GetComponent<Controller.PlayerGrab>().grabbedBody == null))
-                        mustDestroyChain = true;
-
-                    if (mustDestroyChain) DestroyChain(true);
-                }
+                if (beginningHook.targetJoint.connectedBody = pc.GetComponent<Rigidbody2D>()) this.DestroyChain(true);
+            }else if(_endingHookIsSet && endingHook != null) {
+                if (endingHook.targetJoint.connectedBody = pc.GetComponent<Rigidbody2D>()) this.DestroyChain(true);
             }
-        }
-
-
-        /// <summary>
-        /// Check if the volcano attached to a beginning hook is touching an island
-        /// </summary>
-        /// <returns>If the volcano touch an island, we return true to destroy the chain</returns>
-        private bool CheckVolcanoOnBeginningHook() {
-            bool mustDestroy = false;
-            Island parentIsland = endingHook.currentAnchorPoint.GetIslandChunk().parentIsland;
-            if (parentIsland != null) {
-                if (parentIsland.rigidbody.GetComponent<Collider2D>()
-                    .IsTouching(beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>())) {
-                    mustDestroy = true;
-                }
-            } else {
-                if (endingHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>()
-                    .IsTouching(beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>())) {
-                    mustDestroy = true;
-                }
-            }
-            return mustDestroy;
-        }
-
-        /// <summary>
-        /// Check if the volcano attached to a ending hook is touching an island
-        /// </summary>
-        /// <returns>If the volcano touch an island, we return true to destroy the chain</returns>
-        private bool CheckVolcanoOnEndingHook() {
-            bool mustDestroy = false;
-            Island parentIsland = beginningHook.currentAnchorPoint.GetIslandChunk().parentIsland;
-            if (parentIsland != null) {
-                if (parentIsland.rigidbody.GetComponent<Collider2D>()
-                    .IsTouching(endingHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>())) {
-                    mustDestroy = true;
-                }
-            } else {
-                if (beginningHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>()
-                    .IsTouching(endingHook.currentAnchorPoint.GetIslandChunk().gravityBody.rigidbody.GetComponent<Collider2D>())) {
-                    mustDestroy = true;
-                }
-            }
-            return mustDestroy;
         }
 
         /// <summary>
