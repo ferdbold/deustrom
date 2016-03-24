@@ -222,18 +222,18 @@ namespace Simoncouche.Islands {
             }
             
             if(islandToBreak != null){
-                if (volcano.volcanoActive) {
+                //if (volcano.volcanoActive) {
                     GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
                     ParticleGO.transform.parent = volcano.transform;
                     TakeDamageHandler(islandChunkToBreak, 1000, volcano, volcano.gravityBody.Velocity);
                     Destroy(volcano.gameObject);
-                } else {
+                /*} else {
                     if (islandChunkToBreak.color != IslandUtils.color.neutral) {
                         GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
                         ParticleGO.transform.parent = volcano.transform;
                         islandChunkToBreak.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
                     }
-                }
+                }*/
             }
             if(chunkToPush != null) {
                 GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);

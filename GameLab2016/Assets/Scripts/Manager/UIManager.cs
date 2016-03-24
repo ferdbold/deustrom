@@ -41,12 +41,17 @@ public class UIManager : MonoBehaviour {
     private List<ScoreWidget> _scoreWidgets;
     private List<WinsWidget> _winsWidgets;
     private List<IslandCountWidget> _islandCountWidgets;
+    public TutorialUI _tutoWidget { get; private set; }
     private Image _seal;
     private Image _winSeal;
     private Text _promptText;
     private Text _miniPromptText;
 
     // METHODS
+
+    public void SetupTutoWidget() {
+        _tutoWidget = GameObject.Find("UI/Tutorial").GetComponent<TutorialUI>();
+    }
 
     public void Setup() {
         this.root = GameObject.Find("UI").GetComponent<Canvas>();
@@ -63,7 +68,6 @@ public class UIManager : MonoBehaviour {
         foreach (ParticleSystem ps in _scoreWidgets[(int)LevelManager.Player.sobek]
             .leadParticles.GetComponentsInChildren<ParticleSystem>()) {
             ps.playOnAwake = true;
-            Debug.Log(ps);
         }
         foreach (ParticleSystem ps in _scoreWidgets[(int)LevelManager.Player.cthulu]
             .leadParticles.GetComponentsInChildren<ParticleSystem>()) {
