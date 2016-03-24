@@ -285,7 +285,7 @@ ParticleSystem:
   randomSeed: 0
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   moveWithTransform: 1
   scalingMode: 1
   InitialModule:
@@ -1729,7 +1729,7 @@ ParticleSystem:
   randomSeed: 0
   looping: 1
   prewarm: 1
-  playOnAwake: 1
+  playOnAwake: 0
   moveWithTransform: 1
   scalingMode: 1
   InitialModule:
@@ -3153,7 +3153,7 @@ ParticleSystem:
   randomSeed: 0
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   moveWithTransform: 1
   scalingMode: 1
   InitialModule:
@@ -4597,7 +4597,7 @@ ParticleSystem:
   randomSeed: 0
   looping: 1
   prewarm: 1
-  playOnAwake: 1
+  playOnAwake: 0
   moveWithTransform: 1
   scalingMode: 1
   InitialModule:
