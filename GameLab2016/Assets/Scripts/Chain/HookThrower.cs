@@ -174,11 +174,13 @@ namespace Simoncouche.Chain {
 
                         // Animation handling
                         playerController.HandleFirstHookAnimation();
-
                         // Audio
                         playerAudio.PlaySound(PlayerSounds.PlayerChainFirst);
-
+                        // Rumble
+                        if (playerController.IsPlayerOne) GameManager.inputManager.RumbleGamepad_Light(0);
+                        else GameManager.inputManager.RumbleGamepad_Light(1);
                         break;
+
 
                     // If we press fire when we have 1 hook, 
                     // we create a hook and switch the currentState to NoHook

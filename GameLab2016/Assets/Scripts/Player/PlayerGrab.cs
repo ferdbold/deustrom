@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Simoncouche.Islands;
 using Simoncouche.Chain;
 
+
 namespace Simoncouche.Controller {
     
     [RequireComponent(typeof(Rigidbody2D))]
@@ -159,8 +160,11 @@ namespace Simoncouche.Controller {
                     IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
                     if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) { 
                         //Initiate Grab
-                        Grab(targetBody, targetChunk, 0f);
+                        Grab(targetBody, targetChunk, 0f, true);
                         this.isIslandGrabbed = true; //On ne possède plus le body
+
+
+
                     }
                 }
             }
@@ -174,13 +178,13 @@ namespace Simoncouche.Controller {
                 IslandChunk targetChunk = targetBody.gameObject.GetComponent<IslandChunk>();
                 if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) {
                     //Initiate Grab
-                    Grab(targetBody, targetChunk, 0f);
+                    Grab(targetBody, targetChunk, 0f, true);
                     this.isIslandGrabbed = true; //On ne possède plus le body
                 }
             }
         }
 
-        private void Grab(GravityBody targetBody, IslandChunk targetChunk, float repositionDelay) {
+        private void Grab(GravityBody targetBody, IslandChunk targetChunk, float repositionDelay, bool rumble) {
             //Before grabbing, make the other players release this chunk
             MakeOtherPlayerRelease(targetChunk);
             grabbedBody = targetBody;
@@ -229,6 +233,11 @@ namespace Simoncouche.Controller {
             _playerController.HandleGrabStartAnimation();
             //Sounds
             _playerAudio.PlaySound(PlayerSounds.PlayerGrab);
+            //Rumble
+            if (rumble) {
+                if (_playerController.IsPlayerOne) GameManager.inputManager.RumbleGamepad_Light(0);
+                else GameManager.inputManager.RumbleGamepad_Light(1);
+            }
 
 
         }
@@ -326,6 +335,9 @@ namespace Simoncouche.Controller {
                 _playerController.HandlePushAnimation();
                 //Sounds
                 _playerAudio.PlaySound(PlayerSounds.PlayerPush);
+                //Rumble
+                if (_playerController.IsPlayerOne) GameManager.inputManager.RumbleGamepad_Light(0);
+                else GameManager.inputManager.RumbleGamepad_Light(1);
             } else {
                 Debug.LogWarning("Attempted to throw when grabbedBody is null.");             
             }
@@ -509,7 +521,7 @@ namespace Simoncouche.Controller {
                 if (pg.grabbedBody == bodyToMerge) {
                     //Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " because it was merged.");
                     pg.Release();
-                    if (regrab) pg.Grab(bodyToMerge, bodyToMerge.gameObject.GetComponent<IslandChunk>(), GameManager.islandManager.GetMergeTime());
+                    if (regrab) pg.Grab(bodyToMerge, bodyToMerge.gameObject.GetComponent<IslandChunk>(), GameManager.islandManager.GetMergeTime(), false);
                 }
             }
         }
@@ -539,7 +551,7 @@ namespace Simoncouche.Controller {
         private IEnumerator RegrabCoroutine( GravityBody bodyToGrab, float delay) {
             yield return new WaitForSeconds(delay);
             if (bodyToGrab != null) {
-                Grab(bodyToGrab, bodyToGrab.gameObject.GetComponent<IslandChunk>(), GameManager.islandManager.GetMergeTime());
+                Grab(bodyToGrab, bodyToGrab.gameObject.GetComponent<IslandChunk>(), GameManager.islandManager.GetMergeTime(), false);
             } else Debug.LogWarning("Attempted to regrab an body which has been destroyed. No grab occured.");
         }
 

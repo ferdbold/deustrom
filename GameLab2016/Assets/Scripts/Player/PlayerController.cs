@@ -456,7 +456,10 @@ namespace Simoncouche.Controller {
                     otherPlayer.GetBumped(col.relativeVelocity * BUMP_FORCE);
                     //Decrease speed and start Bump cooldown
                     _playerRigidBody.velocity = _playerRigidBody.velocity - col.relativeVelocity;
-                    StartPlayerBumpCooldown();                   
+                    StartPlayerBumpCooldown();
+                    //Rumble both players
+                    GameManager.inputManager.RumbleGamepad_Light(0);
+                    GameManager.inputManager.RumbleGamepad_Light(1);
                 }
             }
         }
