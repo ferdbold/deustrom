@@ -54,7 +54,8 @@ public class TutorialUI : MonoBehaviour {
     IEnumerator PlayTuto(MovieTexture video) {
         OpenClose(true, timeToOpen);
         yield return new WaitForSeconds(timeToOpen);
-        GameManager.Instance.Pause();
+        video.Play();
+        //GameManager.Instance.Pause();
         movie.material.mainTexture = video;
 
         while (!skip) {
