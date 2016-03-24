@@ -63,7 +63,6 @@ public class UIManager : MonoBehaviour {
         foreach (ParticleSystem ps in _scoreWidgets[(int)LevelManager.Player.sobek]
             .leadParticles.GetComponentsInChildren<ParticleSystem>()) {
             ps.playOnAwake = true;
-            Debug.Log(ps);
         }
         foreach (ParticleSystem ps in _scoreWidgets[(int)LevelManager.Player.cthulu]
             .leadParticles.GetComponentsInChildren<ParticleSystem>()) {
