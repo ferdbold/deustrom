@@ -141,9 +141,12 @@ public class LevelManager {
     }
 
     IEnumerator WaitTimeUntilPlayerCanPlay(float time) {
+        GameManager.audioManager.ToggleGameplaySounds(false);
         //GameManager.inputManager.enabled = false;
         //GameManager.Instance.Pause();
         yield return new WaitForRealSeconds(time);
+        GameManager.audioManager.ToggleGameplaySounds(false);
+
         //GameManager.Instance.UnPause();
         //GameManager.inputManager.enabled = true;
     }
@@ -166,8 +169,8 @@ public class LevelManager {
         sobekScore = -10000;
         cthuluScore = -10000;
 
-        GameManager.audioManager.ToggleAmbiantSounds(false);
         GameManager.audioManager.ToggleGameplaySounds(false);
+        GameManager.audioManager.PlayMusic(MusicSound.Choice.endGame);
 
         _waitingForMatchEndInput = true;
         GameManager.Instance.disableScoring = true;
@@ -188,6 +191,7 @@ public class LevelManager {
     #region Used for callback
     private void OnMatchEndCthulu() {
         OnGameEnd(Player.cthulu);
+
     }
 
     private void OnMatchEndSobek() {

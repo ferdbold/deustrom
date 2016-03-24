@@ -32,7 +32,7 @@ public class AudioManager : MonoBehaviour {
 
     private void Awake() {
         source = GetComponentInChildren<AudioSource>();
-        audioMixer = GameObject.FindObjectOfType<AudioMixer>();
+        audioMixer = source.outputAudioMixerGroup.audioMixer;
         AmbiantSounds = transform.Find("Ambiant").gameObject;
     }
 
@@ -45,13 +45,12 @@ public class AudioManager : MonoBehaviour {
         AmbiantSounds.SetActive(active);
     }
 
-    public void ToggleGameplaySounds(bool isOff) {
-        if (isOff) {
-            this.audioMixer.SetFloat("Swimming", 0.0f);
-            this.audioMixer.SetFloat("Gameplay", 0.0f);
+    public void ToggleGameplaySounds(bool active) {
+        Debug.Log(this.audioMixer);
+        if (!active) {
+            this.audioMixer.SetFloat("GameplayVolume", -80.0f);
         } else {
-            this.audioMixer.SetFloat("Swimming", 100.0f);
-            this.audioMixer.SetFloat("Gameplay", 100.0f);
+            this.audioMixer.SetFloat("GameplayVolume", 0.0f);
         }
     }
     
@@ -60,18 +59,20 @@ public class AudioManager : MonoBehaviour {
         switch (music) {
             case MusicSound.Choice.menu:
                 choice = _music.menuMusic;
+                source.loop = true;
                 break;
 
             case MusicSound.Choice.play:
                 choice = _music.playMusic;
+                source.loop = true;
                 break;
 
             case MusicSound.Choice.endGame:
                 choice = _music.endGameMusic;
+                this.ToggleAmbiantSounds(false);
+                source.loop = false;
                 break;
         }
-
-        source.loop = true;
         source.clip = choice;
         source.Play();
     }
@@ -100,6 +101,9 @@ public class CharacterSound : SoundClass {
 
 [System.Serializable]
 public class SobekSpecificSound : SoundClass {
+
+    public SobekSpecificSound() {
+    }
 
     [SerializeField]
     [Tooltip("AudioClip played when player swims")]
