@@ -90,11 +90,13 @@ namespace Simoncouche.UI {
         private void LoadBible() {
             BibleEntries entries = BibleEntries.LoadBibleEntries();
 
-            // Reverse entry order for twitter-like behaviour
-            entries.quoteListCthulu.Reverse();
-            entries.quoteListSobek.Reverse();
+            
 
             if (entries != null) {
+                // Reverse entry order for twitter-like behaviour
+                entries.quoteListCthulu.Reverse();
+                entries.quoteListSobek.Reverse();
+
                 foreach (BibleQuote entry in entries.quoteListCthulu) {
                     BibleQuoteWidget widget = BibleQuoteWidget.Create(
                         LevelManager.Player.cthulu, 
