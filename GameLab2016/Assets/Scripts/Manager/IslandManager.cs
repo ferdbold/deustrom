@@ -222,10 +222,11 @@ namespace Simoncouche.Islands {
             }
             GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
             ParticleGO.transform.parent = volcano.transform;
-       
+            
+            //TODO do something
             if(islandToBreak != null){
-                islandChunkToBreak.TakeDamage(PlayerGrab.BodyIsGrabbed(volcano.gravityBody) ? 100 : 1, volcano, 3 * volcano.gravityBody.Velocity);
-                StartCoroutine(ChangeVolcanoToNeutralIsland(volcano));
+                /*islandChunkToBreak.TakeDamage(PlayerGrab.BodyIsGrabbed(volcano.gravityBody) ? 100 : 1, volcano, 3 * volcano.gravityBody.Velocity);
+                StartCoroutine(ChangeVolcanoToNeutralIsland(volcano));*/
             }
             if(chunkToPush != null) {
                 PushChunk(chunkToPush, volcano);
