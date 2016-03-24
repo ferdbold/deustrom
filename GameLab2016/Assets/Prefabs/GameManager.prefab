@@ -257,7 +257,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   Priority: 128
@@ -510,7 +510,9 @@ MonoBehaviour:
       _playerRespawn:
       - {fileID: 8300000, guid: 687d525a0f720ee4ebd5a24fb5aeeea1, type: 3}
       _conversion:
-      - {fileID: 8300000, guid: 8a3c3ec672c1d884e8eedbf4f9fbfadc, type: 3}
+      - {fileID: 8300000, guid: e3891156096060a44be9895c364fbe14, type: 3}
+      _conversionRiser:
+      - {fileID: 8300000, guid: 38b8203807b10a24dba964f06b3532ee, type: 3}
       _fastChant:
       - {fileID: 8300000, guid: c9f82067bad72bc4c85b484beee43baa, type: 3}
       _slowChant:
@@ -545,7 +547,9 @@ MonoBehaviour:
       _playerRespawn:
       - {fileID: 8300000, guid: 687d525a0f720ee4ebd5a24fb5aeeea1, type: 3}
       _conversion:
-      - {fileID: 8300000, guid: 304a50985de90b547bb385d6cd13b849, type: 3}
+      - {fileID: 8300000, guid: 505afb3c019822c4e9e911d4bae75e07, type: 3}
+      _conversionRiser:
+      - {fileID: 8300000, guid: 38b8203807b10a24dba964f06b3532ee, type: 3}
       _fastChant:
       - {fileID: 8300000, guid: f71ac2f337c0fcc4db03e5728527bf76, type: 3}
       _slowChant:
@@ -650,7 +654,7 @@ MonoBehaviour:
   _disableScoring: 0
   _matchToWin: 2
   lastWinner: 1
-  _currentScene: 1
+  _currentScene: 0
   SCENE_MENU_NAME: Menu
   SCENE_CUTSCENE: Cutscene
   SCENE_BIBLE_WRITING: BibleWriter

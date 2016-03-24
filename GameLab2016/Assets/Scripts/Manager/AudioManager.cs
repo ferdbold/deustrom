@@ -134,6 +134,10 @@ public class SobekSpecificSound : SoundClass {
     public AudioClip conversion { get { return GetRandom(_conversion); } }
 
     [SerializeField]
+    private List<AudioClip> _conversionRiser;
+    public AudioClip ConversionRiser { get { return GetRandom(_conversionRiser); } }
+
+    [SerializeField]
     private List<AudioClip> _fastChant;
     public AudioClip fastChant { get { return GetRandom(_fastChant); } }
 
@@ -189,6 +193,10 @@ public class CthuluSpecificSound : SoundClass {
     [SerializeField]
     private List<AudioClip> _conversion;
     public AudioClip Conversion { get { return GetRandom(_conversion); } }
+
+    [SerializeField]
+    private List<AudioClip> _conversionRiser;
+    public AudioClip ConversionRiser { get { return GetRandom(_conversionRiser); } }
 
     [SerializeField]
     private List<AudioClip> _fastChant;

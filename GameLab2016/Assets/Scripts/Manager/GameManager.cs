@@ -251,7 +251,7 @@ public class GameManager : MonoBehaviour {
                     feeders[i].OnStart();
                 }
 
-                audioManager.ToggleAmbiantSounds(true);
+                audioManager.ToggleAmbiantSounds(true);              
                 StartCoroutine("CalculateScoreCoroutine");
                 this.gameStarted = true;
 

@@ -161,8 +161,6 @@ namespace Simoncouche.Islands {
                 gravityBody.Weight -= chunk.gravityBody.Weight;
                 chunk.gravityBody.ActivateGravityBody();
 
-                chunk.ResetMergeability(0.5f);
-
                 if (chunks.Count <= 0) {
                     Destroy(gameObject);
                 }
