@@ -339,7 +339,7 @@ public class GameManager : MonoBehaviour {
     }
 
     #endregion
-
+    
     private IEnumerator CalculateScoreCoroutine()
     {
         while (true)

@@ -83,6 +83,20 @@ namespace Simoncouche.Islands {
         [Tooltip("If true, Spawn change will act in a multiplicative manner. If false, will simply add % together.")]
         private bool SPAWN_CHANGE_MULTIPLICATIVE = false;
 
+        [SerializeField] [Tooltip("Interval in which a new volcano will spawn")]
+        private Vector2 VOLCANO_SPAWN_INTERVAL = new Vector2(20f, 60f);
+        
+        [SerializeField] [Tooltip("Amt of chunks of the same color in an island needed for volcano to have a small change to spawn")]
+        private int AMT_ISLANDS_VOLCANO_SPAWN_LIGHT = 4;
+        
+        [SerializeField] [Tooltip("Amt of chunks of the same color in an island needed for volcano to have a medium change to spawn")]
+        private int AMT_ISLANDS_VOLCANO_SPAWN_MEDIUM = 6;
+        
+        [SerializeField] [Tooltip("Amt of chunks of the same color in an island needed for volcano to have a big change to spawn")]
+        private int AMT_ISLANDS_VOLCANO_SPAWN_HIGH = 8;
+
+        
+
 
         [Header("Visual")]
 
@@ -105,6 +119,12 @@ namespace Simoncouche.Islands {
         private int _pCthulhuIsland = 0; //current Number of island of cthulhu
         private int _pVolcanoIsland = 0; //current Number of volcano islands
         private int _pNeutralIsland = 0; //current Number of neutral islands
+        private int _pBiggestSobekIsland = 0; //Biggest sobek island
+        private int _pBiggestCthulhuIsland = 0; //Biggest cthulhu island
+        //Volcano
+        private float _timeSinceLastVolcano = 0f;
+        private float _timeSinceLastVolcanoSpawnCheck = 0f;
+        private float _timeInbetweenVolcanoSpawnChecks = 1f;
         //Instantiated objects refs
         private List<List<ChunkWithCollider>> _islandRows;
         private GameObject _islandContainer;
@@ -118,6 +138,8 @@ namespace Simoncouche.Islands {
         private float _timeSinceLastSpawn = 0f; //current time since last island spawn
         //Tutorial Spawning
         private enum TutorialState { NoIsland, OneIsland, ThreeIsland, VolcanoPhase, EndTutorial };
+
+
         [Header("TUTORIAL")]
         [Tooltip("Start tutorial or not")]
         public bool _inTutorial = true;
@@ -133,16 +155,18 @@ namespace Simoncouche.Islands {
         
 
         void Awake() {
-            _islandRows = new List<List<ChunkWithCollider>>(); //Create data obj_islandRows = new List<List<ChunkWithCollider>>(); //Create data obj
-            GenerateIslandContainer();
+
 
             _volcanoPrefab = (GameObject)Resources.Load("Island/Volcano");
         }
 
         public void OnStart() {
             if (_isStarted == false) {
-                if(_islandRows == null) _islandRows = new List<List<ChunkWithCollider>>(); 
                 _isStarted = true;
+
+                _islandRows = new List<List<ChunkWithCollider>>();
+                GenerateIslandContainer();
+        
                 _islandParentTransform = GameManager.islandManager.GetIslandSubFolder(); //Get ISland Subfolder from manager
                 for (int i = 0; i <= MIN_COLUMN; ++i) {
                     GenerateColumn();
@@ -179,9 +203,22 @@ namespace Simoncouche.Islands {
         private void ManageSpawn() {
             //Update Spawn Timer
             _timeSinceLastSpawn += Time.deltaTime;
+            _timeSinceLastVolcano += Time.deltaTime;
+            _timeSinceLastVolcanoSpawnCheck += Time.deltaTime;
             if (_timeSinceLastSpawn > _modifiedSpawnRate) {
                 _timeSinceLastSpawn = 0f;
                 StartReleaseProcessOnRandomIsland();
+            }
+            if (_timeSinceLastVolcano > VOLCANO_SPAWN_INTERVAL.x)
+            {
+                if(_timeSinceLastVolcano > VOLCANO_SPAWN_INTERVAL.y) {
+                    StartReleaseProcessOnVolcano();
+                }
+                if (_timeSinceLastVolcanoSpawnCheck > _timeInbetweenVolcanoSpawnChecks)
+                {
+                    _timeSinceLastVolcanoSpawnCheck = 0f;
+                    CheckVolcanoSpawnConditions();
+                }            
             }
         }
 
@@ -354,6 +391,7 @@ namespace Simoncouche.Islands {
 
         /// <summary> Select a random island in column and trasnform it into a volcano and start release process </summary>
         private void StartReleaseProcessOnVolcano(){
+            _timeSinceLastVolcano = 0;
             int randIndex = Random.Range(0, _islandRows[0].Count);
             ChunkWithCollider selectedChunk = _islandRows[0][randIndex];
             RemoveIslandChunkFromList(selectedChunk, 0);
@@ -472,6 +510,23 @@ namespace Simoncouche.Islands {
             _modifiedSpawnRate = Mathf.Max(_modifiedSpawnRate, 0.5f);
         }
 
+        /// <summary> Check if we need to spanw a volcano </summary>
+        private void CheckVolcanoSpawnConditions() {
+            int curOpponentBigIsland;
+            if (IS_SOBEK) curOpponentBigIsland = _pBiggestCthulhuIsland;
+            else curOpponentBigIsland = _pBiggestSobekIsland;
+
+            float randChange = Random.Range(0f, 1f);
+            if(curOpponentBigIsland > AMT_ISLANDS_VOLCANO_SPAWN_HIGH) {
+                if(randChange > 0.75f) StartReleaseProcessOnVolcano();
+            } else if (curOpponentBigIsland > AMT_ISLANDS_VOLCANO_SPAWN_MEDIUM) {
+                if (randChange > 0.20f) StartReleaseProcessOnVolcano();
+            } else if (curOpponentBigIsland > AMT_ISLANDS_VOLCANO_SPAWN_LIGHT) {
+                if (randChange > 0.05f) StartReleaseProcessOnVolcano();
+            }
+        }
+
+
         /// <summary> Update the spawn paramaters in a timed loop</summary>
         private IEnumerator UpdateSpawnParametersCoroutine() {
             while (true) {
@@ -486,9 +541,11 @@ namespace Simoncouche.Islands {
             _pSobekIsland = 0;
             _pCthulhuIsland = 0;
             _pVolcanoIsland = 0;
+            _pBiggestSobekIsland = 0;
+            _pBiggestCthulhuIsland = 0;
             List<IslandChunk> _CurChunks = GameManager.islandManager.GetIslandChunks();
             List<IslandChunk> _CurPendingChunks = GameManager.islandManager.GetPendingIslandChunks();
-
+            List<Island> _CurIslands = GameManager.islandManager.GetIslands();
 
             float _pSobekScorePercent = (float)GameManager.levelManager.sobekScore / (float)GameManager.Instance.pointsGoal * 100f;
             float _pCthulhuScorePercent = (float)GameManager.levelManager.cthuluScore / (float)GameManager.Instance.pointsGoal * 100f;
@@ -506,6 +563,18 @@ namespace Simoncouche.Islands {
                 if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
                 if (ic.color == IslandUtils.color.volcano) ++_pVolcanoIsland;
             }
+            foreach (Island i in _CurIslands)
+            {
+                int tMaxSobek = 0;
+                int tMaxCthulhu = 0;
+                foreach(IslandChunk ic in i.chunks) {
+                    if (ic.color == IslandUtils.color.red) ++tMaxSobek;
+                    if (ic.color == IslandUtils.color.blue) ++tMaxCthulhu;
+                }
+                if (tMaxSobek > _pBiggestSobekIsland) _pBiggestSobekIsland = tMaxSobek;
+                if (tMaxCthulhu > _pBiggestCthulhuIsland) _pBiggestCthulhuIsland = tMaxCthulhu;
+            }
+
             if (IS_SOBEK)
             {
                 _pIslandDiffPlayers = _pSobekIsland - _pCthulhuIsland;
