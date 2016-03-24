@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.Audio;
 using System.Collections.Generic;
 
 public class AudioManager : MonoBehaviour {
+
+    public AudioMixer audioMixer { get; private set; }
 
     private GameObject AmbiantSounds;
 
@@ -29,6 +32,7 @@ public class AudioManager : MonoBehaviour {
 
     private void Awake() {
         source = GetComponentInChildren<AudioSource>();
+        audioMixer = source.outputAudioMixerGroup.audioMixer;
         AmbiantSounds = transform.Find("Ambiant").gameObject;
     }
 
@@ -40,24 +44,35 @@ public class AudioManager : MonoBehaviour {
     public void ToggleAmbiantSounds(bool active) {
         AmbiantSounds.SetActive(active);
     }
+
+    public void ToggleGameplaySounds(bool active) {
+        Debug.Log(this.audioMixer);
+        if (!active) {
+            this.audioMixer.SetFloat("GameplayVolume", -80.0f);
+        } else {
+            this.audioMixer.SetFloat("GameplayVolume", 0.0f);
+        }
+    }
     
     public void PlayMusic(MusicSound.Choice music) {
         AudioClip choice = null;
         switch (music) {
             case MusicSound.Choice.menu:
                 choice = _music.menuMusic;
+                source.loop = true;
                 break;
 
             case MusicSound.Choice.play:
                 choice = _music.playMusic;
+                source.loop = true;
                 break;
 
             case MusicSound.Choice.endGame:
                 choice = _music.endGameMusic;
+                this.ToggleAmbiantSounds(false);
+                source.loop = false;
                 break;
         }
-
-        source.loop = true;
         source.clip = choice;
         source.Play();
     }
@@ -81,12 +96,15 @@ public class CharacterSound : SoundClass {
     [SerializeField]
     private CthuluSpecificSound _cthuluSound;
     public CthuluSpecificSound cthuluSpecificSound { get { return _cthuluSound; } }
-
    
 }
 
 [System.Serializable]
 public class SobekSpecificSound : SoundClass {
+
+    public SobekSpecificSound() {
+    }
+
     [SerializeField]
     [Tooltip("AudioClip played when player swims")]
     private List<AudioClip> _swim;

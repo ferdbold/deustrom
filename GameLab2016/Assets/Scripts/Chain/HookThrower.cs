@@ -133,14 +133,14 @@ namespace Simoncouche.Chain {
         }
 
         private void OnDebugFireDown() {
-            if (this.playerGrab.grabbedBody==null) { 
+            if (this.playerGrab.grabbedBody!=null) { 
             this.autoAimController.enabled = true;
             this.aimController.ToggleAimIndicator(true);
             }
         }
 
         private void OnDebugFireUp() {
-            if (this.playerGrab.grabbedBody==null) {
+            if (this.playerGrab.grabbedBody!=null) {
                 this.autoAimController.enabled = false;
                 this.aimController.ToggleAimIndicator(false);
                 this.Fire();

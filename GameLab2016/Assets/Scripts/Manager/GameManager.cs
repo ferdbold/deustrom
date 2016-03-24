@@ -263,10 +263,13 @@ public class GameManager : MonoBehaviour {
         switch (scene) {
             case Scene.Menu:
                 audioManager.ToggleAmbiantSounds(false);
+                audioManager.PlayMusic(MusicSound.Choice.menu);
                 break;
 
             case Scene.PlayLevel:
-                    
+                audioManager.ToggleGameplaySounds(true);
+                audioManager.ToggleAmbiantSounds(true);
+                audioManager.PlayMusic(MusicSound.Choice.play);
                 islandManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_matchToWin);
@@ -293,6 +296,7 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case Scene.BibleWriter:
+                audioManager.PlayMusic(MusicSound.Choice.menu);
                 audioManager.ToggleAmbiantSounds(false);
                 break;
 
@@ -353,7 +357,9 @@ public class GameManager : MonoBehaviour {
 
 		if (_currentScene == Scene.PlayLevel) {
 			if (this.isPaused) {
-				UnPause();
+                GameManager.audioManager.ToggleGameplaySounds(true);
+                GameManager.audioManager.ToggleAmbiantSounds(true);
+                UnPause();
 			} else {
 				Pause();
 			}
@@ -366,6 +372,8 @@ public class GameManager : MonoBehaviour {
     public void Pause() {
         Debug.LogWarning("The game was paused, don't freak out");
         ChangePauseStatus(true);
+        GameManager.audioManager.ToggleGameplaySounds(false);
+        GameManager.audioManager.ToggleAmbiantSounds(false);
 
         this.Paused.Invoke();
     }
@@ -375,6 +383,8 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     public void UnPause() {
         ChangePauseStatus(false);
+        GameManager.audioManager.ToggleGameplaySounds(true);
+        GameManager.audioManager.ToggleAmbiantSounds(true);
 
         this.Unpaused.Invoke();
     }
