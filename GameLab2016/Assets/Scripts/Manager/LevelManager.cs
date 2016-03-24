@@ -104,7 +104,6 @@ public class LevelManager {
     /// <param name="scoreAdded">The score added to the player score</param>
     /// <param name="originPos">The position of the object that produced the points </param>
     public void AddScore(Player player, int scoreAdded, Vector3 originPos) {
-        
         if (!GameManager.Instance.disableScoring) {
             if (player == Player.sobek) {
                 sobekScore += scoreAdded;
