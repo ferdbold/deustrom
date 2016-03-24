@@ -95,6 +95,9 @@ namespace Simoncouche.Islands {
         [SerializeField] [Tooltip("Amt of chunks of the same color in an island needed for volcano to have a big change to spawn")]
         private int AMT_ISLANDS_VOLCANO_SPAWN_HIGH = 8;
 
+        [SerializeField] [Tooltip("Maximum amount of volcano currently spawned")]
+        private int MAX_AMT_VOLCANO = 3;
+
         
 
 
@@ -206,14 +209,17 @@ namespace Simoncouche.Islands {
             }
             if (_timeSinceLastVolcano > VOLCANO_SPAWN_INTERVAL.x)
             {
-                if(_timeSinceLastVolcano > VOLCANO_SPAWN_INTERVAL.y) {
-                    StartReleaseProcessOnVolcano();
-                }
-                if (_timeSinceLastVolcanoSpawnCheck > _timeInbetweenVolcanoSpawnChecks)
-                {
+                if (_pVolcanoIsland >= MAX_AMT_VOLCANO) {  //Max amount of volcanoes reached
                     _timeSinceLastVolcanoSpawnCheck = 0f;
-                    CheckVolcanoSpawnConditions();
-                }            
+                } else { //If not max amount of islands
+                    if (_timeSinceLastVolcano > VOLCANO_SPAWN_INTERVAL.y) {
+                        StartReleaseProcessOnVolcano();
+                    }
+                    if (_timeSinceLastVolcanoSpawnCheck > _timeInbetweenVolcanoSpawnChecks) {
+                        _timeSinceLastVolcanoSpawnCheck = 0f;
+                        CheckVolcanoSpawnConditions();
+                    }
+                }     
             }
         }
 
@@ -240,8 +246,7 @@ namespace Simoncouche.Islands {
                 case (TutorialState.VolcanoPhase):
                     if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.EndTutorial);
                     if (_pVolcanoIsland < 1) { //Spawn volcano if there is none
-                        StartReleaseProcessOnVolcano();
-                        UpdateSpawnParameters();
+                        StartReleaseProcessOnVolcano();                    
                     }
                     break;
             }
@@ -386,15 +391,17 @@ namespace Simoncouche.Islands {
 
         /// <summary> Select a random island in column and trasnform it into a volcano and start release process </summary>
         private void StartReleaseProcessOnVolcano(){
-            _timeSinceLastVolcano = 0;
-            int randIndex = Random.Range(0, _islandRows[0].Count);
+            _timeSinceLastVolcano = 0; // reset time
+            int randIndex = Random.Range(0, _islandRows[0].Count); // get random chunk to transform
             ChunkWithCollider selectedChunk = _islandRows[0][randIndex];
             RemoveIslandChunkFromList(selectedChunk, 0);
             IslandUtils.color prevColor = selectedChunk.chunk.color;
             selectedChunk.chunk.ConvertChunkToAnotherColor(IslandUtils.color.volcano);
-            GameManager.islandManager.AddPendingIslandChunk(selectedChunk.chunk);
+
+            GameManager.islandManager.AddPendingIslandChunk(selectedChunk.chunk); //add volcano to pending list
             StartCoroutine(TransformIntoVolcano(selectedChunk, prevColor));
-            
+            UpdateSpawnParameters();
+
         }
 
         /// <summary> Coroutine that transform a basic island into a volcano then start it's spawn process</summary>
@@ -539,6 +546,7 @@ namespace Simoncouche.Islands {
             _pIslandDiffPlayers = 0;
             _pSobekIsland = 0;
             _pCthulhuIsland = 0;
+            _pNeutralIsland = 0;
             _pVolcanoIsland = 0;
             _pBiggestSobekIsland = 0;
             _pBiggestCthulhuIsland = 0;
@@ -553,14 +561,16 @@ namespace Simoncouche.Islands {
             foreach (IslandChunk ic in _CurChunks)
             {
                 if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
-                if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
-                if (ic.color == IslandUtils.color.volcano) ++_pVolcanoIsland;
+                else if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
+                else if (ic.color == IslandUtils.color.neutral) ++_pNeutralIsland;
+                else if (ic.color == IslandUtils.color.volcano) ++_pVolcanoIsland;
             }
             foreach (IslandChunk ic in _CurPendingChunks)
             {
                 if (ic.color == IslandUtils.color.red) ++_pSobekIsland;
-                if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
-                if (ic.color == IslandUtils.color.volcano) ++_pVolcanoIsland;
+                else if (ic.color == IslandUtils.color.blue) ++_pCthulhuIsland;
+                else if (ic.color == IslandUtils.color.neutral) ++_pNeutralIsland;
+                else if (ic.color == IslandUtils.color.volcano) ++_pVolcanoIsland;
             }
             foreach (Island i in _CurIslands)
             {

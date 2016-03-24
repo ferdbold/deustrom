@@ -645,7 +645,7 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 406cc4aaa1480eb45b20eeafba8ab153, type: 3}
   _chainSound:
     _chainDestruction:
-    - {fileID: 8300000, guid: 2249f2e354ead7948a4a21ae872e5559, type: 3}
+    - {fileID: 8300000, guid: 64a7737017843234a8659e9c6dde8757, type: 3}
     _chainHit:
     - {fileID: 8300000, guid: a389068c7d11a7749aff52af8f685453, type: 3}
     - {fileID: 8300000, guid: 7c0b4d0c8c3e7444fb0b354c610b57e1, type: 3}
