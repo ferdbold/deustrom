@@ -334,10 +334,6 @@ namespace Simoncouche.Islands {
             _islandChunks.Remove(chunk);
             PlayerGrab.UngrabBody(chunk.gravityBody);
             chunk.gravityBody.DestroyGravityBody();
-            foreach (GameObject chain in GameObject.FindGameObjectsWithTag("Chain")) { //MUST SEND A MESSAGE TO CHAINS IN ORDER TO CHECK IF A HOOK IS ATTACHED TO A DESTROYED ISLAND
-                chain.SendMessage("AttachedHookToIslandsUpdate");
-            }
-
         }
 
         /// <summary> Remove Island from the list and call a destroyChunk for each chunk of the island </summary>
@@ -346,9 +342,6 @@ namespace Simoncouche.Islands {
             foreach (IslandChunk chunk in island.chunks) DestroyChunk(chunk);
             island.gravityBody.isDestroyed = true; //MUST SET THAT TO TRUE !!
             RemoveIsland(island);
-            foreach (GameObject chain in GameObject.FindGameObjectsWithTag("Chain")) { //MUST SEND A MESSAGE TO CHAINS IN ORDER TO CHECK IF A HOOK IS ATTACHED TO A DESTROYED ISLAND
-                chain.SendMessage("AttachedHookToIslandsUpdate");
-            }
         }
 
         /// <summary>
