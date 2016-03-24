@@ -82,6 +82,7 @@ namespace Simoncouche.UI {
                 _authorText.text = string.Format("{0} {1}:{2}", bibleQuote.godName, bibleQuote.quoteFirstNo, bibleQuote.quoteSecondNo);
             } else {
                 _quoteText.text = "Encore aucun texte sacré n'a été entré dans la bible!";
+                _authorText.text = string.Empty;
             }
             
             _scrolls[(int)LevelManager.Player.cthulu].gameObject.SetActive(bible == LevelManager.Player.cthulu);
