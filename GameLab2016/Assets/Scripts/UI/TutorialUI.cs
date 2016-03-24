@@ -55,22 +55,16 @@ public class TutorialUI : MonoBehaviour {
         OpenClose(true, timeToOpen);
         yield return new WaitForSeconds(timeToOpen);
         video.Play();
+        video.loop = true;
         GameManager.Instance.Pause();
         movie.material.mainTexture = video;
 
         while (!skip) {
-            if (!video.isPlaying) {
-                movie.material.mainTexture = video;
-                GameManager.audioManager.PlayAudioClip(video.audioClip);
-                video.Play();
-            }
-            movie.material.mainTexture = video;
-            GameManager.audioManager.PlayAudioClip(video.audioClip);
-            video.Play();
             yield return new WaitForRealSeconds(0.05f);
         }
 
         GameManager.Instance.UnPause();
+        video.Stop();
         isCompleted = true;
 
         OpenClose(false, timeToOpen);
