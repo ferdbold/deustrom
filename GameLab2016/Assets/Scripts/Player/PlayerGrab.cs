@@ -401,9 +401,6 @@ namespace Simoncouche.Controller {
 
             //Reset charge multiplier
             StartCoroutine(ResetChargeMultiplier());
-            foreach(GameObject chain in GameObject.FindGameObjectsWithTag("Chain")){
-                chain.SendMessage("AttachedHookToIslandsUpdate");
-            }
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Simoncouche.Controller;
+using Simoncouche.Islands;
 
 public class LevelManager {
 

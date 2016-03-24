@@ -217,9 +217,6 @@ namespace Simoncouche.Islands {
         /// <param name="triggerChunk"> Chunk that triggered the maelstrom enter</param>
         public void OnMaelstromEnter(IslandChunk triggerChunk) {
             //Handle Score or island destruction
-            /*foreach (IslandChunk chunk in chunks) {
-                PlayerGrab.UngrabBody(chunk.gravityBody);
-            }*/
             RemoveChunkToIsland(triggerChunk);
             GameManager.islandManager.DestroyChunk(triggerChunk);
             if (this.chunks.Count <= 0) {
