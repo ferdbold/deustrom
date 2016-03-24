@@ -27,9 +27,9 @@ public class GravityBody : GravityObject {
     public Vector2 Velocity { get { return _rigidBody.velocity; } set { _rigidBody.velocity = value; } }
     public float LinearDrag { get { return _rigidBody.drag; } set { _rigidBody.drag = value; } }
     public float AngularDrag { get { return _rigidBody.angularDrag; } set { _rigidBody.angularDrag = value; } }
-    
     public float AdditionnalDrag { get { return _additionnalDrag; } set { _additionnalDrag = Mathf.Clamp(value, 0f, 2f); } }
     public float DefaultDrag { get { return DEFAULT_DRAG;  } private set { DEFAULT_DRAG = value; } }
+    public bool Kinematic { get { return _rigidBody.isKinematic; } }
 
     public bool isDestroyed = false;
  

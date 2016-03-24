@@ -154,16 +154,11 @@ namespace Simoncouche.Islands {
         private bool _isStarted = false;
         
 
-        void Awake() {
-
-
-            _volcanoPrefab = (GameObject)Resources.Load("Island/Volcano");
-        }
-
         public void OnStart() {
             if (_isStarted == false) {
                 _isStarted = true;
 
+                _volcanoPrefab = (GameObject)Resources.Load("Island/Volcano");
                 _islandRows = new List<List<ChunkWithCollider>>();
                 GenerateIslandContainer();
         
@@ -489,6 +484,7 @@ namespace Simoncouche.Islands {
 
         #endregion
 
+        /// <summary> Calculate a spawn rate based on the spawn parameters  </summary>
         private void CalculateSpawnRate() {
             _modifiedSpawnRate = SPAWN_RATE;
 
@@ -535,6 +531,9 @@ namespace Simoncouche.Islands {
             }
         }
 
+        /// <summary>
+        /// Update the parameters that are used by the rest on the A.I. This is not called every frame to avoid calculations
+        /// </summary>
         private void UpdateSpawnParameters() {
             _pScoreDiff = 0f;
             _pIslandDiffPlayers = 0;

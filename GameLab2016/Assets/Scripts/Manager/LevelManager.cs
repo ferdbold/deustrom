@@ -131,19 +131,18 @@ public class LevelManager {
     /// Event called when the match starts
     /// </summary>
     private void OnMatchStart() {
-        _waitingForMatchEndInput = false;
-
-        if (sobekMatchWon + cthuluMatchWon == 1) {
-            GameManager.Instance.StartVideoTutorial();
+        switch (sobekMatchWon + cthuluMatchWon) {
+            case 0: GameManager.Instance.StartVideoTutorial(TutorialUI.TutoChoice.one); break;
+            case 1: GameManager.Instance.StartVideoTutorial(TutorialUI.TutoChoice.two); break;
         }
-        GameManager.Instance.StartCoroutine(WaitTimeUntilPlayerCanPlay(GameManager.Instance.timeUntilControllersAreEnabled));
+        //GameManager.Instance.StartCoroutine(WaitTimeUntilPlayerCanPlay(GameManager.Instance.timeUntilControllersAreEnabled));
     }
 
     IEnumerator WaitTimeUntilPlayerCanPlay(float time) {
         //GameManager.inputManager.enabled = false;
-        GameManager.Instance.Pause();
+        //GameManager.Instance.Pause();
         yield return new WaitForRealSeconds(time);
-        GameManager.Instance.UnPause();
+        //GameManager.Instance.UnPause();
         //GameManager.inputManager.enabled = true;
     }
 

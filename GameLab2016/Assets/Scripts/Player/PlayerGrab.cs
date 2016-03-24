@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Simoncouche.Islands;
 using Simoncouche.Chain;
 
-
 namespace Simoncouche.Controller {
     
     [RequireComponent(typeof(Rigidbody2D))]
@@ -39,9 +38,6 @@ namespace Simoncouche.Controller {
         private float _curChargeMultiplier = 1f;
         /// <summary> Has maxed charge been reached </summary>
         private bool _maxChargeReached = false;
-
-        public bool isIslandGrabbed { get; private set; }
-
 
         //Components
         /// <summary> Currently Grabbed GravityBody</summary>
@@ -161,8 +157,6 @@ namespace Simoncouche.Controller {
                     if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) { 
                         //Initiate Grab
                         Grab(targetBody, targetChunk, 0f, true);
-                        this.isIslandGrabbed = true; //On ne possède plus le body
-
 
 
                     }
@@ -179,7 +173,6 @@ namespace Simoncouche.Controller {
                 if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) {
                     //Initiate Grab
                     Grab(targetBody, targetChunk, 0f, true);
-                    this.isIslandGrabbed = true; //On ne possède plus le body
                 }
             }
         }
@@ -188,6 +181,7 @@ namespace Simoncouche.Controller {
             //Before grabbing, make the other players release this chunk
             MakeOtherPlayerRelease(targetChunk);
             grabbedBody = targetBody;
+            _hookThrower.OnPlayerIslandGrab();
 
             if (targetChunk.parentIsland == null) {
                 //Set parent
@@ -354,7 +348,6 @@ namespace Simoncouche.Controller {
         /// Raises the ReleasedByPlayer event in the targeted Island or IslandChunk.
         /// </summary>
         public void Release() {
-
             if (grabbedBody != null) {
                 IslandChunk targetChunk = grabbedBody.gameObject.GetComponent<IslandChunk>();
 
@@ -403,6 +396,7 @@ namespace Simoncouche.Controller {
 
             //Reset charge multiplier
             StartCoroutine(ResetChargeMultiplier());
+
         }
 
         /// <summary>
@@ -575,8 +569,7 @@ namespace Simoncouche.Controller {
 
         private void CheckPlayerInputs(params float[] input) {
             bool isCurrentlyHeld = (input[0] == 1);
-
-            if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
+            if (_triggerIsHeld && !isCurrentlyHeld || _triggerIsHeld && grabbedBody ==null) { //If just stop pressing OR there is no island grabbed
                 ToggleChargeParticles(false);
                 ToggleMaxChargeParticles(false);
                 _triggerIsHeld = false;

@@ -222,18 +222,18 @@ namespace Simoncouche.Islands {
             }
             
             if(islandToBreak != null){
-                if (volcano.volcanoActive) {
+                //if (volcano.volcanoActive) {
                     GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
                     ParticleGO.transform.parent = volcano.transform;
                     TakeDamageHandler(islandChunkToBreak, 1000, volcano, volcano.gravityBody.Velocity);
                     Destroy(volcano.gameObject);
-                } else {
+                /*} else {
                     if (islandChunkToBreak.color != IslandUtils.color.neutral) {
                         GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
                         ParticleGO.transform.parent = volcano.transform;
                         islandChunkToBreak.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
                     }
-                }
+                }*/
             }
             if(chunkToPush != null) {
                 GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
@@ -253,8 +253,15 @@ namespace Simoncouche.Islands {
         /// <param name="volcano">Chunk to push </param>
         private void PushChunk(IslandChunk chunkToPush, IslandChunk volcano) {
             //Add Force
-            Vector2 forceDirection = ((Vector2)(chunkToPush.transform.position - volcano.transform.position)).normalized;
-            chunkToPush.gravityBody.Velocity += forceDirection * 5f;
+            GravityBody bodyToCheck = chunkToPush.gravityBody;
+            if(chunkToPush.parentIsland != null) bodyToCheck = chunkToPush.parentIsland.gravityBody;
+            if(bodyToCheck.Kinematic) {
+                Vector2 forceDirection = ((Vector2)(volcano.transform.position - chunkToPush.transform.position)).normalized;
+                chunkToPush.gravityBody.Velocity += forceDirection * 5f;
+            } else { 
+                Vector2 forceDirection = ((Vector2)(chunkToPush.transform.position - volcano.transform.position)).normalized;
+                chunkToPush.gravityBody.Velocity += forceDirection * 5f;
+            }
             //Convert to neutral
             if(chunkToPush.color != IslandUtils.color.neutral) chunkToPush.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
         }

@@ -133,30 +133,29 @@ namespace Simoncouche.Chain {
         }
 
         private void OnDebugFireDown() {
+            if (this.playerGrab.grabbedBody==null) { 
             this.autoAimController.enabled = true;
             this.aimController.ToggleAimIndicator(true);
+            }
         }
 
         private void OnDebugFireUp() {
-            this.autoAimController.enabled = false;
-            this.aimController.ToggleAimIndicator(false);
-            this.Fire();
+            if (this.playerGrab.grabbedBody==null) {
+                this.autoAimController.enabled = false;
+                this.aimController.ToggleAimIndicator(false);
+                this.Fire();
+            }
         }
 
         /// <summary>Handle user input to throw a new chain and hook</summary>
         private void Fire() {
             if (GameManager.Instance.mustEnableChainThrower) {
-                // Exit early if currently respawning
-                if (playerController.InRespawnState) return;
+                // Exit early if currently respawning or Exit early if the player is currently grabbing an island
+                if (playerController.InRespawnState || playerGrab.grabbedBody != null) return;
 
                 // Exit early if currently in cooldown
                 if (_throwCooldownRemaining > 0) {
                     this.playerAudio.PlaySound(PlayerSounds.PlayerCooldown);
-                    return;
-                }
-
-                // Exit early if the player is currently grabbing an island
-                if (playerGrab.grabbedBody != null) {
                     return;
                 }
 
@@ -201,7 +200,7 @@ namespace Simoncouche.Chain {
         }
 
         private void CheckPlayerInputs(params float[] input) {
-            if (playerController.InRespawnState == true  || !GameManager.Instance.mustEnableChainThrower) return; //Deactivate hook if currently respawning
+            if (playerController.InRespawnState == true  || !GameManager.Instance.mustEnableChainThrower || this.playerGrab.grabbedBody!=null) return; //Deactivate hook if currently respawning
             bool isCurrentlyHeld = (input[0] == 1);
 
             if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
@@ -370,8 +369,13 @@ namespace Simoncouche.Chain {
                 }
             }
 
+            //animation 
             _triggerIsHeld = false;
             playerController.HandleAimStopAnimation();
+
+            //disable of aim indicator
+            this.autoAimController.enabled = false;
+            this.aimController.ToggleAimIndicator(false);
         }
 
         /// <summary>
@@ -384,6 +388,16 @@ namespace Simoncouche.Chain {
             //Must apply a rotation towards the island in order to prevent the player from going on the other side of the island when grabbing
             this.rigidbody.transform.Rotate(this.transform.forward, angle, Space.Self);
             this.playerGrab.AttemptGrabOnHookRetraction(gBody); //MAKES THE PLAYER GRAB THE ISLAND
+        }
+
+        public void OnPlayerIslandGrab() {
+            //animation 
+            _triggerIsHeld = false;
+            playerController.HandleAimStopAnimation();
+
+            //disable of aim indicator
+            this.autoAimController.enabled = false;
+            this.aimController.ToggleAimIndicator(false);
         }
 
 
