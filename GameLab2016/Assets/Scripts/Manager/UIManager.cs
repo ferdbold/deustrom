@@ -173,8 +173,10 @@ public class UIManager : MonoBehaviour {
     }
 
     private void OnPause() {
-		if (_pauseWidget != null) {
-			_pauseWidget.enabled = true;
+		if (_pauseWidget != null && _tutoWidget != null) {
+			if (_tutoWidget.isCompleted) {
+				_pauseWidget.enabled = true;
+			}
 		}
     }
 

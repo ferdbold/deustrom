@@ -341,6 +341,8 @@ public class GameManager : MonoBehaviour {
     #region Utils
 
 	private void OnStartButton() {
+		Debug.Log ("Start");
+
 		if (_currentScene == Scene.PlayLevel) {
 			if (this.isPaused) {
 				UnPause();

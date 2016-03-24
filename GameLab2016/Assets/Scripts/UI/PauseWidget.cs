@@ -61,17 +61,23 @@ namespace Simoncouche.UI {
         }
 
         private void OnResume() {
-            GameManager.Instance.UnPause();
+			if (!GameManager.levelManager.matchEnded) {
+				GameManager.Instance.UnPause ();
+			}
         }
 
         private void OnReturnMenu() {
             // TODO: Maybe check here for proper game reset
-			GameManager.Instance.UnPause();
-            GameManager.Instance.SwitchScene(GameManager.Scene.Menu);
+			if (!GameManager.levelManager.matchEnded) {
+				GameManager.Instance.UnPause ();
+				GameManager.Instance.SwitchScene (GameManager.Scene.Menu);
+			}
         }
 
         private void OnQuit() {
-            GameManager.Instance.QuitGame();
+			if (!GameManager.levelManager.matchEnded) {
+				GameManager.Instance.QuitGame ();
+			}
         }
 
         private void GenerateRandomQuote() {
