@@ -56,6 +56,18 @@ public class UIManager : MonoBehaviour {
         _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles = GameObject.Find("UIParticles/Sobek").transform;
         _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles = GameObject.Find("UIParticles/Cthulhu").transform;
 
+        //Must play on awake these particle systems (cannot be set in the inspector)
+        foreach (ParticleSystem ps in _scoreWidgets[(int)LevelManager.Player.sobek]
+            .leadParticles.GetComponentsInChildren<ParticleSystem>()) {
+            ps.playOnAwake = true;
+            Debug.Log(ps);
+        }
+        foreach (ParticleSystem ps in _scoreWidgets[(int)LevelManager.Player.cthulu]
+            .leadParticles.GetComponentsInChildren<ParticleSystem>()) {
+            ps.playOnAwake = true;
+            Debug.Log(ps);
+        }
+
         _winsWidgets = new List<WinsWidget>();
         _winsWidgets.Add(GameObject.Find("UI/Wins/Sobek").GetComponent<WinsWidget>());
         _winsWidgets.Add(GameObject.Find("UI/Wins/Cthulhu").GetComponent<WinsWidget>());
