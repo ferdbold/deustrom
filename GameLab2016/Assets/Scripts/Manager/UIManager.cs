@@ -42,6 +42,8 @@ public class UIManager : MonoBehaviour {
     private List<WinsWidget> _winsWidgets;
     private List<IslandCountWidget> _islandCountWidgets;
     private Image _seal;
+    private Image _winSeal;
+    private Text _promptText;
 
     // METHODS
 
@@ -65,6 +67,8 @@ public class UIManager : MonoBehaviour {
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Cthulhu").GetComponent<IslandCountWidget>());
 
         _seal = GameObject.Find("UI/Seal").GetComponent<Image>();
+        _winSeal = GameObject.Find("UI/WinSeal").GetComponent<Image>();
+        _promptText = GameObject.Find("UI/PromptText").GetComponent<Text>();
 
         RefreshWins();
 
@@ -80,6 +84,13 @@ public class UIManager : MonoBehaviour {
         _seal.sprite = _roundSeals[GameManager.levelManager.currentRound];
     }
 
+    private void Start() {
+        _promptText.GetComponent<RectTransform>().localScale = Vector3.zero;
+
+        _winSeal.color = new Color(_winSeal.color.r, _winSeal.color.g, _winSeal.color.b, 0f);
+        _winSeal.GetComponent<RectTransform>().localScale = Vector3.one * 5;
+    }
+
     private void Update() {
         if (GameManager.Instance.currentScene == GameManager.Scene.PlayLevel && GameManager.Instance.gameStarted) {
             UpdateLeadParticles();
@@ -87,6 +98,10 @@ public class UIManager : MonoBehaviour {
             foreach (LevelManager.Player player in System.Enum.GetValues(typeof(LevelManager.Player))) {
                 _islandCountWidgets[(int)player].value = GameManager.islandManager.GetPlayerIslandCount(player);
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.G)) {
+            OnRoundEnd();
         }
     }
 
@@ -133,6 +148,24 @@ public class UIManager : MonoBehaviour {
     private void OnOrbAnimComplete(LevelManager.Player player, Image orb) {
         ReturnRune(orb, player);
         _scoreWidgets[(int)player].AddPoints(1);
+    }
+
+    private void OnRoundEnd() {
+        string godName = (GameManager.Instance.lastWinner == LevelManager.Player.cthulu) ? "CTHULHU" : "SOBEK";
+
+        _promptText.text = "VICTOIRE " + godName;
+        _winSeal.sprite = (GameManager.Instance.lastWinner == LevelManager.Player.cthulu) ? _sealCthulhu : _sealSobek;
+
+        // Anim sequence
+        _promptText.GetComponent<RectTransform>().DOShakeRotation(0.5f, 45);
+        _promptText.GetComponent<RectTransform>().DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce).OnComplete(() => {
+            _winSeal.DOColor(Color.white, 0.2f);
+            _winSeal.GetComponent<RectTransform>().DOScale(Vector3.one, 0.25f).SetEase(Ease.OutCirc);
+
+            Camera.main.DOShakePosition(0.3f, 5, 30).SetDelay(0.25f);
+            _winSeal.GetComponent<RectTransform>().DOShakePosition(0.3f, 15, 30).SetDelay(0.25f);
+        });
+
     }
 
     #region Pooling
