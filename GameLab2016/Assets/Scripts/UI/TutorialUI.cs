@@ -46,7 +46,7 @@ public class TutorialUI : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Joystick1Button0) && Input.GetKeyDown(KeyCode.Joystick2Button0) && Input.GetKeyDown(KeyCode.F1)) { 
+        if (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick2Button0) || Input.GetKeyDown(KeyCode.F1)) { 
             skip = true;
         }
     }
@@ -55,7 +55,7 @@ public class TutorialUI : MonoBehaviour {
         OpenClose(true, timeToOpen);
         yield return new WaitForSeconds(timeToOpen);
         video.Play();
-        //GameManager.Instance.Pause();
+        GameManager.Instance.Pause();
         movie.material.mainTexture = video;
 
         while (!skip) {
