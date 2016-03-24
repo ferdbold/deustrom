@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 using Simoncouche.Bible;
 
@@ -60,7 +61,11 @@ namespace Simoncouche.UI {
             }
         }
 
-        private void Update() {
+        private void LateUpdate() {
+
+            // #SHAME
+
+            // Tab order handling
             if (Input.GetKeyDown(KeyCode.Tab)) {
                 if (_verseField.isFocused) {
                     _authorField.Select();
@@ -69,10 +74,24 @@ namespace Simoncouche.UI {
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.Return) && _verseField.text != "" && _authorField.text != "") {
+            // Submit handling
+            else if (Input.GetKeyDown(KeyCode.Return) && _verseField.text != "" && _authorField.text != "") {
                 _writer.SaveQuote(_verseField.text, _authorField.text, (GameManager.Instance.lastWinner == LevelManager.Player.sobek));
                 GameManager.Instance.SwitchScene(GameManager.Scene.Menu);
+            } 
+
+            // First input handling
+            else if (Input.anyKeyDown && !_verseField.isFocused && !_authorField.isFocused) {
+                _verseField.Select();
+                _verseField.text = Input.inputString;
+
+                StartCoroutine(UnselectField());
             }
+        }
+
+        private IEnumerator UnselectField() {
+            yield return 0;
+            _verseField.MoveTextEnd(false);
         }
     }
 }
