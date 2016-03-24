@@ -468,17 +468,17 @@ namespace Simoncouche.Islands {
 			Vector3 medianIslandPos = FindMedianPos(islandLink.chunks);
 
 			//Recursivly remove island
-            List<IslandChunk> islandRemoved = islandLink.chunks;
+            List<IslandChunk> islandRemoved = new List<IslandChunk>(islandLink.chunks);
 
             //Remove chunk from island
             foreach (IslandChunk c in islandRemoved) {
 				islandLink.RemoveChunkToIsland(c);
 			}
-            
+
             foreach (IslandChunk c in islandRemoved) {
                 float angle = Random.Range(0, 361);
                 Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.PI / 180f), Mathf.Sin(angle * Mathf.PI / 180f));
-                c.gravityBody.Velocity = 600 * direction;
+                c.gravityBody.Velocity = 10 * direction;
                 if (c.color != IslandUtils.color.neutral) c.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
             }
 		}
