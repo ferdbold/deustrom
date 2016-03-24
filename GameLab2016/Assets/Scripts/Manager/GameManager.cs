@@ -145,6 +145,10 @@ public class GameManager : MonoBehaviour {
             OnStartButton();
         }
 
+        if (Input.GetButtonDown("Start")) {
+            Debug.Log("Start");
+        }
+
         #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Alpha0)) {
             Time.timeScale = 0f;
