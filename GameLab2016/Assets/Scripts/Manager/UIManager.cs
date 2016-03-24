@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using System.Collections.Generic;
 using Simoncouche.UI;
 using DG.Tweening;
@@ -32,6 +33,10 @@ public class UIManager : MonoBehaviour {
 
     private List<Image> sobekRunesPool = new List<Image>();
     private List<Image> cthulhuRunesPool = new List<Image>();
+
+    // EVENTS
+
+    public UnityEvent RoundEndAnimationCompleted { get; private set; }
 
     // COMPONENTS
 
@@ -90,6 +95,8 @@ public class UIManager : MonoBehaviour {
         _winSeal = GameObject.Find("UI/WinSeal").GetComponent<Image>();
         _promptText = GameObject.Find("UI/PromptText").GetComponent<Text>();
         _miniPromptText = GameObject.Find("UI/MiniPromptText").GetComponent<Text>();
+
+        this.RoundEndAnimationCompleted = new UnityEvent();
 
         RefreshWins();
 
@@ -206,7 +213,9 @@ public class UIManager : MonoBehaviour {
             Camera.main.DOShakePosition(0.3f, 5, 30).SetDelay(0.25f);
             _winSeal.GetComponent<RectTransform>().DOShakePosition(0.3f, 15, 30).SetDelay(0.25f).OnComplete(() => {
                 _miniPromptText.GetComponent<RectTransform>().DOShakeRotation(0.3f, 30).SetDelay(0.75f);
-                _miniPromptText.GetComponent<RectTransform>().DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBounce).SetDelay(0.75f);
+                _miniPromptText.GetComponent<RectTransform>().DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBounce).SetDelay(0.75f).OnComplete(() => {
+                    this.RoundEndAnimationCompleted.Invoke();
+                });
             });
         });
     }

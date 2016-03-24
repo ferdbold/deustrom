@@ -83,6 +83,7 @@ public class LevelManager {
         this.MatchEnd = new PlayerEvent();
 
         SetupPlayers();
+
         OnMatchStart();
         GameManager.Instance.disableScoring = false;
         if (!hardReset) {
@@ -166,6 +167,9 @@ public class LevelManager {
         }
 
 		this.matchEnded = false;
+
+        GameManager.uiManager.RoundEndAnimationCompleted.AddListener(OnRoundEndAnimationCompleted);
+
         //GameManager.Instance.StartCoroutine(WaitTimeUntilPlayerCanPlay(GameManager.Instance.timeUntilControllersAreEnabled));
     }
 
@@ -201,7 +205,6 @@ public class LevelManager {
         GameManager.audioManager.ToggleGameplaySounds(false);
         GameManager.audioManager.PlayMusic(MusicSound.Choice.endGame);
 
-        _waitingForMatchEndInput = true;
         GameManager.Instance.disableScoring = true;
         // FIXME: I don't need to explain why this is bad.
         foreach (IslandFeeder feeder in GameObject.FindObjectsOfType<IslandFeeder>()) {
@@ -215,6 +218,11 @@ public class LevelManager {
         } else if (cthuluMatchWon >= matchToWin) {
             OnGameEnd(Player.cthulu);
         }
+    }
+
+    private void OnRoundEndAnimationCompleted() {
+        Debug.Log("Round end animation completed");
+        _waitingForMatchEndInput = true;
     }
 
     #region Used for callback
