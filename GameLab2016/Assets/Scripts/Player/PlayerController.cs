@@ -48,7 +48,7 @@ namespace Simoncouche.Controller {
         #endregion
 
         #region PrivateVariables
-        //Componentsgit 
+        //Components git 
         /// <summary>  Reference of player's rigidbody  </summary>
         private Rigidbody2D _playerRigidBody;
        /// <summary> Reference to the playerGrab which handles gravity body grabbing</summary>
@@ -63,6 +63,8 @@ namespace Simoncouche.Controller {
         private HookThrower _hookThrower;
         /// <summary> Reference to the script that position the player on Z background </summary>
         private PositionZOnBackground _positionZOnBackground;
+        /// <summary> Reference to the Object to show when player respawn </summary>
+        private GameObject _deathIndicator;
 
         //Inputs
         /// <summary>  Is the player moving horizontally? </summary>
@@ -106,10 +108,12 @@ namespace Simoncouche.Controller {
             _playerGrab = GetComponent<PlayerGrab>();
             _playerAudio = GetComponent<PlayerAudio>();
             _positionZOnBackground = GetComponent<PositionZOnBackground>();
+            _deathIndicator = transform.Find("P_DeathIndicator").gameObject;
 
             _startDrag = _playerRigidBody.drag;
             _startZOffset = _positionZOnBackground._zOffset;
             _startPlayerWeight = _playerRigidBody.mass;
+            _deathIndicator.SetActive(false);
 
             if (_playerGrab == null) {
                 Debug.LogError("Player/PlayerGrab cannot be found!");
@@ -187,6 +191,8 @@ namespace Simoncouche.Controller {
             if (_TimeSinceLastBump <= _TimeSinceLastBumpNeededForChant) _playerAudio.PlaySound(PlayerSounds.OtherPlayerChant);
             //Animation
             HandleKnockedOutStartAnimation();
+            //Indicator
+            _deathIndicator.SetActive(true);
         }
 
         private void StopRespawnState() {
@@ -200,6 +206,8 @@ namespace Simoncouche.Controller {
             _playerAudio.PlaySound(PlayerSounds.PlayerRespawn);
             //Animation
             HandleKnockedOutStopAnimation();
+            //Indicator
+            _deathIndicator.SetActive(false);
         }
 
         IEnumerator Respawn_Spin(Vector3 tP) {

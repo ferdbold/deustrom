@@ -520,9 +520,9 @@ namespace Simoncouche.Islands {
             if(curOpponentBigIsland > AMT_ISLANDS_VOLCANO_SPAWN_HIGH) {
                 if(randChange > 0.75f) StartReleaseProcessOnVolcano();
             } else if (curOpponentBigIsland > AMT_ISLANDS_VOLCANO_SPAWN_MEDIUM) {
-                if (randChange > 0.25f) StartReleaseProcessOnVolcano();
+                if (randChange > 0.20f) StartReleaseProcessOnVolcano();
             } else if (curOpponentBigIsland > AMT_ISLANDS_VOLCANO_SPAWN_LIGHT) {
-                if (randChange > 0.10f) StartReleaseProcessOnVolcano();
+                if (randChange > 0.05f) StartReleaseProcessOnVolcano();
             }
         }
 
