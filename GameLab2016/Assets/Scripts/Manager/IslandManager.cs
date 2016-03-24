@@ -470,10 +470,14 @@ namespace Simoncouche.Islands {
 				return;
 			}
 
+            // List of Chunks that are in the starting island
+            List<IslandChunk> startingIslandChunks = new List<IslandChunk>(chunk.parentIsland.chunks);
+
             originChunk.ResetMergeability(1f);
 			//Make every part not mergeable for a time
-			foreach (IslandChunk c in chunk.parentIsland.chunks) {
-				c.ResetMergeability(0.5f);
+			foreach (IslandChunk c in startingIslandChunks) {
+                PlayerGrab.UngrabBody(c.gravityBody);
+                c.ResetMergeability(0.5f);
 			}
 
 			//Spawn Particle and play sound
@@ -498,7 +502,14 @@ namespace Simoncouche.Islands {
                 c.gravityBody.Velocity = 10 * direction;
                 if (c.color != IslandUtils.color.neutral) c.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
             }
-		}
+
+            //Once destruction is complete, Ungrab and Reactivate Collision
+            foreach (IslandChunk c in startingIslandChunks) {
+                if (c != null) {
+                    PlayerGrab.ReactivateCollisionForBothPlayer(c.GetComponent<Collider2D>(), c, 0f);
+                }
+            }
+        }
 
 		/// <summary>
 		/// Finds resulting velocity after a take Damage Hit

@@ -241,10 +241,10 @@ namespace Simoncouche.Islands {
                     if (_tutoTimeInPhase > 8f) ChangeState(TutorialState.ThreeIsland);
                     break;
                 case (TutorialState.ThreeIsland):
-                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.VolcanoPhase);
+                    if (_tutoTimeInPhase > 15f) ChangeState(TutorialState.VolcanoPhase);
                     break;
                 case (TutorialState.VolcanoPhase):
-                    if (_tutoTimeInPhase > 10f) ChangeState(TutorialState.EndTutorial);
+                    if (_tutoTimeInPhase > 5f) ChangeState(TutorialState.EndTutorial);
                     if (_pVolcanoIsland < 1) { //Spawn volcano if there is none
                         StartReleaseProcessOnVolcano();                    
                     }

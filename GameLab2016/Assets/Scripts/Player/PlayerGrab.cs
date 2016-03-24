@@ -420,9 +420,13 @@ namespace Simoncouche.Controller {
         }
 
         public static void ReactivateCollisionForBothPlayer(Collider2D otherCol, IslandChunk chunk) {
+            ReactivateCollisionForBothPlayer(otherCol, chunk, 0);
+        }
+
+        public static void ReactivateCollisionForBothPlayer(Collider2D otherCol, IslandChunk chunk, float time) {
             foreach (PlayerGrab grab in _allPlayerGrabs) {
-                if(grab.grabbedBody != chunk.gravityBody && chunk.parentIsland != null && grab.grabbedBody != chunk.parentIsland.gravityBody)
-                    grab.ReactivateCollision(otherCol, 0);
+                if (grab.grabbedBody != chunk.gravityBody && chunk.parentIsland != null && grab.grabbedBody != chunk.parentIsland.gravityBody)
+                    grab.ReactivateCollision(otherCol, time);
             }
         }
 
@@ -430,13 +434,16 @@ namespace Simoncouche.Controller {
         /// <param name="otherCol">collider to unIgnore</param>
         /// <param name="time">time before unignore</param>
         void ReactivateCollision(Collider2D otherCol, float time) {
-       
-            Coroutine disableCoroutine = StartCoroutine(ResumeCollision(otherCol, time));
 
-            //Add coroutine to a dictionnary until is done in case it needs to be interrupted
-            string colID = otherCol.GetInstanceID().ToString();
-            if (collisionCoroutines.ContainsKey(colID)) collisionCoroutines.Remove(colID);
-            collisionCoroutines.Add(colID, disableCoroutine);
+            if (time <= 0f) Physics2D.IgnoreCollision(GetComponent<Collider2D>(), otherCol, false);
+            else {
+                Coroutine disableCoroutine = StartCoroutine(ResumeCollision(otherCol, time));
+
+                //Add coroutine to a dictionnary until is done in case it needs to be interrupted
+                string colID = otherCol.GetInstanceID().ToString();
+                if (collisionCoroutines.ContainsKey(colID)) collisionCoroutines.Remove(colID);
+                collisionCoroutines.Add(colID, disableCoroutine);
+            }
         }
 
         /// <summary> Resume collision with given collider2D after a amount of time </summary>
@@ -530,7 +537,7 @@ namespace Simoncouche.Controller {
             foreach (PlayerGrab pg in _allPlayerGrabs) {
                 //Debug.Log("checking if " + pg.name + " is grabbing " + bodyToMerge + "      he's grabbing " + pg.grabbedBody);
                 if (pg.grabbedBody == bodyToMerge) {
-                    //Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " because it was merged.");
+                    Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " with regrab delay of " + regrabDelay);
                     pg.Release();
                     if (regrab) pg.StartRegrabCoroutine(bodyToMerge, regrabDelay);
                 }
@@ -569,7 +576,8 @@ namespace Simoncouche.Controller {
 
         private void CheckPlayerInputs(params float[] input) {
             bool isCurrentlyHeld = (input[0] == 1);
-            if (_triggerIsHeld && !isCurrentlyHeld || _triggerIsHeld && grabbedBody ==null) { //If just stop pressing OR there is no island grabbed
+            if ((_triggerIsHeld && !isCurrentlyHeld) || (_triggerIsHeld && grabbedBody ==null)) { //If just stop pressing OR there is no island grabbed
+                Debug.Log("gb : " + grabbedBody + "  tri : " + _triggerIsHeld);
                 ToggleChargeParticles(false);
                 ToggleMaxChargeParticles(false);
                 _triggerIsHeld = false;
