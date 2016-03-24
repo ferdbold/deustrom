@@ -234,7 +234,7 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case Scene.PlayLevel:
-                audioManager.ToggleAmbiantSounds(true);
+                
                 islandManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_matchToWin);
@@ -251,7 +251,7 @@ public class GameManager : MonoBehaviour {
                     feeders[i].OnStart();
                 }
 
-                audioManager.PlayMusic(MusicSound.Choice.play);
+                audioManager.ToggleAmbiantSounds(true);              
                 StartCoroutine("CalculateScoreCoroutine");
                 this.gameStarted = true;
 

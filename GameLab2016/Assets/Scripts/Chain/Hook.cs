@@ -226,7 +226,7 @@ namespace Simoncouche.Chain {
             this.Attach.Invoke();
 
             //Sound
-
+            this.chain.thrower.playerAudio.PlaySound(PlayerSounds.PlayerChainHit);
             //Rumble
             if (this.chain.thrower.playerController.IsPlayerOne) GameManager.inputManager.RumbleGamepad_Light(0);
             else GameManager.inputManager.RumbleGamepad_Light(1);

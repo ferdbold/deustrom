@@ -134,6 +134,10 @@ public class SobekSpecificSound : SoundClass {
     public AudioClip conversion { get { return GetRandom(_conversion); } }
 
     [SerializeField]
+    private List<AudioClip> _conversionRiser;
+    public AudioClip ConversionRiser { get { return GetRandom(_conversionRiser); } }
+
+    [SerializeField]
     private List<AudioClip> _fastChant;
     public AudioClip fastChant { get { return GetRandom(_fastChant); } }
 
@@ -191,6 +195,10 @@ public class CthuluSpecificSound : SoundClass {
     public AudioClip Conversion { get { return GetRandom(_conversion); } }
 
     [SerializeField]
+    private List<AudioClip> _conversionRiser;
+    public AudioClip ConversionRiser { get { return GetRandom(_conversionRiser); } }
+
+    [SerializeField]
     private List<AudioClip> _fastChant;
     public AudioClip fastChant { get { return GetRandom(_fastChant); } }
 
@@ -230,10 +238,13 @@ public class EnvironmentSound : SoundClass {
 
 [System.Serializable]
 public class ChainSound : SoundClass {
-    [SerializeField]
-    [Tooltip("Sound played when an island is destroyed")]
+    [SerializeField] [Tooltip("Sound played when a chain is destroyed")]
     private List<AudioClip> _chainDestruction;
     public AudioClip chainDestruction { get { return GetRandom(_chainDestruction); } }
+
+    [SerializeField] [Tooltip("Sound played when a chain hits an island")]
+    private List<AudioClip> _chainHit;
+    public AudioClip chainHit { get { return GetRandom(_chainHit); } }
 }
 
 [System.Serializable]

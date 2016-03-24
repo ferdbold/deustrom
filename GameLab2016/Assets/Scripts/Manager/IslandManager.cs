@@ -223,10 +223,9 @@ namespace Simoncouche.Islands {
             GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
             ParticleGO.transform.parent = volcano.transform;
             
-            //TODO do something
             if(islandToBreak != null){
-                /*islandChunkToBreak.TakeDamage(PlayerGrab.BodyIsGrabbed(volcano.gravityBody) ? 100 : 1, volcano, 3 * volcano.gravityBody.Velocity);
-                StartCoroutine(ChangeVolcanoToNeutralIsland(volcano));*/
+                TakeDamageHandler(islandChunkToBreak, 1000, volcano, volcano.gravityBody.Velocity);
+                Destroy(volcano.gameObject);
             }
             if(chunkToPush != null) {
                 PushChunk(chunkToPush, volcano);
@@ -236,15 +235,6 @@ namespace Simoncouche.Islands {
             IslandChunk[] twoCollidedChunks = new IslandChunk[2] { a, b };
             foreach(Simoncouche.Chain.Hook hook in hooks) {
                 hook.SendMessage("CheckConnectedVolcanoWithOtherIsland", twoCollidedChunks);
-            }
-        }
-
-        IEnumerator ChangeVolcanoToNeutralIsland(IslandChunk volcano) {
-            yield return new WaitForSeconds(volcanoTurnTime);
-            if (volcano != null) {
-                PlayerGrab.UngrabBody(volcano.gravityBody);
-                Destroy(volcano.gameObject);
-
             }
         }
 
@@ -462,16 +452,11 @@ namespace Simoncouche.Islands {
 			if (damage < 1) {
 				return;
 			}
-            
-			//If the chunk has no connection
-			if (chunk.parentIsland == null || chunk.connectedChunk == null || chunk.connectedChunk.Count == 0) {
-				return;
-			}
 
             originChunk.ResetMergeability(1f);
 			//Make every part not mergeable for a time
 			foreach (IslandChunk c in chunk.parentIsland.chunks) {
-				c.ResetMergeability(1f);
+				c.ResetMergeability(0.5f);
 			}
 
 			//Spawn Particle and play sound
@@ -482,54 +467,19 @@ namespace Simoncouche.Islands {
 			//Find median point for all chunks
 			Vector3 medianIslandPos = FindMedianPos(islandLink.chunks);
 
-			//Check if the damage is too high for the island (the maximum is to divided the island in 2
-			if ((float)islandLink.chunks.Count / 2 <= damage) {
-				damage = Mathf.CeilToInt(islandLink.chunks.Count / 2f);
-			}
-
 			//Recursivly remove island
-			List<IslandChunk> islandRemoved = new List<IslandChunk>();
-            if (damage == 1) {
-                islandRemoved.Add(chunk);
-            } else {
-                islandRemoved = islandLink.chunks;
-            }
-			
-            /*if (damage > 1) {
-				islandRemoved = DamageConnectedIsland(chunk, islandRemoved, damage);
-            }*/
+            List<IslandChunk> islandRemoved = islandLink.chunks;
 
             //Remove chunk from island
             foreach (IslandChunk c in islandRemoved) {
 				islandLink.RemoveChunkToIsland(c);
 			}
-
-			//Remove connection (only need to remove the connection from one side, one chunk removes the connection from both)
-			foreach (IslandChunk c in islandLink.chunks) {
-				if (!islandRemoved.Contains(c)) {
-					c.RemoveConnectedChunk(islandRemoved);
-				}
-			}
-
-            //Divide Island and gives velocity to this piece
-            if (islandRemoved.Count > 1) { //Multiple Chunk
-                foreach (IslandChunk c in islandRemoved) {
-                    c.gravityBody.Velocity = 30 * (DamageResultingVelocity(medianIslandPos, c.transform.position)).normalized;
-                }
-            } else {
-                islandRemoved[0].gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
-                originChunk.gravityBody.Velocity = 2 * (-velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, islandRemoved[0].transform.position)).normalized;
-
-                //Divide island and Set velocity for every pieces
-                List<GravityBody> pieces = CheckIslandBroken(islandLink);
-                foreach (GravityBody piece in pieces) {
-                    Island islandRef = piece.GetComponent<Island>();
-                    if (islandRef != null) {
-                        piece.Velocity = 2 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, FindMedianPos(islandRef.chunks))).normalized;
-                    } else {
-                        piece.Velocity = 2 * (velocityGiven.normalized + DamageResultingVelocity(medianIslandPos, piece.transform.position)).normalized;
-                    }
-                }
+            
+            foreach (IslandChunk c in islandRemoved) {
+                float angle = Random.Range(0, 361);
+                Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.PI / 180f), Mathf.Sin(angle * Mathf.PI / 180f));
+                c.gravityBody.Velocity = 600 * direction;
+                if (c.color != IslandUtils.color.neutral) c.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
             }
 		}
 
