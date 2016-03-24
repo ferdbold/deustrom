@@ -279,7 +279,7 @@ public class GameManager : MonoBehaviour {
                 // Start Feeder
                 IslandFeeder[] feeders = GameObject.FindObjectsOfType<IslandFeeder>();
                 for (int i = 0; i < feeders.Length; i++) {
-                    if (levelManager.currentRound == 1)
+                    if (levelManager.currentRound == 0)
                         feeders[i]._inTutorial = true;
                     else
                         feeders[i]._inTutorial = false;
