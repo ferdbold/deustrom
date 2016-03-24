@@ -63,7 +63,6 @@ GameObject:
   - 223: {fileID: 22346156}
   - 114: {fileID: 11417682}
   - 114: {fileID: 11471794}
-  - 114: {fileID: 11494278}
   - 114: {fileID: 11400748}
   m_Layer: 5
   m_Name: FadeUI
@@ -779,18 +778,6 @@ MonoBehaviour:
   timeForTuto: 1
   _timeUntilControllersAreEnabled: 0.1
   _amountOfRoundsUntilChainsEnabled: 1
---- !u!114 &11494278
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 177750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21e28f1807ce43b44b4df425a0485a12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  image: {fileID: 0}
 --- !u!222 &22238406
 CanvasRenderer:
   m_ObjectHideFlags: 1
