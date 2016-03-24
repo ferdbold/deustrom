@@ -298,12 +298,12 @@ namespace Simoncouche.Chain {
         /// </summary>
         public void DestroyChain(bool playDestroySound) {
             foreach (ChainSection section in _chainSections) {
-                Destroy(section.gameObject);
+                if(section != null) Destroy(section.gameObject);
             }
 
             if (playDestroySound) this.PlayDestroySound();
 
-            Destroy(beginningHook.gameObject);
+            if (beginningHook != null) Destroy(beginningHook.gameObject);
 
             if(endingHook!=null) Destroy(endingHook.gameObject);
 
