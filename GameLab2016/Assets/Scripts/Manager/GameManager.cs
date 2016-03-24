@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
     [Tooltip("Disable scoring (for debug purposes only")]
     private bool _disableScoring = true;
-    public bool disableScoring { get { return _disableScoring; } }
+    public bool disableScoring { get { return _disableScoring; } set { _disableScoring = value; } }
 
     [Tooltip("Number of match to win to finish the game")]
     [SerializeField]
@@ -89,6 +89,8 @@ public class GameManager : MonoBehaviour {
     #region Utils Variables
     public bool gameStarted { get; private set; }
     public bool isPaused { get; private set; }
+
+    private FadeUI fadeUI;
     #endregion
 
     void Awake() {
@@ -102,6 +104,7 @@ public class GameManager : MonoBehaviour {
             GameManager.islandManager = GetComponent<IslandManager>();
             GameManager.audioManager = GetComponent<AudioManager>();
             GameManager.uiManager = GetComponent<UIManager>();
+            fadeUI = GetComponentInChildren<FadeUI>();
 
             DontDestroyOnLoad(gameObject);
 
@@ -195,7 +198,7 @@ public class GameManager : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene, CutsceneManager.Cutscene cutsceneVideo) {
         SceneManager.LoadSceneAsync(SCENE_CUTSCENE);
-        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Single);
+        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
         loading.allowSceneActivation = false;
 
         CutsceneManager cutscene = null;
@@ -219,7 +222,6 @@ public class GameManager : MonoBehaviour {
         }
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneToLoad));
         Scene_OnOpen(scene);
-        yield return new WaitForRealSeconds(cutscene.TimeToFade);
         SceneManager.UnloadScene(SCENE_CUTSCENE);
     }
 
@@ -228,13 +230,14 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     /// <param name="scene">The scene loaded</param>
     private void Scene_OnOpen(Scene scene) {
+        fadeUI.StartFadeAnim(false);
         switch (scene) {
             case Scene.Menu:
                 audioManager.ToggleAmbiantSounds(false);
                 break;
 
             case Scene.PlayLevel:
-                
+                    
                 islandManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_matchToWin);
@@ -243,11 +246,14 @@ public class GameManager : MonoBehaviour {
                 }
 
                 uiManager.Setup();
-                //Start Feeder
+                
+                // Start Feeder
                 IslandFeeder[] feeders = GameObject.FindObjectsOfType<IslandFeeder>();
                 for (int i = 0; i < feeders.Length; i++) {
-                    if (levelManager.currentRound == 1) feeders[i]._inTutorial = true;
-                    else feeders[i]._inTutorial = false;
+                    if (levelManager.currentRound == 1)
+                        feeders[i]._inTutorial = true;
+                    else
+                        feeders[i]._inTutorial = false;
                     feeders[i].OnStart();
                 }
 
@@ -273,6 +279,7 @@ public class GameManager : MonoBehaviour {
     /// <param name="scene">the scene closed</param>
     private void Scene_OnClose(Scene scene) {
         this.gameStarted = false;
+        fadeUI.StartFadeAnim(false);
 
         switch (scene) {
             case Scene.Menu:
@@ -335,7 +342,7 @@ public class GameManager : MonoBehaviour {
     }
 
     #endregion
-
+    
     private IEnumerator CalculateScoreCoroutine()
     {
         while (true)

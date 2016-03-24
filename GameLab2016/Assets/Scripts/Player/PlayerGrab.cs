@@ -327,7 +327,9 @@ namespace Simoncouche.Controller {
                 Vector2 forceDirection = _aimController.aimOrientationVector2.normalized;
                 float finalThrowForce = Mathf.Max(MIN_THROW_FORCE, THROW_FORCE / Mathf.Max(1, bodyToAddForce.Weight / 10f));
                 bodyToAddForce.Velocity = forceDirection * finalThrowForce * _curChargeMultiplier;
-                if (_maxChargeReached) bodyToAddForce.StartDestroyMode();
+                if (targetChunk.color == IslandUtils.color.volcano) {
+                    targetChunk.volcanoActive = true;
+                }
                 //Remove Force from player
                 _playerGravityBody.Velocity /= 4f;
 

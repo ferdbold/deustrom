@@ -220,14 +220,24 @@ namespace Simoncouche.Islands {
                     islandChunkToBreak = a;
                 }
             }
-            GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
-            ParticleGO.transform.parent = volcano.transform;
             
             if(islandToBreak != null){
-                TakeDamageHandler(islandChunkToBreak, 1000, volcano, volcano.gravityBody.Velocity);
-                Destroy(volcano.gameObject);
+                if (volcano.volcanoActive) {
+                    GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+                    ParticleGO.transform.parent = volcano.transform;
+                    TakeDamageHandler(islandChunkToBreak, 1000, volcano, volcano.gravityBody.Velocity);
+                    Destroy(volcano.gameObject);
+                } else {
+                    if (islandChunkToBreak.color != IslandUtils.color.neutral) {
+                        GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+                        ParticleGO.transform.parent = volcano.transform;
+                        islandChunkToBreak.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
+                    }
+                }
             }
             if(chunkToPush != null) {
+                GameObject ParticleGO = (GameObject)Instantiate(AssembleParticlePrefab[2], volcano.transform.position + new Vector3(0, 0, -1.25f), Quaternion.identity);
+                ParticleGO.transform.parent = volcano.transform;
                 PushChunk(chunkToPush, volcano);
             }
 
@@ -468,17 +478,17 @@ namespace Simoncouche.Islands {
 			Vector3 medianIslandPos = FindMedianPos(islandLink.chunks);
 
 			//Recursivly remove island
-            List<IslandChunk> islandRemoved = islandLink.chunks;
+            List<IslandChunk> islandRemoved = new List<IslandChunk>(islandLink.chunks);
 
             //Remove chunk from island
             foreach (IslandChunk c in islandRemoved) {
 				islandLink.RemoveChunkToIsland(c);
 			}
-            
+
             foreach (IslandChunk c in islandRemoved) {
                 float angle = Random.Range(0, 361);
                 Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.PI / 180f), Mathf.Sin(angle * Mathf.PI / 180f));
-                c.gravityBody.Velocity = 600 * direction;
+                c.gravityBody.Velocity = 10 * direction;
                 if (c.color != IslandUtils.color.neutral) c.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
             }
 		}

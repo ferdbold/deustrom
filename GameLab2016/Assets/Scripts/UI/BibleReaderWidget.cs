@@ -56,7 +56,7 @@ namespace Simoncouche.UI {
             _scrollContents.Add(transform.Find("Scrolls/Sobek/Scroll View/Viewport/Content").GetComponent<RectTransform>());
             _scrollContents.Add(transform.Find("Scrolls/Cthulhu/Scroll View/Viewport/Content").GetComponent<RectTransform>());
 
-            _rectTransform.anchoredPosition = new Vector2(0, -600);
+            _rectTransform.anchoredPosition = new Vector2(0, -Screen.height);
         }
 
         private void Start() {

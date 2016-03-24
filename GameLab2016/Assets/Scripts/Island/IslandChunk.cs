@@ -84,7 +84,11 @@ namespace Simoncouche.Islands {
         private static GameObject N_POP;
         #endregion
 
+        #region volcano
 
+        public bool volcanoActive = false;
+
+        #endregion
 
         void Awake() {
             gravityBody = GetComponent<GravityBody>();
@@ -107,10 +111,6 @@ namespace Simoncouche.Islands {
 
         void Start() {
             if (color != IslandUtils.color.volcano) _randomizeIslandVisual.SetIslandColorVisual(color);
-        }
-
-        void Update() {
-            isMergeable = !(gravityBody.inDestroyMode || (parentIsland != null && parentIsland.gravityBody.inDestroyMode));
         }
 
 
