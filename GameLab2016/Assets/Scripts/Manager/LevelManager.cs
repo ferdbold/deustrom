@@ -166,6 +166,9 @@ public class LevelManager {
         sobekScore = -10000;
         cthuluScore = -10000;
 
+        GameManager.audioManager.ToggleAmbiantSounds(false);
+        GameManager.audioManager.ToggleGameplaySounds(false);
+
         _waitingForMatchEndInput = true;
         GameManager.Instance.disableScoring = true;
         // FIXME: I don't need to explain why this is bad.

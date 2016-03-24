@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.Audio;
 using System.Collections.Generic;
 
 public class AudioManager : MonoBehaviour {
+
+    public AudioMixer audioMixer { get; private set; }
 
     private GameObject AmbiantSounds;
 
@@ -29,6 +32,7 @@ public class AudioManager : MonoBehaviour {
 
     private void Awake() {
         source = GetComponentInChildren<AudioSource>();
+        audioMixer = GameObject.FindObjectOfType<AudioMixer>();
         AmbiantSounds = transform.Find("Ambiant").gameObject;
     }
 
@@ -39,6 +43,16 @@ public class AudioManager : MonoBehaviour {
 
     public void ToggleAmbiantSounds(bool active) {
         AmbiantSounds.SetActive(active);
+    }
+
+    public void ToggleGameplaySounds(bool isOff) {
+        if (isOff) {
+            this.audioMixer.SetFloat("Swimming", 0.0f);
+            this.audioMixer.SetFloat("Gameplay", 0.0f);
+        } else {
+            this.audioMixer.SetFloat("Swimming", 100.0f);
+            this.audioMixer.SetFloat("Gameplay", 100.0f);
+        }
     }
     
     public void PlayMusic(MusicSound.Choice music) {
@@ -81,12 +95,12 @@ public class CharacterSound : SoundClass {
     [SerializeField]
     private CthuluSpecificSound _cthuluSound;
     public CthuluSpecificSound cthuluSpecificSound { get { return _cthuluSound; } }
-
    
 }
 
 [System.Serializable]
 public class SobekSpecificSound : SoundClass {
+
     [SerializeField]
     [Tooltip("AudioClip played when player swims")]
     private List<AudioClip> _swim;
