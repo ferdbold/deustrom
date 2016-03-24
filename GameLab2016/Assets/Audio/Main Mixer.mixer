@@ -20,6 +20,7 @@ AudioMixerController:
     - fb3a00d0e811f9a44bf860cd6bd47293
     - 1cfe2378c540428448c0c8659970adfc
     - 5147c5c0c54417e4ba9f73cc466d8378
+    - 02862992927acd040833ba2b6c863474
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500003}
@@ -35,6 +36,7 @@ AudioMixerGroupController:
   - {fileID: 24318460}
   - {fileID: 24372724}
   - {fileID: 24338642}
+  - {fileID: 24375666}
   m_Volume: 4a1ebdb62eaf5d945b70c4867b13383a
   m_Pitch: cccbcf863fef5f94eb6f4186901e5436
   m_Effects:
@@ -94,6 +96,23 @@ AudioMixerGroupController:
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
+--- !u!243 &24375666
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Music
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 02862992927acd040833ba2b6c863474
+  m_Children: []
+  m_Volume: 0e47de4afc56c324880ab0a8016ee341
+  m_Pitch: 3737bdecd6126b44a99a78543f66302a
+  m_Effects:
+  - {fileID: 24482402}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
 --- !u!244 &24400002
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -133,6 +152,19 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
+--- !u!244 &24482402
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_EffectID: 2566ee311ecc7274cb83b627e52652fe
+  m_EffectName: Attenuation
+  m_MixLevel: 35bec1968e23e9f48a08512c527699e0
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!244 &24486312
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -161,7 +193,7 @@ AudioMixerSnapshotController:
     4fa3c4611c1889844ae83bffd068f8fe: 0.814
     205b9ce1169142648b49e3987b6e524b: 4.7
     054f343232dcf054d8708304a13c146c: 0.973
-    5eb311d293752e44b982319f96570117: -9
+    5eb311d293752e44b982319f96570117: -12
     d1087d43a47e72b45a941d98c9584684: 1
     4a786453fdd5c094db49472c77553fb7: 0.49400002
     7c66d983a3b44254bb89a692d44269c9: -4992

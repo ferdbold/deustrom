@@ -11,6 +11,7 @@ GameObject:
   - 82: {fileID: 8262694}
   - 82: {fileID: 8213320}
   - 82: {fileID: 8274454}
+  - 82: {fileID: 8228410}
   m_Layer: 0
   m_Name: Ambiant
   m_TagString: Untagged
@@ -104,7 +105,7 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: cb7cd33ad8dc18f448c8d73c5fc305ef, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.7
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -242,6 +243,81 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!82 &8228410
+AudioSource:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 124366}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24372724, guid: 19e3b45c4ab55234bb874f7410cef789,
+    type: 2}
+  m_audioClip: {fileID: 8300000, guid: 310586b5daea68244babf18ecc686fda, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!82 &8262694
 AudioSource:
   m_ObjectHideFlags: 1
@@ -254,7 +330,7 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: 384e548ee46f8564a9f7a85b74fc1627, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -329,7 +405,7 @@ AudioSource:
     type: 2}
   m_audioClip: {fileID: 8300000, guid: ec8e12884be0293408133828b5503e7f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.7
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -495,6 +571,12 @@ MonoBehaviour:
   _chainSound:
     _chainDestruction:
     - {fileID: 8300000, guid: 2249f2e354ead7948a4a21ae872e5559, type: 3}
+    _chainHit:
+    - {fileID: 8300000, guid: a389068c7d11a7749aff52af8f685453, type: 3}
+    - {fileID: 8300000, guid: 7c0b4d0c8c3e7444fb0b354c610b57e1, type: 3}
+    - {fileID: 8300000, guid: 21ff49e37cac327429025ad5357cd9c6, type: 3}
+    - {fileID: 8300000, guid: f4370ba956072a941971d9d399b35981, type: 3}
+    - {fileID: 8300000, guid: 9723642d6104f5841a1441efe3e2af2a, type: 3}
   _music:
     menuMusic: {fileID: 0}
     playMusic: {fileID: 8300000, guid: 310586b5daea68244babf18ecc686fda, type: 3}
@@ -577,6 +659,7 @@ MonoBehaviour:
   - Main
   timeForTuto: 1
   _timeUntilControllersAreEnabled: 0.1
+  _amountOfRoundsUntilChainsEnabled: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
