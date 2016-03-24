@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Simoncouche.Islands;
 using Simoncouche.Chain;
-
+using System;
 
 namespace Simoncouche.Controller {
     
@@ -397,6 +397,7 @@ namespace Simoncouche.Controller {
 
             //Reset charge multiplier
             StartCoroutine(ResetChargeMultiplier());
+
         }
 
         /// <summary>
@@ -569,8 +570,8 @@ namespace Simoncouche.Controller {
 
         private void CheckPlayerInputs(params float[] input) {
             bool isCurrentlyHeld = (input[0] == 1);
-
-            if (_triggerIsHeld && !isCurrentlyHeld) { //If just stop pressing
+            if (this.gameObject == LevelManager.cthulhuPlayer) { Debug.Log(grabbedBody + DateTime.Now.ToString());}
+            if (_triggerIsHeld && !isCurrentlyHeld || _triggerIsHeld && grabbedBody ==null) { //If just stop pressing OR there is no island grabbed
                 ToggleChargeParticles(false);
                 ToggleMaxChargeParticles(false);
                 _triggerIsHeld = false;
