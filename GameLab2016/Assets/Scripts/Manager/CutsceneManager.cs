@@ -103,9 +103,12 @@ public class CutsceneManager : MonoBehaviour {
             yield return new WaitForRealSeconds(0.05f);
             if (skip) {
                 movie.Stop();
+                Video = null;
                 break;
             }
         }
+        movie.Stop();
+        Video = null;
         isDone = true;
     }
 

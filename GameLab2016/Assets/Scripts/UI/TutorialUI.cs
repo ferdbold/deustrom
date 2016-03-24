@@ -12,10 +12,10 @@ public class TutorialUI : MonoBehaviour {
     private RawImage movie;
 
     [SerializeField]
-    private MovieTexture videoOne;
+    private RawImage tuto1;
 
     [SerializeField]
-    private MovieTexture videoTwo;
+    private RawImage tuto2;
 
     public bool isCompleted { get; private set; }
 
@@ -24,26 +24,27 @@ public class TutorialUI : MonoBehaviour {
     public enum TutoChoice { one, two }
 
 	public void StartTuto(TutoChoice choice) {
-        MovieTexture video = null;
         this.skip = false;
         this.isCompleted = false;
 
         switch (choice) {
             case TutoChoice.one:
-                video = videoOne;
+                tuto1.gameObject.SetActive(true);
+                StartCoroutine(PlayTuto(tuto1));
                 break;
 
             case TutoChoice.two:
-                video = videoTwo;
+                tuto2.gameObject.SetActive(false);
+                StartCoroutine(PlayTuto(tuto2));
                 break;
         }
-
-        StartCoroutine(PlayTuto(video));
     }
 
     void Awake() {
         isCompleted = false;
         GetComponent<RectTransform>().DOScale(0, 0);
+        tuto1.gameObject.SetActive(false);
+        tuto2.gameObject.SetActive(false);
     }
 
     void Update() {
@@ -52,12 +53,13 @@ public class TutorialUI : MonoBehaviour {
         }
     }
 
-    IEnumerator PlayTuto(MovieTexture video) {
+    IEnumerator PlayTuto(RawImage movie) {
         OpenClose(true, timeToOpen);
         yield return new WaitForSeconds(timeToOpen);
-        movie.material.mainTexture = video;
-        video.Play();
+        MovieTexture video = (MovieTexture)movie.mainTexture;
         video.loop = true;
+        video.Play();
+        GameManager.audioManager.PlayAudioClip(video.audioClip);
         GameManager.Instance.Pause();
 
         while (!skip) {
