@@ -66,6 +66,7 @@ namespace Simoncouche.UI {
 
         private void OnReturnMenu() {
             // TODO: Maybe check here for proper game reset
+			GameManager.Instance.UnPause();
             GameManager.Instance.SwitchScene(GameManager.Scene.Menu);
         }
 

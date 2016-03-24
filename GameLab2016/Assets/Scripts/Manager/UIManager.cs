@@ -154,19 +154,17 @@ public class UIManager : MonoBehaviour {
     /// Update the visibility of both players' lead particles
     /// </summary>
     private void UpdateLeadParticles() {
-        if (_scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles != null){ 
-            _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive(
-                GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) >
-                GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
-            );
-         }
+		if (_scoreWidgets[0] != null) {
+			_scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive (
+				GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) >
+				GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
+			);
 
-        if (_scoreWidgets[(int)LevelManager.Player.sobek].leadParticles != null) {
-            _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive(
-            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek) >
-            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu)
-            );
-        }
+			_scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive (
+				GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek) >
+				GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu)
+			);
+		}
     }
 
     private void RefreshWins() {
@@ -175,11 +173,15 @@ public class UIManager : MonoBehaviour {
     }
 
     private void OnPause() {
-        _pauseWidget.enabled = true;
+		if (_pauseWidget != null) {
+			_pauseWidget.enabled = true;
+		}
     }
 
-    private void OnUnpause() {
-        _pauseWidget.enabled = false;
+	private void OnUnpause() {
+		if (_pauseWidget != null) {
+			_pauseWidget.enabled = false;
+		}
     }
 
     private void OnOrbAnimComplete(LevelManager.Player player, Image orb) {
