@@ -5281,7 +5281,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 126896}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -319.9863, y: 3.2811127, z: 0}
+  m_LocalPosition: {x: -20.66, y: 1.39, z: 0}
   m_LocalScale: {x: 3.5, y: 3.5, z: 3.5}
   m_Children:
   - {fileID: 429300}
@@ -5703,7 +5703,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  ROTATION_SPEED: 720
+  ROTATION_SPEED: 1200
   GRAB_RATIO_ROTATION: 0.65
   GRAB_RATIO_MOVEMENT: 0.45
   RESPAWN_SPIN_TIME: 2
