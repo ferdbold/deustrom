@@ -253,8 +253,15 @@ namespace Simoncouche.Islands {
         /// <param name="volcano">Chunk to push </param>
         private void PushChunk(IslandChunk chunkToPush, IslandChunk volcano) {
             //Add Force
-            Vector2 forceDirection = ((Vector2)(chunkToPush.transform.position - volcano.transform.position)).normalized;
-            chunkToPush.gravityBody.Velocity += forceDirection * 5f;
+            GravityBody bodyToCheck = chunkToPush.gravityBody;
+            if(chunkToPush.parentIsland != null) bodyToCheck = chunkToPush.parentIsland.gravityBody;
+            if(bodyToCheck.Kinematic) {
+                Vector2 forceDirection = ((Vector2)(volcano.transform.position - chunkToPush.transform.position)).normalized;
+                chunkToPush.gravityBody.Velocity += forceDirection * 5f;
+            } else { 
+                Vector2 forceDirection = ((Vector2)(chunkToPush.transform.position - volcano.transform.position)).normalized;
+                chunkToPush.gravityBody.Velocity += forceDirection * 5f;
+            }
             //Convert to neutral
             if(chunkToPush.color != IslandUtils.color.neutral) chunkToPush.ConvertChunkToAnotherColor(IslandUtils.color.neutral);
         }

@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField]
     [Tooltip("Disable scoring (for debug purposes only")]
     private bool _disableScoring = true;
-    public bool disableScoring { get { return _disableScoring; } }
+    public bool disableScoring { get { return _disableScoring; } set { _disableScoring = value; } }
 
     [Tooltip("Number of match to win to finish the game")]
     [SerializeField]
@@ -237,7 +237,7 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case Scene.PlayLevel:
-                
+                    
                 islandManager.Setup();
                 if (levelManager == null) {
                     levelManager = new LevelManager(_matchToWin);
@@ -246,11 +246,14 @@ public class GameManager : MonoBehaviour {
                 }
 
                 uiManager.Setup();
-                //Start Feeder
+                
+                // Start Feeder
                 IslandFeeder[] feeders = GameObject.FindObjectsOfType<IslandFeeder>();
                 for (int i = 0; i < feeders.Length; i++) {
-                    if (levelManager.currentRound == 1) feeders[i]._inTutorial = true;
-                    else feeders[i]._inTutorial = false;
+                    if (levelManager.currentRound == 1)
+                        feeders[i]._inTutorial = true;
+                    else
+                        feeders[i]._inTutorial = false;
                     feeders[i].OnStart();
                 }
 

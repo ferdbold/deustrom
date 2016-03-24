@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 using Simoncouche.Controller;
 using Simoncouche.Islands;
+
+public class PlayerEvent : UnityEvent<LevelManager.Player> {}
 
 public class LevelManager {
 
@@ -11,6 +14,7 @@ public class LevelManager {
 
     /// <summary> Cthulu (player two)</summary>
     public static GameObject cthulhuPlayer { get; private set; }
+
     #endregion
 
     #region Score
@@ -30,6 +34,21 @@ public class LevelManager {
     public int cthuluMatchWon { get; private set; }
     #endregion
 
+    #region Events
+
+    /// <summary>
+    /// Fired as soon as a winner is declared at match end
+    /// </summary>
+    public PlayerEvent MatchEnd { get; private set; }
+
+    #endregion
+
+    /// <summary>
+    /// Is the level waiting for a player to input A after a round has concluded
+    /// </summary>
+    private bool _waitingForMatchEndInput;
+    private LevelManager.Player _winner;
+
     #region Setup
 
     public LevelManager(int numberOfMatchToWin) {
@@ -38,10 +57,15 @@ public class LevelManager {
     }
 
     public void Setup() {
-            SetupPlayers();
-            sobekScore = 0;
-            cthuluScore = 0;
-            OnMatchStart();
+        this.MatchEnd = new PlayerEvent();
+
+        SetupPlayers();
+        sobekScore = 0;
+        cthuluScore = 0;
+        OnMatchStart();
+
+        GameManager.inputManager.AddEvent(InputManager.Button.p1_retractHooksButtonUp, OnMatchEndInput);
+        GameManager.inputManager.AddEvent(InputManager.Button.p2_retractHooksButtonUp, OnMatchEndInput);
     }
 
     /// <summary> Setup ref to players </summary>
@@ -127,6 +151,8 @@ public class LevelManager {
     /// </summary>
     /// <param name="winner"></param>
     private void OnMatchEnd(Player winner) {
+        _winner = winner;
+
         if (winner == Player.sobek) {
             ++sobekMatchWon;
             if (sobekMatchWon >= matchToWin) {
@@ -143,7 +169,15 @@ public class LevelManager {
 
         sobekScore = -10000;
         cthuluScore = -10000;
-        GameManager.Instance.SwitchScene(GameManager.Scene.PlayLevel, winner == Player.sobek ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch, dontClose: true);
+
+        _waitingForMatchEndInput = true;
+        GameManager.Instance.disableScoring = true;
+        // FIXME: I don't need to explain why this is bad.
+        foreach (IslandFeeder feeder in GameObject.FindObjectsOfType<IslandFeeder>()) {
+            Object.Destroy(feeder);
+        }
+
+        this.MatchEnd.Invoke(winner);
     }
 
     #region Used for callback
@@ -153,6 +187,16 @@ public class LevelManager {
 
     private void OnMatchEndSobek() {
         OnGameEnd(Player.sobek);
+    }
+
+    private void OnMatchEndInput() {
+        if (_waitingForMatchEndInput) {
+            GameManager.Instance.SwitchScene(
+                GameManager.Scene.PlayLevel, 
+                (_winner == Player.sobek) ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch, 
+                dontClose: true
+            );
+        }
     }
     #endregion
 

@@ -12,6 +12,7 @@ namespace Simoncouche.UI {
         private string _authorValue;
 
         private bool _waitingForBeginningInput = true;
+        private InputField _focusedInput;
 
         // COMPONENTS
 
@@ -59,33 +60,44 @@ namespace Simoncouche.UI {
                 _authorPlaceholder.text = "Croque-mister";
                 break;
             }
+
+            _focusedInput = null;
         }
 
-        private void LateUpdate() {
+        private void Update() {
 
             // #SHAME
 
+            // Submit handling
+            if ((Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) && _verseField.text != "" && _authorField.text != "") {
+                _writer.SaveQuote(_verseField.text, _authorField.text, (GameManager.Instance.lastWinner == LevelManager.Player.sobek));
+                GameManager.Instance.SwitchScene(GameManager.Scene.Menu);
+            } 
+
             // Tab order handling
-            if (Input.GetKeyDown(KeyCode.Tab)) {
-                if (_verseField.isFocused) {
+            else if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+                if (_focusedInput == _verseField) {
                     _authorField.Select();
                 } else {
                     _verseField.Select();
                 }
             }
-
-            // Submit handling
-            else if (Input.GetKeyDown(KeyCode.Return) && _verseField.text != "" && _authorField.text != "") {
-                _writer.SaveQuote(_verseField.text, _authorField.text, (GameManager.Instance.lastWinner == LevelManager.Player.sobek));
-                GameManager.Instance.SwitchScene(GameManager.Scene.Menu);
-            } 
-
+                
             // First input handling
-            else if (Input.anyKeyDown && !_verseField.isFocused && !_authorField.isFocused) {
+            else if (Input.anyKeyDown && _focusedInput == null) {
                 _verseField.Select();
                 _verseField.text = Input.inputString;
 
                 StartCoroutine(UnselectField());
+            }
+
+            // Updating focus state after logic pass
+            if (_verseField.isFocused) {
+                _focusedInput = _verseField;
+            } else if (_authorField.isFocused) {
+                _focusedInput = _authorField;
+            } else {
+                _focusedInput = null;
             }
         }
 

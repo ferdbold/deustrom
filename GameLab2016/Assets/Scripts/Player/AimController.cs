@@ -70,6 +70,9 @@ namespace Simoncouche.Controller {
         /// <summary> Public method call to toggle indicator on or off from the outside </summary>
         /// <param name="active">If true, activate. Otherwise, deactivate.</param>
         public void ToggleAimIndicator(bool active) {
+            foreach (ParticleSystem ps in _aimIndicator.GetComponentsInChildren<ParticleSystem>()) {
+                ps.playOnAwake = true;
+            }
             if (active) ActivateIndicator();
             else DeactivateIndicator();
         }

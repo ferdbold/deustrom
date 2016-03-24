@@ -220,7 +220,7 @@ namespace Simoncouche.Controller {
                 transform.position = new Vector3(lerpV2.x, lerpV2.y, transform.position.z);
                 transform.Rotate(new Vector3(0, 0, RESPAWN_SPIN_RATE * Time.deltaTime));
                 _positionZOnBackground._zOffset = Mathf.Lerp(sZ, tZ, i);
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
             StartCoroutine(Respawn_ReachEdgeUnderwater());
         }
@@ -233,7 +233,7 @@ namespace Simoncouche.Controller {
                 Vector2 lerpV2 = Vector2.Lerp(startPosition, targetPosition, i);
                 transform.position = new Vector3(lerpV2.x, lerpV2.y, transform.position.z);
                 transform.Rotate(new Vector3(0, 0, RESPAWN_SPIN_RATE * Time.deltaTime));
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
             StopRespawnState();
         } 

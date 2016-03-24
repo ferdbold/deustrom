@@ -43,6 +43,9 @@ public class UIManager : MonoBehaviour {
     private List<IslandCountWidget> _islandCountWidgets;
     public TutorialUI _tutoWidget { get; private set; }
     private Image _seal;
+    private Image _winSeal;
+    private Text _promptText;
+    private Text _miniPromptText;
 
     // METHODS
 
@@ -61,6 +64,17 @@ public class UIManager : MonoBehaviour {
         _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles = GameObject.Find("UIParticles/Sobek").transform;
         _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles = GameObject.Find("UIParticles/Cthulhu").transform;
 
+        //Must play on awake these particle systems (cannot be set in the inspector)
+        foreach (ParticleSystem ps in _scoreWidgets[(int)LevelManager.Player.sobek]
+            .leadParticles.GetComponentsInChildren<ParticleSystem>()) {
+            ps.playOnAwake = true;
+        }
+        foreach (ParticleSystem ps in _scoreWidgets[(int)LevelManager.Player.cthulu]
+            .leadParticles.GetComponentsInChildren<ParticleSystem>()) {
+            ps.playOnAwake = true;
+            Debug.Log(ps);
+        }
+
         _winsWidgets = new List<WinsWidget>();
         _winsWidgets.Add(GameObject.Find("UI/Wins/Sobek").GetComponent<WinsWidget>());
         _winsWidgets.Add(GameObject.Find("UI/Wins/Cthulhu").GetComponent<WinsWidget>());
@@ -70,6 +84,9 @@ public class UIManager : MonoBehaviour {
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Cthulhu").GetComponent<IslandCountWidget>());
 
         _seal = GameObject.Find("UI/Seal").GetComponent<Image>();
+        _winSeal = GameObject.Find("UI/WinSeal").GetComponent<Image>();
+        _promptText = GameObject.Find("UI/PromptText").GetComponent<Text>();
+        _miniPromptText = GameObject.Find("UI/MiniPromptText").GetComponent<Text>();
 
         RefreshWins();
 
@@ -83,6 +100,18 @@ public class UIManager : MonoBehaviour {
 
         // Set seal
         _seal.sprite = _roundSeals[GameManager.levelManager.currentRound];
+
+        // Event listeners
+        GameManager.levelManager.MatchEnd.AddListener(OnMatchEnd);
+    }
+
+    private void Start() {
+        if (GameManager.Instance.currentScene == GameManager.Scene.PlayLevel) {
+            _promptText.GetComponent<RectTransform>().localScale = Vector3.zero;
+
+            _winSeal.color = new Color(_winSeal.color.r, _winSeal.color.g, _winSeal.color.b, 0f);
+            _winSeal.GetComponent<RectTransform>().localScale = Vector3.one * 5;
+        }
     }
 
     private void Update() {
@@ -119,15 +148,19 @@ public class UIManager : MonoBehaviour {
     /// Update the visibility of both players' lead particles
     /// </summary>
     private void UpdateLeadParticles() {
-        _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive(
-            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) > 
-            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
-        );
+        if (_scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles != null){ 
+            _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive(
+                GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) >
+                GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
+            );
+         }
 
-        _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive(
+        if (_scoreWidgets[(int)LevelManager.Player.sobek].leadParticles != null) {
+            _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive(
             GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek) >
             GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu)
-        );
+            );
+        }
     }
 
     private void RefreshWins() {
@@ -138,6 +171,27 @@ public class UIManager : MonoBehaviour {
     private void OnOrbAnimComplete(LevelManager.Player player, Image orb) {
         ReturnRune(orb, player);
         _scoreWidgets[(int)player].AddPoints(1);
+    }
+
+    private void OnMatchEnd(LevelManager.Player winner) {
+        string godName = (winner == LevelManager.Player.cthulu) ? "CTHULHU" : "SOBEK";
+
+        _promptText.text = "VICTOIRE " + godName;
+        _promptText.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 3);
+        _winSeal.sprite = (winner == LevelManager.Player.cthulu) ? _sealCthulhu : _sealSobek;
+
+        // Anim sequence
+        _promptText.GetComponent<RectTransform>().DOShakeRotation(0.5f, 45);
+        _promptText.GetComponent<RectTransform>().DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce).OnComplete(() => {
+            _winSeal.DOColor(Color.white, 0.2f);
+            _winSeal.GetComponent<RectTransform>().DOScale(Vector3.one, 0.25f).SetEase(Ease.OutCirc);
+
+            Camera.main.DOShakePosition(0.3f, 5, 30).SetDelay(0.25f);
+            _winSeal.GetComponent<RectTransform>().DOShakePosition(0.3f, 15, 30).SetDelay(0.25f).OnComplete(() => {
+                _miniPromptText.GetComponent<RectTransform>().DOShakeRotation(0.3f, 30).SetDelay(0.75f);
+                _miniPromptText.GetComponent<RectTransform>().DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBounce).SetDelay(0.75f);
+            });
+        });
     }
 
     #region Pooling
