@@ -170,6 +170,10 @@ namespace Simoncouche.Controller {
                 StartRespawnState();
                 StartCoroutine(Respawn_Spin(deathPosition));
                 _hookThrower.RemoveChainOnPlayerMaelstromEnter();
+                Chain.Chain[] chains = GameObject.FindObjectsOfType<Chain.Chain>();
+                foreach(Chain.Chain chain in chains){
+                    chain.SendMessage("OnMaelstromEnterOfPlayer", this);
+                }
             }
         }
 
