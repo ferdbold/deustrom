@@ -4,6 +4,8 @@ using System.Collections;
 using Simoncouche.Controller;
 using Simoncouche.Islands;
 
+public class PlayerEvent : UnityEvent<LevelManager.Player> {}
+
 public class LevelManager {
 
     #region Players
@@ -37,7 +39,7 @@ public class LevelManager {
     /// <summary>
     /// Fired as soon as a winner is declared at match end
     /// </summary>
-    public UnityEvent MatchEnd { get; private set; }
+    public PlayerEvent MatchEnd { get; private set; }
 
     #endregion
 
@@ -55,7 +57,7 @@ public class LevelManager {
     }
 
     public void Setup() {
-        this.MatchEnd = new UnityEvent();
+        this.MatchEnd = new PlayerEvent();
 
         SetupPlayers();
         sobekScore = 0;
@@ -176,7 +178,7 @@ public class LevelManager {
             Object.Destroy(feeder);
         }
 
-        this.MatchEnd.Invoke();
+        this.MatchEnd.Invoke(winner);
     }
 
     #region Used for callback

@@ -85,6 +85,7 @@ public class UIManager : MonoBehaviour {
         // Set seal
         _seal.sprite = _roundSeals[GameManager.levelManager.currentRound];
 
+        // Event listeners
         GameManager.levelManager.MatchEnd.AddListener(OnMatchEnd);
     }
 
@@ -104,10 +105,6 @@ public class UIManager : MonoBehaviour {
             foreach (LevelManager.Player player in System.Enum.GetValues(typeof(LevelManager.Player))) {
                 _islandCountWidgets[(int)player].value = GameManager.islandManager.GetPlayerIslandCount(player);
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.G)) {
-            OnMatchEnd();
         }
     }
 
@@ -156,12 +153,12 @@ public class UIManager : MonoBehaviour {
         _scoreWidgets[(int)player].AddPoints(1);
     }
 
-    private void OnMatchEnd() {
-        string godName = (GameManager.Instance.lastWinner == LevelManager.Player.cthulu) ? "CTHULHU" : "SOBEK";
+    private void OnMatchEnd(LevelManager.Player winner) {
+        string godName = (winner == LevelManager.Player.cthulu) ? "CTHULHU" : "SOBEK";
 
         _promptText.text = "VICTOIRE " + godName;
         _promptText.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 3);
-        _winSeal.sprite = (GameManager.Instance.lastWinner == LevelManager.Player.cthulu) ? _sealCthulhu : _sealSobek;
+        _winSeal.sprite = (winner == LevelManager.Player.cthulu) ? _sealCthulhu : _sealSobek;
 
         // Anim sequence
         _promptText.GetComponent<RectTransform>().DOShakeRotation(0.5f, 45);
