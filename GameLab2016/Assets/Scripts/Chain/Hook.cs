@@ -40,6 +40,8 @@ namespace Simoncouche.Chain {
         /// <summary>Whether this hook is currently attached to a target</summary>
         public bool attachedToTarget { get; private set; }
 
+
+
         // EVENTS
 
         /// <summary>Invoked when this hook attaches itself to an island</summary>
@@ -223,7 +225,11 @@ namespace Simoncouche.Chain {
 
             this.Attach.Invoke();
 
+            //Sound
 
+            //Rumble
+            if (this.chain.thrower.playerController.IsPlayerOne) GameManager.inputManager.RumbleGamepad_Light(0);
+            else GameManager.inputManager.RumbleGamepad_Light(1);
         }
 
         /// <summary>

@@ -119,7 +119,6 @@ namespace Simoncouche.UI {
                         entry.quoteSecondNo
                     );
 
-                    Debug.Log(_scrollContents.Count);
                     widget.transform.SetParent(_scrollContents[(int)LevelManager.Player.sobek]);
                     widget.transform.localScale = Vector3.one;
                 }
