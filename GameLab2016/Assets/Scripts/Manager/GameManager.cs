@@ -117,6 +117,9 @@ public class GameManager : MonoBehaviour {
             this.Paused = new UnityEvent();
             this.Unpaused = new UnityEvent();
 
+            inputManager.AddEvent(InputManager.Button.start, OnStartButton);
+
+
             DontDestroyOnLoad(gameObject);
 
             Scene_OnOpen(currentScene);
@@ -139,7 +142,7 @@ public class GameManager : MonoBehaviour {
             if(_currentScene != Scene.BibleWriter)SwitchScene(Scene.Menu);
         }
         if (Input.GetKeyDown(KeyCode.Escape)) {
-            QuitGame();
+            OnStartButton();
         }
 
         #if UNITY_EDITOR
@@ -316,6 +319,20 @@ public class GameManager : MonoBehaviour {
 
             case Scene.BibleReader:
                 break;
+        }
+    }
+
+    private void OnStartButton() {
+        switch (_currentScene) {
+        case Scene.Menu:
+            QuitGame();
+            break;
+        case Scene.PlayLevel:
+            Pause();
+            break;
+        case Scene.BibleWriter:
+            SwitchScene(Scene.Menu);
+            break;
         }
     }
 
