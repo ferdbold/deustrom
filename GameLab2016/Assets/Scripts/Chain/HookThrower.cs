@@ -174,9 +174,11 @@ namespace Simoncouche.Chain {
 
                 // Animation handling
                 playerController.HandleFirstHookAnimation();
-
                 // Audio
                 playerAudio.PlaySound(PlayerSounds.PlayerChainFirst);
+                // Rumble
+                if (playerController.IsPlayerOne) GameManager.inputManager.RumbleGamepad_Light(0);
+                else GameManager.inputManager.RumbleGamepad_Light(1);
 
                 break;
 
