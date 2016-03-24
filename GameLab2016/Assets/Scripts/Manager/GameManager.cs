@@ -252,6 +252,7 @@ public class GameManager : MonoBehaviour {
                 }
 
                 audioManager.PlayMusic(MusicSound.Choice.play);
+                StartCoroutine("CalculateScoreCoroutine");
                 this.gameStarted = true;
 
                 break;
@@ -279,6 +280,7 @@ public class GameManager : MonoBehaviour {
 
             case Scene.PlayLevel:
                 levelManager = null;
+                StopCoroutine("CalculateScoreCoroutine");
                 break;
 
             case Scene.BibleWriter:
@@ -333,4 +335,19 @@ public class GameManager : MonoBehaviour {
     }
 
     #endregion
+
+    private IEnumerator CalculateScoreCoroutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(5f);
+            if (levelManager == null) break;
+            foreach (IslandChunk ic in islandManager.GetIslandChunks())
+            {
+                if (ic.color == IslandUtils.color.red) levelManager.AddScore(LevelManager.Player.sobek, 1, ic.transform.position);
+                else if (ic.color == IslandUtils.color.blue) levelManager.AddScore(LevelManager.Player.cthulu, 1, ic.transform.position);
+            }
+
+        }
+    }
 }
