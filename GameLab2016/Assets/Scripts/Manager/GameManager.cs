@@ -89,6 +89,8 @@ public class GameManager : MonoBehaviour {
     #region Utils Variables
     public bool gameStarted { get; private set; }
     public bool isPaused { get; private set; }
+
+    private FadeUI fadeUI;
     #endregion
 
     void Awake() {
@@ -102,6 +104,7 @@ public class GameManager : MonoBehaviour {
             GameManager.islandManager = GetComponent<IslandManager>();
             GameManager.audioManager = GetComponent<AudioManager>();
             GameManager.uiManager = GetComponent<UIManager>();
+            fadeUI = GetComponentInChildren<FadeUI>();
 
             DontDestroyOnLoad(gameObject);
 
@@ -195,7 +198,7 @@ public class GameManager : MonoBehaviour {
     /// <returns></returns>
     private IEnumerator WaitForSceneToLoad(string sceneToLoad, Scene scene, CutsceneManager.Cutscene cutsceneVideo) {
         SceneManager.LoadSceneAsync(SCENE_CUTSCENE);
-        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Single);
+        AsyncOperation loading = SceneManager.LoadSceneAsync(sceneToLoad, LoadSceneMode.Additive);
         loading.allowSceneActivation = false;
 
         CutsceneManager cutscene = null;
@@ -219,7 +222,6 @@ public class GameManager : MonoBehaviour {
         }
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneToLoad));
         Scene_OnOpen(scene);
-        yield return new WaitForRealSeconds(cutscene.TimeToFade);
         SceneManager.UnloadScene(SCENE_CUTSCENE);
     }
 
@@ -228,6 +230,7 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     /// <param name="scene">The scene loaded</param>
     private void Scene_OnOpen(Scene scene) {
+        fadeUI.StartFadeAnim(false);
         switch (scene) {
             case Scene.Menu:
                 audioManager.ToggleAmbiantSounds(false);
@@ -273,6 +276,7 @@ public class GameManager : MonoBehaviour {
     /// <param name="scene">the scene closed</param>
     private void Scene_OnClose(Scene scene) {
         this.gameStarted = false;
+        fadeUI.StartFadeAnim(false);
 
         switch (scene) {
             case Scene.Menu:

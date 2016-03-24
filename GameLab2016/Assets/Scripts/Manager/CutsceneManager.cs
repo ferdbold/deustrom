@@ -120,21 +120,14 @@ public class CutsceneManager : MonoBehaviour {
             }
         }
         isDone = true;
-
-        FadeUI(false);
-
-
     }
 
     IEnumerator WaitForImageEnd() {
         yield return new WaitForRealSeconds(timeToFade);
         Video.gameObject.SetActive(true);
-
         yield return new WaitForRealSeconds(imageTimeStaying);
 
         isDone = true;
-        
-        FadeUI(false);
     }
 
     void FadeUI (bool fadeIn) {
