@@ -84,13 +84,17 @@ public class UIManager : MonoBehaviour {
 
         // Set seal
         _seal.sprite = _roundSeals[GameManager.levelManager.currentRound];
+
+        GameManager.levelManager.MatchEnd.AddListener(OnMatchEnd);
     }
 
     private void Start() {
-        _promptText.GetComponent<RectTransform>().localScale = Vector3.zero;
+        if (GameManager.Instance.currentScene == GameManager.Scene.PlayLevel) {
+            _promptText.GetComponent<RectTransform>().localScale = Vector3.zero;
 
-        _winSeal.color = new Color(_winSeal.color.r, _winSeal.color.g, _winSeal.color.b, 0f);
-        _winSeal.GetComponent<RectTransform>().localScale = Vector3.one * 5;
+            _winSeal.color = new Color(_winSeal.color.r, _winSeal.color.g, _winSeal.color.b, 0f);
+            _winSeal.GetComponent<RectTransform>().localScale = Vector3.one * 5;
+        }
     }
 
     private void Update() {
@@ -103,7 +107,7 @@ public class UIManager : MonoBehaviour {
         }
 
         if (Input.GetKeyDown(KeyCode.G)) {
-            OnRoundEnd();
+            OnMatchEnd();
         }
     }
 
@@ -152,7 +156,7 @@ public class UIManager : MonoBehaviour {
         _scoreWidgets[(int)player].AddPoints(1);
     }
 
-    private void OnRoundEnd() {
+    private void OnMatchEnd() {
         string godName = (GameManager.Instance.lastWinner == LevelManager.Player.cthulu) ? "CTHULHU" : "SOBEK";
 
         _promptText.text = "VICTOIRE " + godName;
