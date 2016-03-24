@@ -44,6 +44,7 @@ public class UIManager : MonoBehaviour {
     private Image _seal;
     private Image _winSeal;
     private Text _promptText;
+    private Text _miniPromptText;
 
     // METHODS
 
@@ -69,6 +70,7 @@ public class UIManager : MonoBehaviour {
         _seal = GameObject.Find("UI/Seal").GetComponent<Image>();
         _winSeal = GameObject.Find("UI/WinSeal").GetComponent<Image>();
         _promptText = GameObject.Find("UI/PromptText").GetComponent<Text>();
+        _miniPromptText = GameObject.Find("UI/MiniPromptText").GetComponent<Text>();
 
         RefreshWins();
 
@@ -154,6 +156,7 @@ public class UIManager : MonoBehaviour {
         string godName = (GameManager.Instance.lastWinner == LevelManager.Player.cthulu) ? "CTHULHU" : "SOBEK";
 
         _promptText.text = "VICTOIRE " + godName;
+        _promptText.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, 0, 3);
         _winSeal.sprite = (GameManager.Instance.lastWinner == LevelManager.Player.cthulu) ? _sealCthulhu : _sealSobek;
 
         // Anim sequence
@@ -163,9 +166,11 @@ public class UIManager : MonoBehaviour {
             _winSeal.GetComponent<RectTransform>().DOScale(Vector3.one, 0.25f).SetEase(Ease.OutCirc);
 
             Camera.main.DOShakePosition(0.3f, 5, 30).SetDelay(0.25f);
-            _winSeal.GetComponent<RectTransform>().DOShakePosition(0.3f, 15, 30).SetDelay(0.25f);
+            _winSeal.GetComponent<RectTransform>().DOShakePosition(0.3f, 15, 30).SetDelay(0.25f).OnComplete(() => {
+                _miniPromptText.GetComponent<RectTransform>().DOShakeRotation(0.3f, 30).SetDelay(0.75f);
+                _miniPromptText.GetComponent<RectTransform>().DOScale(Vector3.one, 0.3f).SetEase(Ease.OutBounce).SetDelay(0.75f);
+            });
         });
-
     }
 
     #region Pooling
