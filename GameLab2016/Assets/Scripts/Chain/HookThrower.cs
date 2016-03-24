@@ -369,8 +369,13 @@ namespace Simoncouche.Chain {
                 }
             }
 
+            //animation 
             _triggerIsHeld = false;
             playerController.HandleAimStopAnimation();
+
+            //disable of aim indicator
+            this.autoAimController.enabled = false;
+            this.aimController.ToggleAimIndicator(false);
         }
 
         /// <summary>
@@ -383,6 +388,16 @@ namespace Simoncouche.Chain {
             //Must apply a rotation towards the island in order to prevent the player from going on the other side of the island when grabbing
             this.rigidbody.transform.Rotate(this.transform.forward, angle, Space.Self);
             this.playerGrab.AttemptGrabOnHookRetraction(gBody); //MAKES THE PLAYER GRAB THE ISLAND
+        }
+
+        public void OnPlayerIslandGrab() {
+            //animation 
+            _triggerIsHeld = false;
+            playerController.HandleAimStopAnimation();
+
+            //disable of aim indicator
+            this.autoAimController.enabled = false;
+            this.aimController.ToggleAimIndicator(false);
         }
 
 

@@ -182,6 +182,7 @@ namespace Simoncouche.Controller {
             //Before grabbing, make the other players release this chunk
             MakeOtherPlayerRelease(targetChunk);
             grabbedBody = targetBody;
+            _hookThrower.OnPlayerIslandGrab();
 
             if (targetChunk.parentIsland == null) {
                 //Set parent
