@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using Simoncouche.Islands;
 using System.Collections;
-using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(InputManager))]
 [RequireComponent(typeof(IslandManager))]
@@ -93,6 +94,13 @@ public class GameManager : MonoBehaviour {
     private FadeUI fadeUI;
     #endregion
 
+    #region Events
+
+    public UnityEvent Paused { get; private set; }
+    public UnityEvent Unpaused { get; private set; } 
+
+    #endregion
+
     void Awake() {
         this.gameStarted = false;
 
@@ -105,6 +113,9 @@ public class GameManager : MonoBehaviour {
             GameManager.audioManager = GetComponent<AudioManager>();
             GameManager.uiManager = GetComponent<UIManager>();
             fadeUI = GetComponentInChildren<FadeUI>();
+
+            this.Paused = new UnityEvent();
+            this.Unpaused = new UnityEvent();
 
             DontDestroyOnLoad(gameObject);
 
@@ -334,6 +345,8 @@ public class GameManager : MonoBehaviour {
     public void Pause() {
         Debug.LogWarning("The game was paused, don't freak out");
         ChangePauseStatus(true);
+
+        this.Paused.Invoke();
     }
 
     /// <summary>
@@ -341,6 +354,8 @@ public class GameManager : MonoBehaviour {
     /// </summary>
     public void UnPause() {
         ChangePauseStatus(false);
+
+        this.Unpaused.Invoke();
     }
 
     private void ChangePauseStatus(bool pause) {
