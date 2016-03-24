@@ -40,9 +40,6 @@ namespace Simoncouche.Controller {
         /// <summary> Has maxed charge been reached </summary>
         private bool _maxChargeReached = false;
 
-        public bool isIslandGrabbed { get; private set; }
-
-
         //Components
         /// <summary> Currently Grabbed GravityBody</summary>
         public GravityBody grabbedBody { get; private set; }
@@ -161,8 +158,6 @@ namespace Simoncouche.Controller {
                     if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) { 
                         //Initiate Grab
                         Grab(targetBody, targetChunk, 0f, true);
-                        this.isIslandGrabbed = true; //On ne possède plus le body
-
 
 
                     }
@@ -179,7 +174,6 @@ namespace Simoncouche.Controller {
                 if (targetChunk != null && !_hookThrower.isHookAttachedToPlayer) {
                     //Initiate Grab
                     Grab(targetBody, targetChunk, 0f, true);
-                    this.isIslandGrabbed = true; //On ne possède plus le body
                 }
             }
         }
@@ -354,7 +348,6 @@ namespace Simoncouche.Controller {
         /// Raises the ReleasedByPlayer event in the targeted Island or IslandChunk.
         /// </summary>
         public void Release() {
-
             if (grabbedBody != null) {
                 IslandChunk targetChunk = grabbedBody.gameObject.GetComponent<IslandChunk>();
 
