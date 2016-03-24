@@ -115,6 +115,15 @@ public class GameManager : MonoBehaviour {
     }
 
     void Update() {
+        if (GameManager.levelManager != null && GameManager.levelManager._waitingForMatchEndInput && (Input.GetKeyDown(KeyCode.Joystick1Button0) || Input.GetKeyDown(KeyCode.Joystick2Button0))) {
+            GameManager.levelManager._waitingForMatchEndInput = false;
+            GameManager.Instance.SwitchScene(
+                GameManager.Scene.PlayLevel,
+                (lastWinner == LevelManager.Player.sobek) ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch,
+                dontClose: true
+            );
+        }
+
         if (Input.GetKeyDown(KeyCode.R)) {
             if(_currentScene != Scene.BibleWriter)SwitchScene(Scene.Menu);
         }
@@ -287,6 +296,7 @@ public class GameManager : MonoBehaviour {
 
             case Scene.PlayLevel:
                 levelManager = null;
+                GameManager.inputManager.ResetInputs();
                 StopCoroutine("CalculateScoreCoroutine");
                 break;
 

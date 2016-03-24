@@ -46,7 +46,7 @@ public class LevelManager {
     /// <summary>
     /// Is the level waiting for a player to input A after a round has concluded
     /// </summary>
-    private bool _waitingForMatchEndInput;
+    public bool _waitingForMatchEndInput;
     private LevelManager.Player _winner;
 
     #region Setup
@@ -63,9 +63,7 @@ public class LevelManager {
         sobekScore = 0;
         cthuluScore = 0;
         OnMatchStart();
-
-        GameManager.inputManager.AddEvent(InputManager.Button.p1_retractHooksButtonUp, OnMatchEndInput);
-        GameManager.inputManager.AddEvent(InputManager.Button.p2_retractHooksButtonUp, OnMatchEndInput);
+        GameManager.Instance.disableScoring = false;
     }
 
     /// <summary> Setup ref to players </summary>
@@ -187,16 +185,6 @@ public class LevelManager {
 
     private void OnMatchEndSobek() {
         OnGameEnd(Player.sobek);
-    }
-
-    private void OnMatchEndInput() {
-        if (_waitingForMatchEndInput) {
-            GameManager.Instance.SwitchScene(
-                GameManager.Scene.PlayLevel, 
-                (_winner == Player.sobek) ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch, 
-                dontClose: true
-            );
-        }
     }
     #endregion
 
