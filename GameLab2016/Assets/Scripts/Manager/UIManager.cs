@@ -143,15 +143,19 @@ public class UIManager : MonoBehaviour {
     /// Update the visibility of both players' lead particles
     /// </summary>
     private void UpdateLeadParticles() {
-        _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive(
-            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) > 
-            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
-        );
+        if (_scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles != null){ 
+            _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive(
+                GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) >
+                GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
+            );
+         }
 
-        _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive(
+        if (_scoreWidgets[(int)LevelManager.Player.sobek].leadParticles != null) {
+            _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive(
             GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek) >
             GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu)
-        );
+            );
+        }
     }
 
     private void RefreshWins() {
