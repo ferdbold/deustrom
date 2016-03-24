@@ -86,14 +86,7 @@ public class CutsceneManager : MonoBehaviour {
                 break;
 
             case Cutscene.Base_Loading:
-                if (Base_Loading_Cutscene != null) {
-                    Video.material.mainTexture = Base_Loading_Cutscene;
-                    movie.Play();
-                    StartCoroutine(WaitVideoEndToFade(movie));
-                } else {
-                    Debug.LogWarning("No cutscene for loading screen");
-                    StartCoroutine("WaitForImageEnd");
-                }
+                movie = Base_Loading_Cutscene;
                 break;
         }
         Video.material.mainTexture = movie;
