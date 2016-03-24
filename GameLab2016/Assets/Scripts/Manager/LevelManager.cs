@@ -32,6 +32,8 @@ public class LevelManager {
 
     /// <summary>Cthulu number of match won </summary>
     public int cthuluMatchWon { get; private set; }
+
+	public bool matchEnded { get; private set; }
     #endregion
 
     #region Events
@@ -134,6 +136,8 @@ public class LevelManager {
             case 0: GameManager.Instance.StartVideoTutorial(TutorialUI.TutoChoice.one); break;
             case 1: GameManager.Instance.StartVideoTutorial(TutorialUI.TutoChoice.two); break;
         }
+
+		this.matchEnded = false;
         //GameManager.Instance.StartCoroutine(WaitTimeUntilPlayerCanPlay(GameManager.Instance.timeUntilControllersAreEnabled));
     }
 
@@ -152,6 +156,7 @@ public class LevelManager {
     private void OnMatchEnd(Player winner) {
         _winner = winner;
         GameManager.Instance.lastWinner = winner;
+		this.matchEnded = true;
 
         if (winner == Player.sobek) {
             ++sobekMatchWon;

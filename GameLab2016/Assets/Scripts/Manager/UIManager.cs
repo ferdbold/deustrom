@@ -42,6 +42,8 @@ public class UIManager : MonoBehaviour {
     private List<WinsWidget> _winsWidgets;
     private List<IslandCountWidget> _islandCountWidgets;
     public TutorialUI _tutoWidget { get; private set; }
+    private PauseWidget _pauseWidget;
+
     private Image _seal;
     private Image _winSeal;
     private Text _promptText;
@@ -83,6 +85,8 @@ public class UIManager : MonoBehaviour {
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Sobek").GetComponent<IslandCountWidget>());
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Cthulhu").GetComponent<IslandCountWidget>());
 
+        _pauseWidget = GameObject.Find("UI/Pause").GetComponent<PauseWidget>();
+
         _seal = GameObject.Find("UI/Seal").GetComponent<Image>();
         _winSeal = GameObject.Find("UI/WinSeal").GetComponent<Image>();
         _promptText = GameObject.Find("UI/PromptText").GetComponent<Text>();
@@ -103,6 +107,8 @@ public class UIManager : MonoBehaviour {
 
         // Event listeners
         GameManager.levelManager.MatchEnd.AddListener(OnMatchEnd);
+        GameManager.Instance.Paused.AddListener(OnPause);
+        GameManager.Instance.Unpaused.AddListener(OnUnpause);
     }
 
     private void Start() {
@@ -148,24 +154,36 @@ public class UIManager : MonoBehaviour {
     /// Update the visibility of both players' lead particles
     /// </summary>
     private void UpdateLeadParticles() {
-        if (_scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles != null){ 
-            _scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive(
-                GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) >
-                GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
-            );
-         }
+		if (_scoreWidgets[0] != null) {
+			_scoreWidgets[(int)LevelManager.Player.cthulu].leadParticles.gameObject.SetActive (
+				GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu) >
+				GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek)
+			);
 
-        if (_scoreWidgets[(int)LevelManager.Player.sobek].leadParticles != null) {
-            _scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive(
-            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek) >
-            GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu)
-            );
-        }
+			_scoreWidgets[(int)LevelManager.Player.sobek].leadParticles.gameObject.SetActive (
+				GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.sobek) >
+				GameManager.islandManager.GetPlayerIslandCount(LevelManager.Player.cthulu)
+			);
+		}
     }
 
     private void RefreshWins() {
         _winsWidgets[(int)LevelManager.Player.cthulu].score = GameManager.levelManager.cthuluMatchWon;
         _winsWidgets[(int)LevelManager.Player.sobek].score = GameManager.levelManager.sobekMatchWon;
+    }
+
+    private void OnPause() {
+		if (_pauseWidget != null && _tutoWidget != null) {
+			if (_tutoWidget.isCompleted) {
+				_pauseWidget.enabled = true;
+			}
+		}
+    }
+
+	private void OnUnpause() {
+		if (_pauseWidget != null) {
+			_pauseWidget.enabled = false;
+		}
     }
 
     private void OnOrbAnimComplete(LevelManager.Player player, Image orb) {

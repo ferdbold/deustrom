@@ -70,23 +70,30 @@ namespace Simoncouche.Bible {
         /// This method gives a random quote from the two gods
         /// </summary>
         /// <returns>A random biblequote from the save system/returns>
-        public static BibleQuote GetRandomQuote() {
+        public static BibleQuote GetRandomQuote(out LevelManager.Player bible) {
             if (File.Exists(Application.persistentDataPath + fileName)) {
                 BinaryFormatter bf = new BinaryFormatter();
                 FileStream file = File.Open(Application.persistentDataPath + fileName, FileMode.Open);
                 BibleEntries bibleEntries = (BibleEntries)bf.Deserialize(file);
                 List<BibleQuote> quoteList = bibleEntries.quoteListCthulu;
                 quoteList.AddRange(bibleEntries.quoteListSobek);
+
                 int accessor = 0;
+
                 if (quoteList.Count < 1) {
                     file.Close();
+                    bible = LevelManager.Player.sobek;
                     return null; //Si on a rien à retourner
                 } else {
                     accessor = Random.Range(0, quoteList.Count - 1);
                 }
+
                 file.Close();
+
+                bible = (accessor < bibleEntries.quoteListCthulu.Count) ? LevelManager.Player.cthulu : LevelManager.Player.sobek;
                 return quoteList[accessor];
             } else {
+                bible = LevelManager.Player.sobek;
                 return null;
             }
         }
