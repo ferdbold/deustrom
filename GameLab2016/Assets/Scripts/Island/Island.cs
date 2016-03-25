@@ -66,6 +66,7 @@ namespace Simoncouche.Islands {
         private void Start() {
             if (_collider != null) _collider.isTrigger = true;
             StartCoroutine("BrokenCheck");
+            StartCoroutine(CheckRemnantIslands());
         }
 
         private void OnDestroy() {
@@ -76,6 +77,20 @@ namespace Simoncouche.Islands {
             while (true) {
                 yield return new WaitForSeconds(1f);
                 GameManager.islandManager.CheckIslandBroken(this);
+            }
+        }
+
+        private IEnumerator CheckRemnantIslands() {
+            while (true) {
+                yield return new WaitForSeconds(1f);
+                if (transform.parent != null && transform.parent.tag == "Player") {
+                    PlayerGrab pg = transform.parent.GetComponent<PlayerGrab>();
+                    if (pg.grabbedBody == null) {
+                        transform.parent = GameManager.islandManager.GetIslandSubFolder();
+                        gravityBody.ActivateGravityBody();
+                        Debug.Log("Bitch no");
+                    }
+                } 
             }
         }
 

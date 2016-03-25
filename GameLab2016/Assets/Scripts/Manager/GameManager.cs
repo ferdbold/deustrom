@@ -254,6 +254,8 @@ public class GameManager : MonoBehaviour {
         SceneManager.UnloadScene(SCENE_CUTSCENE);
     }
 
+    
+
     /// <summary>
     /// Event called when the scene is loaded
     /// </summary>
@@ -263,7 +265,7 @@ public class GameManager : MonoBehaviour {
         switch (scene) {
             case Scene.Menu:
                 audioManager.ToggleAmbiantSounds(false);
-                audioManager.PlayMusic(MusicSound.Choice.menu);
+                if(!audioManager.IsMenuPlaying())audioManager.PlayMusic(MusicSound.Choice.menu);
                 break;
 
             case Scene.PlayLevel:
@@ -374,6 +376,7 @@ public class GameManager : MonoBehaviour {
         ChangePauseStatus(true);
         GameManager.audioManager.ToggleGameplaySounds(false);
         GameManager.audioManager.ToggleAmbiantSounds(false);
+        GameManager.audioManager.ToggleLowMusicVolume(true);
 
         this.Paused.Invoke();
     }
@@ -385,6 +388,7 @@ public class GameManager : MonoBehaviour {
         ChangePauseStatus(false);
         GameManager.audioManager.ToggleGameplaySounds(true);
         GameManager.audioManager.ToggleAmbiantSounds(true);
+        GameManager.audioManager.ToggleLowMusicVolume(false);
 
         this.Unpaused.Invoke();
     }

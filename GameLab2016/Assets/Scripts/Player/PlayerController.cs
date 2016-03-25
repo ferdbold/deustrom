@@ -148,7 +148,12 @@ namespace Simoncouche.Controller {
             //No need to check for null since we do it in Awake
             _hookThrower.SetupInput(isPlayerOne);
             _playerGrab.SetupInput(isPlayerOne);
+
+
         }
+
+
+
 
         void Update() {
             _TimeSinceLastBump += Time.deltaTime;

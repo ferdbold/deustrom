@@ -67,6 +67,7 @@ namespace Simoncouche.Islands {
         }
 
 
+
         /// <summary> Called when an island is created. Add it's reference to the island chunk list  </summary>
         /// <param name="ic">created island chunk</param>
         public void CreatedIslandChunk(IslandChunk chunk) {

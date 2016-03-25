@@ -3783,7 +3783,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: ARTISTE TECHNIQUE
+  m_Text: ARTISTE FX/ENVIRO.
 --- !u!114 &11478740
 MonoBehaviour:
   m_ObjectHideFlags: 1

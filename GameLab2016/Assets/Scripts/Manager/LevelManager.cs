@@ -220,7 +220,6 @@ public class LevelManager {
     #region Used for callback
     private void OnMatchEndCthulu() {
         OnGameEnd(Player.cthulu);
-
     }
 
     private void OnMatchEndSobek() {
@@ -234,6 +233,13 @@ public class LevelManager {
     /// <param name="winner"></param>
     private void OnGameEnd(Player winner) {
         GameManager.Instance.lastWinner = winner;
+        GameManager.Instance.StartCoroutine(startEndingSoundAfterTime(0.05f, winner));
+    }
+
+    IEnumerator startEndingSoundAfterTime(float time, Player winner) {
+        yield return new WaitForSeconds(time);
+        if (winner == Player.sobek) GameManager.audioManager.PlayAudioClipNonMusic(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.winInGame);
+        else GameManager.audioManager.PlayAudioClipNonMusic(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.winInGame);
     }
 
     #endregion

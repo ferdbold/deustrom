@@ -537,7 +537,7 @@ namespace Simoncouche.Controller {
             foreach (PlayerGrab pg in _allPlayerGrabs) {
                 //Debug.Log("checking if " + pg.name + " is grabbing " + bodyToMerge + "      he's grabbing " + pg.grabbedBody);
                 if (pg.grabbedBody == bodyToMerge) {
-                    Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " with regrab delay of " + regrabDelay);
+                    //Debug.Log(pg.name + " ungrabbed " + bodyToMerge.name + " with regrab delay of " + regrabDelay);
                     pg.Release();
                     if (regrab) pg.StartRegrabCoroutine(bodyToMerge, regrabDelay);
                 }
