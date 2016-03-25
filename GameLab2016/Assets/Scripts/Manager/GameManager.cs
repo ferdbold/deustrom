@@ -143,8 +143,8 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.R)) {
-            if(_currentScene != Scene.BibleWriter)SwitchScene(Scene.Menu);
+        if (Input.GetKeyDown(KeyCode.F9)) {
+            GameManager.levelManager.HardReset();
         }
 
 		if (Input.GetButtonDown("Start")) {
@@ -410,6 +410,16 @@ public class GameManager : MonoBehaviour {
                 else if (ic.color == IslandUtils.color.blue) levelManager.AddScore(LevelManager.Player.cthulu, 1, ic.transform.position);
             }
 
+        }
+    }
+
+    public IEnumerator HardResetGivePoint(int cthuluScore, int sobekScore) {
+        yield return new WaitForSeconds(0.5f);
+        for (int i = 0; i < sobekScore; i++) {
+            if (GameManager.uiManager != null) GameManager.uiManager.AddPoint(LevelManager.Player.sobek, Vector3.zero);
+        }
+        for (int i = 0; i < cthuluScore; i++) {
+            if (GameManager.uiManager != null) GameManager.uiManager.AddPoint(LevelManager.Player.cthulu, Vector3.zero);
         }
     }
 }
