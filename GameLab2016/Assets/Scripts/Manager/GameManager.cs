@@ -402,6 +402,8 @@ public class GameManager : MonoBehaviour {
         GameManager.audioManager.ToggleGameplaySounds(true);
         GameManager.audioManager.ToggleAmbiantSounds(true);
         GameManager.audioManager.ToggleLowMusicVolume(false);
+        GameManager.uiManager.OnTutoComplete();
+
         this.Unpaused.Invoke();
         isPausedByTutorial = false;
     }

@@ -53,6 +53,8 @@ public class UIManager : MonoBehaviour {
     private Image _winSeal;
     private Text _promptText;
     private Text _miniPromptText;
+    private CanvasGroup _round1Controls;
+    private CanvasGroup _round2Controls;
 
     // METHODS
 
@@ -96,6 +98,9 @@ public class UIManager : MonoBehaviour {
         _promptText = GameObject.Find("UI/PromptText").GetComponent<Text>();
         _miniPromptText = GameObject.Find("UI/MiniPromptText").GetComponent<Text>();
 
+        _round1Controls = GameObject.Find("UI/ControlsHelp/Round 1").GetComponent<CanvasGroup>();
+        _round2Controls = GameObject.Find("UI/ControlsHelp/Round 2").GetComponent<CanvasGroup>();
+
         this.RoundEndAnimationCompleted = new UnityEvent();
 
         RefreshWins();
@@ -112,7 +117,9 @@ public class UIManager : MonoBehaviour {
         _seal.sprite = _roundSeals[GameManager.levelManager.currentRound];
 
         // Event listeners
+
         GameManager.levelManager.MatchEnd.AddListener(OnMatchEnd);
+
         GameManager.Instance.Paused.AddListener(OnPause);
         GameManager.Instance.Unpaused.AddListener(OnUnpause);
     }
@@ -190,6 +197,16 @@ public class UIManager : MonoBehaviour {
 		if (_pauseWidget != null) {
 			_pauseWidget.enabled = false;
 		}
+    }
+
+    public void OnTutoComplete() {
+        if (GameManager.levelManager.currentRound == 0) {
+            _round1Controls.alpha = 1;
+            _round1Controls.DOFade(0f, 5f).SetDelay(7f);
+        } else if (GameManager.levelManager.currentRound == 1) {
+            _round2Controls.alpha = 1;
+            _round2Controls.DOFade(0f, 5f).SetDelay(7f);
+        }
     }
 
     private void OnOrbAnimComplete(LevelManager.Player player, Image orb) {
