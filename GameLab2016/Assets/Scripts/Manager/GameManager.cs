@@ -448,4 +448,9 @@ public class GameManager : MonoBehaviour {
             if (GameManager.uiManager != null) GameManager.uiManager.AddPoint(LevelManager.Player.cthulu, Vector3.zero);
         }
     }
+
+    public IEnumerator FUCKINGSETUP() {
+        yield return new WaitForSeconds(0.5f);
+        GameManager.uiManager.RoundEndAnimationCompleted.AddListener(GameManager.levelManager.OnRoundEndAnimationCompleted);
+    }
 }

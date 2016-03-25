@@ -168,7 +168,7 @@ public class LevelManager {
 
 		this.matchEnded = false;
 
-        GameManager.uiManager.RoundEndAnimationCompleted.AddListener(OnRoundEndAnimationCompleted);
+        GameManager.Instance.StartCoroutine(GameManager.Instance.FUCKINGSETUP());
 
         //GameManager.Instance.StartCoroutine(WaitTimeUntilPlayerCanPlay(GameManager.Instance.timeUntilControllersAreEnabled));
     }
@@ -220,7 +220,7 @@ public class LevelManager {
         }
     }
 
-    private void OnRoundEndAnimationCompleted() {
+    public void OnRoundEndAnimationCompleted() {
         Debug.Log("Round end animation completed");
         _waitingForMatchEndInput = true;
     }
