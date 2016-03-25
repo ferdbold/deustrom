@@ -66,6 +66,7 @@ public class TutorialUI : MonoBehaviour {
         }
 
         GameManager.Instance.UnPauseFromTutorial();
+
         video.Stop();
         isCompleted = true;
 
