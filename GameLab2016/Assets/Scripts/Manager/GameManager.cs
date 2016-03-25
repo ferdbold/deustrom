@@ -350,8 +350,7 @@ public class GameManager : MonoBehaviour {
     #region Tutorial
 
     public void StartVideoTutorial(TutorialUI.TutoChoice choice) {
-        GameManager.uiManager.SetupTutoWidget();
-        GameManager.uiManager._tutoWidget.StartTuto(choice);
+        UIManager.SetupTutoWidget().StartTuto(choice);
     }
 
     #endregion
@@ -409,7 +408,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public void PauseFromTutorial() {
-        ChangePauseStatus(false);
+        ChangePauseStatus(true);
         GameManager.audioManager.ToggleGameplaySounds(true);
         GameManager.audioManager.ToggleAmbiantSounds(true);
         GameManager.audioManager.ToggleLowMusicVolume(false);

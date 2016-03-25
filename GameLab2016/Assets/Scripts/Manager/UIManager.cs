@@ -58,8 +58,8 @@ public class UIManager : MonoBehaviour {
 
     // METHODS
 
-    public void SetupTutoWidget() {
-        _tutoWidget = GameObject.Find("UI/Tutorial").GetComponent<TutorialUI>();
+    public static TutorialUI SetupTutoWidget() {
+        return GameObject.Find("UI/Tutorial").GetComponent<TutorialUI>();
     }
 
     public void Setup() {
