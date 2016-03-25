@@ -34,7 +34,7 @@ public class TutorialUI : MonoBehaviour {
                 break;
 
             case TutoChoice.two:
-                tuto2.gameObject.SetActive(false);
+                tuto2.gameObject.SetActive(true);
                 StartCoroutine(PlayTuto(tuto2));
                 break;
         }

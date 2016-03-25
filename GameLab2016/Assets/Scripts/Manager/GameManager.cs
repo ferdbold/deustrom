@@ -132,7 +132,7 @@ public class GameManager : MonoBehaviour {
             if (GameManager.levelManager.sobekMatchWon >= _matchToWin || GameManager.levelManager.cthuluMatchWon >= _matchToWin) {
                 GameManager.Instance.SwitchScene(
                     GameManager.Scene.BibleWriter, 
-                    (lastWinner == LevelManager.Player.sobek) ? CutsceneManager.Cutscene.Sobek_WinMatch : CutsceneManager.Cutscene.Cthulu_WinMatch
+                    (lastWinner == LevelManager.Player.sobek) ? CutsceneManager.Cutscene.Sobek_WinGame : CutsceneManager.Cutscene.Cthulu_WinGame
                 );
             } else {
                 GameManager.Instance.SwitchScene(
