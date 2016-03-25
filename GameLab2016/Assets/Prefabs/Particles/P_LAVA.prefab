@@ -405,7 +405,7 @@ ParticleSystem:
     serializedVersion: 2
     m_Type: 0
     rate:
-      scalar: 50
+      scalar: 65
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1547,19 +1547,8 @@ ParticleSystem:
     serializedVersion: 2
     enabled: 1
     startLifetime:
-      scalar: 3.47
+      scalar: 5
       maxCurve:
-        serializedVersion: 2
-        m_Curve:
-        - time: 0
-          value: 0.7752162
-          inSlope: 0
-          outSlope: 0
-          tangentMode: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      minCurve:
         serializedVersion: 2
         m_Curve:
         - time: 0
@@ -1569,7 +1558,18 @@ ParticleSystem:
           tangentMode: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
-        m_RotationOrder: 4
+        m_RotationOrder: 0
+      minCurve:
+        serializedVersion: 2
+        m_Curve:
+        - time: 0
+          value: 0.8
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 0
       minMaxState: 3
     startSpeed:
       scalar: 16.7
@@ -1877,7 +1877,7 @@ ParticleSystem:
     cnt1: 30
     cnt2: 30
     cnt3: 30
-    cntmax0: 130
+    cntmax0: 185
     cntmax1: 30
     cntmax2: 30
     cntmax3: 30

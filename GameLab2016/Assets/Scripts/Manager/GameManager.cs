@@ -90,6 +90,9 @@ public class GameManager : MonoBehaviour {
     #region Utils Variables
     public bool gameStarted { get; private set; }
     public bool isPaused { get; private set; }
+    public bool isPausedByTutorial { get; private set; }
+    
+
 
     private FadeUI fadeUI;
     #endregion
@@ -102,6 +105,7 @@ public class GameManager : MonoBehaviour {
     #endregion
 
     void Awake() {
+        this.isPausedByTutorial = false;
         this.gameStarted = false;
 
         if (Instance == null) {
@@ -148,7 +152,7 @@ public class GameManager : MonoBehaviour {
         }
 
 		if (Input.GetButtonDown("Start")) {
-			OnStartButton();
+			if(_currentScene == Scene.PlayLevel) OnStartButton();
 		}
 
         #if UNITY_EDITOR
@@ -357,14 +361,14 @@ public class GameManager : MonoBehaviour {
 	private void OnStartButton() {
 		Debug.Log ("Start");
 
-		if (_currentScene == Scene.PlayLevel) {
-			if (this.isPaused) {
+		if (_currentScene == Scene.PlayLevel && gameStarted) {
+            if (this.isPaused && !this.isPausedByTutorial) {
                 GameManager.audioManager.ToggleGameplaySounds(true);
                 GameManager.audioManager.ToggleAmbiantSounds(true);
                 UnPause();
-			} else {
-				Pause();
-			}
+            } else {
+                Pause();
+            }
 		}
 	}
 
@@ -391,6 +395,24 @@ public class GameManager : MonoBehaviour {
         GameManager.audioManager.ToggleLowMusicVolume(false);
 
         this.Unpaused.Invoke();
+    }
+
+    public void UnPauseFromTutorial() {
+        ChangePauseStatus(false);
+        GameManager.audioManager.ToggleGameplaySounds(true);
+        GameManager.audioManager.ToggleAmbiantSounds(true);
+        GameManager.audioManager.ToggleLowMusicVolume(false);
+        this.Unpaused.Invoke();
+        isPausedByTutorial = false;
+    }
+
+    public void PauseFromTutorial() {
+        ChangePauseStatus(false);
+        GameManager.audioManager.ToggleGameplaySounds(true);
+        GameManager.audioManager.ToggleAmbiantSounds(true);
+        GameManager.audioManager.ToggleLowMusicVolume(false);
+        this.Unpaused.Invoke();
+        isPausedByTutorial = true;
     }
 
     private void ChangePauseStatus(bool pause) {
