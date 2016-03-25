@@ -120,7 +120,7 @@ MonoBehaviour:
   imageTimeStaying: 5
   Base_Loading_Cutscene: {fileID: 15200000, guid: a8a2a2c5de6fe7945a4367cd675d47df,
     type: 3}
-  Intro_Cutscene: {fileID: 15200000, guid: a0b5a75b165364744a8583214ec7aecd, type: 3}
+  Intro_Cutscene: {fileID: 15200000, guid: abb52ea7572809043b9f069659dded40, type: 3}
   Sobek_WinMatch_Cutscene: {fileID: 15200000, guid: 48d35f0018187384ea45f0ab59ae69bd,
     type: 3}
   Cthulu_WinMatch_Cutscene: {fileID: 15200000, guid: 10a350376c15022409e76ff64e982204,
