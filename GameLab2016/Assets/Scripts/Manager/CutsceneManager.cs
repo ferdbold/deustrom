@@ -87,6 +87,7 @@ public class CutsceneManager : MonoBehaviour {
 
             case Cutscene.Base_Loading:
                 movie = Base_Loading_Cutscene;
+                movie.loop = true;
                 break;
         }
         Video.material.mainTexture = movie;
