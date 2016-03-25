@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour {
             GameManager.levelManager.HardReset();
         }
 
-		if (Input.GetButtonDown("Start")) {
+        if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.Escape)) {
 			if(_currentScene == Scene.PlayLevel) OnStartButton();
 		}
 

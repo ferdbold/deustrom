@@ -91,6 +91,7 @@ public class UIManager : MonoBehaviour {
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Sobek").GetComponent<IslandCountWidget>());
         _islandCountWidgets.Add(GameObject.Find("UI/Islands/Cthulhu").GetComponent<IslandCountWidget>());
 
+        _tutoWidget = UIManager.SetupTutoWidget();
         _pauseWidget = GameObject.Find("UI/Pause").GetComponent<PauseWidget>();
 
         _seal = GameObject.Find("UI/Seal").GetComponent<Image>();
@@ -186,7 +187,7 @@ public class UIManager : MonoBehaviour {
     }
 
     private void OnPause() {
-		if (_pauseWidget != null && _tutoWidget != null) {
+        if (_pauseWidget != null && _tutoWidget != null) {
 			if (_tutoWidget.isCompleted) {
 				_pauseWidget.enabled = true;
 			}
