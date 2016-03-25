@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using Simoncouche.Controller;
 
 namespace Simoncouche.Islands {
     public class Rigidbody2DEvent : UnityEvent<Rigidbody2D> {}
@@ -111,8 +112,21 @@ namespace Simoncouche.Islands {
 
         void Start() {
             if (color != IslandUtils.color.volcano) _randomizeIslandVisual.SetIslandColorVisual(color);
+            StartCoroutine(CheckRemnantIslands());
         }
 
+        private IEnumerator CheckRemnantIslands() {
+            while (true) {
+                yield return new WaitForSeconds(1f);
+                if (transform.parent != null && transform.parent.tag == "Player") {
+                    PlayerGrab pg = transform.parent.GetComponent<PlayerGrab>();
+                    if (pg.grabbedBody == null) {
+                        transform.parent = GameManager.islandManager.GetIslandSubFolder();
+                        gravityBody.ActivateGravityBody();
+                    }
+                } 
+            }
+        }
 
         #region Connection
 
