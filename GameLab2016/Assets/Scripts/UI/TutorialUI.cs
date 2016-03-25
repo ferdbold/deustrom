@@ -59,13 +59,13 @@ public class TutorialUI : MonoBehaviour {
         MovieTexture video = (MovieTexture)movie.mainTexture;
         video.loop = true;
         video.Play();
-        GameManager.Instance.Pause();
+        GameManager.Instance.PauseFromTutorial();
 
         while (!skip) {
             yield return new WaitForRealSeconds(0.05f);
         }
 
-        GameManager.Instance.UnPause();
+        GameManager.Instance.UnPauseFromTutorial();
         video.Stop();
         isCompleted = true;
 
