@@ -90,6 +90,9 @@ public class GameManager : MonoBehaviour {
     #region Utils Variables
     public bool gameStarted { get; private set; }
     public bool isPaused { get; private set; }
+    public bool isPausedByTutorial { get; private set; }
+    
+
 
     private FadeUI fadeUI;
     #endregion
@@ -102,6 +105,7 @@ public class GameManager : MonoBehaviour {
     #endregion
 
     void Awake() {
+        this.isPausedByTutorial = false;
         this.gameStarted = false;
 
         if (Instance == null) {
@@ -143,12 +147,12 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.R)) {
-            if(_currentScene != Scene.BibleWriter)SwitchScene(Scene.Menu);
+        if (Input.GetKeyDown(KeyCode.F9)) {
+            GameManager.levelManager.HardReset();
         }
 
 		if (Input.GetButtonDown("Start")) {
-			OnStartButton();
+			if(_currentScene == Scene.PlayLevel) OnStartButton();
 		}
 
         #if UNITY_EDITOR
@@ -357,14 +361,14 @@ public class GameManager : MonoBehaviour {
 	private void OnStartButton() {
 		Debug.Log ("Start");
 
-		if (_currentScene == Scene.PlayLevel) {
-			if (this.isPaused) {
+		if (_currentScene == Scene.PlayLevel && gameStarted) {
+            if (this.isPaused && !this.isPausedByTutorial) {
                 GameManager.audioManager.ToggleGameplaySounds(true);
                 GameManager.audioManager.ToggleAmbiantSounds(true);
                 UnPause();
-			} else {
-				Pause();
-			}
+            } else {
+                Pause();
+            }
 		}
 	}
 
@@ -393,6 +397,24 @@ public class GameManager : MonoBehaviour {
         this.Unpaused.Invoke();
     }
 
+    public void UnPauseFromTutorial() {
+        ChangePauseStatus(false);
+        GameManager.audioManager.ToggleGameplaySounds(true);
+        GameManager.audioManager.ToggleAmbiantSounds(true);
+        GameManager.audioManager.ToggleLowMusicVolume(false);
+        this.Unpaused.Invoke();
+        isPausedByTutorial = false;
+    }
+
+    public void PauseFromTutorial() {
+        ChangePauseStatus(false);
+        GameManager.audioManager.ToggleGameplaySounds(true);
+        GameManager.audioManager.ToggleAmbiantSounds(true);
+        GameManager.audioManager.ToggleLowMusicVolume(false);
+        this.Unpaused.Invoke();
+        isPausedByTutorial = true;
+    }
+
     private void ChangePauseStatus(bool pause) {
         isPaused = pause;
         Time.timeScale = isPaused ? 0 : 1;
@@ -414,6 +436,16 @@ public class GameManager : MonoBehaviour {
                 else if (ic.color == IslandUtils.color.blue) levelManager.AddScore(LevelManager.Player.cthulu, 1, ic.transform.position);
             }
 
+        }
+    }
+
+    public IEnumerator HardResetGivePoint(int cthuluScore, int sobekScore) {
+        yield return new WaitForSeconds(0.5f);
+        for (int i = 0; i < sobekScore; i++) {
+            if (GameManager.uiManager != null) GameManager.uiManager.AddPoint(LevelManager.Player.sobek, Vector3.zero);
+        }
+        for (int i = 0; i < cthuluScore; i++) {
+            if (GameManager.uiManager != null) GameManager.uiManager.AddPoint(LevelManager.Player.cthulu, Vector3.zero);
         }
     }
 }

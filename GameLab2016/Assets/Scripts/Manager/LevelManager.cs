@@ -36,6 +36,26 @@ public class LevelManager {
 	public bool matchEnded { get; private set; }
     #endregion
 
+    #region Hard Reset
+
+    private bool hardReset;
+
+    private int cthuluScoreHardReset = 0;
+    private int sobekScoreHardReset = 0;
+
+    public void HardReset() {
+        hardReset = true;
+        cthuluScoreHardReset = cthuluScore;
+        sobekScoreHardReset = sobekScore;
+        GameManager.Instance.SwitchScene(
+            GameManager.Scene.PlayLevel,
+            CutsceneManager.Cutscene.Base_Loading,
+            dontClose: true
+        );
+    }
+
+    #endregion
+
     #region Events
 
     /// <summary>
@@ -54,6 +74,7 @@ public class LevelManager {
     #region Setup
 
     public LevelManager(int numberOfMatchToWin) {
+        hardReset = false;
         matchToWin = numberOfMatchToWin;
         Setup();
     }
@@ -62,10 +83,18 @@ public class LevelManager {
         this.MatchEnd = new PlayerEvent();
 
         SetupPlayers();
-        sobekScore = 0;
-        cthuluScore = 0;
         OnMatchStart();
         GameManager.Instance.disableScoring = false;
+        if (!hardReset) {
+            sobekScore = 0;
+            cthuluScore = 0;
+        } else {
+            Debug.Log("test");
+            sobekScore = sobekScoreHardReset;
+            cthuluScore = cthuluScoreHardReset;
+            hardReset = false;
+            GameManager.Instance.StartCoroutine(GameManager.Instance.HardResetGivePoint(cthuluScore, sobekScore));
+        }
     }
 
     /// <summary> Setup ref to players </summary>
