@@ -28,17 +28,30 @@ public class AudioManager : MonoBehaviour {
     [SerializeField]
     private MusicSound _music;
 
-    private AudioSource source;
+    private AudioSource _sourceNonMusic;
+
+    private AudioSource _sourceMusic;
 
     private void Awake() {
-        source = GetComponentInChildren<AudioSource>();
-        audioMixer = source.outputAudioMixerGroup.audioMixer;
+        AudioSource[] audioSources = GetComponentsInChildren<AudioSource>();
+        _sourceNonMusic = audioSources[0];
+        _sourceMusic = audioSources[1];
+        audioMixer = _sourceNonMusic.outputAudioMixerGroup.audioMixer;
         AmbiantSounds = transform.Find("Ambiant").gameObject;
     }
 
-    public void PlayAudioClip(AudioClip clip) {
-        source.clip = clip;
-        source.Play();
+    public bool IsMenuPlaying() {
+        return _sourceMusic.clip == _music.menuMusic;
+    }
+
+    public void PlayAudioClipMusic(AudioClip clip) {
+        _sourceMusic.clip = clip;
+        _sourceMusic.Play();
+    }
+
+    public void PlayAudioClipNonMusic(AudioClip clip) {
+        _sourceNonMusic.clip = clip;
+        _sourceNonMusic.Play();
     }
 
     public void ToggleAmbiantSounds(bool active) {
@@ -53,28 +66,35 @@ public class AudioManager : MonoBehaviour {
             this.audioMixer.SetFloat("GameplayVolume", 0.0f);
         }
     }
+
+    public void ToggleLowMusicVolume(bool isLow) {
+        if (isLow) this.audioMixer.SetFloat("MusicVolume", -7.5f);
+        else this.audioMixer.SetFloat("MusicVolume", 0.0f);
+    }
     
+
+
     public void PlayMusic(MusicSound.Choice music) {
         AudioClip choice = null;
         switch (music) {
             case MusicSound.Choice.menu:
                 choice = _music.menuMusic;
-                source.loop = true;
+                _sourceMusic.loop = true;
                 break;
 
             case MusicSound.Choice.play:
                 choice = _music.playMusic;
-                source.loop = true;
+                _sourceMusic.loop = true;
                 break;
 
             case MusicSound.Choice.endGame:
                 choice = _music.endGameMusic;
                 this.ToggleAmbiantSounds(false);
-                source.loop = false;
+                _sourceMusic.loop = false;
                 break;
         }
-        source.clip = choice;
-        source.Play();
+        _sourceMusic.clip = choice;
+        _sourceMusic.Play();
     }
 }
 
@@ -162,6 +182,16 @@ public class SobekSpecificSound : SoundClass {
     [SerializeField]
     private List<AudioClip> _slowChant;
     public AudioClip slowChant { get { return GetRandom(_slowChant); } }
+
+
+    [SerializeField]
+    private List<AudioClip> _winInGame;
+    public AudioClip winInGame { get { return GetRandom(_winInGame); } }
+
+    [SerializeField]
+    private List<AudioClip> _winScreen;
+    public AudioClip winScreen { get { return GetRandom(_winScreen); } }
+
 }
 
 [System.Serializable]
@@ -223,6 +253,14 @@ public class CthuluSpecificSound : SoundClass {
     [SerializeField]
     private List<AudioClip> _slowChant;
     public AudioClip slowChant { get { return GetRandom(_slowChant); } }
+
+    [SerializeField]
+    private List<AudioClip> _winInGame;
+    public AudioClip winInGame { get { return GetRandom(_winInGame); } }
+
+    [SerializeField]
+    private List<AudioClip> _winScreen;
+    public AudioClip winScreen { get { return GetRandom(_winScreen); } }
 }
 
 [System.Serializable]

@@ -78,10 +78,12 @@ public class CutsceneManager : MonoBehaviour {
                 break;
 
             case Cutscene.Sobek_WinGame:
+                GameManager.audioManager.PlayAudioClipMusic(GameManager.audioManager.characterSpecificSound.sobekSpecificSound.winInGame);
                 movie = Sobek_WinGame_Cutscene;
                 break;
 
             case Cutscene.Cthulu_WinGame:
+                GameManager.audioManager.PlayAudioClipMusic(GameManager.audioManager.characterSpecificSound.cthuluSpecificSound.winInGame);
                 movie = Cthulu_WinGame_Cutscene;
                 break;
 
@@ -91,7 +93,8 @@ public class CutsceneManager : MonoBehaviour {
         }
         Video.material.mainTexture = movie;
         movie.Play();
-        GameManager.audioManager.PlayAudioClip(movie.audioClip);
+        if(scene!=Cutscene.Cthulu_WinMatch 
+            || scene!=Cutscene.Sobek_WinMatch) GameManager.audioManager.PlayAudioClipMusic(movie.audioClip);
         StartCoroutine(WaitVideoEndToFade(movie));
     }
 
